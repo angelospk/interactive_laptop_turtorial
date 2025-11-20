@@ -315,11 +315,11 @@
 				<div class="space-y-6">
 					<div class="flex items-center gap-4">
 						<Sun class="h-5 w-5 text-slate-400" />
-						<Slider bind:value={settings.brightness} max={100} step={1} class="flex-1" />
+						<Slider bind:value={settings.brightness} max={100} step={1} class="flex-1" type="multiple" />
 					</div>
 					<div class="flex items-center gap-4">
 						<Volume2 class="h-5 w-5 text-slate-400" />
-						<Slider bind:value={settings.volume} max={100} step={1} class="flex-1" />
+						<Slider bind:value={settings.volume} max={100} step={1} class="flex-1" type="multiple" />
 						<span class="w-8 text-right text-sm text-slate-400">{settings.volume[0]}%</span>
 					</div>
 				</div>

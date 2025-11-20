@@ -8,7 +8,7 @@
 
 	function toggleLanguage() {
 		const currentPath = $page.url.pathname;
-		let newPath: any = currentPath;
+		let newPath: string;
 
 		if (currentLang === 'el') {
 			// Switch to English (remove /el)
@@ -19,10 +19,13 @@
 				newPath = '/el';
 			} else if (!currentPath.startsWith('/el')) {
 				newPath = '/el' + currentPath;
+			} else {
+				newPath = currentPath;
 			}
 		}
 
-		goto(newPath);
+		// Use window.location for full page reload to apply language change
+		window.location.href = newPath;
 	}
 
 	let displayText = $derived(currentLang === 'el' ? 'English' : 'Ελληνικά');
