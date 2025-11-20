@@ -1,0 +1,11 @@
+# Local SQLite Database
+local.db
+local.db-shm
+local.db-wal
+
+# Drizzle migrations
+drizzle/
+
+# Environment variables
+.env
+.env.local
