@@ -17,6 +17,7 @@
 		onMinimize,
 		onMaximize,
 		onClose,
+		onFocus,
 		children,
 		class: className
 	} = $props<{
@@ -32,6 +33,7 @@
 		onMinimize: () => void;
 		onMaximize: () => void;
 		onClose: () => void;
+		onFocus?: () => void;
 		children?: Snippet;
 		class?: string;
 	}>();
@@ -42,6 +44,7 @@
 	let dragOffset = { x: 0, y: 0 };
 
 	function startDrag(e: MouseEvent) {
+		onFocus?.();
 		if (isMaximized) return;
 		isDragging = true;
 		// Calculate offset relative to the window's top-left corner
@@ -72,7 +75,7 @@
 {#if isOpen && !isMinimized}
 	<div
 		class={cn(
-			"absolute flex flex-col overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-100",
+			'absolute flex flex-col overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-100',
 			className
 		)}
 		style="
@@ -83,6 +86,8 @@
 			z-index: {isMaximized ? 10 : 1};
 		"
 		onclick={(e) => e.stopPropagation()}
+		onmousedown={() => onFocus?.()}
+		role="application"
 	>
 		<!-- Title Bar -->
 		<div
@@ -101,7 +106,10 @@
 					variant="ghost"
 					size="icon"
 					class="h-8 w-8 hover:bg-slate-200"
-					onclick={(e) => { e.stopPropagation(); onMinimize(); }}
+					onclick={(e) => {
+						e.stopPropagation();
+						onMinimize();
+					}}
 				>
 					<Minus class="h-4 w-4" />
 				</Button>
@@ -109,7 +117,10 @@
 					variant="ghost"
 					size="icon"
 					class="h-8 w-8 hover:bg-slate-200"
-					onclick={(e) => { e.stopPropagation(); onMaximize(); }}
+					onclick={(e) => {
+						e.stopPropagation();
+						onMaximize();
+					}}
 				>
 					<Square class="h-4 w-4" />
 				</Button>
@@ -117,7 +128,10 @@
 					variant="destructive"
 					size="icon"
 					class="h-8 w-8"
-					onclick={(e) => { e.stopPropagation(); onClose(); }}
+					onclick={(e) => {
+						e.stopPropagation();
+						onClose();
+					}}
 				>
 					<X class="h-4 w-4" />
 				</Button>
@@ -125,7 +139,7 @@
 		</div>
 
 		<!-- Content -->
-		<div class="flex-1 overflow-hidden bg-white relative">
+		<div class="relative flex-1 overflow-hidden bg-white">
 			{@render children?.()}
 		</div>
 	</div>

@@ -7,6 +7,8 @@
 	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 
+	import { untrack } from 'svelte';
+
 	// Import Apps
 	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';
 	import BrowserApp from '$lib/components/apps/BrowserApp.svelte';
@@ -16,15 +18,7 @@
 	import SettingsApp from '$lib/components/apps/SettingsApp.svelte';
 
 	// Icons
-	import {
-		Folder,
-		Globe,
-		Mail,
-		Grid3X3,
-		Download,
-		Settings,
-		FileText
-	} from 'lucide-svelte';
+	import { Folder, Globe, Mail, Grid3X3, Download, Settings, FileText } from 'lucide-svelte';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
@@ -33,7 +27,7 @@
 	}>();
 
 	// Parse config
-	const config = lesson.config as any || {};
+	const config = (lesson.config as any) || {};
 	const goal = config.goal || '';
 
 	// Define available apps
@@ -48,14 +42,18 @@
 	];
 
 	// State
-	let openApps = $state<{ id: string; appId: string; minimized: boolean; maximized: boolean }[]>([]);
+	let openApps = $state<{ id: string; appId: string; minimized: boolean; maximized: boolean }[]>(
+		[]
+	);
 	let startMenuOpen = $state(false);
 	let completed = $state(false);
 
 	// Initialize from config
 	$effect(() => {
 		if (config.initialApps) {
-			config.initialApps.forEach((appId: string) => openApp(appId));
+			untrack(() => {
+				config.initialApps.forEach((appId: string) => openApp(appId));
+			});
 		}
 	});
 
@@ -65,7 +63,7 @@
 		if (existing) {
 			if (existing.minimized) existing.minimized = false;
 			// Bring to front (remove and push)
-			openApps = openApps.filter(a => a !== existing);
+			openApps = openApps.filter((a) => a !== existing);
 			openApps.push(existing);
 		} else {
 			openApps.push({
@@ -80,7 +78,7 @@
 	}
 
 	function closeApp(instanceId: string) {
-		const app = openApps.find(a => a.id === instanceId);
+		const app = openApps.find((a) => a.id === instanceId);
 		if (app) {
 			checkGoal('close-app', { appId: app.appId });
 			openApps = openApps.filter((a) => a.id !== instanceId);
@@ -109,57 +107,82 @@
 		}
 	}
 
+	function bringToFront(instanceId: string) {
+		const index = openApps.findIndex((a) => a.id === instanceId);
+		if (index !== -1 && index !== openApps.length - 1) {
+			const app = openApps[index];
+			openApps = [...openApps.slice(0, index), ...openApps.slice(index + 1), app];
+		}
+	}
+
 	// Goal Checking Logic
 	function checkGoal(action: string, data: any = {}) {
 		if (completed) return;
 
-		// console.log('Action:', action, 'Data:', data, 'Goal:', goal);
+		try {
+			// console.log('Action:', action, 'Data:', data, 'Goal:', goal);
 
-		let success = false;
+			let success = false;
 
-		// Direct match
-		if (goal === action) success = true;
+			// Direct match
+			if (goal === action) success = true;
 
-		// Specific matches based on config
-		if (action === 'navigate' && goal === 'navigate-site' && data.url?.includes(config.targetUrl)) {
-			success = true;
-		}
-		if (action === 'report-phishing' && goal === 'identify-phishing' && data.correct) {
-			success = true;
-		}
-		if (action === 'formula-success' && goal === 'enter-formula') {
-			success = true;
-		}
-		if (action === 'install-complete' && goal === 'install-app') {
-			success = true;
-		}
-		if (action === 'connect-wifi' && goal === 'connect-wifi') {
-			success = true;
-		}
-		if (action === 'add-printer' && goal === 'add-printer') {
-			success = true;
-		}
-		if (action === 'create-folder' && goal === 'create-folder' && (!config.targetName || data.name === config.targetName)) {
-			success = true;
-		}
-		if (action === 'open-app' && goal === 'open-app' && data.appId === config.targetAppId) {
-			success = true;
-		}
-		if (action === 'open-quick-settings' && goal === 'open-quick-settings') {
-			success = true;
-		}
+			// Specific matches based on config
+			if (
+				action === 'navigate' &&
+				goal === 'navigate-site' &&
+				data.url?.includes(config.targetUrl)
+			) {
+				success = true;
+			}
+			if (action === 'report-phishing' && goal === 'identify-phishing' && data.correct) {
+				success = true;
+			}
+			if (action === 'formula-success' && goal === 'enter-formula') {
+				success = true;
+			}
+			if (action === 'install-complete' && goal === 'install-app') {
+				success = true;
+			}
+			if (action === 'connect-wifi' && goal === 'connect-wifi') {
+				success = true;
+			}
+			if (action === 'add-printer' && goal === 'add-printer') {
+				success = true;
+			}
+			if (
+				action === 'create-folder' &&
+				goal === 'create-folder' &&
+				(!config.targetName || data.name === config.targetName)
+			) {
+				success = true;
+			}
+			if (action === 'open-app' && goal === 'open-app' && data.appId === config.targetAppId) {
+				success = true;
+			}
+			if (action === 'open-quick-settings' && goal === 'open-quick-settings') {
+				success = true;
+			}
 
-		if (success) {
-			completed = true;
-			toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
-			setTimeout(() => {
-				onComplete(100);
-			}, 1500);
+			if (success) {
+				completed = true;
+				toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
+				setTimeout(() => {
+					onComplete(100);
+				}, 1500);
+			}
+		} catch (err) {
+			console.error('Error checking goal:', err);
+			toast.error('Παρουσιάστηκε σφάλμα κατά τον έλεγχο της δραστηριότητας.');
 		}
 	}
 
 	function handleAppAction(action: string, data: any) {
-		checkGoal(action, data);
+		try {
+			checkGoal(action, data);
+		} catch (err) {
+			console.error('Error handling app action:', err);
+		}
 	}
 </script>
 
@@ -179,10 +202,11 @@
 					onMinimize={() => toggleMinimize(instance.id)}
 					onMaximize={() => toggleMaximize(instance.id)}
 					onClose={() => closeApp(instance.id)}
+					onFocus={() => bringToFront(instance.id)}
 				>
 					<!-- Dynamic Component Rendering -->
 					<appDef.component
-						config={config}
+						{config}
 						onAction={handleAppAction}
 						initialFiles={config.initialFiles}
 						initialData={config.initialData}
@@ -200,6 +224,7 @@
 					onMinimize={() => toggleMinimize(instance.id)}
 					onMaximize={() => toggleMaximize(instance.id)}
 					onClose={() => closeApp(instance.id)}
+					onFocus={() => bringToFront(instance.id)}
 				>
 					<div class="flex h-full items-center justify-center bg-white">
 						<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
@@ -218,7 +243,9 @@
 
 		<!-- Taskbar -->
 		<Taskbar
-			apps={availableApps.filter(a => ['explorer', 'browser', 'email', 'settings'].includes(a.id))}
+			apps={availableApps.filter((a) =>
+				['explorer', 'browser', 'email', 'settings'].includes(a.id)
+			)}
 			openAppIds={openApps.map((a) => a.appId)}
 			onAppClick={(id) => openApp(id)}
 			onStartClick={() => (startMenuOpen = !startMenuOpen)}

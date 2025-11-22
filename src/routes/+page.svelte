@@ -25,40 +25,6 @@
 	function getProgress(moduleId: string) {
 		return getModuleProgress(moduleId, data.moduleLessonIds, data.progress);
 	}
-
-	type Module = {
-		id: string;
-		titleKey: string;
-		descriptionKey: string;
-	};
-
-	const modules: Module[] = [
-		{
-			id: 'module1',
-			titleKey: 'module1_title',
-			descriptionKey: 'module1_description'
-		},
-		{
-			id: 'module2',
-			titleKey: 'module2_title',
-			descriptionKey: 'module2_description'
-		},
-		{
-			id: 'module3',
-			titleKey: 'module3_title',
-			descriptionKey: 'module3_description'
-		},
-		{
-			id: 'module4',
-			titleKey: 'module4_title',
-			descriptionKey: 'module4_description'
-		},
-		{
-			id: 'module5',
-			titleKey: 'module5_title',
-			descriptionKey: 'module5_description'
-		}
-	];
 </script>
 
 <main class="container mx-auto p-4 md:p-8">
@@ -81,12 +47,16 @@
 	</div>
 
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-		{#each modules as module (module.id)}
+		{#each data.modules as module (module.id)}
 			{@const moduleProgress = getProgress(module.id)}
 			<Card class="transition-shadow hover:shadow-lg">
 				<CardHeader>
-					<CardTitle>{messages[module.titleKey]()}</CardTitle>
-					<CardDescription>{messages[module.descriptionKey]()}</CardDescription>
+					<CardTitle
+						>{messages[module.titleKey] ? messages[module.titleKey]() : module.id}</CardTitle
+					>
+					<CardDescription>
+						{messages[module.descriptionKey] ? messages[module.descriptionKey]() : ''}
+					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div class="mb-4">

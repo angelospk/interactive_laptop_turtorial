@@ -30,7 +30,7 @@ export const module1Lessons: NewLesson[] = [
         difficulty: 'beginner',
         orderIndex: 2,
         lessonType: 'click',
-        config: { targetCount: 10, timeLimit: 45 },
+        config: { targetCount: 10, timeLimit: 45, theme: 'balloons' },
         enabled: true,
         requiredLessonId: 'module1-lesson1'
     },
@@ -105,7 +105,7 @@ export const module1Lessons: NewLesson[] = [
         difficulty: 'intermediate',
         orderIndex: 7,
         lessonType: 'click',
-        config: { targetCount: 15, timeLimit: 60, targetSize: 'small' },
+        config: { targetCount: 15, timeLimit: 60, targetSize: 'small', theme: 'bugs' },
         enabled: true,
         requiredLessonId: 'module1-lesson6'
     },

@@ -12,9 +12,38 @@
 
 	let { lesson, onComplete, onBack }: Props = $props();
 
-	const config = lesson.config as { targetCount: number; timeLimit: number; targetSize?: string };
+	const config = lesson.config as {
+		targetCount: number;
+		timeLimit: number;
+		targetSize?: string;
+		theme?: string;
+	};
 	const targetCount = config.targetCount || 10;
 	const timeLimit = config.timeLimit || 45;
+	const theme = config.theme || 'default';
+
+	// Theme assets/styles
+	const themes: Record<string, any> = {
+		default: {
+			targetClass: 'bg-red-500 border-4 border-white rounded-full',
+			content: 'CLICK',
+			bgClass: 'bg-white/50'
+		},
+		balloons: {
+			targetClass: 'bg-transparent border-none shadow-none',
+			content: '🎈',
+			bgClass: 'bg-sky-100',
+			targetStyle: 'font-size: 60px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));'
+		},
+		bugs: {
+			targetClass: 'bg-transparent border-none shadow-none',
+			content: '🐞',
+			bgClass: 'bg-green-50',
+			targetStyle: 'font-size: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));'
+		}
+	};
+
+	let currentTheme = $derived(themes[theme] || themes.default);
 
 	let score = $state(0);
 	let successfulClicks = $state(0);
@@ -44,6 +73,9 @@
 
 	function handleTargetClick() {
 		if (!gameStarted || isComplete) return;
+
+		// Play sound effect (optional, placeholder for now)
+		// new Audio('/pop.mp3').play().catch(() => {});
 
 		successfulClicks++;
 		const timeTaken = timeLimit - timeRemaining;
@@ -85,33 +117,37 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	<div class="click-lesson">
+	<div class="click-lesson {currentTheme.bgClass} h-full rounded-lg transition-colors duration-500">
 		{#if !gameStarted}
 			<div class="start-screen">
-				<h2>Click Training</h2>
-				<p>Click on the targets as quickly as possible!</p>
+				<h2 class="mb-4 text-2xl font-bold">Click Training</h2>
+				<p class="mb-6 text-slate-600">Click on the targets as quickly as possible!</p>
 				<button class="start-button" onclick={startGame}>Start</button>
 			</div>
 		{:else if isComplete}
 			<div class="complete-screen">
-				<h2>✓ Complete!</h2>
-				<p>Clicks: {successfulClicks}/{targetCount}</p>
-				<p>Score: {score}</p>
+				<h2 class="mb-2 text-3xl font-bold text-green-600">✓ Complete!</h2>
+				<p class="mb-2 text-xl">Clicks: {successfulClicks}/{targetCount}</p>
+				<p class="text-lg text-slate-500">Score: {score}</p>
 			</div>
 		{:else}
 			<div class="game-ui">
-				<div class="hud">
-					<div>Progress: {successfulClicks}/{targetCount}</div>
-					<div>Time: {timeRemaining}s</div>
-					<div>Score: {score}</div>
+				<div
+					class="hud mx-4 mt-4 flex justify-between rounded-lg bg-white/80 p-4 shadow-sm backdrop-blur"
+				>
+					<div class="font-bold text-slate-700">Progress: {successfulClicks}/{targetCount}</div>
+					<div class="font-mono text-blue-600">Time: {timeRemaining}s</div>
+					<div class="font-bold text-green-600">Score: {score}</div>
 				</div>
-				<div class="game-area">
+				<div
+					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
+				>
 					<button
-						class="target"
-						style="left: {targetX}%; top: {targetY}%;"
+						class="target absolute flex items-center justify-center transition-all duration-100 active:scale-90 {currentTheme.targetClass}"
+						style="left: {targetX}%; top: {targetY}%; {currentTheme.targetStyle || ''}"
 						onclick={handleTargetClick}
 					>
-						CLICK
+						{currentTheme.content}
 					</button>
 				</div>
 			</div>
