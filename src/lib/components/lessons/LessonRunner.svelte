@@ -148,31 +148,53 @@
 
 	{#if mergedProgress[currentLesson.id]?.completed}
 		<div
-			class="mt-6 flex animate-in flex-col items-center justify-center gap-4 rounded-xl border-2 border-green-100 bg-green-50 p-6 duration-500 fade-in slide-in-from-bottom-4"
+			class="fixed right-0 bottom-0 left-0 z-50 flex animate-in items-center justify-between border-t border-green-200 bg-green-50 p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] duration-500 slide-in-from-bottom-full"
 		>
-			<div class="flex items-center gap-2 text-xl font-bold text-green-700">
-				<span>✓ {getMessage('lesson_completed')}</span>
-				{#if mergedProgress[currentLesson.id]?.score}
-					<span class="font-medium text-green-600"
-						>({getMessage('score')}: {mergedProgress[currentLesson.id].score})</span
-					>
-				{/if}
+			<div class="flex items-center gap-4">
+				<div
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600"
+				>
+					<span class="text-2xl">✓</span>
+				</div>
+				<div>
+					<h3 class="text-lg font-bold text-green-800">{getMessage('lesson_completed')}</h3>
+					{#if mergedProgress[currentLesson.id]?.score}
+						<p class="text-sm text-green-700">
+							{getMessage('score')}: {mergedProgress[currentLesson.id].score}
+						</p>
+					{/if}
+				</div>
 			</div>
 
-			{#if currentLessonIndex < lessons.length - 1}
+			<div class="flex items-center gap-3">
 				<Button
-					size="lg"
-					onclick={nextLesson}
-					class="gap-2 px-8 text-lg shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+					variant="ghost"
+					onclick={() => (localUpdates[currentLesson.id].completed = false)}
+					class="text-green-700 hover:bg-green-100 hover:text-green-900"
 				>
-					{getMessage('next_lesson') || 'Next Lesson'}
-					<span class="text-xl">→</span>
+					{getMessage('back') || 'Close'}
 				</Button>
-			{:else}
-				<Button size="lg" onclick={onExit} variant="outline" class="gap-2">
-					{getMessage('back_to_modules') || 'Back to Modules'}
-				</Button>
-			{/if}
+
+				{#if currentLessonIndex < lessons.length - 1}
+					<Button
+						size="lg"
+						onclick={nextLesson}
+						class="gap-2 bg-green-600 text-white shadow-md hover:bg-green-700"
+					>
+						{getMessage('next_lesson') || 'Next Lesson'}
+						<span class="text-xl">→</span>
+					</Button>
+				{:else}
+					<Button
+						size="lg"
+						onclick={onExit}
+						variant="outline"
+						class="gap-2 border-green-200 bg-white text-green-700 hover:bg-green-50"
+					>
+						{getMessage('back_to_modules') || 'Back to Modules'}
+					</Button>
+				{/if}
+			</div>
 		</div>
 	{/if}
 </div>
