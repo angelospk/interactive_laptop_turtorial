@@ -1,59 +1,83 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-	import { gameState } from '$lib/gameStore.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import LessonRunner from '$lib/components/lessons/LessonRunner.svelte';
+	import LessonCard from '$lib/components/ui/lesson/LessonCard.svelte';
 	import { ArrowLeft } from '@lucide/svelte';
+	import { invalidateAll } from '$app/navigation';
 	import * as m from '$lib/paraglide/messages';
 
-	// Import all modules
-	import Module1 from '$lib/components/modules/Module1.svelte';
-	import Module2 from '$lib/components/modules/Module2.svelte';
-	import Module3 from '$lib/components/modules/Module3.svelte';
-	import Module4 from '$lib/components/modules/Module4.svelte';
-	import Module5 from '$lib/components/modules/Module5.svelte';
-
-	// Get module ID from URL
 	let { data } = $props();
-	const moduleId = $page.params.id || '';
 
-	// Module mapping
-	const moduleComponents: Record<string, any> = {
-		module1: Module1,
-		module2: Module2,
-		module3: Module3,
-		module4: Module4,
-		module5: Module5
-	};
+	// Get lessons for this module
+	let moduleLessons = $derived(data.moduleLessons || []);
+	let progress = $derived((data.progress || {}) as Record<string, any>);
 
-	const ModuleComponent = moduleId ? moduleComponents[moduleId] : null;
+	// Selection state
+	let selectedLessonId = $state<string | null>(null);
 
-	// Get progress for this module
-	function getModuleProgress(): number {
-		const lessonId = `${moduleId}-complete`;
-		const progress = (data.progress as Record<string, any>)?.[lessonId];
-		return progress?.score || 0;
+	// Find index of selected lesson to pass to LessonRunner
+	let initialLessonIndex = $derived(
+		selectedLessonId ? moduleLessons.findIndex((l) => l.id === selectedLessonId) : 0
+	);
+
+	function selectLesson(lessonId: string) {
+		selectedLessonId = lessonId;
+	}
+
+	async function backToGrid() {
+		selectedLessonId = null;
+		// Refresh data to update progress
+		await invalidateAll();
+	}
+
+	// Determine if a lesson is locked based on previous completion
+	import { isLessonLocked } from '$lib/utils/progress';
+
+	// Determine if a lesson is locked based on previous completion
+	function checkLocked(index: number, lesson: any) {
+		return isLessonLocked(index, lesson, moduleLessons, progress);
 	}
 </script>
 
-<div class="container mx-auto max-w-6xl py-8">
-	<!-- Back Button -->
+<div class="container mx-auto p-4 md:p-8">
 	<div class="mb-6">
-		<Button variant="ghost" onclick={() => goto('/')}>
-			<ArrowLeft class="mr-2 h-4 w-4" />
-			{m.back_to_modules?.() || 'Back to Modules'}
-		</Button>
+		{#if selectedLessonId}
+			<Button variant="ghost" onclick={backToGrid} class="gap-2">
+				<ArrowLeft class="h-4 w-4" />
+				{m.back_to_lessons ? m.back_to_lessons() : 'Back to Lessons'}
+			</Button>
+		{:else}
+			<Button variant="ghost" href="/" class="gap-2">
+				<ArrowLeft class="h-4 w-4" />
+				{m.back_to_modules ? m.back_to_modules() : 'Back to Modules'}
+			</Button>
+		{/if}
 	</div>
 
-	<!-- Module Content -->
-	{#if ModuleComponent}
-		{@const Component = ModuleComponent}
-		<Component />
+	{#if selectedLessonId}
+		<LessonRunner
+			lessons={moduleLessons}
+			{progress}
+			startIndex={initialLessonIndex}
+			onExit={backToGrid}
+		/>
+	{:else if moduleLessons.length > 0}
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{#each moduleLessons as lesson, i (lesson.id)}
+				{@const locked = checkLocked(i, lesson)}
+				<LessonCard
+					{lesson}
+					progress={progress[lesson.id]}
+					isLocked={locked}
+					onclick={() => !locked && selectLesson(lesson.id)}
+				/>
+			{/each}
+		</div>
 	{:else}
 		<div class="py-12 text-center">
-			<h1 class="text-2xl font-bold text-slate-700">Module Not Found</h1>
-			<p class="mt-2 text-slate-500">The requested module does not exist.</p>
-			<Button class="mt-6" onclick={() => goto('/')}>Go Home</Button>
+			<p class="mt-2 text-slate-500">No lessons found for this module.</p>
+			<Button class="mt-6" href="/">Go Home</Button>
 		</div>
 	{/if}
 </div>

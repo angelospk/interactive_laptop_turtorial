@@ -5,7 +5,9 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 ## Features
 
 - 🔐 Simple username-based authentication
+- 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
+- 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, etc.)
 - 🎯 Multi-level difficulty system (Beginner/Intermediate/Advanced)
 - 🌍 Bilingual support (English/Greek) via inlang
 - 💾 SQLite database (local dev + Turso for production)
@@ -33,6 +35,16 @@ bun run dev
 ```
 
 Navigate to `http://localhost:5173` and login with any username (e.g., `user01`)
+
+### 4. Access Admin Panel
+
+Navigate to `http://localhost:5173/admin/login`
+Password: `admin123` (configurable in `.env`)
+
+Features:
+- Enable/Disable lessons
+- Seed database with default lessons
+- View statistics
 
 ## Database Scripts
 

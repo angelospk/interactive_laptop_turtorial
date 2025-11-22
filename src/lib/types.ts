@@ -46,4 +46,5 @@ export type UserSession = {
     username: string;
     displayName?: string;
     lastLogin?: Date;
+    isAdmin?: boolean;
 };

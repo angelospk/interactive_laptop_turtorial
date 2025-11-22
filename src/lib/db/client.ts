@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { drizzle as drizzleSQLite } from 'drizzle-orm/better-sqlite3';
 import { drizzle as drizzleLibSQL } from 'drizzle-orm/libsql';
 import Database from 'better-sqlite3';
@@ -13,7 +14,10 @@ const env = {
     TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN
 };
 
-// Helper to validate Turso URL
+/**
+ * Helper to validate Turso URL
+ * Checks if the URL uses libsql: or https: protocol
+ */
 function isValidTursoUrl(url: string | undefined): boolean {
     if (!url) return false;
     try {
@@ -26,6 +30,12 @@ function isValidTursoUrl(url: string | undefined): boolean {
 
 // Use Turso if credentials are valid, otherwise use local SQLite
 let dbInstance;
+
+console.log('Debug Env:', {
+    url: env.TURSO_DATABASE_URL ? 'Set' : 'Unset',
+    token: env.TURSO_AUTH_TOKEN ? 'Set' : 'Unset',
+    validUrl: isValidTursoUrl(env.TURSO_DATABASE_URL)
+});
 
 if (env.TURSO_DATABASE_URL && env.TURSO_AUTH_TOKEN && isValidTursoUrl(env.TURSO_DATABASE_URL)) {
     try {

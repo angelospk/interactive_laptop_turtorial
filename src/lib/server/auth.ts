@@ -49,7 +49,8 @@ export async function loginOrCreateUser(username: string): Promise<UserSession> 
         id: user.id,
         username: user.username,
         displayName: user.displayName || undefined,
-        lastLogin: user.lastLogin || undefined
+        lastLogin: user.lastLogin || undefined,
+        isAdmin: user.isAdmin || false
     };
 }
 

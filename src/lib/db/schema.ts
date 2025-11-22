@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 // Users table - simple username-based authentication
@@ -9,23 +9,34 @@ export const users = sqliteTable('users', {
     createdAt: integer('created_at', { mode: 'timestamp' })
         .notNull()
         .$defaultFn(() => new Date()),
-    lastLogin: integer('last_login', { mode: 'timestamp' })
+    lastLogin: integer('last_login', { mode: 'timestamp' }),
+    isAdmin: integer('is_admin', { mode: 'boolean' }).default(false)
 });
 
 // Lessons table - dynamic lesson repository
 export const lessons = sqliteTable('lessons', {
     id: text('id').primaryKey(),
     moduleId: text('module_id').notNull(), // module1, module2, etc.
-    lessonKey: text('lesson_key').notNull(), // unique key for this lesson
+    lessonKey: text('lesson_key').notNull(), // unique key for this lesson (e.g., 'hover-basic')
     titleKey: text('title_key').notNull(), // i18n message key
     descriptionKey: text('description_key'), // i18n message key
     difficulty: text('difficulty', { enum: ['beginner', 'intermediate', 'advanced'] }).notNull(),
     orderIndex: integer('order_index').notNull(),
+
+    // NEW FIELDS for dynamic lesson system
+    lessonType: text('lesson_type').notNull(), // 'hover', 'click', 'drag', 'legacy-module-3', etc.
+    config: text('config', { mode: 'json' }), // JSON configuration for lesson-specific settings
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true), // Admin can disable lessons
+    requiredLessonId: text('required_lesson_id').references((): any => lessons.id, { onDelete: 'set null' }), // Prerequisite lesson
+
     createdAt: integer('created_at', { mode: 'timestamp' })
         .notNull()
         .$defaultFn(() => new Date())
 }, (table) => ({
-    unq: unique().on(table.moduleId, table.lessonKey)
+    unq: unique().on(table.moduleId, table.lessonKey),
+    moduleIdIdx: index('module_id_idx').on(table.moduleId),
+    enabledIdx: index('enabled_idx').on(table.enabled),
+    lessonTypeIdx: index('lesson_type_idx').on(table.lessonType)
 }));
 
 // User progress tracking - per user, per lesson

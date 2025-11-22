@@ -24,12 +24,15 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Paraglide
-src/lib/paraglide
+/src/lib/paraglide
 
 # Local Database
 local.db
 local.db-shm
 local.db-wal
 drizzle/
-.env.example
+
 .mcp.json
+*.md
+.gemini/
+.env.example

@@ -9,7 +9,6 @@
 	} from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
 	import { Button } from '$lib/components/ui/button';
-	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import { goto } from '$app/navigation';
@@ -17,14 +16,14 @@
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
 
+	import { getModuleProgress } from '$lib/utils/progress';
+
 	// Get progress from server
 	let { data } = $props();
 
-	// Calculate module progress from lesson progress
-	function getModuleProgress(moduleId: string): number {
-		const lessonId = `${moduleId}-complete`;
-		const progress = (data.progress as Record<string, any>)?.[lessonId];
-		return progress?.score || 0;
+	// Helper to use the utility with current data
+	function getProgress(moduleId: string) {
+		return getModuleProgress(moduleId, data.moduleLessonIds, data.progress);
 	}
 
 	type Module = {
@@ -68,7 +67,7 @@
 		<div class="flex gap-4">
 			<LogoutButton />
 		</div>
-		<LanguageSwitcher />
+		<!-- Language Switcher removed as per user request -->
 	</div>
 
 	<div class="mb-12 text-center">
@@ -83,7 +82,7 @@
 
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
 		{#each modules as module (module.id)}
-			{@const moduleProgress = getModuleProgress(module.id)}
+			{@const moduleProgress = getProgress(module.id)}
 			<Card class="transition-shadow hover:shadow-lg">
 				<CardHeader>
 					<CardTitle>{messages[module.titleKey]()}</CardTitle>
@@ -96,8 +95,8 @@
 						</p>
 						<Progress value={moduleProgress} />
 					</div>
-					<Button class="w-full" onclick={() => goto(`/modules/${module.id}`)}>
-						{messages.start_lesson()}
+					<Button class="w-full" href={`/modules/${module.id}`}>
+						{messages.start_module()}
 					</Button>
 				</CardContent>
 			</Card>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -12,7 +12,6 @@
 	} from '$lib/components/ui/card';
 	import * as m from '$lib/paraglide/messages';
 	import { toast } from 'svelte-sonner';
-	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 
 	let username = $state('');
 	let loading = $state(false);
@@ -42,6 +41,9 @@
 			const data = await response.json();
 			toast.success(m.welcome_user({ displayName: data.user.displayName || data.user.username }));
 
+			// Force re-run of all load functions to pick up the new session
+			await invalidateAll();
+
 			// Redirect to home
 			goto('/');
 		} catch (error) {
@@ -61,10 +63,6 @@
 <div
 	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4"
 >
-	<div class="absolute top-4 right-4">
-		<LanguageSwitcher />
-	</div>
-
 	<Card class="w-full max-w-md">
 		<CardHeader class="text-center">
 			<CardTitle class="text-3xl font-bold">{m.app_title()}</CardTitle>
