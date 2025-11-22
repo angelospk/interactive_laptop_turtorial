@@ -2,7 +2,7 @@ import type { NewLesson } from '../schema';
 
 /**
  * Module 5: Web Browser & Internet Navigation
- * 6 comprehensive lessons covering web browsing fundamentals
+ * Refactored to use desktop-simulation
  */
 export const module5Lessons: NewLesson[] = [
     // Lesson 1: Opening Browser & New Tabs
@@ -14,8 +14,11 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson1_desc',
         difficulty: 'beginner',
         orderIndex: 1,
-        lessonType: 'browser',
-        config: { action: 'new-tab' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'new-tab',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: null
     },
@@ -29,8 +32,12 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson2_desc',
         difficulty: 'beginner',
         orderIndex: 2,
-        lessonType: 'browser',
-        config: { action: 'navigate', targetUrl: 'news.gr' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'navigate',
+            targetUrl: 'news',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: 'module5-lesson1'
     },
@@ -44,8 +51,11 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson3_desc',
         difficulty: 'beginner',
         orderIndex: 3,
-        lessonType: 'browser',
-        config: { action: 'search', searchQuery: 'καιρός' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'search',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: 'module5-lesson2'
     },
@@ -59,8 +69,11 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
-        lessonType: 'browser',
-        config: { action: 'switch-tabs', tabCount: 3 },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'switch-tab',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: 'module5-lesson3'
     },
@@ -74,8 +87,11 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson5_desc',
         difficulty: 'beginner',
         orderIndex: 5,
-        lessonType: 'browser',
-        config: { action: 'close-tab' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'close-tab',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: 'module5-lesson4'
     },
@@ -89,8 +105,12 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson6_desc',
         difficulty: 'intermediate',
         orderIndex: 6,
-        lessonType: 'browser',
-        config: { action: 'bookmark', targetSite: 'gov.gr' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'bookmark',
+            targetSite: 'gov',
+            initialApps: ['browser']
+        },
         enabled: true,
         requiredLessonId: 'module5-lesson5'
     }

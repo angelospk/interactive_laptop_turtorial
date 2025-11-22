@@ -2,7 +2,7 @@ import type { NewLesson } from '../schema';
 
 /**
  * Module 3: Windows 11 Environment & Window Management
- * 6 comprehensive lessons covering window management and quick settings
+ * Refactored to use desktop-simulation
  */
 export const module3Lessons: NewLesson[] = [
     // Lesson 1: Opening Applications
@@ -14,8 +14,12 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson1_desc',
         difficulty: 'beginner',
         orderIndex: 1,
-        lessonType: 'window-management',
-        config: { action: 'open', taskbarApp: 'Σημειωματάριο' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'open-app',
+            targetAppId: 'notepad',
+            initialApps: []
+        },
         enabled: true,
         requiredLessonId: null
     },
@@ -29,8 +33,12 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson2_desc',
         difficulty: 'beginner',
         orderIndex: 2,
-        lessonType: 'window-management',
-        config: { action: 'minimize' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'minimize-app',
+            targetAppId: 'notepad',
+            initialApps: ['notepad']
+        },
         enabled: true,
         requiredLessonId: 'module3-lesson1'
     },
@@ -44,8 +52,12 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson3_desc',
         difficulty: 'beginner',
         orderIndex: 3,
-        lessonType: 'window-management',
-        config: { action: 'restore' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'restore-app',
+            targetAppId: 'notepad',
+            initialApps: ['notepad'] // Need logic to start minimized? For now start open and user minimizes then restores or just assume minimized logic
+        },
         enabled: true,
         requiredLessonId: 'module3-lesson2'
     },
@@ -59,8 +71,12 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
-        lessonType: 'window-management',
-        config: { action: 'maximize' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'maximize-app',
+            targetAppId: 'notepad',
+            initialApps: ['notepad']
+        },
         enabled: true,
         requiredLessonId: 'module3-lesson3'
     },
@@ -74,8 +90,12 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson5_desc',
         difficulty: 'beginner',
         orderIndex: 5,
-        lessonType: 'window-management',
-        config: { action: 'close' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'close-app',
+            targetAppId: 'notepad',
+            initialApps: ['notepad']
+        },
         enabled: true,
         requiredLessonId: 'module3-lesson4'
     },
@@ -89,8 +109,11 @@ export const module3Lessons: NewLesson[] = [
         descriptionKey: 'module3_lesson6_desc',
         difficulty: 'intermediate',
         orderIndex: 6,
-        lessonType: 'window-management',
-        config: { action: 'quick-settings', targetVolume: 50 },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'open-quick-settings',
+            initialApps: []
+        },
         enabled: true,
         requiredLessonId: 'module3-lesson5'
     }

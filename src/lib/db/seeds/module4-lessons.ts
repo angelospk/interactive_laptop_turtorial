@@ -2,7 +2,7 @@ import type { NewLesson } from '../schema';
 
 /**
  * Module 4: File Explorer & File Management
- * 8 comprehensive lessons covering file and folder operations
+ * Refactored to use desktop-simulation
  */
 export const module4Lessons: NewLesson[] = [
     // Lesson 1: Navigating Folders
@@ -14,8 +14,12 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson1_desc',
         difficulty: 'beginner',
         orderIndex: 1,
-        lessonType: 'file-explorer',
-        config: { action: 'navigate', targetFolder: 'Documents' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'open-app',
+            targetAppId: 'explorer',
+            initialApps: []
+        },
         enabled: true,
         requiredLessonId: null
     },
@@ -29,13 +33,18 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson2_desc',
         difficulty: 'beginner',
         orderIndex: 2,
-        lessonType: 'file-explorer',
-        config: { action: 'create-folder', targetName: 'Εργασία' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'create-folder',
+            targetName: 'Εργασία',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson1'
     },
 
-    // Lesson 3: Selecting Files
+    // Lesson 3: Selecting Files (Just opening explorer simulates this for now in new architecture, or we can add specific select goal later)
+    // Simplified to just open for now or kept as 'select' if supported
     {
         id: 'module4-lesson3',
         moduleId: 'module4',
@@ -44,8 +53,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson3_desc',
         difficulty: 'beginner',
         orderIndex: 3,
-        lessonType: 'file-explorer',
-        config: { action: 'select', targetCount: 2 },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'select-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson2'
     },
@@ -59,8 +71,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
-        lessonType: 'file-explorer',
-        config: { action: 'copy', targetFile: 'document.txt' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'copy-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson3'
     },
@@ -74,8 +89,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson5_desc',
         difficulty: 'intermediate',
         orderIndex: 5,
-        lessonType: 'file-explorer',
-        config: { action: 'cut', targetFile: 'Λίστα Ψώνια.txt', targetFolder: 'Έγγραφα' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'paste-cut-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson4'
     },
@@ -89,8 +107,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson6_desc',
         difficulty: 'intermediate',
         orderIndex: 6,
-        lessonType: 'file-explorer',
-        config: { action: 'rename', oldName: 'Εικόνες', newName: 'Φωτογραφίες' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'rename-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson5'
     },
@@ -104,8 +125,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson7_desc',
         difficulty: 'intermediate',
         orderIndex: 7,
-        lessonType: 'file-explorer',
-        config: { action: 'delete', targetFile: 'Διακοπές.jpg' },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'delete-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson6'
     },
@@ -119,8 +143,11 @@ export const module4Lessons: NewLesson[] = [
         descriptionKey: 'module4_lesson8_desc',
         difficulty: 'advanced',
         orderIndex: 8,
-        lessonType: 'file-explorer',
-        config: { action: 'drag-drop', itemCount: 3 },
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'drag-drop-file',
+            initialApps: ['explorer']
+        },
         enabled: true,
         requiredLessonId: 'module4-lesson7'
     }

@@ -21,9 +21,16 @@
 		scroll: () => import('./interactive/ScrollLesson.svelte'),
 		typing: () => import('./interactive/TypingLesson.svelte'),
 		'keyboard-action': () => import('./interactive/KeyboardActionLesson.svelte'),
+
+		// Legacy implementations - kept for backward compatibility if needed,
+		// but new lessons should use desktop-simulation where appropriate
 		'window-management': () => import('./interactive/WindowManagementLesson.svelte'),
 		'file-explorer': () => import('./interactive/FileExplorerLesson.svelte'),
 		browser: () => import('./interactive/BrowserLesson.svelte'),
+
+		// The new unified desktop simulation
+		'desktop-simulation': () => import('./interactive/DesktopLesson.svelte'),
+
 		'legacy-module-3': () => import('./legacy/LegacyModule3Lesson.svelte'),
 		'legacy-module-4': () => import('./legacy/LegacyModule4Lesson.svelte')
 	};

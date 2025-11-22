@@ -1,0 +1,228 @@
+<script lang="ts">
+	import { toast } from 'svelte-sonner';
+	import type { Lesson } from '$lib/db/schema';
+	import Desktop from '$lib/components/desktop/Desktop.svelte';
+	import Taskbar from '$lib/components/desktop/Taskbar.svelte';
+	import Window from '$lib/components/desktop/Window.svelte';
+	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
+	import LessonTemplate from '../LessonTemplate.svelte';
+
+	// Import Apps
+	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';
+	import BrowserApp from '$lib/components/apps/BrowserApp.svelte';
+	import EmailApp from '$lib/components/apps/EmailApp.svelte';
+	import SpreadsheetApp from '$lib/components/apps/SpreadsheetApp.svelte';
+	import InstallerApp from '$lib/components/apps/InstallerApp.svelte';
+	import SettingsApp from '$lib/components/apps/SettingsApp.svelte';
+
+	// Icons
+	import {
+		Folder,
+		Globe,
+		Mail,
+		Grid3X3,
+		Download,
+		Settings,
+		FileText
+	} from 'lucide-svelte';
+
+	let { lesson, onComplete, onBack } = $props<{
+		lesson: Lesson;
+		onComplete: (score: number) => void;
+		onBack: () => void;
+	}>();
+
+	// Parse config
+	const config = lesson.config as any || {};
+	const goal = config.goal || '';
+
+	// Define available apps
+	const availableApps = [
+		{ id: 'explorer', name: 'Εξερεύνηση', icon: Folder, component: FileExplorerApp },
+		{ id: 'browser', name: 'Browser', icon: Globe, component: BrowserApp },
+		{ id: 'email', name: 'Email', icon: Mail, component: EmailApp },
+		{ id: 'excel', name: 'Υπολογιστικά Φύλλα', icon: Grid3X3, component: SpreadsheetApp },
+		{ id: 'installer', name: 'Εγκατάσταση', icon: Download, component: InstallerApp },
+		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
+		{ id: 'notepad', name: 'Σημειωματάριο', icon: FileText, component: null } // Placeholder
+	];
+
+	// State
+	let openApps = $state<{ id: string; appId: string; minimized: boolean; maximized: boolean }[]>([]);
+	let startMenuOpen = $state(false);
+	let completed = $state(false);
+
+	// Initialize from config
+	$effect(() => {
+		if (config.initialApps) {
+			config.initialApps.forEach((appId: string) => openApp(appId));
+		}
+	});
+
+	function openApp(appId: string) {
+		// Check if already open
+		const existing = openApps.find((a) => a.appId === appId);
+		if (existing) {
+			if (existing.minimized) existing.minimized = false;
+			// Bring to front (remove and push)
+			openApps = openApps.filter(a => a !== existing);
+			openApps.push(existing);
+		} else {
+			openApps.push({
+				id: crypto.randomUUID(),
+				appId,
+				minimized: false,
+				maximized: false
+			});
+			checkGoal('open-app', { appId });
+		}
+		startMenuOpen = false;
+	}
+
+	function closeApp(instanceId: string) {
+		const app = openApps.find(a => a.id === instanceId);
+		if (app) {
+			checkGoal('close-app', { appId: app.appId });
+			openApps = openApps.filter((a) => a.id !== instanceId);
+		}
+	}
+
+	function toggleMinimize(instanceId: string) {
+		const app = openApps.find((a) => a.id === instanceId);
+		if (app) {
+			app.minimized = !app.minimized;
+			if (app.minimized) {
+				checkGoal('minimize-app', { appId: app.appId });
+			} else {
+				checkGoal('restore-app', { appId: app.appId });
+			}
+		}
+	}
+
+	function toggleMaximize(instanceId: string) {
+		const app = openApps.find((a) => a.id === instanceId);
+		if (app) {
+			app.maximized = !app.maximized;
+			if (app.maximized) {
+				checkGoal('maximize-app', { appId: app.appId });
+			}
+		}
+	}
+
+	// Goal Checking Logic
+	function checkGoal(action: string, data: any = {}) {
+		if (completed) return;
+
+		// console.log('Action:', action, 'Data:', data, 'Goal:', goal);
+
+		let success = false;
+
+		// Direct match
+		if (goal === action) success = true;
+
+		// Specific matches based on config
+		if (action === 'navigate' && goal === 'navigate-site' && data.url?.includes(config.targetUrl)) {
+			success = true;
+		}
+		if (action === 'report-phishing' && goal === 'identify-phishing' && data.correct) {
+			success = true;
+		}
+		if (action === 'formula-success' && goal === 'enter-formula') {
+			success = true;
+		}
+		if (action === 'install-complete' && goal === 'install-app') {
+			success = true;
+		}
+		if (action === 'connect-wifi' && goal === 'connect-wifi') {
+			success = true;
+		}
+		if (action === 'add-printer' && goal === 'add-printer') {
+			success = true;
+		}
+		if (action === 'create-folder' && goal === 'create-folder' && (!config.targetName || data.name === config.targetName)) {
+			success = true;
+		}
+		if (action === 'open-app' && goal === 'open-app' && data.appId === config.targetAppId) {
+			success = true;
+		}
+		if (action === 'open-quick-settings' && goal === 'open-quick-settings') {
+			success = true;
+		}
+
+		if (success) {
+			completed = true;
+			toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
+			setTimeout(() => {
+				onComplete(100);
+			}, 1500);
+		}
+	}
+
+	function handleAppAction(action: string, data: any) {
+		checkGoal(action, data);
+	}
+</script>
+
+<LessonTemplate {lesson} {onBack}>
+	<!-- Desktop Environment -->
+	<Desktop class="h-[600px]">
+		<!-- Windows -->
+		{#each openApps as instance (instance.id)}
+			{@const appDef = availableApps.find((a) => a.id === instance.appId)}
+			{#if appDef && appDef.component}
+				<Window
+					title={appDef.name}
+					icon={appDef.icon}
+					isOpen={true}
+					isMinimized={instance.minimized}
+					isMaximized={instance.maximized}
+					onMinimize={() => toggleMinimize(instance.id)}
+					onMaximize={() => toggleMaximize(instance.id)}
+					onClose={() => closeApp(instance.id)}
+				>
+					<!-- Dynamic Component Rendering -->
+					<appDef.component
+						config={config}
+						onAction={handleAppAction}
+						initialFiles={config.initialFiles}
+						initialData={config.initialData}
+						emails={config.emails}
+					/>
+				</Window>
+			{:else}
+				<!-- Fallback/Placeholder Window -->
+				<Window
+					title={appDef?.name || 'App'}
+					icon={appDef?.icon}
+					isOpen={true}
+					isMinimized={instance.minimized}
+					isMaximized={instance.maximized}
+					onMinimize={() => toggleMinimize(instance.id)}
+					onMaximize={() => toggleMaximize(instance.id)}
+					onClose={() => closeApp(instance.id)}
+				>
+					<div class="flex h-full items-center justify-center bg-white">
+						<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
+					</div>
+				</Window>
+			{/if}
+		{/each}
+
+		<!-- Start Menu -->
+		<StartMenu
+			isOpen={startMenuOpen}
+			apps={availableApps}
+			onAppClick={openApp}
+			onClose={() => (startMenuOpen = false)}
+		/>
+
+		<!-- Taskbar -->
+		<Taskbar
+			apps={availableApps.filter(a => ['explorer', 'browser', 'email', 'settings'].includes(a.id))}
+			openAppIds={openApps.map((a) => a.appId)}
+			onAppClick={(id) => openApp(id)}
+			onStartClick={() => (startMenuOpen = !startMenuOpen)}
+			onQuickSettingsClick={() => checkGoal('open-quick-settings')}
+		/>
+	</Desktop>
+</LessonTemplate>
