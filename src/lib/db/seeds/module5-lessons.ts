@@ -2,7 +2,7 @@ import type { NewLesson } from '../schema';
 
 /**
  * Module 5: Web Browser & Internet Navigation
- * Refactored to use desktop-simulation
+ * Refactored with History and improved Tabs
  */
 export const module5Lessons: NewLesson[] = [
     // Lesson 1: Opening Browser & New Tabs
@@ -17,7 +17,8 @@ export const module5Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'new-tab',
-            initialApps: ['browser']
+            initialApps: ['browser'],
+            instructions: 'Ανοίξτε μια νέα καρτέλα πατώντας το κουμπί "+".'
         },
         enabled: true,
         requiredLessonId: null
@@ -36,7 +37,8 @@ export const module5Lessons: NewLesson[] = [
         config: {
             goal: 'navigate',
             targetUrl: 'news',
-            initialApps: ['browser']
+            initialApps: ['browser'],
+            instructions: 'Πληκτρολογήστε "news" στη γραμμή διευθύνσεων και πατήστε Enter.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson1'
@@ -54,49 +56,53 @@ export const module5Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'search',
-            initialApps: ['browser']
+            initialApps: ['browser'],
+            instructions: 'Χρησιμοποιήστε τη μπάρα αναζήτησης του Google.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson2'
     },
 
-    // Lesson 4: Switching Between Tabs
+    // Lesson 4: Tab Management (Switch & Close)
     {
         id: 'module5-lesson4',
         moduleId: 'module5',
-        lessonKey: 'switch-tabs',
+        lessonKey: 'manage-tabs',
         titleKey: 'module5_lesson4_title',
         descriptionKey: 'module5_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'switch-tab',
-            initialApps: ['browser']
+            goal: 'switch-tab', // Simplified goal, simulation should track switching
+            initialApps: ['browser'],
+            instructions: 'Έχετε πολλές καρτέλες. Αλλάξτε σε μια άλλη καρτέλα.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson3'
     },
 
-    // Lesson 5: Closing Tabs
+    // Lesson 5: Browser History
     {
         id: 'module5-lesson5',
         moduleId: 'module5',
-        lessonKey: 'close-tabs',
+        lessonKey: 'check-history',
         titleKey: 'module5_lesson5_title',
         descriptionKey: 'module5_lesson5_desc',
-        difficulty: 'beginner',
+        difficulty: 'intermediate',
         orderIndex: 5,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'close-tab',
-            initialApps: ['browser']
+            goal: 'navigate',
+            targetUrl: 'history',
+            initialApps: ['browser'],
+            instructions: 'Ανοίξτε το Ιστορικό περιήγησης πατώντας το εικονίδιο του ρολογιού.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson4'
     },
 
-    // Lesson 6: Bookmarks & Favorites
+    // Lesson 6: Bookmarks
     {
         id: 'module5-lesson6',
         moduleId: 'module5',
@@ -109,7 +115,8 @@ export const module5Lessons: NewLesson[] = [
         config: {
             goal: 'bookmark',
             targetSite: 'gov',
-            initialApps: ['browser']
+            initialApps: ['browser'],
+            instructions: 'Προσθέστε τη σελίδα gov στα αγαπημένα πατώντας το αστέρι.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson5'

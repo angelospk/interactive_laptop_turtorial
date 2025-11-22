@@ -17,6 +17,7 @@
 		timeLimit: number;
 		targetSize?: string;
 		theme?: string;
+        instructions?: string;
 	};
 	const targetCount = config.targetCount || 10;
 	const timeLimit = config.timeLimit || 45;
@@ -25,7 +26,7 @@
 	// Theme assets/styles
 	const themes: Record<string, any> = {
 		default: {
-			targetClass: 'bg-red-500 border-4 border-white rounded-full',
+			targetClass: 'bg-red-500 border-4 border-white rounded-full shadow-lg',
 			content: 'CLICK',
 			bgClass: 'bg-white/50'
 		},
@@ -33,14 +34,26 @@
 			targetClass: 'bg-transparent border-none shadow-none',
 			content: '🎈',
 			bgClass: 'bg-sky-100',
-			targetStyle: 'font-size: 60px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));'
+			targetStyle: 'font-size: 70px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); animation: float 3s ease-in-out infinite;'
+		},
+		moles: {
+			targetClass: 'bg-amber-700 border-4 border-amber-900 rounded-full shadow-inner',
+			content: '🐹',
+			bgClass: 'bg-green-50',
+			targetStyle: 'font-size: 50px; box-shadow: inset 0 0 20px rgba(0,0,0,0.3);'
 		},
 		bugs: {
 			targetClass: 'bg-transparent border-none shadow-none',
 			content: '🐞',
 			bgClass: 'bg-green-50',
-			targetStyle: 'font-size: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));'
-		}
+			targetStyle: 'font-size: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); transform: rotate(45deg);'
+		},
+        flies: {
+            targetClass: 'bg-transparent border-none shadow-none',
+            content: '🪰',
+            bgClass: 'bg-slate-50',
+            targetStyle: 'font-size: 40px; animation: jitter 0.5s infinite;'
+        }
 	};
 
 	let currentTheme = $derived(themes[theme] || themes.default);
@@ -120,24 +133,24 @@
 	<div class="click-lesson {currentTheme.bgClass} h-full rounded-lg transition-colors duration-500">
 		{#if !gameStarted}
 			<div class="start-screen">
-				<h2 class="mb-4 text-2xl font-bold">Click Training</h2>
-				<p class="mb-6 text-slate-600">Click on the targets as quickly as possible!</p>
-				<button class="start-button" onclick={startGame}>Start</button>
+				<h2 class="mb-4 text-2xl font-bold">{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
+				<p class="mb-6 text-slate-600">{config.instructions || 'Κάντε κλικ στους στόχους όσο πιο γρήγορα μπορείτε!'}</p>
+				<button class="start-button" onclick={startGame}>{m.start_lesson?.() || 'Έναρξη'}</button>
 			</div>
 		{:else if isComplete}
 			<div class="complete-screen">
-				<h2 class="mb-2 text-3xl font-bold text-green-600">✓ Complete!</h2>
-				<p class="mb-2 text-xl">Clicks: {successfulClicks}/{targetCount}</p>
-				<p class="text-lg text-slate-500">Score: {score}</p>
+				<h2 class="mb-2 text-3xl font-bold text-green-600">✓ {m.lesson_complete?.() || 'Ολοκληρώθηκε'}!</h2>
+				<p class="mb-2 text-xl">{m.successful_hovers?.() || 'Επιτυχίες'}: {successfulClicks}/{targetCount}</p>
+				<p class="text-lg text-slate-500">{m.final_score?.() || 'Βαθμολογία'}: {score}</p>
 			</div>
 		{:else}
 			<div class="game-ui">
 				<div
 					class="hud mx-4 mt-4 flex justify-between rounded-lg bg-white/80 p-4 shadow-sm backdrop-blur"
 				>
-					<div class="font-bold text-slate-700">Progress: {successfulClicks}/{targetCount}</div>
-					<div class="font-mono text-blue-600">Time: {timeRemaining}s</div>
-					<div class="font-bold text-green-600">Score: {score}</div>
+					<div class="font-bold text-slate-700">{m.progress?.() || 'Πρόοδος'}: {successfulClicks}/{targetCount}</div>
+					<div class="font-mono text-blue-600">{m.time?.() || 'Χρόνος'}: {timeRemaining}s</div>
+					<div class="font-bold text-green-600">{m.score?.() || 'Σκορ'}: {score}</div>
 				</div>
 				<div
 					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
@@ -199,17 +212,32 @@
 		background: rgba(255, 255, 255, 0.5);
 		border-radius: 8px;
 		min-height: 400px;
+        /* For moles theme, maybe add grass/dirt bg */
 	}
 	.target {
 		position: absolute;
 		width: 80px;
 		height: 80px;
 		transform: translate(-50%, -50%);
-		background: #ef4444;
-		border: 4px solid white;
-		border-radius: 50%;
+		/* background: #ef4444;  Handled by theme class */
+		/* border: 4px solid white; Handled by theme class */
+		/* border-radius: 50%; Handled by theme class */
 		color: white;
 		font-weight: bold;
 		cursor: pointer;
+        user-select: none;
 	}
+
+    @keyframes float {
+        0%, 100% { transform: translate(-50%, -50%); }
+        50% { transform: translate(-50%, -55%); }
+    }
+
+    @keyframes jitter {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        25% { transform: translate(-48%, -48%) rotate(5deg); }
+        50% { transform: translate(-50%, -50%) rotate(0deg); }
+        75% { transform: translate(-52%, -52%) rotate(-5deg); }
+        100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
 </style>

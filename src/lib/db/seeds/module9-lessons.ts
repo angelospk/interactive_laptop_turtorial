@@ -2,6 +2,7 @@ import type { NewLesson } from '../schema';
 
 /**
  * Module 9: Advanced (Install, Settings)
+ * Added Uninstall Lesson
  */
 export const module9Lessons: NewLesson[] = [
     {
@@ -16,7 +17,8 @@ export const module9Lessons: NewLesson[] = [
         config: {
             goal: 'install-app',
             initialApps: ['installer'],
-            appName: 'Super Browser'
+            appName: 'Super Browser',
+            instructions: 'Εγκαταστήστε την εφαρμογή "Super Browser".'
         },
         enabled: true,
         requiredLessonId: null
@@ -32,7 +34,9 @@ export const module9Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'connect-wifi',
-            initialApps: ['settings']
+            initialApps: ['settings'],
+            initialPage: 'network',
+            instructions: 'Συνδεθείτε σε ένα δίκτυο Wi-Fi.'
         },
         enabled: true,
         requiredLessonId: 'module9-lesson1'
@@ -48,9 +52,29 @@ export const module9Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'add-printer',
-            initialApps: ['settings']
+            initialApps: ['settings'],
+            initialPage: 'devices',
+            instructions: 'Προσθέστε έναν νέο εκτυπωτή.'
         },
         enabled: true,
         requiredLessonId: 'module9-lesson2'
+    },
+    {
+        id: 'module9-lesson4',
+        moduleId: 'module9',
+        lessonKey: 'uninstall-app',
+        titleKey: 'module9_lesson4_title',
+        descriptionKey: 'module9_lesson4_desc',
+        difficulty: 'advanced',
+        orderIndex: 4,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'uninstall-app',
+            initialApps: ['settings'],
+            initialPage: 'apps',
+            instructions: 'Πηγαίνετε στις Εφαρμογές και απεγκαταστήστε το "Spotify".'
+        },
+        enabled: true,
+        requiredLessonId: 'module9-lesson3'
     }
 ];

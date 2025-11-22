@@ -8,6 +8,7 @@ import { module6Lessons } from './module6-lessons';
 import { module7Lessons } from './module7-lessons';
 import { module8Lessons } from './module8-lessons';
 import { module9Lessons } from './module9-lessons';
+import { module10Lessons } from './module10-lessons';
 
 /**
  * All lesson seed data
@@ -21,7 +22,8 @@ export const allLessons: NewLesson[] = [
     ...module6Lessons,
     ...module7Lessons,
     ...module8Lessons,
-    ...module9Lessons
+    ...module9Lessons,
+    ...module10Lessons
 ];
 
 export {
@@ -33,5 +35,6 @@ export {
     module6Lessons,
     module7Lessons,
     module8Lessons,
-    module9Lessons
+    module9Lessons,
+    module10Lessons
 };

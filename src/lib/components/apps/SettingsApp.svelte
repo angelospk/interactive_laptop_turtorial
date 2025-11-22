@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Wifi, Printer, Volume2, Monitor, Battery, Moon, Globe } from 'lucide-svelte';
+	import { Wifi, Printer, Volume2, Monitor, Battery, Moon, Globe, AppWindow, Trash2, Box } from 'lucide-svelte';
 	import { Switch } from '$lib/components/ui/switch';
 	import { toast } from 'svelte-sonner';
+    import { osState } from '$lib/osState.svelte';
 
 	let {
 		config = {},
@@ -12,22 +13,31 @@
 		onAction: (action: string, data?: any) => void;
 	}>();
 
-	let activeSection = $state('system');
+	let activeSection = $state(config?.initialPage || 'system');
 
-	// Settings State
-	let wifiEnabled = $state(true);
-	let connectedNetwork = $state<string | null>(null);
-	let volume = $state(80);
+	// Sync with Global OS State
+    $effect(() => {
+        if(config?.initialPage) {
+            activeSection = config.initialPage;
+        }
+    });
+
 	let printerConnected = $state(false);
 	let darkMode = $state(false);
 
-	const networks = ['Home_WiFi', 'OTE_Network', 'Public_WiFi_Free'];
+    // Mock Installed Apps
+    let installedApps = $state([
+        { id: 'chrome', name: 'Google Chrome', size: '450 MB', version: '120.0.3' },
+        { id: 'vlc', name: 'VLC Media Player', size: '120 MB', version: '3.0.18' },
+        { id: 'spotify', name: 'Spotify', size: '800 MB', version: '1.2.10' },
+        { id: 'adobe', name: 'Adobe Acrobat Reader', size: '350 MB', version: '2023.1' },
+    ]);
 
 	function connectWifi(ssid: string) {
-		if (!wifiEnabled) return;
+		if (!osState.wifiEnabled) return;
 		toast.loading('Σύνδεση...');
 		setTimeout(() => {
-			connectedNetwork = ssid;
+			osState.connectWifi(ssid);
 			toast.success(`Συνδέθηκε στο ${ssid}`);
 			onAction('connect-wifi', { ssid });
 		}, 1500);
@@ -43,10 +53,19 @@
 	}
 
 	function toggleWifi(checked: boolean) {
-		wifiEnabled = checked;
-		if (!checked) connectedNetwork = null;
+        osState.toggleWifi(checked);
 		onAction('toggle-wifi', { enabled: checked });
 	}
+
+    function uninstallApp(appId: string) {
+        toast.loading('Απεγκατάσταση...');
+        setTimeout(() => {
+            const appName = installedApps.find(a => a.id === appId)?.name;
+            installedApps = installedApps.filter(a => a.id !== appId);
+            toast.success(`${appName} απεγκαταστάθηκε επιτυχώς`);
+            onAction('uninstall-app', { appId });
+        }, 2000);
+    }
 </script>
 
 <div class="flex h-full overflow-hidden bg-slate-50">
@@ -74,6 +93,12 @@
 			>
 				<Printer class="h-4 w-4" /> Συσκευές
 			</button>
+            <button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection === 'apps' ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-100'}"
+				onclick={() => (activeSection = 'apps')}
+			>
+				<AppWindow class="h-4 w-4" /> Εφαρμογές
+			</button>
 		</nav>
 	</div>
 
@@ -98,8 +123,15 @@
 						<Volume2 class="h-5 w-5 text-slate-500" />
 						<span>Ένταση ήχου</span>
 					</div>
-					<input type="range" min="0" max="100" bind:value={volume} class="w-full" />
-					<div class="text-right text-sm text-slate-500">{volume}%</div>
+					<input
+                        type="range"
+                        min="0"
+                        max="100"
+                        bind:value={osState.volume}
+                        class="w-full"
+                        oninput={() => onAction('change-volume', { value: osState.volume })}
+                    />
+					<div class="text-right text-sm text-slate-500">{osState.volume}%</div>
 				</div>
 			</div>
 		{:else if activeSection === 'network'}
@@ -113,22 +145,22 @@
 							<div>
 								<div class="font-medium">Wi-Fi</div>
 								<div class="text-sm text-slate-500">
-									{wifiEnabled ? (connectedNetwork ? `Συνδεδεμένο: ${connectedNetwork}` : 'Διαθέσιμα δίκτυα') : 'Απενεργοποιημένο'}
+									{osState.wifiEnabled ? (osState.connectedNetwork ? `Συνδεδεμένο: ${osState.connectedNetwork}` : 'Διαθέσιμα δίκτυα') : 'Απενεργοποιημένο'}
 								</div>
 							</div>
 						</div>
-						<Switch checked={wifiEnabled} onCheckedChange={toggleWifi} />
+						<Switch checked={osState.wifiEnabled} onCheckedChange={toggleWifi} />
 					</div>
 
-					{#if wifiEnabled}
+					{#if osState.wifiEnabled}
 						<div class="mt-4 border-t pt-4 space-y-2">
-							{#each networks as net}
+							{#each osState.availableNetworks as net}
 								<div class="flex items-center justify-between rounded p-2 hover:bg-slate-50">
 									<span class="flex items-center gap-2">
 										<Wifi class="h-4 w-4 text-slate-400" />
 										{net}
 									</span>
-									{#if connectedNetwork === net}
+									{#if osState.connectedNetwork === net}
 										<span class="text-xs font-medium text-green-600">Συνδέθηκε</span>
 									{:else}
 										<Button size="sm" variant="outline" onclick={() => connectWifi(net)}>Σύνδεση</Button>
@@ -163,6 +195,30 @@
 					{/if}
 				</div>
 			</div>
+        {:else if activeSection === 'apps'}
+            <div class="space-y-6">
+                <h3 class="text-xl font-semibold">Εφαρμογές & Δυνατότητες</h3>
+
+                <div class="space-y-2">
+                    {#each installedApps as app}
+                        <div class="rounded-lg border bg-white p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 bg-blue-100 rounded flex items-center justify-center text-blue-600">
+                                    <Box class="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <div class="font-medium">{app.name}</div>
+                                    <div class="text-xs text-slate-500">{app.version} • {app.size}</div>
+                                </div>
+                            </div>
+                            <Button variant="outline" class="text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200" onclick={() => uninstallApp(app.id)}>
+                                <Trash2 class="h-4 w-4 mr-2" />
+                                Απεγκατάσταση
+                            </Button>
+                        </div>
+                    {/each}
+                </div>
+            </div>
 		{/if}
 	</div>
 </div>

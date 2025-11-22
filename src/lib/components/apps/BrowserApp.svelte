@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Globe, Search, ArrowLeft, ArrowRight, RefreshCw, Plus, X, Star } from 'lucide-svelte';
+	import { Globe, Search, ArrowLeft, ArrowRight, RefreshCw, Plus, X, Star, Clock, History } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let {
@@ -15,8 +15,14 @@
 		id: number;
 		title: string;
 		url: string;
-		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking';
+		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking' | 'history';
 	};
+
+    type HistoryItem = {
+        url: string;
+        title: string;
+        time: string;
+    }
 
 	let tabs = $state<Tab[]>([{ id: 1, title: 'Αρχική', url: 'home', type: 'home' }]);
 	let activeTabId = $state(1);
@@ -24,11 +30,18 @@
 	let searchBarInput = $state('');
 	let bookmarkedSites = $state<string[]>([]);
 
+    // History State
+    let history = $state<HistoryItem[]>([
+        { url: 'google.com', title: 'Google', time: '10:00' },
+        { url: 'news247.gr', title: 'Ειδήσεις 24/7', time: '09:45' }
+    ]);
+
 	let activeTab = $derived(tabs.find((t) => t.id === activeTabId) || tabs[0]);
 
 	function addTab() {
 		const newId = Math.max(...tabs.map((t) => t.id)) + 1;
-		tabs.push({ id: newId, title: 'Νέα καρτέλα', url: '', type: 'search' });
+		// Start with empty/home tab
+        tabs.push({ id: newId, title: 'Νέα καρτέλα', url: '', type: 'home' });
 		activeTabId = newId;
 		addressBarInput = '';
 		searchBarInput = '';
@@ -65,7 +78,13 @@
 		} else if (url.includes('bank')) {
 			type = 'banking';
 			title = 'e-Banking';
-		}
+		} else if (url === 'history') {
+            type = 'history';
+            title = 'Ιστορικό';
+        } else if (url === 'home') {
+            type = 'home';
+            title = 'Αρχική';
+        }
 
 		const tab = tabs.find((t) => t.id === activeTabId);
 		if (tab) {
@@ -73,6 +92,16 @@
 			tab.type = type;
 			tab.title = title;
 		}
+
+        // Add to history if it's a real page
+        if(type !== 'home' && type !== 'history') {
+             history.unshift({
+                url,
+                title,
+                time: new Date().toLocaleTimeString('el-GR', {hour: '2-digit', minute: '2-digit'})
+             });
+        }
+
 		onAction('navigate', { url });
 	}
 
@@ -99,6 +128,11 @@
 			onAction('bookmark', { url: activeTab.url });
 		}
 	}
+
+    function openHistory() {
+        addTab();
+        navigate('history');
+    }
 </script>
 
 <div class="flex h-full w-full flex-col overflow-hidden bg-white">
@@ -137,9 +171,9 @@
 	<!-- 2. Toolbar (Address Bar) -->
 	<div class="flex items-center gap-2 border-b border-slate-200 bg-white p-2">
 		<div class="flex gap-1 text-slate-400">
-			<ArrowLeft class="h-5 w-5" />
-			<ArrowRight class="h-5 w-5" />
-			<RefreshCw class="h-5 w-5" />
+			<ArrowLeft class="h-5 w-5 hover:text-slate-600 cursor-pointer" />
+			<ArrowRight class="h-5 w-5 hover:text-slate-600 cursor-pointer" />
+			<RefreshCw class="h-5 w-5 hover:text-slate-600 cursor-pointer" />
 		</div>
 		<div class="relative flex-1">
 			<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
@@ -159,22 +193,31 @@
 				}}
 			/>
 		</div>
-		<button
-			class="rounded-full p-2 hover:bg-slate-100"
-			onclick={bookmarkSite}
-			title="Προσθήκη στα Αγαπημένα"
-		>
-			<Star
-				class="h-5 w-5 {bookmarkedSites.includes(activeTab.url)
-					? 'fill-yellow-400 text-yellow-400'
-					: 'text-slate-400'}"
-			/>
-		</button>
+        <div class="flex items-center">
+            <button
+                class="rounded-full p-2 hover:bg-slate-100"
+                onclick={bookmarkSite}
+                title="Προσθήκη στα Αγαπημένα"
+            >
+                <Star
+                    class="h-5 w-5 {bookmarkedSites.includes(activeTab.url)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-slate-400'}"
+                />
+            </button>
+            <button
+                class="rounded-full p-2 hover:bg-slate-100"
+                onclick={openHistory}
+                title="Ιστορικό"
+            >
+                <History class="h-5 w-5 text-slate-400" />
+            </button>
+        </div>
 	</div>
 
 	<!-- 3. Content Area -->
 	<div class="relative flex-1 overflow-y-auto bg-slate-50">
-		{#if activeTab.type === 'home' || activeTab.type === 'search'}
+		{#if activeTab.type === 'home'}
 			<!-- Google Simulator -->
 			<div class="flex h-full flex-col items-center justify-center p-4">
 				<h1 class="mb-8 text-4xl font-bold text-slate-700">
@@ -201,6 +244,58 @@
 					<Button variant="ghost">Αισθάνομαι τυχερός</Button>
 				</div>
 			</div>
+        {:else if activeTab.type === 'search'}
+            <!-- Search Results Simulation -->
+             <div class="p-6 max-w-4xl mx-auto bg-white min-h-full">
+                <div class="flex items-center gap-4 mb-6 pb-4 border-b">
+                    <div class="text-2xl font-bold">
+                        <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
+                    </div>
+                    <div class="relative flex-1 max-w-xl">
+                         <input
+                            type="text"
+                            class="w-full rounded-full border border-slate-300 py-2 px-4 shadow-sm outline-none"
+                            value={searchBarInput.replace('search?q=', '') || addressBarInput.replace('search?q=', '')}
+                            readonly
+                        />
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Fake Result 1 -->
+                    <div class="group cursor-pointer" onclick={() => navigate('https://www.wikipedia.org')}>
+                        <div class="text-sm text-slate-700 mb-1">https://el.wikipedia.org › wiki</div>
+                        <div class="text-xl text-blue-800 hover:underline group-hover:text-blue-600 visited:text-purple-900 font-medium">
+                           {searchBarInput.replace('search?q=', '') || 'Αποτελέσματα'} - Βικιπαίδεια
+                        </div>
+                        <div class="text-sm text-slate-600 mt-1">
+                            Η Βικιπαίδεια είναι μια ελεύθερη, διαδικτυακή εγκυκλοπαίδεια που γράφεται και συντηρείται από εθελοντές...
+                        </div>
+                    </div>
+
+                     <!-- Fake Result 2 -->
+                    <div class="group cursor-pointer" onclick={() => navigate('news')}>
+                        <div class="text-sm text-slate-700 mb-1">https://www.news247.gr › eidiseis</div>
+                        <div class="text-xl text-blue-800 hover:underline group-hover:text-blue-600 visited:text-purple-900 font-medium">
+                           Ειδήσεις τώρα - Όλες οι εξελίξεις
+                        </div>
+                        <div class="text-sm text-slate-600 mt-1">
+                            Διαβάστε τις τελευταίες ειδήσεις από την Ελλάδα και τον κόσμο. Πολιτική, Οικονομία, Κοινωνία...
+                        </div>
+                    </div>
+
+                     <!-- Fake Result 3 -->
+                    <div class="group cursor-pointer">
+                        <div class="text-sm text-slate-700 mb-1">https://www.example.com › info</div>
+                        <div class="text-xl text-blue-800 hover:underline group-hover:text-blue-600 visited:text-purple-900 font-medium">
+                           Πληροφορίες για {searchBarInput.replace('search?q=', '')}
+                        </div>
+                        <div class="text-sm text-slate-600 mt-1">
+                            Βρείτε όλα όσα ψάχνετε εδώ. Γρήγορα και εύκολα αποτελέσματα για την αναζήτησή σας.
+                        </div>
+                    </div>
+                </div>
+             </div>
 		{:else if activeTab.type === 'news'}
 			<!-- News Site Simulator -->
 			<div class="mx-auto min-h-full max-w-3xl bg-white p-8 shadow-sm">
@@ -220,8 +315,11 @@
 					<h2 class="text-2xl font-bold">Νέα πλατφόρμα εκπαίδευσης για αρχάριους</h2>
 					<p class="leading-relaxed text-slate-700">
 						Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την
-						τεχνολογία...
+						τεχνολογία. Η πλατφόρμα προσφέρει μαθήματα για Windows, Internet, και Email με διαδραστικό τρόπο.
 					</p>
+                    <p class="leading-relaxed text-slate-700">
+                        Οι χρήστες μπορούν να μάθουν πώς να προστατεύονται από ηλεκτρονικές απάτες και πώς να χρησιμοποιούν αποτελεσματικά τον υπολογιστή τους.
+                    </p>
 				</article>
 			</div>
 		{:else if activeTab.type === 'gov'}
@@ -232,13 +330,21 @@
 					<p class="mt-2 text-slate-600">Ενιαία Ψηφιακή Πύλη της Δημόσιας Διοίκησης</p>
 				</header>
 				<div class="grid grid-cols-2 gap-6">
-					<div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500">
+					<div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500 cursor-pointer">
 						<h3 class="mb-2 font-bold">Υπηρεσίες Πολιτών</h3>
 						<p class="text-sm text-slate-600">Βρείτε υπηρεσίες και πληροφορίες</p>
 					</div>
-					<div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500">
+					<div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500 cursor-pointer">
 						<h3 class="mb-2 font-bold">Ψηφιακή Ταυτότητα</h3>
 						<p class="text-sm text-slate-600">Είσοδος στις υπηρεσίες</p>
+					</div>
+                    <div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500 cursor-pointer">
+						<h3 class="mb-2 font-bold">Εξουσιοδότηση</h3>
+						<p class="text-sm text-slate-600">Δημιουργία εγγράφου</p>
+					</div>
+                    <div class="rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500 cursor-pointer">
+						<h3 class="mb-2 font-bold">Υπεύθυνη Δήλωση</h3>
+						<p class="text-sm text-slate-600">Δημιουργία εγγράφου</p>
 					</div>
 				</div>
 			</div>
@@ -261,6 +367,33 @@
 					</p>
 				</div>
 			</div>
+        {:else if activeTab.type === 'history'}
+            <!-- History View -->
+             <div class="mx-auto max-w-2xl p-8 bg-white min-h-full">
+                <h2 class="text-2xl font-bold mb-6">Ιστορικό</h2>
+                <div class="space-y-0 border rounded-lg overflow-hidden">
+                    {#each history as item}
+                        <div class="flex items-center justify-between p-4 border-b last:border-0 hover:bg-slate-50 cursor-pointer" onclick={() => navigate(item.url)}>
+                            <div class="flex items-center gap-3">
+                                <Clock class="h-4 w-4 text-slate-400" />
+                                <div>
+                                    <div class="font-medium text-blue-600">{item.title}</div>
+                                    <div class="text-xs text-slate-400">{item.url}</div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-500">{item.time}</div>
+                        </div>
+                    {/each}
+                    {#if history.length === 0}
+                        <div class="p-8 text-center text-slate-500">Το ιστορικό είναι κενό</div>
+                    {/if}
+                </div>
+                <div class="mt-4 text-right">
+                    <Button variant="outline" size="sm" onclick={() => { history = []; toast.success('Το ιστορικό διαγράφηκε'); }}>
+                        Διαγραφή ιστορικού
+                    </Button>
+                </div>
+             </div>
 		{:else}
 			<!-- Generic Page -->
 			<div class="flex h-full items-center justify-center text-slate-400">

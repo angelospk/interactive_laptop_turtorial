@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Save } from 'lucide-svelte';
+	import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Save, Calculator } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let {
@@ -13,14 +13,24 @@
 		onAction: (action: string, data?: any) => void;
 	}>();
 
+    type CellStyle = {
+        bold: boolean;
+        italic: boolean;
+        underline: boolean;
+        align: 'left' | 'center' | 'right';
+    };
+
 	let cells = $state<Record<string, string>>(initialData);
+    let cellStyles = $state<Record<string, CellStyle>>({});
 	let selectedCell = $state<string | null>(null);
 	let formulaBar = $state('');
 
 	// Grid configuration
-	const rows = 15;
+	const rows = 20;
 	const cols = 8;
 	const colLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+    let currentStyle = $derived(selectedCell ? (cellStyles[selectedCell] || { bold: false, italic: false, underline: false, align: 'left' }) : { bold: false, italic: false, underline: false, align: 'left' });
 
 	function selectCell(cellId: string) {
 		selectedCell = cellId;
@@ -33,7 +43,7 @@
 			cells[selectedCell] = value;
 			onAction('update-cell', { cellId: selectedCell, value });
 
-			// Check for basic formulas (simplified)
+			// Check for formulas
 			if (value.startsWith('=')) {
 				handleFormula(selectedCell, value);
 			}
@@ -41,12 +51,19 @@
 	}
 
 	function handleFormula(cellId: string, formula: string) {
-		// Very basic sum example: =SUM(A1,A2) or =A1+A2
-		// For this simulation, we might just trigger a success if they type the correct formula
-		if (config.targetFormula && formula.toUpperCase().includes(config.targetFormula)) {
+        const cleanFormula = formula.toUpperCase().replace('=', '');
+
+        // Simple arithmetic mocking
+        // =SUM(A1, B1)
+		if (config.targetFormula && cleanFormula.includes(config.targetFormula)) {
 			toast.success('Σωστός τύπος!');
 			onAction('formula-success', { formula });
-		}
+		} else if (cleanFormula.startsWith('SUM')) {
+            // Simulate calculation
+            toast.success('Ο τύπος SUM εφαρμόστηκε');
+        } else if (cleanFormula.startsWith('AVERAGE')) {
+            toast.success('Ο τύπος AVERAGE εφαρμόστηκε');
+        }
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -59,6 +76,26 @@
 			}
 		}
 	}
+
+    function toggleStyle(prop: keyof CellStyle, value?: any) {
+        if(!selectedCell) return;
+
+        const current = cellStyles[selectedCell] || { bold: false, italic: false, underline: false, align: 'left' };
+        let newValue;
+
+        if (value !== undefined) {
+            newValue = value;
+        } else {
+            newValue = !current[prop];
+        }
+
+        cellStyles[selectedCell] = {
+            ...current,
+            [prop]: newValue
+        };
+
+        onAction('format-cell', { cellId: selectedCell, style: cellStyles[selectedCell] });
+    }
 </script>
 
 <div class="flex h-full flex-col overflow-hidden bg-white">
@@ -68,13 +105,65 @@
 			<Save class="h-4 w-4" />
 		</Button>
 		<div class="h-6 w-px bg-slate-300"></div>
-		<Button variant="ghost" size="icon"><Bold class="h-4 w-4" /></Button>
-		<Button variant="ghost" size="icon"><Italic class="h-4 w-4" /></Button>
-		<Button variant="ghost" size="icon"><Underline class="h-4 w-4" /></Button>
+
+        <!-- Formatting Buttons -->
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.bold ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('bold')}
+        >
+            <Bold class="h-4 w-4" />
+        </Button>
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.italic ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('italic')}
+        >
+            <Italic class="h-4 w-4" />
+        </Button>
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.underline ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('underline')}
+        >
+            <Underline class="h-4 w-4" />
+        </Button>
+
 		<div class="h-6 w-px bg-slate-300"></div>
-		<Button variant="ghost" size="icon"><AlignLeft class="h-4 w-4" /></Button>
-		<Button variant="ghost" size="icon"><AlignCenter class="h-4 w-4" /></Button>
-		<Button variant="ghost" size="icon"><AlignRight class="h-4 w-4" /></Button>
+
+        <!-- Alignment -->
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.align === 'left' ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('align', 'left')}
+        >
+            <AlignLeft class="h-4 w-4" />
+        </Button>
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.align === 'center' ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('align', 'center')}
+        >
+            <AlignCenter class="h-4 w-4" />
+        </Button>
+		<Button
+            variant="ghost"
+            size="icon"
+            class={currentStyle.align === 'right' ? 'bg-slate-200' : ''}
+            onclick={() => toggleStyle('align', 'right')}
+        >
+            <AlignRight class="h-4 w-4" />
+        </Button>
+
+        <div class="h-6 w-px bg-slate-300"></div>
+        <Button variant="ghost" size="icon" title="Συναρτήσεις" onclick={() => formulaBar = '='}>
+            <Calculator class="h-4 w-4" />
+        </Button>
 	</div>
 
 	<!-- Formula Bar -->
@@ -93,7 +182,7 @@
 	</div>
 
 	<!-- Grid -->
-	<div class="flex-1 overflow-auto">
+	<div class="flex-1 overflow-auto select-none">
 		<table class="w-full border-collapse text-sm">
 			<thead>
 				<tr>
@@ -109,16 +198,22 @@
 				{#each Array(rows) as _, r}
 					{@const rowNum = r + 1}
 					<tr>
-						<td class="border bg-slate-100 text-center text-slate-500">{rowNum}</td>
+						<td class="border bg-slate-100 text-center text-slate-500 text-xs">{rowNum}</td>
 						{#each colLabels as col}
 							{@const cellId = `${col}${rowNum}`}
+                            {@const style = cellStyles[cellId]}
 							<td
 								class="border p-0 {selectedCell === cellId ? 'ring-2 ring-green-500 z-10' : ''}"
 								onclick={() => selectCell(cellId)}
 							>
 								<input
 									type="text"
-									class="h-full w-full px-2 py-1 outline-none"
+									class="h-full w-full px-2 py-1 outline-none bg-transparent
+                                    {style?.bold ? 'font-bold' : ''}
+                                    {style?.italic ? 'italic' : ''}
+                                    {style?.underline ? 'underline' : ''}
+                                    {style?.align === 'center' ? 'text-center' : style?.align === 'right' ? 'text-right' : 'text-left'}
+                                    "
 									value={cells[cellId] || ''}
 									oninput={(e) => {
 										selectedCell = cellId;
