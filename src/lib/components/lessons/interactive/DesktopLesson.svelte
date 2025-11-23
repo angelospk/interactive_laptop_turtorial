@@ -219,6 +219,43 @@
 				success = true;
 			}
 
+            // --- ENHANCED EXCEL VERIFICATION ---
+            if (action === 'update-cell') {
+                if (goal === 'check-value' && config.targetCell === data.cellId) {
+                    const currentVal = parseFloat(data.calculatedValue);
+                    const targetVal = parseFloat(config.targetValue);
+
+                    // Check number equality (with tolerance) or string equality
+                    if (!isNaN(targetVal) && !isNaN(currentVal)) {
+                        if (Math.abs(currentVal - targetVal) < 0.1) {
+                            success = true;
+                        }
+                    } else if (data.calculatedValue === config.targetValue) {
+                         success = true;
+                    } else if (data.value === config.targetValue) { // Check raw input (e.g. text)
+                        success = true;
+                    }
+                }
+            }
+            if (action === 'format-cell' && goal === 'format-cell') {
+                // If we care about specific formatting, we can check it here
+                // For now, any format action on the correct lesson is success
+                // Or verify bold/center if needed (requires extending config)
+                if (config.requiredStyle) {
+                    // Check if style matches
+                    // data.style contains { bold: boolean, ... }
+                    const req = config.requiredStyle;
+                    const style = data.style;
+                    let matches = true;
+                    if(req.bold !== undefined && req.bold !== style.bold) matches = false;
+                    if(req.align !== undefined && req.align !== style.align) matches = false;
+
+                    if (matches) success = true;
+                } else {
+                     success = true;
+                }
+            }
+
 			if (success) {
 				completed = true;
 				toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
