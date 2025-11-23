@@ -179,6 +179,21 @@
 			// Direct match
 			if (goal === action) success = true;
 
+            // Email related matches
+            if (action === 'view-folder' && goal === 'view-' + data.folder) {
+                success = true;
+            }
+            if (action === 'save-draft' && goal === 'save-draft') {
+                success = true;
+            }
+            if (action === 'restore-email' && goal === 'restore-email') {
+                success = true;
+            }
+            if (action === 'send-email' && goal === 'send-email') {
+                // Could add subject/to check if needed
+                success = true;
+            }
+
 			// Specific matches based on config
 			if (
 				action === 'navigate' &&

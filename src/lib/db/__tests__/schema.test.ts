@@ -232,17 +232,17 @@ describe('Database Schema - Lessons Table', () => {
 });
 
 describe('Database Schema - Seed Data', () => {
-    it('should have 24 total lessons in seed data', () => {
-        expect(allLessons).toHaveLength(24);
+    it('should have 68 total lessons in seed data', () => {
+        expect(allLessons).toHaveLength(68);
     });
 
-    it('should have 11 Module 1 lessons', () => {
-        expect(module1Lessons).toHaveLength(11);
+    it('should have 8 Module 1 lessons', () => {
+        expect(module1Lessons).toHaveLength(8);
     });
 
     it('should have sequential order indexes in Module 1', () => {
         const orderIndexes = module1Lessons.map((l) => l.orderIndex).sort((a, b) => a - b);
-        expect(orderIndexes).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+        expect(orderIndexes).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     it('should have valid lesson types', () => {
@@ -256,7 +256,8 @@ describe('Database Schema - Seed Data', () => {
             'typing',
             'keyboard-action',
             'legacy-module-3',
-            'legacy-module-4'
+            'legacy-module-4',
+            'desktop-simulation'
         ];
 
         allLessons.forEach((lesson) => {

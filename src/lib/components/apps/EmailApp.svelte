@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Mail, Star, Send, Inbox, Trash2, AlertTriangle, Paperclip, Archive, Menu, FileText, X } from 'lucide-svelte';
+	import { Mail, Star, Send, Inbox, Trash2, AlertTriangle, Paperclip, Archive, Menu, FileText, X, RotateCcw } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
     import { fly } from 'svelte/transition';
 
@@ -117,6 +117,16 @@
 		onAction('delete-email', { id });
 	}
 
+    function restoreEmail(id: string) {
+        const email = emailList.find(e => e.id === id);
+        if(email && email.folder === 'trash') {
+            email.folder = 'inbox';
+            toast.success('Το μήνυμα επαναφέρθηκε στα Εισερχόμενα');
+            if (selectedEmailId === id) selectedEmailId = null;
+            onAction('restore-email', { id });
+        }
+    }
+
 	function reportPhishing(id: string) {
 		const email = emailList.find((e) => e.id === id);
         if(!email) return;
@@ -191,6 +201,7 @@
         emailList = [newDraft, ...emailList];
         isComposing = false;
         toast.info('Αποθηκεύτηκε στα Πρόχειρα');
+        onAction('save-draft', { subject: composeSubject });
     }
 </script>
 
@@ -245,25 +256,25 @@
 		<nav class="space-y-1">
 			<button
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'inbox' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
-				onclick={() => (currentView = 'inbox')}
+				onclick={() => { currentView = 'inbox'; onAction('view-folder', { folder: 'inbox' }); }}
 			>
 				<Inbox class="h-4 w-4" /> Εισερχόμενα
 			</button>
             <button
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'drafts' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
-				onclick={() => (currentView = 'drafts')}
+				onclick={() => { currentView = 'drafts'; onAction('view-folder', { folder: 'drafts' }); }}
 			>
 				<FileText class="h-4 w-4" /> Πρόχειρα
 			</button>
 			<button
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'sent' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
-				onclick={() => (currentView = 'sent')}
+				onclick={() => { currentView = 'sent'; onAction('view-folder', { folder: 'sent' }); }}
 			>
 				<Send class="h-4 w-4" /> Απεσταλμένα
 			</button>
 			<button
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'trash' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
-				onclick={() => (currentView = 'trash')}
+				onclick={() => { currentView = 'trash'; onAction('view-folder', { folder: 'trash' }); }}
 			>
 				<Trash2 class="h-4 w-4" /> Κάδος
 			</button>
@@ -315,9 +326,20 @@
 						>
 							<AlertTriangle class="h-4 w-4" />
 						</Button>
+                        {#if currentView === 'trash'}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Επαναφορά"
+                                onclick={() => restoreEmail(selectedEmail!.id)}
+                            >
+                                <RotateCcw class="h-4 w-4" />
+                            </Button>
+                        {/if}
 						<Button
 							variant="ghost"
 							size="icon"
+                            title={currentView === 'trash' ? 'Οριστική Διαγραφή' : 'Διαγραφή'}
 							onclick={() => deleteEmail(selectedEmail!.id)}
 						>
 							<Trash2 class="h-4 w-4" />

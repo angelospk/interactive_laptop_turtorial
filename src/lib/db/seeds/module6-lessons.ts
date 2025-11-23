@@ -36,35 +36,15 @@ export const module6Lessons: NewLesson[] = [
     {
         id: 'module6-lesson3',
         moduleId: 'module6',
-        lessonKey: 'identify-phishing',
+        lessonKey: 'compose-email',
         titleKey: 'module6_lesson3_title',
         descriptionKey: 'module6_lesson3_desc',
         difficulty: 'intermediate',
         orderIndex: 3,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'identify-phishing',
-            initialApps: ['email'],
-            emails: [
-                {
-                    id: 'phish1',
-                    sender: 'Secure Bank <admin@x-bank-verify.com>',
-                    subject: 'Ασυνήθιστη δραστηριότητα',
-                    body: 'Παρακαλώ κάντε κλικ εδώ για να επαληθεύσετε τον λογαριασμό σας.',
-                    date: '10:00',
-                    isRead: false,
-                    isPhishing: true
-                },
-                {
-                    id: 'real1',
-                    sender: 'Γιάννης <giannis@gmail.com>',
-                    subject: 'Καλημέρα',
-                    body: 'Τι κάνεις; Θα τα πούμε το απόγευμα;',
-                    date: '09:00',
-                    isRead: true,
-                    isPhishing: false
-                }
-            ]
+            goal: 'send-email',
+            initialApps: ['email']
         },
         enabled: true,
         requiredLessonId: 'module6-lesson2'
@@ -72,11 +52,114 @@ export const module6Lessons: NewLesson[] = [
     {
         id: 'module6-lesson4',
         moduleId: 'module6',
-        lessonKey: 'download-attachment',
+        lessonKey: 'save-draft',
         titleKey: 'module6_lesson4_title',
         descriptionKey: 'module6_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'save-draft',
+            initialApps: ['email']
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson3'
+    },
+    {
+        id: 'module6-lesson5',
+        moduleId: 'module6',
+        lessonKey: 'view-sent',
+        titleKey: 'module6_lesson5_title',
+        descriptionKey: 'module6_lesson5_desc',
+        difficulty: 'beginner',
+        orderIndex: 5,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'view-sent',
+            initialApps: ['email']
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson4'
+    },
+    {
+        id: 'module6-lesson6',
+        moduleId: 'module6',
+        lessonKey: 'delete-email',
+        titleKey: 'module6_lesson6_title',
+        descriptionKey: 'module6_lesson6_desc',
+        difficulty: 'intermediate',
+        orderIndex: 6,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'delete-email',
+            initialApps: ['email'],
+            emails: [
+                {
+                    id: 'spam1',
+                    sender: 'Spam <spam@spam.com>',
+                    subject: 'Κερδίσατε!',
+                    body: 'Κλικ εδώ για το δώρο σας.',
+                    date: '09:00',
+                    isRead: false,
+                    isPhishing: false,
+                    folder: 'inbox'
+                }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson5'
+    },
+    {
+        id: 'module6-lesson7',
+        moduleId: 'module6',
+        lessonKey: 'view-trash',
+        titleKey: 'module6_lesson7_title',
+        descriptionKey: 'module6_lesson7_desc',
+        difficulty: 'beginner',
+        orderIndex: 7,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'view-trash',
+            initialApps: ['email']
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson6'
+    },
+    {
+        id: 'module6-lesson8',
+        moduleId: 'module6',
+        lessonKey: 'restore-email',
+        titleKey: 'module6_lesson8_title',
+        descriptionKey: 'module6_lesson8_desc',
+        difficulty: 'intermediate',
+        orderIndex: 8,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'restore-email',
+            initialApps: ['email'],
+            emails: [
+                {
+                    id: 'deleted1',
+                    sender: 'Φίλος',
+                    subject: 'Σημαντικό',
+                    body: 'Μην το σβήσεις.',
+                    date: '08:00',
+                    isRead: true,
+                    folder: 'trash'
+                }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson7'
+    },
+    {
+        id: 'module6-lesson9',
+        moduleId: 'module6',
+        lessonKey: 'download-attachment',
+        titleKey: 'module6_lesson9_title',
+        descriptionKey: 'module6_lesson9_desc',
+        difficulty: 'intermediate',
+        orderIndex: 9,
         lessonType: 'desktop-simulation',
         config: {
             goal: 'download-attachment',
@@ -90,11 +173,12 @@ export const module6Lessons: NewLesson[] = [
                     date: 'Δευτέρα',
                     isRead: true,
                     isPhishing: false,
-                    hasAttachment: true
+                    hasAttachment: true,
+                    folder: 'inbox'
                 }
             ]
         },
         enabled: true,
-        requiredLessonId: 'module6-lesson3'
+        requiredLessonId: 'module6-lesson8'
     }
 ];
