@@ -76,6 +76,7 @@ export const module5Lessons: NewLesson[] = [
         config: {
             goal: 'switch-tab', // Simplified goal, simulation should track switching
             initialApps: ['browser'],
+            initialTabs: ['home', 'news', 'search?q=tech'],
             instructions: 'Έχετε πολλές καρτέλες. Αλλάξτε σε μια άλλη καρτέλα.'
         },
         enabled: true,
@@ -96,6 +97,7 @@ export const module5Lessons: NewLesson[] = [
             goal: 'navigate',
             targetUrl: 'history',
             initialApps: ['browser'],
+            initialTabs: ['home', 'news', 'weather'],
             instructions: 'Ανοίξτε το Ιστορικό περιήγησης πατώντας το εικονίδιο του ρολογιού.'
         },
         enabled: true,
@@ -116,7 +118,7 @@ export const module5Lessons: NewLesson[] = [
             goal: 'bookmark',
             targetSite: 'gov',
             initialApps: ['browser'],
-            instructions: 'Προσθέστε τη σελίδα gov στα αγαπημένα πατώντας το αστέρι.'
+            instructions: 'Πηγαίνετε στη σελίδα "gov" και προσθέστε τη στα αγαπημένα πατώντας το αστέρι.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson5'

@@ -56,7 +56,7 @@ export const module3Lessons: NewLesson[] = [
         config: {
             goal: 'restore-app',
             targetAppId: 'notepad',
-            initialApps: ['notepad'] // Need logic to start minimized? For now start open and user minimizes then restores or just assume minimized logic
+            initialApps: [{ appId: 'notepad', minimized: true }]
         },
         enabled: true,
         requiredLessonId: 'module3-lesson2'

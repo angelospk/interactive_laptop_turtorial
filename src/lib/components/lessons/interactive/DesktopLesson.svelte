@@ -72,16 +72,30 @@
 	$effect(() => {
 		if (config.initialApps) {
 			untrack(() => {
-				config.initialApps.forEach((appId: string) => openApp(appId));
+				config.initialApps.forEach((appItem: string | { appId: string; minimized?: boolean; maximized?: boolean }) => {
+                    if (typeof appItem === 'string') {
+                        openApp(appItem);
+                    } else {
+                        openApp(appItem.appId, appItem);
+                    }
+                });
 			});
 		}
 	});
 
-	function openApp(appId: string) {
+	function openApp(appId: string, initialState?: { minimized?: boolean; maximized?: boolean }) {
 		// Check if already open
 		const existing = openApps.find((a) => a.appId === appId);
 		if (existing) {
-			if (existing.minimized) existing.minimized = false;
+            if (initialState) {
+                 existing.minimized = !!initialState.minimized;
+                 existing.maximized = !!initialState.maximized;
+            } else {
+			    if (existing.minimized) {
+					existing.minimized = false;
+					checkGoal('restore-app', { appId: existing.appId });
+				}
+            }
 			// Bring to front (remove and push)
 			openApps = openApps.filter((a) => a !== existing);
 			openApps.push(existing);
@@ -89,8 +103,8 @@
 			openApps.push({
 				id: crypto.randomUUID(),
 				appId,
-				minimized: false,
-				maximized: false
+				minimized: !!initialState?.minimized,
+				maximized: !!initialState?.maximized
 			});
 			checkGoal('open-app', { appId });
 		}
@@ -210,6 +224,9 @@
 				goal === 'create-folder' &&
 				(!config.targetName || data.name === config.targetName)
 			) {
+				success = true;
+			}
+			if (action === 'select-file' && goal === 'select-file') {
 				success = true;
 			}
 			if (action === 'open-app' && goal === 'open-app' && data.appId === config.targetAppId) {

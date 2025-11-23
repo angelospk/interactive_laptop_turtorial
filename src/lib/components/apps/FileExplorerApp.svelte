@@ -284,7 +284,7 @@
 								onclick={(e) => {
 									e.stopPropagation();
 									selectedItemId = item.id;
-									onAction('select', { id: item.id });
+									onAction('select-file', { id: item.id });
 								}}
 								ondblclick={() => {
 									if (item.type === 'folder') navigate(item.id);

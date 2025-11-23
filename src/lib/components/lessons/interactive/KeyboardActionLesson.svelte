@@ -43,12 +43,12 @@
 				});
 			}
 		} else if (config.shortcuts) {
-			const shortcutMap: Record<string, { label: string; keys: string[] }> = {
-				copy: { label: 'Ctrl + C', keys: ['Control', 'c'] },
-				paste: { label: 'Ctrl + V', keys: ['Control', 'v'] },
-				cut: { label: 'Ctrl + X', keys: ['Control', 'x'] },
-				undo: { label: 'Ctrl + Z', keys: ['Control', 'z'] },
-				redo: { label: 'Ctrl + Y', keys: ['Control', 'y'] }
+			const shortcutMap: Record<string, { label: string; keys: string[]; description: string }> = {
+				copy: { label: 'Ctrl + C', keys: ['Control', 'c'], description: 'Αντιγραφή (Copy)' },
+				paste: { label: 'Ctrl + V', keys: ['Control', 'v'], description: 'Επικόλληση (Paste)' },
+				cut: { label: 'Ctrl + X', keys: ['Control', 'x'], description: 'Αποκοπή (Cut)' },
+				undo: { label: 'Ctrl + Z', keys: ['Control', 'z'], description: 'Αναίρεση (Undo)' },
+				redo: { label: 'Ctrl + Y', keys: ['Control', 'y'], description: 'Επανάληψη (Redo)' }
 			};
 
 			config.shortcuts.forEach((s) => {
@@ -68,6 +68,9 @@
 	});
 
 	let currentTarget = $derived(steps[currentStep]);
+
+	// Detect if F-keys are present to show Mac warning
+	let showMacWarning = $derived(config.keys?.some(k => k.startsWith('F')));
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (completed || !currentTarget) return;
@@ -145,9 +148,21 @@
 			{#if !completed}
 				<div class="current-task py-8">
 					<p class="mb-4 text-lg text-slate-500">Press the following keys:</p>
-					<div class="key-display mb-4 animate-pulse text-5xl font-bold text-primary">
+					<div class="key-display mb-2 animate-pulse text-5xl font-bold text-primary">
 						{currentTarget?.label}
 					</div>
+					{#if (currentTarget as any)?.description}
+						<div class="text-xl text-slate-600 font-medium mb-4">
+							{(currentTarget as any).description}
+						</div>
+					{/if}
+
+					{#if showMacWarning}
+						<div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 max-w-md mx-auto">
+							<span class="font-bold">Mac Users:</span> You may need to hold the <span class="font-mono bg-yellow-100 px-1 rounded">Fn</span> key while pressing F-keys (e.g. Fn + F1).
+						</div>
+					{/if}
+
 					{#if lastPressed}
 						<div class="mt-4 text-sm text-slate-400">
 							Detected: <span class="rounded bg-slate-100 px-2 py-1 font-mono">{lastPressed}</span>

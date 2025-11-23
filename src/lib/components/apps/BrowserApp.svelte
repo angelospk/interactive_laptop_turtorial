@@ -30,6 +30,39 @@
 	let searchBarInput = $state('');
 	let bookmarkedSites = $state<string[]>([]);
 
+    // Initialize from config
+    $effect(() => {
+        if (config.initialTabs && config.initialTabs.length > 0) {
+            // Map string URLs to tab objects
+            tabs = config.initialTabs.map((url: string, index: number) => {
+                let type: Tab['type'] = 'search';
+                let title = url;
+
+                if (url === 'home') {
+                    type = 'home';
+                    title = 'Αρχική';
+                } else if (url.includes('news')) {
+                    type = 'news';
+                    title = 'Ειδήσεις';
+                } else if (url.includes('gov')) {
+                    type = 'gov';
+                    title = 'Gov.gr';
+                } else if (url.includes('search') || url.includes('google')) {
+                    type = 'search';
+                    title = 'Google';
+                }
+
+                return {
+                    id: index + 1,
+                    title,
+                    url,
+                    type
+                };
+            });
+            activeTabId = 1;
+        }
+    });
+
     // History State
     let history = $state<HistoryItem[]>([
         { url: 'google.com', title: 'Google', time: '10:00' },

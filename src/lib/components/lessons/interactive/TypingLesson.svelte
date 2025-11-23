@@ -88,7 +88,7 @@
 
 	function checkAnswer() {
 		if (isCorrect) {
-			completed = true;
+			// completed = true; // No need to set completed state for UI, just finish
 			const timeTaken = startTime ? (Date.now() - startTime) / 1000 : 0;
 
 			// Calculate score
@@ -100,9 +100,8 @@
 
 			toast.success(m.very_good ? m.very_good() : 'Very good!');
 
-			setTimeout(() => {
-				onComplete(finalScore);
-			}, 1500);
+			// Immediately complete
+			onComplete(finalScore);
 		} else {
 			toast.error(m.try_again ? m.try_again() : 'Try again');
 		}
@@ -151,22 +150,7 @@
 			</div>
 		</div>
 
-		<div class="actions mt-8 flex justify-center">
-			<Button
-				size="lg"
-				onclick={checkAnswer}
-				disabled={!isCorrect || completed}
-				class="px-12 text-lg"
-			>
-				{completed
-					? m.lesson_completed
-						? m.lesson_completed()
-						: 'Completed'
-					: m.progress_continue
-						? m.progress_continue()
-						: 'Continue'}
-			</Button>
-		</div>
+		<!-- Button removed as requested for auto-completion -->
 	</div>
 </LessonTemplate>
 
