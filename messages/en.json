@@ -115,5 +115,19 @@
 	"type_window_management": "Window Management",
 	"type_file_explorer": "File Explorer",
 	"type_browser": "Web Browser",
-	"next_lesson": "Next Lesson"
+	"next_lesson": "Next Lesson",
+	"module10_title": "Module 10: Advanced Security & Phishing",
+	"module10_description": "Dedicated module for recognizing and handling security threats",
+	"module10_lesson1_title": "1. Urgent Payment Request",
+	"module10_lesson1_desc": "Identify the suspicious email asking for urgent payment",
+	"module10_lesson2_title": "2. Fake Login Page",
+	"module10_lesson2_desc": "Beware of links! Find the email trying to steal passwords",
+	"module10_lesson3_title": "3. Safe Attachment",
+	"module10_lesson3_desc": "Distinguish the safe email from the dangerous one",
+	"module10_lesson4_title": "4. Fake Lottery Winner",
+	"module10_lesson4_desc": "Someone is giving you money. Is it true?",
+	"module10_lesson5_title": "5. Bank Verification",
+	"module10_lesson5_desc": "The bank sends an email. Is it genuine?",
+	"module10_lesson6_title": "6. Tech Support Scam",
+	"module10_lesson6_desc": "Microsoft is asking for access?"
 }

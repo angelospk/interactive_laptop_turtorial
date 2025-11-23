@@ -201,5 +201,19 @@
 	"type_file_explorer": "Εξερεύνηση Αρχείων",
 	"type_browser": "Περιηγητής Ιστού",
 	"type_desktop_simulation": "Προσομοίωση Windows",
-	"next_lesson": "Επόμενο Μάθημα"
+	"next_lesson": "Επόμενο Μάθημα",
+	"module10_title": "Ενότητα 10: Προχωρημένη Ασφάλεια & Phishing",
+	"module10_description": "Ειδική ενότητα για την αναγνώριση και αντιμετώπιση απειλών ασφαλείας",
+	"module10_lesson1_title": "1. Επείγον Αίτημα Πληρωμής",
+	"module10_lesson1_desc": "Εντοπίστε το ύποπτο email που ζητάει επείγουσα πληρωμή",
+	"module10_lesson2_title": "2. Ψεύτικη Σελίδα Σύνδεσης",
+	"module10_lesson2_desc": "Προσοχή στους συνδέσμους! Βρείτε το email που προσπαθεί να κλέψει κωδικούς",
+	"module10_lesson3_title": "3. Ασφαλές Συνημμένο",
+	"module10_lesson3_desc": "Ξεχωρίστε το ασφαλές email από το επικίνδυνο",
+	"module10_lesson4_title": "4. Ψεύτικος Νικητής Λοταρίας",
+	"module10_lesson4_desc": "Κάποιος σας χαρίζει λεφτά. Είναι αλήθεια;",
+	"module10_lesson5_title": "5. Επαλήθευση Τράπεζας",
+	"module10_lesson5_desc": "Η τράπεζα στέλνει email. Είναι γνήσιο;",
+	"module10_lesson6_title": "6. Απάτη Τεχνικής Υποστήριξης",
+	"module10_lesson6_desc": "Η Microsoft σας ζητάει πρόσβαση;"
 }
