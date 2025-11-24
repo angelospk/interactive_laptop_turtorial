@@ -111,10 +111,10 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<Button variant="outline" onclick={prevLesson} disabled={currentLessonIndex === 0}>
-			Previous
+			Προηγούμενο
 		</Button>
 		<span class="text-sm font-medium text-slate-500">
-			Lesson {currentLessonIndex + 1} of {lessons.length}
+			Μάθημα {currentLessonIndex + 1} από {lessons.length}
 		</span>
 		<Button
 			onclick={nextLesson}
@@ -122,7 +122,7 @@
 				? true
 				: !mergedProgress[currentLesson.id]?.completed}
 		>
-			{currentLessonIndex === lessons.length - 1 ? 'Finish' : 'Next'}
+			{currentLessonIndex === lessons.length - 1 ? 'Λήξη' : 'Επόμενο'}
 		</Button>
 	</div>
 
@@ -132,7 +132,7 @@
 				<div class="flex h-64 items-center justify-center rounded-md bg-slate-100 text-slate-500">
 					<div class="text-center">
 						<span class="text-4xl">🔒</span>
-						<p class="mt-2">Complete the previous lesson to unlock.</p>
+						<p class="mt-2">Ολοκλήρωσε το προηγούμενο μάθημα για να το ξεκλειδώσεις.</p>
 					</div>
 				</div>
 			{:else}

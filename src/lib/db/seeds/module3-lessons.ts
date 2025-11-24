@@ -116,5 +116,41 @@ export const module3Lessons: NewLesson[] = [
         },
         enabled: true,
         requiredLessonId: 'module3-lesson5'
+    },
+
+    // Lesson 7: Start Menu
+    {
+        id: 'module3-lesson7',
+        moduleId: 'module3',
+        lessonKey: 'start-menu',
+        titleKey: 'module3_lesson7_title',
+        descriptionKey: 'module3_lesson7_desc',
+        difficulty: 'beginner',
+        orderIndex: 7,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'open-start-menu',
+            initialApps: []
+        },
+        enabled: true,
+        requiredLessonId: 'module3-lesson6'
+    },
+
+    // Lesson 8: Task View
+    {
+        id: 'module3-lesson8',
+        moduleId: 'module3',
+        lessonKey: 'task-view',
+        titleKey: 'module3_lesson8_title',
+        descriptionKey: 'module3_lesson8_desc',
+        difficulty: 'intermediate',
+        orderIndex: 8,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'open-task-view',
+            initialApps: ['notepad', 'browser']
+        },
+        enabled: true,
+        requiredLessonId: 'module3-lesson7'
     }
 ];

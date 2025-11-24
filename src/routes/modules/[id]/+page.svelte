@@ -45,12 +45,12 @@
 		{#if selectedLessonId}
 			<Button variant="ghost" onclick={backToGrid} class="gap-2">
 				<ArrowLeft class="h-4 w-4" />
-				{m.back_to_lessons ? m.back_to_lessons() : 'Back to Lessons'}
+				{m.back_to_lessons ? m.back_to_lessons() : 'Πίσω στα Μαθήματα'}
 			</Button>
 		{:else}
 			<Button variant="ghost" href="/" class="gap-2">
 				<ArrowLeft class="h-4 w-4" />
-				{m.back_to_modules ? m.back_to_modules() : 'Back to Modules'}
+				{m.back_to_modules ? m.back_to_modules() : 'Πίσω στις Ενότητες'}
 			</Button>
 		{/if}
 	</div>

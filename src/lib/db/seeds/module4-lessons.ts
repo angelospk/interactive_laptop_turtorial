@@ -74,7 +74,12 @@ export const module4Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'copy-file',
-            initialApps: ['explorer']
+            initialApps: ['explorer'],
+            instructions: 'Επιλέξτε το αρχείο "Έγγραφο.txt", πατήστε "Αντιγραφή" (ή Ctrl+C), ανοίξτε τον φάκελο "Εργασία" και πατήστε "Επικόλληση" (ή Ctrl+V).',
+            initialFiles: [
+                { id: 'doc1', name: 'Έγγραφο.txt', type: 'text', parentId: 'root' },
+                { id: 'work-folder', name: 'Εργασία', type: 'folder', parentId: 'root' }
+            ]
         },
         enabled: true,
         requiredLessonId: 'module4-lesson3'
