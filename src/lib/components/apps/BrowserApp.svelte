@@ -82,6 +82,30 @@
 		{ url: 'news247.gr', title: 'Ειδήσεις 24/7', time: '09:45' }
 	]);
 
+	// Missing State Declarations
+	let showCookieBanner = $state(false);
+
+	// Banking State
+	let bankState = $state<'login' | 'dashboard' | 'transfer_success'>('login');
+	let bankUsername = $state('');
+	let bankPassword = $state('');
+	let bankBalance = $state(1250.5);
+	let bankRecipient = $state('');
+	let bankIBAN = $state('');
+	let bankTransferAmount = $state('');
+	let bankPasswordStrength = $derived.by(() => {
+		if (bankPassword.length < 4) return 'weak';
+		if (bankPassword.length >= 8 && /[0-9]/.test(bankPassword) && /[^A-Za-z0-9]/.test(bankPassword))
+			return 'strong';
+		return 'weak';
+	});
+
+	// Gov State
+	let govState = $state<'home' | 'form' | 'success'>('home');
+	let govName = $state('');
+	let govAFM = $state('');
+	let govText = $state('');
+
 	let activeTab = $derived(tabs.find((t) => t.id === activeTabId) || tabs[0]);
 
 	// Reset internal states when tab changes
