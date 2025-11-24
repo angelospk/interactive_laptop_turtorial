@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { CheckCircle, XCircle } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		lesson: Lesson;

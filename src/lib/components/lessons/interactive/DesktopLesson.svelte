@@ -10,7 +10,7 @@
 	import { Info } from 'lucide-svelte';
 
 	import { untrack } from 'svelte';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Import Apps
 	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';

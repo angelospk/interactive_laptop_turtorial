@@ -6,7 +6,7 @@
 	import { CheckCircle2, XCircle, HelpCircle } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { Lesson } from '$lib/db/schema';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;

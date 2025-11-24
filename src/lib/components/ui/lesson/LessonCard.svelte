@@ -9,7 +9,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Lock, CheckCircle, Star } from '@lucide/svelte';
 	import type { Lesson } from '$lib/db/schema';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { lesson, progress, isLocked, onclick } = $props<{
 		lesson: Lesson;

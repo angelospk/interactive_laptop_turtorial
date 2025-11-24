@@ -16,12 +16,9 @@
 		ShieldAlert
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
-	let {
-		config = {},
-		onAction
-	} = $props<{
+	let { config = {}, onAction } = $props<{
 		config?: any;
 		onAction: (action: string, data?: any) => void;
 	}>();
@@ -40,9 +37,7 @@
 		time: string;
 	};
 
-	let tabs = $state<Tab[]>([
-		{ id: 1, title: 'Αρχική', url: 'home', type: 'home', isSecure: true }
-	]);
+	let tabs = $state<Tab[]>([{ id: 1, title: 'Αρχική', url: 'home', type: 'home', isSecure: true }]);
 	let activeTabId = $state(1);
 	let addressBarInput = $state('');
 	let searchBarInput = $state('');
@@ -61,11 +56,7 @@
 	let bankIBAN = $state('');
 	let bankPasswordStrength = $derived.by(() => {
 		if (!bankPassword) return 'none';
-		if (
-			bankPassword.length >= 8 &&
-			/[0-9]/.test(bankPassword) &&
-			/[a-zA-Z]/.test(bankPassword)
-		)
+		if (bankPassword.length >= 8 && /[0-9]/.test(bankPassword) && /[a-zA-Z]/.test(bankPassword))
 			return 'strong';
 		return 'weak';
 	});
@@ -268,7 +259,7 @@
 	<!-- Cookie Banner Overlay -->
 	{#if showCookieBanner}
 		<div
-			class="animate-in slide-in-from-bottom absolute bottom-0 right-0 left-0 z-50 flex flex-col items-center justify-between gap-4 bg-slate-800 p-6 text-white shadow-xl md:flex-row"
+			class="absolute right-0 bottom-0 left-0 z-50 flex animate-in flex-col items-center justify-between gap-4 bg-slate-800 p-6 text-white shadow-xl slide-in-from-bottom md:flex-row"
 		>
 			<div>
 				<h3 class="mb-1 text-lg font-bold">{t('browser_cookie_title')}</h3>
@@ -282,11 +273,7 @@
 				>
 					{t('browser_cookie_reject')}
 				</Button>
-				<Button
-					variant="default"
-					class="bg-blue-600 hover:bg-blue-700"
-					onclick={acceptCookies}
-				>
+				<Button variant="default" class="bg-blue-600 hover:bg-blue-700" onclick={acceptCookies}>
 					{t('browser_cookie_accept')}
 				</Button>
 			</div>
@@ -313,18 +300,14 @@
 				{/if}
 				<span class="max-w-[100px] truncate">{tab.title}</span>
 				<button
-					class="rounded-full p-0.5 opacity-0 hover:bg-slate-200 group-hover:opacity-100"
+					class="rounded-full p-0.5 opacity-0 group-hover:opacity-100 hover:bg-slate-200"
 					onclick={(e) => closeTab(tab.id, e)}
 				>
 					<X class="h-3 w-3" />
 				</button>
 			</div>
 		{/each}
-		<button
-			class="mb-1 rounded-full p-2 hover:bg-slate-200"
-			onclick={addTab}
-			title="Νέα καρτέλα"
-		>
+		<button class="mb-1 rounded-full p-2 hover:bg-slate-200" onclick={addTab} title="Νέα καρτέλα">
 			<Plus class="h-4 w-4 text-slate-600" />
 		</button>
 	</div>
@@ -368,11 +351,7 @@
 						: 'text-slate-400'}"
 				/>
 			</button>
-			<button
-				class="rounded-full p-2 hover:bg-slate-100"
-				onclick={openHistory}
-				title="Ιστορικό"
-			>
+			<button class="rounded-full p-2 hover:bg-slate-100" onclick={openHistory} title="Ιστορικό">
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
 		</div>
@@ -418,10 +397,10 @@
 							class="text-red-500">e</span
 						>
 					</div>
-					<div class="relative flex-1 max-w-xl">
+					<div class="relative max-w-xl flex-1">
 						<input
 							type="text"
-							class="w-full rounded-full border border-slate-300 py-2 px-4 shadow-sm outline-none"
+							class="w-full rounded-full border border-slate-300 px-4 py-2 shadow-sm outline-none"
 							value={searchBarInput.replace('search?q=', '') ||
 								addressBarInput.replace('search?q=', '')}
 							readonly
@@ -440,7 +419,7 @@
 					>
 						<div class="mb-1 text-sm text-slate-700">https://el.wikipedia.org › wiki</div>
 						<div
-							class="text-xl font-medium text-blue-800 visited:text-purple-900 hover:underline group-hover:text-blue-600"
+							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
 						>
 							{searchBarInput.replace('search?q=', '') || 'Αποτελέσματα'} - Βικιπαίδεια
 						</div>
@@ -460,7 +439,7 @@
 					>
 						<div class="mb-1 text-sm text-slate-700">https://www.news247.gr › eidiseis</div>
 						<div
-							class="text-xl font-medium text-blue-800 visited:text-purple-900 hover:underline group-hover:text-blue-600"
+							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
 						>
 							Ειδήσεις τώρα - Όλες οι εξελίξεις
 						</div>
@@ -474,7 +453,7 @@
 					<div class="group cursor-pointer">
 						<div class="mb-1 text-sm text-slate-700">https://www.example.com › info</div>
 						<div
-							class="text-xl font-medium text-blue-800 visited:text-purple-900 hover:underline group-hover:text-blue-600"
+							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
 						>
 							Πληροφορίες για {searchBarInput.replace('search?q=', '')}
 						</div>
@@ -499,7 +478,7 @@
 					</p>
 				</header>
 				<article class="space-y-4">
-					<div class="h-48 w-full rounded-lg bg-slate-200 mb-4"></div>
+					<div class="mb-4 h-48 w-full rounded-lg bg-slate-200"></div>
 					<h2 class="text-2xl font-bold">Νέα πλατφόρμα εκπαίδευσης για αρχάριους</h2>
 					<p class="leading-relaxed text-slate-700">
 						Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την τεχνολογία. Η
