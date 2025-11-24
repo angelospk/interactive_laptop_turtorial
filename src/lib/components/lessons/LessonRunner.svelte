@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import LessonRenderer from './LessonRenderer.svelte';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		lessons,
@@ -172,7 +172,7 @@
 					onclick={() => (localUpdates[currentLesson.id].completed = false)}
 					class="text-green-700 hover:bg-green-100 hover:text-green-900"
 				>
-					{getMessage('back') || 'Close'}
+					{getMessage('try_again') || 'Retry'}
 				</Button>
 
 				{#if currentLessonIndex < lessons.length - 1}

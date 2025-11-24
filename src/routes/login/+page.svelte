@@ -10,7 +10,7 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 	import { toast } from 'svelte-sonner';
 
 	let username = $state('');

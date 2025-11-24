@@ -3,7 +3,7 @@
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 	import { CheckCircle } from '@lucide/svelte';
 

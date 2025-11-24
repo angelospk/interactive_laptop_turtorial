@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ArrowLeft, HelpCircle } from 'lucide-svelte';
 	import type { Lesson } from '$lib/db/schema';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Snippet } from 'svelte';
 	import GuideOverlay from './GuideOverlay.svelte';
 

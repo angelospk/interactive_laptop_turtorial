@@ -31,6 +31,9 @@
 		// The new unified desktop simulation
 		'desktop-simulation': () => import('./interactive/DesktopLesson.svelte'),
 
+		// New Quiz Type
+		quiz: () => import('./interactive/QuizLesson.svelte'),
+
 		'legacy-module-3': () => import('./legacy/LegacyModule3Lesson.svelte'),
 		'legacy-module-4': () => import('./legacy/LegacyModule4Lesson.svelte')
 	};

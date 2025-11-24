@@ -5,7 +5,7 @@
 	import LessonCard from '$lib/components/ui/lesson/LessonCard.svelte';
 	import { ArrowLeft } from '@lucide/svelte';
 	import { invalidateAll } from '$app/navigation';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 

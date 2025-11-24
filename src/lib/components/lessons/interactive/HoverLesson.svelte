@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		lesson: Lesson;
@@ -18,13 +18,13 @@
 		timeLimit: number;
 		shape?: string;
 		targetSize?: string;
-        theme?: 'balloons' | 'moles' | 'simple';
-        gameMode?: boolean;
-        instructions?: string;
+		theme?: 'balloons' | 'moles' | 'simple';
+		gameMode?: boolean;
+		instructions?: string;
 	};
 	const targetCount = config.targetCount || 5;
 	const timeLimit = config.timeLimit || 30;
-    const theme = config.theme || 'simple';
+	const theme = config.theme || 'simple';
 
 	// Game state
 	let score = $state(0);
@@ -74,7 +74,7 @@
 		const efficiency = Math.max(0, 100 - timeTaken * 2);
 		score += Math.round(efficiency);
 
-        // Audio feedback would be nice here
+		// Audio feedback would be nice here
 
 		// Generate new target after short delay
 		setTimeout(() => {
@@ -125,7 +125,11 @@
 		{#if !gameStarted}
 			<div class="start-screen">
 				<h2>{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
-				<p>{config.instructions || m.hover_instructions?.() || 'Μετακινήστε το ποντίκι πάνω από τους στόχους.'}</p>
+				<p>
+					{config.instructions ||
+						m.hover_instructions?.() ||
+						'Μετακινήστε το ποντίκι πάνω από τους στόχους.'}
+				</p>
 				<div class="game-info">
 					<div class="info-item">
 						<span class="label">{m.targets?.() || 'Στόχοι'}:</span>
@@ -173,19 +177,19 @@
 						onmouseenter={handleTargetHover}
 						onmouseleave={handleTargetLeave}
 					>
-                        {#if theme === 'balloons'}
-                            <!-- Balloon Visual -->
-                            <div class="balloon-wrapper">
-                                <div class="balloon {isHovering ? 'popped' : ''}">
-                                    {#if isHovering}
-                                        💥
-                                    {/if}
-                                </div>
-                                <div class="string"></div>
-                            </div>
-                        {:else}
-						    <div class="target-inner"></div>
-                        {/if}
+						{#if theme === 'balloons'}
+							<!-- Balloon Visual -->
+							<div class="balloon-wrapper">
+								<div class="balloon {isHovering ? 'popped' : ''}">
+									{#if isHovering}
+										💥
+									{/if}
+								</div>
+								<div class="string"></div>
+							</div>
+						{:else}
+							<div class="target-inner"></div>
+						{/if}
 					</div>
 				</div>
 			</div>
@@ -310,7 +314,7 @@
 		background: rgba(255, 255, 255, 0.5);
 		border-radius: 8px;
 		min-height: 400px;
-        overflow: hidden;
+		overflow: hidden;
 	}
 
 	.target {
@@ -320,9 +324,9 @@
 		transform: translate(-50%, -50%);
 		cursor: pointer;
 		transition: transform 0.3s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.target:hover {
@@ -342,53 +346,53 @@
 		border: 4px solid white;
 	}
 
-    /* Balloon Theme */
-    .balloon-wrapper {
-        position: relative;
-        width: 60px;
-        height: 80px;
-    }
+	/* Balloon Theme */
+	.balloon-wrapper {
+		position: relative;
+		width: 60px;
+		height: 80px;
+	}
 
-    .balloon {
-        width: 60px;
-        height: 70px;
-        background: radial-gradient(circle at 20% 20%, #60a5fa, #2563eb);
-        border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-        position: relative;
-        box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-    }
+	.balloon {
+		width: 60px;
+		height: 70px;
+		background: radial-gradient(circle at 20% 20%, #60a5fa, #2563eb);
+		border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+		position: relative;
+		box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2rem;
+	}
 
-    .balloon.popped {
-        background: transparent;
-        box-shadow: none;
-    }
+	.balloon.popped {
+		background: transparent;
+		box-shadow: none;
+	}
 
-    .balloon::before {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 8px solid #2563eb;
-    }
+	.balloon::before {
+		content: '';
+		position: absolute;
+		bottom: -4px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 0;
+		border-left: 5px solid transparent;
+		border-right: 5px solid transparent;
+		border-top: 8px solid #2563eb;
+	}
 
-    .string {
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        width: 2px;
-        height: 20px;
-        background: rgba(0,0,0,0.3);
-        transform: translateX(-50%);
-    }
+	.string {
+		position: absolute;
+		bottom: -20px;
+		left: 50%;
+		width: 2px;
+		height: 20px;
+		background: rgba(0, 0, 0, 0.3);
+		transform: translateX(-50%);
+	}
 
 	@keyframes pulse {
 		0% {
