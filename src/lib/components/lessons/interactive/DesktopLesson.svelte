@@ -6,8 +6,11 @@
 	import Window from '$lib/components/desktop/Window.svelte';
 	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
+	import { Card } from '$lib/components/ui/card';
+	import { Info } from 'lucide-svelte';
 
 	import { untrack } from 'svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	// Import Apps
 	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';
@@ -29,6 +32,7 @@
 	// Parse config
 	const config = (lesson.config as any) || {};
 	const goal = config.goal || '';
+	const tutorialSteps = (config.tutorialSteps || []) as string[];
 
 	// Define available apps
 	const availableApps = [
@@ -50,6 +54,12 @@
 	);
 	let startMenuOpen = $state(false);
 	let completed = $state(false);
+
+	// Helper to get localized string safely
+	function t(key: string) {
+		// @ts-ignore
+		return m[key]?.() || key;
+	}
 
 	// Derived Taskbar Apps: Pinned + Open but Unpinned
 	let taskbarApps = $derived.by(() => {
@@ -264,71 +274,105 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	<!-- Desktop Environment -->
-	<Desktop class="h-[600px]">
-		<!-- Windows -->
-		{#each openApps as instance (instance.id)}
-			{@const appDef = availableApps.find((a) => a.id === instance.appId)}
-			{#if appDef && appDef.component}
-				<Window
-					title={appDef.name}
-					icon={appDef.icon}
-					isOpen={true}
-					isMinimized={instance.minimized}
-					isMaximized={instance.maximized}
-					onMinimize={() => toggleMinimize(instance.id)}
-					onMaximize={() => toggleMaximize(instance.id)}
-					onClose={() => closeApp(instance.id)}
-					onFocus={() => bringToFront(instance.id)}
+	<div class="relative h-full w-full">
+		<!-- Tutorial Assistant Overlay -->
+		{#if tutorialSteps && tutorialSteps.length > 0 && !completed}
+			<div
+				class="pointer-events-none absolute top-6 right-6 z-[100] w-72 animate-in fade-in slide-in-from-right-4"
+			>
+				<Card
+					class="pointer-events-auto border-l-4 border-l-blue-500 bg-white/95 shadow-2xl backdrop-blur"
 				>
-					<!-- Dynamic Component Rendering -->
-					<appDef.component
-						config={{
-							...config,
-							...(instance.appId === 'settings' ? { initialPage: config.initialPage } : {})
-						}}
-						onAction={handleAppAction}
-						initialFiles={config.initialFiles}
-						initialData={config.initialData}
-						emails={config.emails}
-					/>
-				</Window>
-			{:else}
-				<!-- Fallback/Placeholder Window -->
-				<Window
-					title={appDef?.name || 'App'}
-					icon={appDef?.icon}
-					isOpen={true}
-					isMinimized={instance.minimized}
-					isMaximized={instance.maximized}
-					onMinimize={() => toggleMinimize(instance.id)}
-					onMaximize={() => toggleMaximize(instance.id)}
-					onClose={() => closeApp(instance.id)}
-					onFocus={() => bringToFront(instance.id)}
-				>
-					<div class="flex h-full items-center justify-center bg-white">
-						<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
+					<div class="p-4">
+						<div class="flex items-start gap-3">
+							<div class="rounded-full bg-blue-100 p-2 text-blue-600">
+								<Info class="h-5 w-5" />
+							</div>
+							<div class="flex-1">
+								<h4 class="mb-1 text-sm font-bold tracking-wider text-slate-900 uppercase">
+									Οδηγίες
+								</h4>
+								<div class="space-y-2 text-sm text-slate-700">
+									{#each tutorialSteps as step, i}
+										<div class="flex gap-2">
+											<span class="font-bold text-blue-600">{i + 1}.</span>
+											<span>{t(step)}</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+						</div>
 					</div>
-				</Window>
-			{/if}
-		{/each}
+				</Card>
+			</div>
+		{/if}
 
-		<!-- Start Menu -->
-		<StartMenu
-			isOpen={startMenuOpen}
-			apps={availableApps}
-			onAppClick={openApp}
-			onClose={() => (startMenuOpen = false)}
-		/>
+		<!-- Desktop Environment -->
+		<Desktop class="h-[600px]">
+			<!-- Windows -->
+			{#each openApps as instance (instance.id)}
+				{@const appDef = availableApps.find((a) => a.id === instance.appId)}
+				{#if appDef && appDef.component}
+					<Window
+						title={appDef.name}
+						icon={appDef.icon}
+						isOpen={true}
+						isMinimized={instance.minimized}
+						isMaximized={instance.maximized}
+						onMinimize={() => toggleMinimize(instance.id)}
+						onMaximize={() => toggleMaximize(instance.id)}
+						onClose={() => closeApp(instance.id)}
+						onFocus={() => bringToFront(instance.id)}
+					>
+						<!-- Dynamic Component Rendering -->
+						<appDef.component
+							config={{
+								...config,
+								...(instance.appId === 'settings' ? { initialPage: config.initialPage } : {})
+							}}
+							onAction={handleAppAction}
+							initialFiles={config.initialFiles}
+							initialData={config.initialData}
+							emails={config.emails}
+						/>
+					</Window>
+				{:else}
+					<!-- Fallback/Placeholder Window -->
+					<Window
+						title={appDef?.name || 'App'}
+						icon={appDef?.icon}
+						isOpen={true}
+						isMinimized={instance.minimized}
+						isMaximized={instance.maximized}
+						onMinimize={() => toggleMinimize(instance.id)}
+						onMaximize={() => toggleMaximize(instance.id)}
+						onClose={() => closeApp(instance.id)}
+						onFocus={() => bringToFront(instance.id)}
+					>
+						<div class="flex h-full items-center justify-center bg-white">
+							<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
+						</div>
+					</Window>
+				{/if}
+			{/each}
 
-		<!-- Taskbar -->
-		<Taskbar
-			apps={taskbarApps}
-			openAppIds={openApps.map((a) => a.appId)}
-			onAppClick={(id) => openApp(id)}
-			onStartClick={() => (startMenuOpen = !startMenuOpen)}
-			onQuickSettingsClick={() => checkGoal('open-quick-settings')}
-			onOpenSettings={openSettingsToPage}
-		/>
-	</Desktop>
+			<!-- Start Menu -->
+			<StartMenu
+				isOpen={startMenuOpen}
+				apps={availableApps}
+				onAppClick={openApp}
+				onClose={() => (startMenuOpen = false)}
+			/>
+
+			<!-- Taskbar -->
+			<Taskbar
+				apps={taskbarApps}
+				openAppIds={openApps.map((a) => a.appId)}
+				onAppClick={(id) => openApp(id)}
+				onStartClick={() => (startMenuOpen = !startMenuOpen)}
+				onQuickSettingsClick={() => checkGoal('open-quick-settings')}
+				onOpenSettings={openSettingsToPage}
+			/>
+		</Desktop>
+	</div>
 </LessonTemplate>
