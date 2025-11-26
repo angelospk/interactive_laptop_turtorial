@@ -5,6 +5,7 @@
 	import Taskbar from '$lib/components/desktop/Taskbar.svelte';
 	import Window from '$lib/components/desktop/Window.svelte';
 	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
+	import TaskView from '$lib/components/desktop/TaskView.svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import { Card } from '$lib/components/ui/card';
 	import { Info } from 'lucide-svelte';
@@ -53,6 +54,7 @@
 		[]
 	);
 	let startMenuOpen = $state(false);
+	let showTaskView = $state(false);
 	let completed = $state(false);
 
 	// Helper to get localized string safely
@@ -247,6 +249,9 @@
 			if (action === 'open-quick-settings' && goal === 'open-quick-settings') {
 				success = true;
 			}
+			if (action === 'open-task-view' && goal === 'open-task-view') {
+				success = true;
+			}
 			// Module 8 New Goals
 			if (
 				action === 'cookie-choice' &&
@@ -364,6 +369,21 @@
 				onClose={() => (startMenuOpen = false)}
 			/>
 
+			<!-- Task View -->
+			<TaskView
+				isOpen={showTaskView}
+				{openApps}
+				{availableApps}
+				onClose={() => (showTaskView = false)}
+				onAppClick={(instanceId) => {
+					const app = openApps.find((a) => a.id === instanceId);
+					if (app && app.minimized) {
+						app.minimized = false;
+					}
+					bringToFront(instanceId);
+				}}
+			/>
+
 			<!-- Taskbar -->
 			<Taskbar
 				apps={taskbarApps}
@@ -376,6 +396,12 @@
 					}
 				}}
 				onQuickSettingsClick={() => checkGoal('open-quick-settings')}
+				onTaskViewClick={() => {
+					showTaskView = !showTaskView;
+					if (showTaskView) {
+						checkGoal('open-task-view');
+					}
+				}}
 				onOpenSettings={openSettingsToPage}
 			/>
 		</Desktop>

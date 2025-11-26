@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Wifi, Volume2, Battery } from 'lucide-svelte';
+	import { Wifi, Volume2, Battery, LayoutGrid } from 'lucide-svelte';
 	import QuickSettings from './QuickSettings.svelte';
 
 	let {
@@ -9,7 +9,8 @@
 		onAppClick,
 		onStartClick,
 		onOpenSettings,
-		onQuickSettingsClick
+		onQuickSettingsClick,
+		onTaskViewClick
 	} = $props<{
 		apps: { id: string; name: string; icon: any }[];
 		openAppIds: string[];
@@ -17,6 +18,7 @@
 		onStartClick: () => void;
 		onOpenSettings: (page: string) => void;
 		onQuickSettingsClick?: () => void;
+		onTaskViewClick?: () => void;
 	}>();
 
 	let time = $state(new Date());
@@ -71,6 +73,21 @@
 				<div class="h-1.5 w-1.5 bg-white"></div>
 			</div>
 		</Button>
+
+		<!-- Task View Button -->
+		{#if onTaskViewClick}
+			<Button
+				variant="ghost"
+				class="text-slate-400 hover:bg-slate-800 hover:text-white"
+				onclick={() => {
+					showQuickSettings = false;
+					onTaskViewClick();
+				}}
+				title="Προβολή Εργασιών"
+			>
+				<LayoutGrid class="h-5 w-5" />
+			</Button>
+		{/if}
 
 		<!-- Taskbar Items -->
 		{#each apps as app}
