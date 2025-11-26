@@ -29,7 +29,7 @@
 			targetClass: 'bg-red-500 border-4 border-white rounded-full shadow-lg',
 			content: 'CLICK',
 			bgClass: 'bg-white/50',
-            type: 'click'
+			type: 'click'
 		},
 		balloons: {
 			targetClass: 'bg-transparent border-none shadow-none',
@@ -37,14 +37,14 @@
 			bgClass: 'bg-sky-100',
 			targetStyle:
 				'font-size: 70px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); animation: float 3s ease-in-out infinite;',
-            type: 'click'
+			type: 'click'
 		},
 		moles: {
 			targetClass: 'bg-amber-700 border-4 border-amber-900 rounded-full shadow-inner',
 			content: '🐹',
 			bgClass: 'bg-green-50',
 			targetStyle: 'font-size: 50px; box-shadow: inset 0 0 20px rgba(0,0,0,0.3);',
-            type: 'click'
+			type: 'click'
 		},
 		bugs: {
 			targetClass: 'bg-transparent border-none shadow-none',
@@ -52,34 +52,46 @@
 			bgClass: 'bg-green-50',
 			targetStyle:
 				'font-size: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); transform: rotate(45deg);',
-            type: 'click'
+			type: 'click'
 		},
 		flies: {
 			targetClass: 'bg-transparent border-none shadow-none',
 			content: '🪰',
 			bgClass: 'bg-slate-50',
 			targetStyle: 'font-size: 40px; animation: jitter 0.5s infinite;',
-            size: '40px', // Tighter hitbox
-            type: 'click'
+			size: '40px', // Tighter hitbox
+			type: 'click'
 		},
-        mixed: {
-            // Placeholder, logic handled in derived/state
-            isMixed: true
-        }
+		mixed: {
+			// Placeholder, logic handled in derived/state
+			isMixed: true
+		}
 	};
 
-    // State for mixed mode
-    let mixedType = $state<'click' | 'double-click' | 'right-click'>('click');
-    
+	// State for mixed mode
+	let mixedType = $state<'click' | 'double-click' | 'right-click'>('click');
+
 	let currentTheme = $derived.by(() => {
-        if (theme === 'mixed') {
-             // Return dynamic theme based on mixedType
-             if (mixedType === 'double-click') return { ...themes.default, content: '2x CLICK', targetClass: 'bg-blue-500 border-4 border-white rounded-full shadow-lg', type: 'double-click' };
-             if (mixedType === 'right-click') return { ...themes.default, content: 'RIGHT', targetClass: 'bg-purple-500 border-4 border-white rounded-lg shadow-lg', type: 'right-click' };
-             return { ...themes.default, content: 'CLICK', type: 'click' };
-        }
-        return themes[theme] || themes.default;
-    });
+		if (theme === 'mixed') {
+			// Return dynamic theme based on mixedType
+			if (mixedType === 'double-click')
+				return {
+					...themes.default,
+					content: '2x CLICK',
+					targetClass: 'bg-blue-500 border-4 border-white rounded-full shadow-lg',
+					type: 'double-click'
+				};
+			if (mixedType === 'right-click')
+				return {
+					...themes.default,
+					content: 'RIGHT',
+					targetClass: 'bg-purple-500 border-4 border-white rounded-lg shadow-lg',
+					type: 'right-click'
+				};
+			return { ...themes.default, content: 'CLICK', type: 'click' };
+		}
+		return themes[theme] || themes.default;
+	});
 
 	let score = $state(0);
 	let successfulClicks = $state(0);
@@ -93,11 +105,11 @@
 	function generateRandomPosition() {
 		targetX = Math.random() * 80 + 10;
 		targetY = Math.random() * 80 + 10;
-        
-        if (theme === 'mixed') {
-            const types = ['click', 'double-click', 'right-click'];
-            mixedType = types[Math.floor(Math.random() * types.length)] as any;
-        }
+
+		if (theme === 'mixed') {
+			const types = ['click', 'double-click', 'right-click'];
+			mixedType = types[Math.floor(Math.random() * types.length)] as any;
+		}
 	}
 
 	function startGame() {
@@ -191,20 +203,22 @@
 				<div
 					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
 				>
+					<button
 						class="target absolute flex items-center justify-center transition-all duration-100 active:scale-90 {currentTheme.targetClass}"
-						style="left: {targetX}%; top: {targetY}%; {currentTheme.targetStyle || ''} width: {currentTheme.size || '80px'}; height: {currentTheme.size || '80px'};"
+						style="left: {targetX}%; top: {targetY}%; {currentTheme.targetStyle ||
+							''} width: {currentTheme.size || '80px'}; height: {currentTheme.size || '80px'};"
 						onclick={handleTargetClick}
-                        oncontextmenu={(e) => {
-                            if (currentTheme.type === 'right-click') {
-                                e.preventDefault();
-                                handleTargetClick();
-                            }
-                        }}
-                        ondblclick={() => {
-                            if (currentTheme.type === 'double-click') {
-                                handleTargetClick();
-                            }
-                        }}
+						oncontextmenu={(e) => {
+							if (currentTheme.type === 'right-click') {
+								e.preventDefault();
+								handleTargetClick();
+							}
+						}}
+						ondblclick={() => {
+							if (currentTheme.type === 'double-click') {
+								handleTargetClick();
+							}
+						}}
 					>
 						{currentTheme.content}
 					</button>
