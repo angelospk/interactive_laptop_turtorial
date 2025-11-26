@@ -21,22 +21,6 @@ export function isLessonLocked(
     lessons: Lesson[],
     userProgress: Record<string, any>
 ): boolean {
-    // First lesson is always unlocked unless it has a specific requirement
-    if (index === 0 && !lesson.requiredLessonId) return false;
-
-    // Check required lesson if specified
-    if (lesson.requiredLessonId) {
-        const requiredProgress = userProgress[lesson.requiredLessonId];
-        return !requiredProgress?.completed;
-    }
-
-    // Fallback: Check if previous lesson in the list is completed
-    // Note: This assumes the lessons array is sorted by orderIndex
-    if (index > 0) {
-        const prevLesson = lessons[index - 1];
-        const prevProgress = userProgress[prevLesson.id];
-        return !prevProgress?.completed;
-    }
-
+    // All lessons are now unlocked - users can navigate freely
     return false;
 }

@@ -28,24 +28,8 @@
 	let mergedProgress = $derived({ ...progress, ...localUpdates });
 
 	// Determine if current lesson is locked
-	let isLocked = $derived.by(() => {
-		if (currentLessonIndex === 0 && !currentLesson.requiredLessonId) return false;
-
-		// Check required lesson if specified
-		if (currentLesson.requiredLessonId) {
-			const requiredProgress = mergedProgress[currentLesson.requiredLessonId];
-			return !requiredProgress?.completed;
-		}
-
-		// Fallback: Check if previous lesson in the list is completed
-		if (currentLessonIndex > 0) {
-			const prevLesson = lessons[currentLessonIndex - 1];
-			const prevProgress = mergedProgress[prevLesson.id];
-			return !prevProgress?.completed;
-		}
-
-		return false;
-	});
+	// All lessons are now unlocked - users can navigate freely
+	let isLocked = $derived(false);
 
 	async function handleLessonComplete(score: number) {
 		// Optimistically update UI immediately
@@ -116,12 +100,7 @@
 		<span class="text-sm font-medium text-slate-500">
 			Μάθημα {currentLessonIndex + 1} από {lessons.length}
 		</span>
-		<Button
-			onclick={nextLesson}
-			disabled={currentLessonIndex === lessons.length - 1 && !onExit
-				? true
-				: !mergedProgress[currentLesson.id]?.completed}
-		>
+		<Button onclick={nextLesson} disabled={currentLessonIndex === lessons.length - 1 && !onExit}>
 			{currentLessonIndex === lessons.length - 1 ? 'Λήξη' : 'Επόμενο'}
 		</Button>
 	</div>

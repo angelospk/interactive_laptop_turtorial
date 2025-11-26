@@ -369,7 +369,12 @@
 				apps={taskbarApps}
 				openAppIds={openApps.map((a) => a.appId)}
 				onAppClick={(id) => openApp(id)}
-				onStartClick={() => (startMenuOpen = !startMenuOpen)}
+				onStartClick={() => {
+					startMenuOpen = !startMenuOpen;
+					if (startMenuOpen) {
+						checkGoal('open-start-menu');
+					}
+				}}
 				onQuickSettingsClick={() => checkGoal('open-quick-settings')}
 				onOpenSettings={openSettingsToPage}
 			/>
