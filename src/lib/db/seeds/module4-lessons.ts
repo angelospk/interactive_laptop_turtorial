@@ -73,13 +73,14 @@ export const module4Lessons: NewLesson[] = [
         orderIndex: 4,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'copy-file',
+            goal: 'paste-copy', // Changed goal to paste-copy to match app event
             initialApps: ['explorer'],
-            instructions: 'Επιλέξτε το αρχείο "Έγγραφο.txt", πατήστε "Αντιγραφή" (ή Ctrl+C), ανοίξτε τον φάκελο "Εργασία" και πατήστε "Επικόλληση" (ή Ctrl+V).',
+            instructions: '1. Κάντε δεξί κλικ στο "Έγγραφο.txt" και επιλέξτε "Αντιγραφή".\n2. Ανοίξτε τον φάκελο "Εργασία".\n3. Κάντε δεξί κλικ στον κενό χώρο και επιλέξτε "Επικόλληση".',
             initialFiles: [
                 { id: 'doc1', name: 'Έγγραφο.txt', type: 'text', parentId: 'root' },
                 { id: 'work-folder', name: 'Εργασία', type: 'folder', parentId: 'root' }
-            ]
+            ],
+            targetFile: 'Έγγραφο.txt'
         },
         enabled: true,
         requiredLessonId: 'module4-lesson3'

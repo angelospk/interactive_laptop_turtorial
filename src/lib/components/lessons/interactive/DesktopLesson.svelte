@@ -82,13 +82,15 @@
 	$effect(() => {
 		if (config.initialApps) {
 			untrack(() => {
-				config.initialApps.forEach((appItem: string | { appId: string; minimized?: boolean; maximized?: boolean }) => {
-                    if (typeof appItem === 'string') {
-                        openApp(appItem);
-                    } else {
-                        openApp(appItem.appId, appItem);
-                    }
-                });
+				config.initialApps.forEach(
+					(appItem: string | { appId: string; minimized?: boolean; maximized?: boolean }) => {
+						if (typeof appItem === 'string') {
+							openApp(appItem);
+						} else {
+							openApp(appItem.appId, appItem);
+						}
+					}
+				);
 			});
 		}
 	});
@@ -97,15 +99,15 @@
 		// Check if already open
 		const existing = openApps.find((a) => a.appId === appId);
 		if (existing) {
-            if (initialState) {
-                 existing.minimized = !!initialState.minimized;
-                 existing.maximized = !!initialState.maximized;
-            } else {
-			    if (existing.minimized) {
+			if (initialState) {
+				existing.minimized = !!initialState.minimized;
+				existing.maximized = !!initialState.maximized;
+			} else {
+				if (existing.minimized) {
 					existing.minimized = false;
 					checkGoal('restore-app', { appId: existing.appId });
 				}
-            }
+			}
 			// Bring to front (remove and push)
 			openApps = openApps.filter((a) => a !== existing);
 			openApps.push(existing);
@@ -268,6 +270,19 @@
 				success = true;
 			}
 
+			// Missing Goal Checks
+			if (action === 'reply-email' && goal === 'reply-email') success = true;
+			if (action === 'forward-email' && goal === 'forward-email') success = true;
+			if (action === 'delete-email' && goal === 'delete-email') success = true;
+			if (action === 'download-attachment' && goal === 'download-attachment') success = true;
+			if (
+				(action === 'paste-cut' || action === 'drag-drop') &&
+				(goal === 'move-file' || goal === 'paste-cut-file' || goal === 'drag-drop-file')
+			) {
+				// Optional: check target folder if needed
+				success = true;
+			}
+
 			if (success) {
 				completed = true;
 				toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
@@ -292,38 +307,6 @@
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="relative h-full w-full">
-		<!-- Tutorial Assistant Overlay -->
-		{#if tutorialSteps && tutorialSteps.length > 0 && !completed}
-			<div
-				class="pointer-events-none absolute top-6 right-6 z-[100] w-72 animate-in fade-in slide-in-from-right-4"
-			>
-				<Card
-					class="pointer-events-auto border-l-4 border-l-blue-500 bg-white/95 shadow-2xl backdrop-blur"
-				>
-					<div class="p-4">
-						<div class="flex items-start gap-3">
-							<div class="rounded-full bg-blue-100 p-2 text-blue-600">
-								<Info class="h-5 w-5" />
-							</div>
-							<div class="flex-1">
-								<h4 class="mb-1 text-sm font-bold tracking-wider text-slate-900 uppercase">
-									Οδηγίες
-								</h4>
-								<div class="space-y-2 text-sm text-slate-700">
-									{#each tutorialSteps as step, i}
-										<div class="flex gap-2">
-											<span class="font-bold text-blue-600">{i + 1}.</span>
-											<span>{t(step)}</span>
-										</div>
-									{/each}
-								</div>
-							</div>
-						</div>
-					</div>
-				</Card>
-			</div>
-		{/if}
-
 		<!-- Desktop Environment -->
 		<Desktop class="h-[600px]">
 			<!-- Windows -->

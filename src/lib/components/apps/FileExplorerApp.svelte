@@ -98,10 +98,12 @@
 				parentId: currentFolderId
 			};
 			items.push(newFolder);
+
+			// Close dialog first
+			isCreatingFolder = false;
+
 			toast.success(`Ο φάκελος '${newItemName}' δημιουργήθηκε!`);
 			onAction('create-folder', { name: newItemName });
-
-			isCreatingFolder = false;
 			newItemName = '';
 		}
 	}
@@ -123,9 +125,12 @@
 		if (item) {
 			const oldName = item.name;
 			item.name = newItemName;
+
+			// Close dialog first
+			isRenaming = false;
+
 			toast.success('Μετονομασία επιτυχής!');
 			onAction('rename', { oldName, newName: newItemName });
-			isRenaming = false;
 			newItemName = '';
 		}
 	}
@@ -147,11 +152,17 @@
 				toast.success('Μετακίνηση ολοκληρώθηκε!');
 				onAction('paste-cut', { name: item.name, targetFolderId: currentFolderId });
 			} else {
+				// Only add "Copy" suffix if pasting in the same folder
+				let newName = item.name;
+				if (item.parentId === currentFolderId) {
+					newName = item.name + ' (Αντίγραφο)';
+				}
+
 				items.push({
 					...item,
 					id: crypto.randomUUID(),
 					parentId: currentFolderId,
-					name: item.name + ' (Αντίγραφο)'
+					name: newName
 				});
 				toast.success('Επικόλληση ολοκληρώθηκε!');
 				onAction('paste-copy', { name: item.name });
@@ -268,7 +279,7 @@
 
 	<!-- Content Area -->
 	<ContextMenu.Root>
-		<ContextMenu.Trigger class="flex-1 p-4 overflow-y-auto">
+		<ContextMenu.Trigger class="flex-1 overflow-y-auto p-4">
 			<div
 				class="grid h-full grid-cols-4 content-start gap-4"
 				ondragover={(e) => e.preventDefault()}
@@ -366,9 +377,7 @@
 
 				<!-- Empty State -->
 				{#if currentItems.length === 0}
-					<div
-						class="col-span-4 flex flex-col items-center justify-center py-12 text-slate-400"
-					>
+					<div class="col-span-4 flex flex-col items-center justify-center py-12 text-slate-400">
 						<Folder class="mb-4 h-16 w-16 opacity-20" />
 						<p>Ο φάκελος είναι άδειος</p>
 					</div>

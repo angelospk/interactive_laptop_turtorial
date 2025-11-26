@@ -172,13 +172,23 @@
 					}
 				}
 			} else {
+				// Only add "Copy" suffix if pasting in the same folder
+				let newName = item.name;
+				if (item.parentId === currentFolderId) {
+					newName = item.name + ' (Αντίγραφο)';
+				}
+
 				items.push({
 					...item,
 					id: crypto.randomUUID(),
 					parentId: currentFolderId,
-					name: item.name + ' (Αντίγραφο)'
+					name: newName
 				});
 				toast.success('Επικόλληση ολοκληρώθηκε!');
+
+				if (action === 'copy-files' || action === 'copy') {
+					checkCompletion();
+				}
 			}
 
 			if (clipboard.action === 'cut') clipboard = null;

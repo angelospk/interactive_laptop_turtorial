@@ -3,7 +3,7 @@
 	import type { Lesson } from '$lib/db/schema';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Snippet } from 'svelte';
-	import GuideOverlay from './GuideOverlay.svelte';
+	import TutorialAssistant from '$lib/components/ui/TutorialAssistant.svelte';
 
 	interface Props {
 		lesson: Lesson;
@@ -27,8 +27,6 @@
 	};
 
 	const difficultyColor = $derived(difficultyColors[lesson.difficulty] || '#6b7280');
-
-	let showGuide = $state(false);
 </script>
 
 <div class="lesson-template">
@@ -51,13 +49,6 @@
 			<span class="lesson-type">
 				{(m as any)[`type_${lesson.lessonType.replace(/-/g, '_')}`]?.() || lesson.lessonType}
 			</span>
-			<button
-				class="ml-auto flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-sm text-white hover:bg-white/30"
-				onclick={() => (showGuide = true)}
-			>
-				<HelpCircle size={16} />
-				<span>Οδηγίες</span>
-			</button>
 		</div>
 	</header>
 
@@ -66,7 +57,12 @@
 		{@render children()}
 	</div>
 
-	<GuideOverlay {title} {description} isOpen={showGuide} onClose={() => (showGuide = false)} />
+	<TutorialAssistant
+		title="Βοηθός"
+		instructions={(lesson.config as any)?.tutorialSteps ||
+			(lesson.config as any)?.instructions ||
+			description}
+	/>
 </div>
 
 <style>

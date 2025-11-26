@@ -170,5 +170,47 @@ export const module1Lessons: NewLesson[] = [
         },
         enabled: true,
         requiredLessonId: 'module1-lesson7'
+    },
+
+    // Lesson 9: Follow the Shape (Hover)
+    {
+        id: 'module1-lesson9',
+        moduleId: 'module1',
+        lessonKey: 'hover-shape',
+        titleKey: 'module1_lesson9_title',
+        descriptionKey: 'module1_lesson9_desc',
+        difficulty: 'advanced',
+        orderIndex: 9,
+        lessonType: 'hover',
+        config: {
+            targetCount: 20,
+            timeLimit: 60,
+            gameMode: true,
+            theme: 'default', // TODO: Implement shape path theme
+            instructions: 'Ακολουθήστε τη διαδρομή με το ποντίκι χωρίς να βγείτε έξω!'
+        },
+        enabled: true,
+        requiredLessonId: 'module1-lesson8'
+    },
+
+    // Lesson 10: Mixed Clicks (Random)
+    {
+        id: 'module1-lesson10',
+        moduleId: 'module1',
+        lessonKey: 'mixed-clicks',
+        titleKey: 'module1_lesson10_title',
+        descriptionKey: 'module1_lesson10_desc',
+        difficulty: 'advanced',
+        orderIndex: 10,
+        lessonType: 'click',
+        config: {
+            targetCount: 15,
+            timeLimit: 60,
+            theme: 'mixed',
+            gameMode: true,
+            instructions: 'Προσοχή! Κάντε Κλικ, Διπλό Κλικ ή Δεξί Κλικ ανάλογα με το τι βλέπετε!'
+        },
+        enabled: true,
+        requiredLessonId: 'module1-lesson9'
     }
 ];

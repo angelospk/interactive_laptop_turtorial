@@ -19,7 +19,7 @@
 		instructions?: string;
 	};
 
-	const targetDistance = config.scrollDistance || 1000;
+	const targetDistance = config.scrollDistance || 200;
 	const timeLimit = config.timeLimit || 40;
 
 	let scrollY = $state(0);

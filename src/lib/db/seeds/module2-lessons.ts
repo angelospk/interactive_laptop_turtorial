@@ -125,7 +125,8 @@ export const module2Lessons: NewLesson[] = [
         requiredLessonId: 'module2-lesson7'
     },
 
-    // Lesson 9: Function Keys
+    // Lesson 9: Function Keys - REMOVED per user request
+    // Lesson 9: Function Keys - Disabled
     {
         id: 'module2-lesson9',
         moduleId: 'module2',
@@ -136,7 +137,7 @@ export const module2Lessons: NewLesson[] = [
         orderIndex: 9,
         lessonType: 'keyboard-action',
         config: { keys: ['F1', 'F2', 'F5', 'F11', 'F12'] },
-        enabled: true,
+        enabled: false,
         requiredLessonId: 'module2-lesson8'
     },
 
@@ -152,7 +153,7 @@ export const module2Lessons: NewLesson[] = [
         lessonType: 'typing',
         config: { text: 'paragraph', timeLimit: 120, minWPM: 20 },
         enabled: true,
-        requiredLessonId: 'module2-lesson9'
+        requiredLessonId: 'module2-lesson8'
     },
 
     // Lesson 11: Typing Test

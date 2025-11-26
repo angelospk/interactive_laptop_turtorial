@@ -33,35 +33,28 @@ export const module6Lessons: NewLesson[] = [
         enabled: true,
         requiredLessonId: 'module6-lesson1'
     },
+    // Lesson 3: Reply to Email
     {
         id: 'module6-lesson3',
         moduleId: 'module6',
-        lessonKey: 'identify-phishing',
+        lessonKey: 'reply-email',
         titleKey: 'module6_lesson3_title',
         descriptionKey: 'module6_lesson3_desc',
-        difficulty: 'intermediate',
+        difficulty: 'beginner',
         orderIndex: 3,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'identify-phishing',
+            goal: 'reply-email',
             initialApps: ['email'],
+            instructions: 'Ανοίξτε το email από τον "Γιάννη" και πατήστε "Απάντηση".',
             emails: [
                 {
-                    id: 'phish1',
-                    sender: 'Secure Bank <admin@x-bank-verify.com>',
-                    subject: 'Ασυνήθιστη δραστηριότητα',
-                    body: 'Παρακαλώ κάντε κλικ εδώ για να επαληθεύσετε τον λογαριασμό σας.',
+                    id: 'reply-task',
+                    sender: 'Γιάννης <giannis@gmail.com>',
+                    subject: 'Καφές;',
+                    body: 'Πάμε για καφέ αύριο;',
                     date: '10:00',
                     isRead: false,
-                    isPhishing: true
-                },
-                {
-                    id: 'real1',
-                    sender: 'Γιάννης <giannis@gmail.com>',
-                    subject: 'Καλημέρα',
-                    body: 'Τι κάνεις; Θα τα πούμε το απόγευμα;',
-                    date: '09:00',
-                    isRead: true,
                     isPhishing: false
                 }
             ]
@@ -69,32 +62,64 @@ export const module6Lessons: NewLesson[] = [
         enabled: true,
         requiredLessonId: 'module6-lesson2'
     },
+
+    // Lesson 4: Forward Email
     {
         id: 'module6-lesson4',
         moduleId: 'module6',
-        lessonKey: 'download-attachment',
+        lessonKey: 'forward-email',
         titleKey: 'module6_lesson4_title',
         descriptionKey: 'module6_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'download-attachment',
+            goal: 'forward-email',
             initialApps: ['email'],
+            instructions: 'Προωθήστε το email της "Εφορίας" στον λογιστή σας.',
             emails: [
                 {
-                    id: 'attach1',
+                    id: 'forward-task',
                     sender: 'Εφορία <noreply@aade.gr>',
-                    subject: 'Δήλωση Εισοδήματος',
-                    body: 'Σας αποστέλλουμε το εκκαθαριστικό σας.',
-                    date: 'Δευτέρα',
+                    subject: 'Δήλωση',
+                    body: 'Η δήλωσή σας.',
+                    date: '09:00',
                     isRead: true,
-                    isPhishing: false,
-                    hasAttachment: true
+                    isPhishing: false
                 }
             ]
         },
         enabled: true,
         requiredLessonId: 'module6-lesson3'
+    },
+
+    // Lesson 5: Delete Email
+    {
+        id: 'module6-lesson5',
+        moduleId: 'module6',
+        lessonKey: 'delete-email',
+        titleKey: 'module6_lesson5_title',
+        descriptionKey: 'module6_lesson5_desc',
+        difficulty: 'beginner',
+        orderIndex: 5,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'delete-email',
+            initialApps: ['email'],
+            instructions: 'Διαγράψτε το διαφημιστικό email.',
+            emails: [
+                {
+                    id: 'spam-task',
+                    sender: 'Super Market <offers@market.gr>',
+                    subject: 'Προσφορές',
+                    body: 'Δείτε τις προσφορές μας.',
+                    date: '08:00',
+                    isRead: false,
+                    isPhishing: false
+                }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson4'
     }
 ];

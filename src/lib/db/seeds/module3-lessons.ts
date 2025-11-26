@@ -130,7 +130,8 @@ export const module3Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'open-start-menu',
-            initialApps: []
+            initialApps: [],
+            instructions: 'Κάντε κλικ στο κουμπί "Έναρξη" (το μπλε εικονίδιο των Windows) κάτω αριστερά για να ανοίξετε το μενού.'
         },
         enabled: true,
         requiredLessonId: 'module3-lesson6'
@@ -148,7 +149,8 @@ export const module3Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'open-task-view',
-            initialApps: ['notepad', 'browser']
+            initialApps: ['notepad', 'browser'],
+            instructions: 'Πατήστε το κουμπί "Προβολή Εργασιών" (δίπλα στην αναζήτηση) για να δείτε όλα τα ανοιχτά παράθυρα.'
         },
         enabled: true,
         requiredLessonId: 'module3-lesson7'

@@ -1,13 +1,24 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Mail, Star, Send, Inbox, Trash2, AlertTriangle, Paperclip, Archive, Menu, FileText, X } from 'lucide-svelte';
+	import {
+		Mail,
+		Star,
+		Send,
+		Inbox,
+		Trash2,
+		AlertTriangle,
+		Paperclip,
+		Archive,
+		Menu,
+		FileText,
+		X,
+		Reply,
+		Forward
+	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-    import { fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
-	let {
-		emails = [],
-		onAction
-	} = $props<{
+	let { emails = [], onAction } = $props<{
 		emails?: any[];
 		onAction: (action: string, data?: any) => void;
 	}>();
@@ -21,7 +32,7 @@
 		isRead: boolean;
 		isPhishing?: boolean;
 		hasAttachment?: boolean;
-        folder?: 'inbox' | 'sent' | 'trash' | 'drafts';
+		folder?: 'inbox' | 'sent' | 'trash' | 'drafts';
 	};
 
 	const defaultEmails: Email[] = [
@@ -33,18 +44,18 @@
 			date: '10:30',
 			isRead: false,
 			isPhishing: true,
-            folder: 'inbox'
+			folder: 'inbox'
 		},
-        {
-            id: '4',
-            sender: 'Netflix Support <support@netflix-verify-payment.com>',
-            subject: 'Πρόβλημα με την πληρωμή σας',
-            body: 'Γεια σας,\n\nΗ τελευταία πληρωμή για τη συνδρομή σας απέτυχε. Παρακαλούμε ενημερώστε τα στοιχεία της κάρτας σας για να μην διακοπεί η υπηρεσία.\n\nΠατήστε εδώ: ενημέρωση-πληρωμής.com\n\nΕυχαριστούμε,\nNetflix Team',
-            date: '09:15',
-            isRead: false,
-            isPhishing: true,
-            folder: 'inbox'
-        },
+		{
+			id: '4',
+			sender: 'Netflix Support <support@netflix-verify-payment.com>',
+			subject: 'Πρόβλημα με την πληρωμή σας',
+			body: 'Γεια σας,\n\nΗ τελευταία πληρωμή για τη συνδρομή σας απέτυχε. Παρακαλούμε ενημερώστε τα στοιχεία της κάρτας σας για να μην διακοπεί η υπηρεσία.\n\nΠατήστε εδώ: ενημέρωση-πληρωμής.com\n\nΕυχαριστούμε,\nNetflix Team',
+			date: '09:15',
+			isRead: false,
+			isPhishing: true,
+			folder: 'inbox'
+		},
 		{
 			id: '2',
 			sender: 'Google <no-reply@accounts.google.com>',
@@ -53,7 +64,7 @@
 			date: 'Χθες',
 			isRead: true,
 			isPhishing: false,
-            folder: 'inbox'
+			folder: 'inbox'
 		},
 		{
 			id: '3',
@@ -64,34 +75,37 @@
 			isRead: true,
 			isPhishing: false,
 			hasAttachment: true,
-            folder: 'inbox'
+			folder: 'inbox'
 		}
 	];
 
-    const defaultDrafts: Email[] = [
-        {
-            id: 'd1',
-            sender: 'Εγώ',
-            subject: 'Αίτηση για άδεια',
-            body: 'Αξιότιμε κ. Διευθυντά,\n\nΘα ήθελα να αιτηθώ...',
-            date: 'Τρίτη',
-            isRead: true,
-            folder: 'drafts'
-        }
-    ];
+	const defaultDrafts: Email[] = [
+		{
+			id: 'd1',
+			sender: 'Εγώ',
+			subject: 'Αίτηση για άδεια',
+			body: 'Αξιότιμε κ. Διευθυντά,\n\nΘα ήθελα να αιτηθώ...',
+			date: 'Τρίτη',
+			isRead: true,
+			folder: 'drafts'
+		}
+	];
 
-	let emailList = $state<Email[]>([...(emails.length > 0 ? emails : defaultEmails), ...defaultDrafts]);
+	let emailList = $state<Email[]>([
+		...(emails.length > 0 ? emails : defaultEmails),
+		...defaultDrafts
+	]);
 	let selectedEmailId = $state<string | null>(null);
 	let currentView = $state<'inbox' | 'sent' | 'trash' | 'drafts'>('inbox');
-    let isComposing = $state(false);
+	let isComposing = $state(false);
 
-    // Compose State
-    let composeTo = $state('');
-    let composeSubject = $state('');
-    let composeBody = $state('');
+	// Compose State
+	let composeTo = $state('');
+	let composeSubject = $state('');
+	let composeBody = $state('');
 
 	let selectedEmail = $derived(emailList.find((e) => e.id === selectedEmailId));
-	let filteredEmails = $derived(emailList.filter(e => (e.folder || 'inbox') === currentView));
+	let filteredEmails = $derived(emailList.filter((e) => (e.folder || 'inbox') === currentView));
 
 	function selectEmail(id: string) {
 		selectedEmailId = id;
@@ -103,45 +117,46 @@
 	}
 
 	function deleteEmail(id: string) {
-        const email = emailList.find(e => e.id === id);
-        if(email) {
-            if(email.folder === 'trash') {
-                 emailList = emailList.filter((e) => e.id !== id);
-                 toast.success('Το μήνυμα διαγράφηκε οριστικά');
-            } else {
-                email.folder = 'trash';
-                toast.success('Το μήνυμα μετακινήθηκε στον Κάδο');
-            }
-        }
+		const email = emailList.find((e) => e.id === id);
+		if (email) {
+			if (email.folder === 'trash') {
+				emailList = emailList.filter((e) => e.id !== id);
+				toast.success('Το μήνυμα διαγράφηκε οριστικά');
+			} else {
+				email.folder = 'trash';
+				toast.success('Το μήνυμα μετακινήθηκε στον Κάδο');
+			}
+		}
 		if (selectedEmailId === id) selectedEmailId = null;
 		onAction('delete-email', { id });
 	}
 
 	function reportPhishing(id: string) {
 		const email = emailList.find((e) => e.id === id);
-        if(!email) return;
+		if (!email) return;
 
 		if (email.isPhishing) {
-            // Success scenario
-            const senderDomain = email.sender.split('@')[1].replace('>', '');
+			// Success scenario
+			const senderDomain = email.sender.split('@')[1].replace('>', '');
 			toast.success('Μπράβο! Εντόπισες σωστά το Phishing!', {
-                description: `Παρατήρησε ότι ο αποστολέας "${senderDomain}" δεν είναι ο επίσημος (π.χ. piraeusbank.gr).`,
-                duration: 5000
-            });
+				description: `Παρατήρησε ότι ο αποστολέας "${senderDomain}" δεν είναι ο επίσημος (π.χ. piraeusbank.gr).`,
+				duration: 5000
+			});
 			onAction('report-phishing', { id, correct: true });
 		} else {
-            // Fail scenario
+			// Fail scenario
 			toast.error('Προσοχή! Αυτό το email φαίνεται ασφαλές.', {
-                description: 'Ελέγξτε τον αποστολέα και το περιεχόμενο ξανά. Δεν υπάρχουν ύποπτοι σύνδεσμοι.',
-                duration: 4000
-            });
+				description:
+					'Ελέγξτε τον αποστολέα και το περιεχόμενο ξανά. Δεν υπάρχουν ύποπτοι σύνδεσμοι.',
+				duration: 4000
+			});
 			onAction('report-phishing', { id, correct: false });
 		}
 
-        // Move to trash after reporting? Or keep it? Let's move to trash if correct.
-        if(email.isPhishing) {
-             deleteEmail(id);
-        }
+		// Move to trash after reporting? Or keep it? Let's move to trash if correct.
+		if (email.isPhishing) {
+			deleteEmail(id);
+		}
 	}
 
 	function downloadAttachment() {
@@ -149,120 +164,135 @@
 		onAction('download-attachment', { id: selectedEmailId });
 	}
 
-    function startCompose() {
-        isComposing = true;
-        composeTo = '';
-        composeSubject = '';
-        composeBody = '';
-    }
+	function startCompose() {
+		isComposing = true;
+		composeTo = '';
+		composeSubject = '';
+		composeBody = '';
+	}
 
-    function sendEmail() {
-        if(!composeTo || !composeSubject) {
-            toast.error('Συμπληρώστε τον παραλήπτη και το θέμα');
-            return;
-        }
+	function sendEmail() {
+		if (!composeTo || !composeSubject) {
+			toast.error('Συμπληρώστε τον παραλήπτη και το θέμα');
+			return;
+		}
 
-        const newEmail: Email = {
-            id: Math.random().toString(36),
-            sender: 'Εγώ',
-            subject: composeSubject,
-            body: composeBody,
-            date: 'Τώρα',
-            isRead: true,
-            folder: 'sent'
-        };
+		const newEmail: Email = {
+			id: Math.random().toString(36),
+			sender: 'Εγώ',
+			subject: composeSubject,
+			body: composeBody,
+			date: 'Τώρα',
+			isRead: true,
+			folder: 'sent'
+		};
 
-        emailList = [newEmail, ...emailList];
-        isComposing = false;
-        toast.success('Το μήνυμα στάλθηκε!');
-        onAction('send-email', { to: composeTo, subject: composeSubject });
-    }
+		emailList = [newEmail, ...emailList];
+		isComposing = false;
+		toast.success('Το μήνυμα στάλθηκε!');
+		onAction('send-email', { to: composeTo, subject: composeSubject });
+	}
 
-    function saveDraft() {
-         const newDraft: Email = {
-            id: Math.random().toString(36),
-            sender: 'Πρόχειρο',
-            subject: composeSubject || '(Χωρίς θέμα)',
-            body: composeBody,
-            date: 'Τώρα',
-            isRead: true,
-            folder: 'drafts'
-        };
-        emailList = [newDraft, ...emailList];
-        isComposing = false;
-        toast.info('Αποθηκεύτηκε στα Πρόχειρα');
-    }
+	function saveDraft() {
+		const newDraft: Email = {
+			id: Math.random().toString(36),
+			sender: 'Πρόχειρο',
+			subject: composeSubject || '(Χωρίς θέμα)',
+			body: composeBody,
+			date: 'Τώρα',
+			isRead: true,
+			folder: 'drafts'
+		};
+		emailList = [newDraft, ...emailList];
+		isComposing = false;
+		toast.info('Αποθηκεύτηκε στα Πρόχειρα');
+	}
 </script>
 
 <div class="relative flex h-full w-full overflow-hidden bg-white">
-    <!-- Compose Modal -->
-    {#if isComposing}
-        <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" transition:fly={{ y: 20, duration: 200 }}>
-            <div class="flex h-[500px] w-[600px] flex-col rounded-xl bg-white shadow-2xl">
-                <div class="flex items-center justify-between border-b px-4 py-3">
-                    <h3 class="font-bold text-slate-700">Νέο Μήνυμα</h3>
-                    <button onclick={() => isComposing = false} class="text-slate-400 hover:text-slate-600">
-                        <X class="h-5 w-5" />
-                    </button>
-                </div>
-                <div class="flex flex-col gap-2 p-4">
-                    <input
-                        type="text"
-                        placeholder="Προς"
-                        class="rounded border p-2 text-sm outline-none focus:border-blue-500"
-                        bind:value={composeTo}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Θέμα"
-                        class="rounded border p-2 text-sm outline-none focus:border-blue-500"
-                        bind:value={composeSubject}
-                    />
-                    <textarea
-                        class="h-64 resize-none rounded border p-2 text-sm outline-none focus:border-blue-500"
-                        placeholder="Γράψτε το μήνυμά σας εδώ..."
-                        bind:value={composeBody}
-                    ></textarea>
-                </div>
-                <div class="flex items-center justify-between border-t bg-slate-50 px-4 py-3">
-                    <Button variant="ghost" onclick={saveDraft}>Αποθήκευση</Button>
-                    <div class="flex gap-2">
-                        <Button variant="ghost" onclick={() => isComposing = false}>Ακύρωση</Button>
-                        <Button class="bg-blue-600 text-white hover:bg-blue-700" onclick={sendEmail}>
-                            <Send class="mr-2 h-4 w-4" /> Αποστολή
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/if}
+	<!-- Compose Modal -->
+	{#if isComposing}
+		<div
+			class="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+			transition:fly={{ y: 20, duration: 200 }}
+		>
+			<div class="flex h-[500px] w-[600px] flex-col rounded-xl bg-white shadow-2xl">
+				<div class="flex items-center justify-between border-b px-4 py-3">
+					<h3 class="font-bold text-slate-700">Νέο Μήνυμα</h3>
+					<button onclick={() => (isComposing = false)} class="text-slate-400 hover:text-slate-600">
+						<X class="h-5 w-5" />
+					</button>
+				</div>
+				<div class="flex flex-col gap-2 p-4">
+					<input
+						type="text"
+						placeholder="Προς"
+						class="rounded border p-2 text-sm outline-none focus:border-blue-500"
+						bind:value={composeTo}
+					/>
+					<input
+						type="text"
+						placeholder="Θέμα"
+						class="rounded border p-2 text-sm outline-none focus:border-blue-500"
+						bind:value={composeSubject}
+					/>
+					<textarea
+						class="h-64 resize-none rounded border p-2 text-sm outline-none focus:border-blue-500"
+						placeholder="Γράψτε το μήνυμά σας εδώ..."
+						bind:value={composeBody}
+					></textarea>
+				</div>
+				<div class="flex items-center justify-between border-t bg-slate-50 px-4 py-3">
+					<Button variant="ghost" onclick={saveDraft}>Αποθήκευση</Button>
+					<div class="flex gap-2">
+						<Button variant="ghost" onclick={() => (isComposing = false)}>Ακύρωση</Button>
+						<Button class="bg-blue-600 text-white hover:bg-blue-700" onclick={sendEmail}>
+							<Send class="mr-2 h-4 w-4" /> Αποστολή
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Sidebar -->
-	<div class="w-48 border-r bg-slate-50 p-4 hidden md:block">
-		<Button class="mb-6 w-full gap-2 bg-red-600 hover:bg-red-700 shadow-sm" onclick={startCompose}>
+	<div class="hidden w-48 border-r bg-slate-50 p-4 md:block">
+		<Button class="mb-6 w-full gap-2 bg-red-600 shadow-sm hover:bg-red-700" onclick={startCompose}>
 			<Menu class="h-4 w-4" /> Σύνταξη
 		</Button>
 		<nav class="space-y-1">
 			<button
-				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'inbox' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView ===
+				'inbox'
+					? 'bg-red-100 text-red-700'
+					: 'text-slate-700 hover:bg-slate-200'}"
 				onclick={() => (currentView = 'inbox')}
 			>
 				<Inbox class="h-4 w-4" /> Εισερχόμενα
 			</button>
-            <button
-				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'drafts' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
+			<button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView ===
+				'drafts'
+					? 'bg-red-100 text-red-700'
+					: 'text-slate-700 hover:bg-slate-200'}"
 				onclick={() => (currentView = 'drafts')}
 			>
 				<FileText class="h-4 w-4" /> Πρόχειρα
 			</button>
 			<button
-				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'sent' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView ===
+				'sent'
+					? 'bg-red-100 text-red-700'
+					: 'text-slate-700 hover:bg-slate-200'}"
 				onclick={() => (currentView = 'sent')}
 			>
 				<Send class="h-4 w-4" /> Απεσταλμένα
 			</button>
 			<button
-				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView === 'trash' ? 'bg-red-100 text-red-700' : 'text-slate-700 hover:bg-slate-200'}"
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {currentView ===
+				'trash'
+					? 'bg-red-100 text-red-700'
+					: 'text-slate-700 hover:bg-slate-200'}"
 				onclick={() => (currentView = 'trash')}
 			>
 				<Trash2 class="h-4 w-4" /> Κάδος
@@ -271,26 +301,33 @@
 	</div>
 
 	<!-- Email List -->
-	<div class="w-80 border-r bg-white overflow-y-auto flex flex-col">
-        <div class="p-3 border-b bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            {currentView === 'inbox' ? 'Εισερχόμενα' : currentView === 'sent' ? 'Απεσταλμένα' : currentView === 'drafts' ? 'Πρόχειρα' : 'Κάδος'}
-        </div>
+	<div class="flex w-80 flex-col overflow-y-auto border-r bg-white">
+		<div class="border-b bg-slate-50 p-3 text-xs font-bold tracking-wider text-slate-500 uppercase">
+			{currentView === 'inbox'
+				? 'Εισερχόμενα'
+				: currentView === 'sent'
+					? 'Απεσταλμένα'
+					: currentView === 'drafts'
+						? 'Πρόχειρα'
+						: 'Κάδος'}
+		</div>
 		{#each filteredEmails as email}
 			<button
-				class="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50 {selectedEmailId === email.id ? 'bg-blue-50' : ''} {!email.isRead ? 'font-semibold' : 'text-slate-600'}"
+				class="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50 {selectedEmailId ===
+				email.id
+					? 'bg-blue-50'
+					: ''} {!email.isRead ? 'font-semibold' : 'text-slate-600'}"
 				onclick={() => selectEmail(email.id)}
 			>
 				<div class="flex w-full justify-between text-xs text-slate-500">
-					<span class="truncate max-w-[150px]">{email.sender.split('<')[0]}</span>
+					<span class="max-w-[150px] truncate">{email.sender.split('<')[0]}</span>
 					<span>{email.date}</span>
 				</div>
 				<div class="text-sm">{email.subject}</div>
 				<div class="truncate text-xs text-slate-400">{email.body}</div>
 			</button>
-        {:else}
-            <div class="p-4 text-center text-sm text-slate-400">
-                Κανένα μήνυμα
-            </div>
+		{:else}
+			<div class="p-4 text-center text-sm text-slate-400">Κανένα μήνυμα</div>
 		{/each}
 	</div>
 
@@ -318,14 +355,32 @@
 						<Button
 							variant="ghost"
 							size="icon"
-							onclick={() => deleteEmail(selectedEmail!.id)}
+							title="Απάντηση"
+							onclick={() => {
+								toast.success('Απάντηση εστάλη!');
+								onAction('reply-email', { id: selectedEmail!.id });
+							}}
 						>
+							<Reply class="h-4 w-4" />
+						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
+							title="Προώθηση"
+							onclick={() => {
+								toast.success('Προώθηση εστάλη!');
+								onAction('forward-email', { id: selectedEmail!.id });
+							}}
+						>
+							<Forward class="h-4 w-4" />
+						</Button>
+						<Button variant="ghost" size="icon" onclick={() => deleteEmail(selectedEmail!.id)}>
 							<Trash2 class="h-4 w-4" />
 						</Button>
 					</div>
 				</div>
 
-				<div class="flex-1 text-slate-700 whitespace-pre-wrap font-sans leading-relaxed">
+				<div class="flex-1 font-sans leading-relaxed whitespace-pre-wrap text-slate-700">
 					{selectedEmail.body}
 				</div>
 
@@ -333,10 +388,12 @@
 					<div class="mt-6 border-t pt-4">
 						<h4 class="mb-2 text-sm font-bold text-slate-700">Συνημμένα</h4>
 						<button
-							class="flex items-center gap-3 rounded-lg border p-3 hover:bg-slate-50 transition-colors"
+							class="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-slate-50"
 							onclick={downloadAttachment}
 						>
-							<div class="flex h-10 w-10 items-center justify-center rounded bg-red-100 text-red-600">
+							<div
+								class="flex h-10 w-10 items-center justify-center rounded bg-red-100 text-red-600"
+							>
 								<Paperclip class="h-5 w-5" />
 							</div>
 							<div class="text-left">

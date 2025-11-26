@@ -18,7 +18,7 @@ export const module9Lessons: NewLesson[] = [
             goal: 'install-app',
             initialApps: ['installer'],
             appName: 'Super Browser',
-            instructions: 'Εγκαταστήστε την εφαρμογή "Super Browser".'
+            instructions: 'Εγκατάσταση Εφαρμογής: Ακολουθήστε τα βήματα για να εγκαταστήσετε το "Super Browser".'
         },
         enabled: true,
         requiredLessonId: null
@@ -36,7 +36,9 @@ export const module9Lessons: NewLesson[] = [
             goal: 'connect-wifi',
             initialApps: ['settings'],
             initialPage: 'network',
-            instructions: 'Συνδεθείτε σε ένα δίκτυο Wi-Fi.'
+            targetSsid: 'Home_WiFi',
+            requiredPassword: 'kwdikos12345',
+            instructions: 'Σύνδεση στο Wi-Fi: Επιλέξτε το δίκτυο "Home_WiFi" και βάλτε τον κωδικό: kwdikos12345'
         },
         enabled: true,
         requiredLessonId: 'module9-lesson1'
@@ -54,7 +56,7 @@ export const module9Lessons: NewLesson[] = [
             goal: 'add-printer',
             initialApps: ['settings'],
             initialPage: 'devices',
-            instructions: 'Προσθέστε έναν νέο εκτυπωτή.'
+            instructions: 'Προσθήκη Εκτυπωτή: Πατήστε "Προσθήκη εκτυπωτή" για να συνδέσετε τον νέο εκτυπωτή.'
         },
         enabled: true,
         requiredLessonId: 'module9-lesson2'
@@ -72,7 +74,7 @@ export const module9Lessons: NewLesson[] = [
             goal: 'uninstall-app',
             initialApps: ['settings'],
             initialPage: 'apps',
-            instructions: 'Πηγαίνετε στις Εφαρμογές και απεγκαταστήστε το "Spotify".'
+            instructions: 'Απεγκατάσταση: Πηγαίνετε στις Εφαρμογές και διαγράψτε το "Spotify".'
         },
         enabled: true,
         requiredLessonId: 'module9-lesson3'

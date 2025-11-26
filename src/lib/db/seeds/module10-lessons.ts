@@ -96,9 +96,9 @@ export const module10Lessons: NewLesson[] = [
             // Wait, if goal is 'identify-phishing', usually we want them to find the BAD one.
             // Let's make them find the BAD one among good ones.
             initialApps: ['email'],
-            instructions: 'Ξεχωρίστε το ασφαλές email από το επικίνδυνο.',
+            instructions: 'Βρείτε το ασφαλές email από το λογιστήριο και κατεβάστε το συνημμένο αρχείο.',
             emails: [
-                 {
+                {
                     id: 'phish-zip',
                     sender: 'Courier <delivery@speedex-tracking-fake.gr>',
                     subject: 'Το δέμα σας έφτασε',
@@ -217,5 +217,59 @@ export const module10Lessons: NewLesson[] = [
         },
         enabled: true,
         requiredLessonId: 'module10-lesson5'
+    },
+
+    // Lesson 7: Quiz - Phishing Signs
+    {
+        id: 'module10-lesson7',
+        moduleId: 'module10',
+        lessonKey: 'quiz-phishing-signs',
+        titleKey: 'module10_lesson7_title',
+        descriptionKey: 'module10_lesson7_desc',
+        difficulty: 'beginner',
+        orderIndex: 7,
+        lessonType: 'quiz',
+        config: {
+            questions: [
+                {
+                    id: 'q1',
+                    text: 'Ποιο από τα παρακάτω είναι σημάδι phishing;',
+                    options: [
+                        { id: 'a', text: 'Ορθογραφικά λάθη και επείγουσα γλώσσα', correct: true },
+                        { id: 'b', text: 'Προσωπική προσφωνηση (π.χ. "Αγαπητέ Γιάννη")', correct: false },
+                        { id: 'c', text: 'Αποστολέας από γνωστή διεύθυνση', correct: false }
+                    ]
+                }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module10-lesson6'
+    },
+
+    // Lesson 8: Quiz - Password Safety
+    {
+        id: 'module10-lesson8',
+        moduleId: 'module10',
+        lessonKey: 'quiz-passwords',
+        titleKey: 'module10_lesson8_title',
+        descriptionKey: 'module10_lesson8_desc',
+        difficulty: 'intermediate',
+        orderIndex: 8,
+        lessonType: 'quiz',
+        config: {
+            questions: [
+                {
+                    id: 'q1',
+                    text: 'Ποιος είναι ο πιο ασφαλής κωδικός;',
+                    options: [
+                        { id: 'a', text: '123456', correct: false },
+                        { id: 'b', text: 'password', correct: false },
+                        { id: 'c', text: 'Kwd!k0s2024$', correct: true }
+                    ]
+                }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module10-lesson7'
     }
 ];
