@@ -65,6 +65,29 @@
 		}
 	}
 
+	async function handleRetry() {
+		// Clear local state immediately for instant UI feedback
+		const { [currentLesson.id]: _, ...rest } = localUpdates;
+		localUpdates = rest;
+
+		// Delete progress from database
+		try {
+			const res = await fetch('/api/lessons/delete-progress', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					lessonId: currentLesson.id
+				})
+			});
+
+			if (res.ok) {
+				await invalidateAll(); // Refresh to get updated state
+			}
+		} catch (error) {
+			console.error('Failed to delete progress:', error);
+		}
+	}
+
 	function nextLesson() {
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
@@ -148,7 +171,7 @@
 			<div class="flex items-center gap-3">
 				<Button
 					variant="ghost"
-					onclick={() => (localUpdates[currentLesson.id].completed = false)}
+					onclick={handleRetry}
 					class="text-green-700 hover:bg-green-100 hover:text-green-900"
 				>
 					{getMessage('try_again') || 'Retry'}
