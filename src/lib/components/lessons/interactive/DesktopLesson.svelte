@@ -281,10 +281,12 @@
 			if (action === 'delete-email' && goal === 'delete-email') success = true;
 			if (action === 'download-attachment' && goal === 'download-attachment') success = true;
 			if (
-				(action === 'paste-cut' || action === 'drag-drop') &&
-				(goal === 'move-file' || goal === 'paste-cut-file' || goal === 'drag-drop-file')
-			) {
-				// Optional: check target folder if needed
+				success = true;
+			}
+			if (action === 'rename' && goal === 'rename-file') {
+				success = true;
+			}
+			if (action === 'delete' && goal === 'delete-file') {
 				success = true;
 			}
 
@@ -311,6 +313,18 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
+	{#if config.instructions}
+		<div class="mb-4">
+			<Card class="border-blue-200 bg-blue-50">
+				<div class="flex gap-3 p-4">
+					<Info class="h-5 w-5 shrink-0 text-blue-600" />
+					<div class="flex-1 text-sm whitespace-pre-line text-blue-900">
+						{config.instructions}
+					</div>
+				</div>
+			</Card>
+		</div>
+	{/if}
 	<div class="relative h-full w-full">
 		<!-- Desktop Environment -->
 		<Desktop class="h-[600px]">

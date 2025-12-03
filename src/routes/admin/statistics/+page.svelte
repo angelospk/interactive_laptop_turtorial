@@ -178,4 +178,66 @@
 			</table>
 		</div>
 	</div>
+
+	<!-- Individual User Statistics -->
+	<div class="mt-8">
+		<h2 class="mb-4 text-2xl font-bold">Επίδοση Χρηστών</h2>
+		<div class="overflow-x-auto rounded-lg border">
+			<table class="w-full">
+				<thead class="bg-slate-100">
+					<tr>
+						<th class="px-4 py-3 text-left text-sm font-medium">Όνομα Χρήστη</th>
+						<th class="px-4 py-3 text-left text-sm font-medium">Εμφανιζόμενο Όνομα</th>
+						<th class="px-4 py-3 text-center text-sm font-medium">Ολοκληρωμένα Μαθήματα</th>
+						<th class="px-4 py-3 text-center text-sm font-medium">Πρόοδος</th>
+						<th class="px-4 py-3 text-center text-sm font-medium">Συνολικές Προσπάθειες</th>
+						<th class="px-4 py-3 text-center text-sm font-medium">Μέσος Βαθμός</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each data.userEngagementStats as user}
+						{@const progressPercent =
+							data.totalLessons > 0
+								? ((user.completedLessons / data.totalLessons) * 100).toFixed(1)
+								: '0.0'}
+						<tr class="border-t hover:bg-slate-50">
+							<td class="px-4 py-3 text-sm font-medium">{user.username}</td>
+							<td class="px-4 py-3 text-sm">{user.displayName || '-'}</td>
+							<td class="px-4 py-3 text-center text-sm">
+								<span class="font-medium">{user.completedLessons}</span>
+								<span class="text-slate-500"> / {data.totalLessons}</span>
+							</td>
+							<td class="px-4 py-3">
+								<div class="flex items-center gap-2">
+									<div class="h-2 flex-1 rounded-full bg-slate-200">
+										<div
+											class="h-2 rounded-full {progressPercent >= 75
+												? 'bg-green-600'
+												: progressPercent >= 50
+													? 'bg-blue-600'
+													: progressPercent >= 25
+														? 'bg-orange-600'
+														: 'bg-red-600'} transition-all"
+											style="width: {progressPercent}%"
+										></div>
+									</div>
+									<span class="text-sm font-medium">{progressPercent}%</span>
+								</div>
+							</td>
+							<td class="px-4 py-3 text-center text-sm">{user.totalAttempts}</td>
+							<td class="px-4 py-3 text-center text-sm">
+								{user.avgScore ? user.avgScore.toFixed(1) : '-'}
+							</td>
+						</tr>
+					{:else}
+						<tr>
+							<td colspan="6" class="p-8 text-center text-sm text-slate-400">
+								Δεν υπάρχουν δεδομένα χρηστών
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>

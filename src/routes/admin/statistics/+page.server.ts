@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db, users, userProgress, lessons } from '$lib/db/client';
-import { count, eq, and, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
     // Check admin authentication
@@ -10,8 +10,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     // Get total users count
-    const totalUsersResult = await db.select({ count: count() }).from(users);
-    const totalUsers = totalUsersResult[0]?.count || 0;
+    const totalUsersResult = await db.select({ value: sql<number>`COUNT(*)` }).from(users);
+    const totalUsers = totalUsersResult[0]?.value || 0;
 
     // Get all lessons for reference
     const allLessons = await db.select().from(lessons);
@@ -19,10 +19,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     // Get all completed lessons count
     const completedLessonsResult = await db
-        .select({ count: count() })
+        .select({ value: sql<number>`COUNT(*)` })
         .from(userProgress)
         .where(eq(userProgress.completed, true));
-    const totalCompletedLessons = completedLessonsResult[0]?.count || 0;
+    const totalCompletedLessons = completedLessonsResult[0]?.value || 0;
 
     // Calculate overall completion percentage
     const overallCompletionRate = totalUsers > 0 && totalLessons > 0
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     const moduleStats = await db
         .select({
             moduleId: lessons.moduleId,
-            totalLessons: count(lessons.id),
+            totalLessons: sql<number>`COUNT(DISTINCT ${lessons.id})`,
             completedCount: sql<number>`SUM(CASE WHEN ${userProgress.completed} = 1 THEN 1 ELSE 0 END)`,
         })
         .from(lessons)
@@ -58,16 +58,20 @@ export const load: PageServerLoad = async ({ locals }) => {
         .groupBy(lessons.id, lessons.moduleId, lessons.titleKey, lessons.orderIndex, lessons.enabled)
         .orderBy(lessons.moduleId, lessons.orderIndex);
 
-    // Get user engagement stats
+    // Get user engagement stats with user details
     const userEngagementStats = await db
         .select({
             userId: userProgress.userId,
+            username: users.username,
+            displayName: users.displayName,
             completedLessons: sql<number>`COUNT(CASE WHEN ${userProgress.completed} = 1 THEN 1 END)`,
             totalAttempts: sql<number>`SUM(${userProgress.attempts})`,
             avgScore: sql<number>`AVG(${userProgress.score})`,
         })
         .from(userProgress)
-        .groupBy(userProgress.userId);
+        .innerJoin(users, eq(userProgress.userId, users.id))
+        .groupBy(userProgress.userId, users.username, users.displayName)
+        .orderBy(sql`COUNT(CASE WHEN ${userProgress.completed} = 1 THEN 1 END) DESC`);
 
     return {
         totalUsers,
