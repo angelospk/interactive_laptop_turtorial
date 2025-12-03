@@ -36,9 +36,9 @@ export const module5Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'navigate',
-            targetUrl: 'news',
+            targetUrl: 'news.gr',
             initialApps: ['browser'],
-            instructions: 'Πληκτρολογήστε "news" στη γραμμή διευθύνσεων και πατήστε Enter.'
+            instructions: 'Πληκτρολογήστε "news.gr" στη γραμμή διευθύνσεων και πατήστε Enter.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson1'
@@ -83,22 +83,21 @@ export const module5Lessons: NewLesson[] = [
         requiredLessonId: 'module5-lesson3'
     },
 
-    // Lesson 5: Browser History
+    // Lesson 5: Close Tab
     {
         id: 'module5-lesson5',
         moduleId: 'module5',
-        lessonKey: 'check-history',
+        lessonKey: 'close-tab',
         titleKey: 'module5_lesson5_title',
         descriptionKey: 'module5_lesson5_desc',
         difficulty: 'intermediate',
         orderIndex: 5,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'navigate',
-            targetUrl: 'history',
+            goal: 'close-tab',
             initialApps: ['browser'],
             initialTabs: ['home', 'news', 'weather'],
-            instructions: 'Ανοίξτε το Ιστορικό περιήγησης πατώντας το εικονίδιο του ρολογιού.'
+            instructions: 'Κλείστε μια καρτέλα πατώντας το X πάνω της.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson4'
@@ -116,11 +115,32 @@ export const module5Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'bookmark',
-            targetSite: 'gov',
+            targetSite: 'gov.gr',
             initialApps: ['browser'],
-            instructions: 'Πηγαίνετε στη σελίδα "gov" και προσθέστε τη στα αγαπημένα πατώντας το αστέρι.'
+            instructions: 'Πηγαίνετε στη σελίδα "gov.gr" και προσθέστε τη στα αγαπημένα πατώντας το αστέρι.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson5'
+    },
+
+    // Lesson 7: Browser History
+    {
+        id: 'module5-lesson7',
+        moduleId: 'module5',
+        lessonKey: 'browser-history',
+        titleKey: 'module5_lesson7_title',
+        descriptionKey: 'module5_lesson7_desc',
+        difficulty: 'intermediate',
+        orderIndex: 7,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'navigate',
+            targetUrl: 'history',
+            initialApps: ['browser'],
+            initialTabs: ['home', 'news', 'weather'],
+            instructions: 'Ανοίξτε το Ιστορικό περιήγησης πατώντας το εικονίδιο του ρολογιού.'
+        },
+        enabled: true,
+        requiredLessonId: 'module5-lesson6'
     }
 ];

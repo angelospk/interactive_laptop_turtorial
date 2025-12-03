@@ -62,6 +62,7 @@
 			<p class="text-slate-500">Manage lessons and content</p>
 		</div>
 		<div class="flex gap-4">
+			<Button variant="outline" href="/admin/statistics">Στατιστικά</Button>
 			<Button variant="outline" onclick={seedDatabase} disabled={seeding}>
 				{seeding ? 'Seeding...' : 'Seed Database'}
 			</Button>

@@ -125,7 +125,7 @@ export const module1Lessons: NewLesson[] = [
             gameMode: true,
             instructions: 'Κυλήστε τη ροδέλα για να φτάσετε στο τέλος του δρόμου!'
         },
-        enabled: true,
+        enabled: false, // Disabled per user request
         requiredLessonId: 'module1-lesson5'
     },
 

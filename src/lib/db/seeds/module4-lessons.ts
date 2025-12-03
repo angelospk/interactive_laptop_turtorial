@@ -116,7 +116,8 @@ export const module4Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'rename-file',
-            initialApps: ['explorer']
+            initialApps: ['explorer'],
+            instructions: '1. Κάντε δεξί κλικ στο αρχείο που θέλετε να μετονομάσετε\\n2. Επιλέξτε "Μετονομασία" από το μενού\\n3. Πληκτρολογήστε το νέο όνομα\\n4. Πατήστε Enter για να αποθηκεύσετε'
         },
         enabled: true,
         requiredLessonId: 'module4-lesson5'

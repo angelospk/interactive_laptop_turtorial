@@ -27,8 +27,9 @@ export const module6Lessons: NewLesson[] = [
         orderIndex: 2,
         lessonType: 'desktop-simulation',
         config: {
-            goal: 'read-email',
-            initialApps: ['email']
+            goal: 'read-all-unread',
+            initialApps: ['email'],
+            instructions: 'Διαβάστε όλα τα μη αναγνωσμένα μηνύματα. Κάντε κλικ σε κάθε μήνυμα που δεν έχετε διαβάσει ακόμα.'
         },
         enabled: true,
         requiredLessonId: 'module6-lesson1'

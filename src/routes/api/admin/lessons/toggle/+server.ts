@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { lessons } from '$lib/db/schema';
+import { db, lessons } from '$lib/db/client';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -15,8 +15,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (!locals.admin) {
         throw error(401, 'Unauthorized');
     }
-
-    const { db } = locals;
 
     try {
         // Parse request body
