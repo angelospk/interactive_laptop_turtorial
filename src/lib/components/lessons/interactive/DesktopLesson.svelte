@@ -280,9 +280,6 @@
 			if (action === 'forward-email' && goal === 'forward-email') success = true;
 			if (action === 'delete-email' && goal === 'delete-email') success = true;
 			if (action === 'download-attachment' && goal === 'download-attachment') success = true;
-			if (
-				success = true;
-			}
 			if (action === 'rename' && goal === 'rename-file') {
 				success = true;
 			}

@@ -109,22 +109,27 @@
 	}
 
 	// Helper to get message safely
-	function getMessage(key: string) {
+	function getMessage(key: string, params?: Record<string, string>) {
 		// @ts-ignore - Dynamic access to messages
-		return m[key]?.() || key;
+		return m[key]?.(params) || key;
 	}
 </script>
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<Button variant="outline" onclick={prevLesson} disabled={currentLessonIndex === 0}>
-			Προηγούμενο
+			{getMessage('nav_previous')}
 		</Button>
 		<span class="text-sm font-medium text-slate-500">
-			Μάθημα {currentLessonIndex + 1} από {lessons.length}
+			{getMessage('lesson_x_of_y', {
+				current: String(currentLessonIndex + 1),
+				total: String(lessons.length)
+			})}
 		</span>
 		<Button onclick={nextLesson} disabled={currentLessonIndex === lessons.length - 1 && !onExit}>
-			{currentLessonIndex === lessons.length - 1 ? 'Λήξη' : 'Επόμενο'}
+			{currentLessonIndex === lessons.length - 1
+				? getMessage('nav_finish')
+				: getMessage('nav_next')}
 		</Button>
 	</div>
 
@@ -134,7 +139,7 @@
 				<div class="flex h-64 items-center justify-center rounded-md bg-slate-100 text-slate-500">
 					<div class="text-center">
 						<span class="text-4xl">🔒</span>
-						<p class="mt-2">Ολοκλήρωσε το προηγούμενο μάθημα για να το ξεκλειδώσεις.</p>
+						<p class="mt-2">{getMessage('lesson_locked_message')}</p>
 					</div>
 				</div>
 			{:else}

@@ -12,6 +12,7 @@
 	} from '$lib/components/ui/card';
 	import * as m from '$lib/paraglide/messages.js';
 	import { toast } from 'svelte-sonner';
+	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 
 	let username = $state('');
 	let loading = $state(false);
@@ -61,8 +62,13 @@
 </script>
 
 <div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4"
+	class="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4"
 >
+	<!-- Language Toggle -->
+	<div class="absolute top-4 right-4">
+		<LanguageToggle />
+	</div>
+
 	<Card class="w-full max-w-md">
 		<CardHeader class="text-center">
 			<CardTitle class="text-3xl font-bold">{m.app_title()}</CardTitle>

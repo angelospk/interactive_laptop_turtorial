@@ -292,5 +292,12 @@
 	"module10_lesson8_title": "8. Κουίζ: Ασφάλεια Κωδικών",
 	"module10_lesson8_desc": "Πόσο ασφαλείς είναι οι κωδικοί σας;",
 	"module5_lesson7_title": "7. Ιστορικό Περιήγησης",
-	"module5_lesson7_desc": "Μάθε πώς να δεις το ιστορικό των σελίδων που επισκέφτηκες"
+	"module5_lesson7_desc": "Μάθε πώς να δεις το ιστορικό των σελίδων που επισκέφτηκες",
+	"language_toggle_greek": "Ελληνικά",
+	"language_toggle_english": "English",
+	"nav_previous": "Προηγούμενο",
+	"nav_next": "Επόμενο",
+	"nav_finish": "Λήξη",
+	"lesson_x_of_y": "Μάθημα {current} από {total}",
+	"lesson_locked_message": "Ολοκλήρωσε το προηγούμενο μάθημα για να το ξεκλειδώσεις."
 }

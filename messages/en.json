@@ -32,6 +32,7 @@
 	"progress_continue": "Continue Learning",
 	"progress_reset": "Reset Progress",
 	"start_lesson": "Start Lesson",
+	"start_module": "Start Module",
 	"back_to_modules": "← Back to Modules",
 	"welcome_user": "Welcome, {displayName}!",
 	"login_success": "Login successful!",
@@ -133,5 +134,13 @@
 	"module5_lesson6_title": "6. Favorite Pages",
 	"module5_lesson6_desc": "Learn how to save your favorite websites",
 	"module5_lesson7_title": "7. Browsing History",
-	"module5_lesson7_desc": "Learn how to view the history of pages you visited"
+	"module5_lesson7_desc": "Learn how to view the history of pages you visited",
+	"language_toggle_greek": "Ελληνικά",
+	"language_toggle_english": "English",
+	"nav_previous": "Previous",
+	"nav_next": "Next",
+	"nav_finish": "Finish",
+	"lesson_x_of_y": "Lesson {current} of {total}",
+	"lesson_locked_message": "Complete the previous lesson to unlock this one.",
+	"back": "Back"
 }

@@ -10,6 +10,7 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { Button } from '$lib/components/ui/button';
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
+	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { goto } from '$app/navigation';
 
@@ -33,7 +34,7 @@
 		<div class="flex gap-4">
 			<LogoutButton />
 		</div>
-		<!-- Language Switcher removed as per user request -->
+		<LanguageToggle />
 	</div>
 
 	<div class="mb-12 text-center">

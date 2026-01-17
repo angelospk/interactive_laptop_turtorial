@@ -7,11 +7,15 @@
 
 	let { children } = $props();
 
-	// Force Greek locale on client-side mount
+	// Read saved locale preference on mount, default to Greek
 	onMount(() => {
-		const current = getLocale();
-		if (current !== 'el') {
-			console.log('Forcing Greek locale on client');
+		const savedLocale = localStorage.getItem('preferred-locale');
+		if (savedLocale === 'en' || savedLocale === 'el') {
+			if (getLocale() !== savedLocale) {
+				setLocale(savedLocale);
+			}
+		} else if (getLocale() !== 'el') {
+			// Default to Greek for first-time visitors
 			setLocale('el');
 		}
 	});
