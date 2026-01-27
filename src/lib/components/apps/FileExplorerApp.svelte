@@ -16,6 +16,7 @@
 		Scissors
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
 
 	let {
 		initialFiles = [],
@@ -53,6 +54,24 @@
 	let isRenaming = $state(false);
 	let isCreatingFolder = $state(false);
 	let newItemName = $state('');
+
+	// Get fullscreen portal target when in fullscreen mode (client-side only)
+	let portalTarget = $state<HTMLElement | undefined>(undefined);
+	onMount(() => {
+		// Update portal target reactively based on fullscreen state
+		const updatePortalTarget = () => {
+			const fullscreenEl = document.fullscreenElement;
+			if (fullscreenEl) {
+				portalTarget = document.getElementById('fullscreen-portal-target') || undefined;
+			} else {
+				portalTarget = undefined;
+			}
+		};
+
+		updatePortalTarget();
+		document.addEventListener('fullscreenchange', updatePortalTarget);
+		return () => document.removeEventListener('fullscreenchange', updatePortalTarget);
+	});
 
 	let currentItems = $derived(items.filter((i) => i.parentId === currentFolderId));
 	let currentPath = $derived(getPath(currentFolderId));
@@ -401,7 +420,7 @@
 
 	<!-- Dialogs -->
 	<Dialog.Root bind:open={isCreatingFolder}>
-		<Dialog.Content>
+		<Dialog.Content portalProps={{ to: portalTarget }}>
 			<Dialog.Header>
 				<Dialog.Title>Δημιουργία Φακέλου</Dialog.Title>
 			</Dialog.Header>
@@ -418,7 +437,7 @@
 	</Dialog.Root>
 
 	<Dialog.Root bind:open={isRenaming}>
-		<Dialog.Content>
+		<Dialog.Content portalProps={{ to: portalTarget }}>
 			<Dialog.Header>
 				<Dialog.Title>Μετονομασία</Dialog.Title>
 			</Dialog.Header>

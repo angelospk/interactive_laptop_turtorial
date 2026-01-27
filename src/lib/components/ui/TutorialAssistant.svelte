@@ -3,21 +3,41 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { X, Minimize2, Maximize2, HelpCircle } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	let {
 		instructions = 'Ακολουθήστε τις οδηγίες για να ολοκληρώσετε το μάθημα.',
 		title = 'Βοηθός Εκμάθησης',
-		visible = true
+		visible = true,
+		lessonId = ''
 	} = $props<{
 		instructions?: string | string[];
 		title?: string;
 		visible?: boolean;
+		lessonId?: string;
 	}>();
 
+	// Global storage key - same for all lessons
+	const storageKey = 'tutorial-assistant-minimized';
+
 	let isMinimized = $state(false);
+	let hasInitialized = $state(false);
+
+	// Check localStorage on mount to determine initial state
+	onMount(() => {
+		if (typeof localStorage !== 'undefined') {
+			const wasMinimized = localStorage.getItem(storageKey) === 'true';
+			isMinimized = wasMinimized;
+		}
+		hasInitialized = true;
+	});
 
 	function toggleMinimize() {
 		isMinimized = !isMinimized;
+		// Save state globally
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(storageKey, isMinimized.toString());
+		}
 	}
 </script>
 

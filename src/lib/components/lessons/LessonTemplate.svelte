@@ -59,6 +59,7 @@
 
 	<TutorialAssistant
 		title="Βοηθός"
+		lessonId={lesson.id}
 		instructions={(lesson.config as any)?.tutorialSteps ||
 			(lesson.config as any)?.instructions ||
 			description}
@@ -75,11 +76,41 @@
 		overflow: hidden;
 	}
 
+	/* Fullscreen-specific styling */
+	:global(:fullscreen) .lesson-template {
+		border-radius: 0;
+		height: 100vh;
+	}
+
 	.lesson-header {
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(10px);
 		padding: 1.5rem 2rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	/* Compact header in fullscreen */
+	:global(:fullscreen) .lesson-header {
+		padding: 0.75rem 1.5rem;
+	}
+
+	:global(:fullscreen) .lesson-title {
+		font-size: 1.25rem;
+		margin-bottom: 0.25rem;
+	}
+
+	:global(:fullscreen) .lesson-description {
+		font-size: 0.85rem;
+	}
+
+	:global(:fullscreen) .back-button {
+		padding: 0.25rem 0.75rem;
+		font-size: 0.8rem;
+		margin-bottom: 0.5rem;
+	}
+
+	:global(:fullscreen) .lesson-info {
+		margin-bottom: 0.5rem;
 	}
 
 	.back-button {
@@ -146,5 +177,13 @@
 		flex: 1;
 		padding: 2rem;
 		overflow-y: auto;
+	}
+
+	/* Ensure content fills and scrolls in fullscreen */
+	:global(:fullscreen) .lesson-content {
+		padding: 1rem;
+		flex: 1;
+		overflow-y: auto;
+		min-height: 0;
 	}
 </style>

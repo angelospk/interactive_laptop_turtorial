@@ -142,5 +142,10 @@
 	"nav_finish": "Finish",
 	"lesson_x_of_y": "Lesson {current} of {total}",
 	"lesson_locked_message": "Complete the previous lesson to unlock this one.",
-	"back": "Back"
+	"back": "Back",
+	"wrong_click_need_single": "Single click required!",
+	"wrong_click_need_double": "Double click required!",
+	"wrong_click_need_right": "Right click required!",
+	"fullscreen_enter": "Enter fullscreen",
+	"fullscreen_exit": "Exit fullscreen"
 }

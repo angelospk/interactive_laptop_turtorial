@@ -299,5 +299,10 @@
 	"nav_next": "Επόμενο",
 	"nav_finish": "Λήξη",
 	"lesson_x_of_y": "Μάθημα {current} από {total}",
-	"lesson_locked_message": "Ολοκλήρωσε το προηγούμενο μάθημα για να το ξεκλειδώσεις."
+	"lesson_locked_message": "Ολοκλήρωσε το προηγούμενο μάθημα για να το ξεκλειδώσεις.",
+	"wrong_click_need_single": "Χρειάζεται απλό κλικ!",
+	"wrong_click_need_double": "Χρειάζεται διπλό κλικ!",
+	"wrong_click_need_right": "Χρειάζεται δεξί κλικ!",
+	"fullscreen_enter": "Πλήρης οθόνη",
+	"fullscreen_exit": "Έξοδος πλήρους οθόνης"
 }

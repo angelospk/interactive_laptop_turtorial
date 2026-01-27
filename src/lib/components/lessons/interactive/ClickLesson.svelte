@@ -3,6 +3,7 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		lesson: Lesson;
@@ -95,12 +96,35 @@
 
 	let score = $state(0);
 	let successfulClicks = $state(0);
+	let wrongClicks = $state(0);
 	let timeRemaining = $state(timeLimit);
 	let isComplete = $state(false);
 	let gameStarted = $state(false);
 	let targetX = $state(50);
 	let targetY = $state(50);
 	let intervalId: number | null = null;
+
+	// Get error message for wrong click type
+	function getWrongClickMessage(): string {
+		switch (currentTheme.type) {
+			case 'click':
+				return m.wrong_click_need_single?.() || 'Χρειάζεται απλό κλικ!';
+			case 'double-click':
+				return m.wrong_click_need_double?.() || 'Χρειάζεται διπλό κλικ!';
+			case 'right-click':
+				return m.wrong_click_need_right?.() || 'Χρειάζεται δεξί κλικ!';
+			default:
+				return '';
+		}
+	}
+
+	// Handle wrong click type in mixed mode
+	function handleWrongClick() {
+		if (!gameStarted || isComplete) return;
+		toast.error(getWrongClickMessage());
+		wrongClicks++;
+		score = Math.max(0, score - 10); // Penalty for wrong click
+	}
 
 	function generateRandomPosition() {
 		targetX = Math.random() * 80 + 10;
@@ -207,16 +231,27 @@
 						class="target absolute flex items-center justify-center transition-all duration-100 active:scale-90 {currentTheme.targetClass}"
 						style="left: {targetX}%; top: {targetY}%; {currentTheme.targetStyle ||
 							''} width: {currentTheme.size || '80px'}; height: {currentTheme.size || '80px'};"
-						onclick={handleTargetClick}
-						oncontextmenu={(e) => {
-							if (currentTheme.type === 'right-click') {
-								e.preventDefault();
+						onclick={(e) => {
+							// In mixed mode, validate click type; in other modes, accept any click
+							if (theme !== 'mixed' || currentTheme.type === 'click') {
 								handleTargetClick();
+							} else {
+								handleWrongClick();
+							}
+						}}
+						oncontextmenu={(e) => {
+							e.preventDefault();
+							if (theme !== 'mixed' || currentTheme.type === 'right-click') {
+								handleTargetClick();
+							} else {
+								handleWrongClick();
 							}
 						}}
 						ondblclick={() => {
-							if (currentTheme.type === 'double-click') {
+							if (theme !== 'mixed' || currentTheme.type === 'double-click') {
 								handleTargetClick();
+							} else {
+								handleWrongClick();
 							}
 						}}
 					>

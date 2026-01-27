@@ -119,3 +119,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure dialogs/modals appear in fullscreen mode */
+/* The ::backdrop creates a new stacking context, so we need to ensure 
+   dialog content has maximum z-index and is positioned above the fullscreen element */
+:fullscreen ~ [data-portal],
+:fullscreen ~ [data-bits-portal-root],
+body:has(:fullscreen) [data-portal],
+body:has(:fullscreen) [data-bits-portal-root] {
+  z-index: 2147483647;
+  position: fixed;
+}
+
+/* Make fullscreen overlay appear above fullscreen element */
+body:has(:fullscreen) [data-slot="dialog-overlay"] {
+  z-index: 2147483646;
+}
+
+body:has(:fullscreen) [data-slot="dialog-content"] {
+  z-index: 2147483647;
+}
