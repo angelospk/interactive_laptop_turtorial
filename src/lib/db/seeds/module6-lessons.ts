@@ -29,7 +29,11 @@ export const module6Lessons: NewLesson[] = [
         config: {
             goal: 'read-all-unread',
             initialApps: ['email'],
-            instructions: 'Διαβάστε όλα τα μη αναγνωσμένα μηνύματα. Κάντε κλικ σε κάθε μήνυμα που δεν έχετε διαβάσει ακόμα.'
+            instructions: 'Κάντε κλικ σε κάθε μη αναγνωσμένο μήνυμα (με έντονη γραμματοσειρά) για να το διαβάσετε.\n\n💡 Τα μη αναγνωσμένα μηνύματα έχουν έντονο τίτλο.',
+            emails: [
+                { id: 'e1', sender: 'Γιάννης <giannis@gmail.com>', subject: 'Καλημέρα!', body: 'Τι κάνεις; Πάμε για καφέ;', date: '10:00', isRead: false, isPhishing: false },
+                { id: 'e2', sender: 'Μαρία <maria@gmail.com>', subject: 'Συνάντηση αύριο', body: 'Θες να βρεθούμε αύριο στις 5;', date: '09:30', isRead: false, isPhishing: false }
+            ]
         },
         enabled: true,
         requiredLessonId: 'module6-lesson1'

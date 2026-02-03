@@ -36,9 +36,9 @@ export const module8Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'navigate-site',
-			targetUrl: 'gov',
+			targetUrl: 'gov.gr',
 			initialApps: ['browser'],
-			tutorialSteps: ['step_browser_type_gov', 'step_browser_check_lock']
+			instructions: '1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης (πάνω μέρος).\n2. Πατήστε Enter.\n3. Ελέγξτε ότι εμφανίζεται το 🔒 λουκετάκι!\n\n💡 Το λουκετάκι σημαίνει ασφαλής σύνδεση.'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson1'
@@ -76,9 +76,9 @@ export const module8Lessons: NewLesson[] = [
 		config: {
 			goal: 'handle-cookies',
 			targetChoice: 'accept',
-			targetUrl: 'news',
+			targetUrl: 'news247.gr',
 			initialApps: ['browser'],
-			tutorialSteps: ['step_browser_visit_news', 'step_browser_accept_cookies']
+			instructions: '1. Πληκτρολογήστε "news247.gr" στη γραμμή διεύθυνσης.\n2. Πατήστε Enter.\n3. Θα εμφανιστεί παράθυρο για cookies.\n4. Πατήστε "Αποδοχή" για να συνεχίσετε.\n\n💡 Τα cookies αποθηκεύουν τις προτιμήσεις σας.'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson3'
@@ -115,14 +115,9 @@ export const module8Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'secure-login',
-			targetUrl: 'bank',
+			targetUrl: 'piraeusbank.gr',
 			initialApps: ['browser'],
-			tutorialSteps: [
-				'step_browser_visit_bank',
-				'step_bank_enter_user',
-				'step_bank_enter_pass',
-				'step_bank_login'
-			]
+			instructions: '1. Πληκτρολογήστε "piraeusbank.gr" στη γραμμή διεύθυνσης και πατήστε Enter.\n2. Συμπληρώστε:\n   • Όνομα χρήστη: οτιδήποτε\n   • Κωδικός: Kwdikos1!\n\n💡 Ισχυρός κωδικός = 8+ χαρακτήρες + αριθμοί + σύμβολα (!@#)\n\n3. Πατήστε "Είσοδος".'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson5'
@@ -138,14 +133,9 @@ export const module8Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'gov-service',
-			targetUrl: 'gov',
+			targetUrl: 'gov.gr',
 			initialApps: ['browser'],
-			tutorialSteps: [
-				'step_browser_visit_gov',
-				'step_gov_select_service',
-				'step_gov_fill_form',
-				'step_gov_submit'
-			]
+			instructions: '1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης.\n2. Επιλέξτε "Υπεύθυνη Δήλωση" από τη λίστα.\n3. Συμπληρώστε:\n   • Ονοματεπώνυμο\n   • ΑΦΜ (9 ψηφία, π.χ. 123456789)\n4. Πατήστε "Υποβολή".'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson6'

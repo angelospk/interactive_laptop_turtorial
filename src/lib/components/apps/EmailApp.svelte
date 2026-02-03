@@ -114,6 +114,12 @@
 			email.isRead = true;
 		}
 		onAction('read-email', { id });
+
+		// Check if all unread emails in inbox have been read
+		const unreadInbox = emailList.filter((e) => !e.isRead && (e.folder === 'inbox' || !e.folder));
+		if (unreadInbox.length === 0) {
+			onAction('read-all-unread-complete', {});
+		}
 	}
 
 	function deleteEmail(id: string) {

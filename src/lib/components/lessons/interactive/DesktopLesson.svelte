@@ -287,6 +287,19 @@
 				success = true;
 			}
 
+			// Module 4: File operations
+			if (action === 'paste-cut' && goal === 'paste-cut-file') {
+				success = true;
+			}
+			if (action === 'drag-drop' && goal === 'drag-drop-file') {
+				success = true;
+			}
+
+			// Module 6: Email - complete when all unread are read
+			if (action === 'read-all-unread-complete' && goal === 'read-all-unread') {
+				success = true;
+			}
+
 			if (success) {
 				completed = true;
 				toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');

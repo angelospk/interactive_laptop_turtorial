@@ -98,7 +98,12 @@ export const module4Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'paste-cut-file',
-            initialApps: ['explorer']
+            initialApps: ['explorer'],
+            instructions: '1. Κάντε δεξί κλικ στο αρχείο "Σημείωση.txt".\n2. Επιλέξτε "Αποκοπή" από το μενού.\n3. Ανοίξτε τον φάκελο "Εργασία" (διπλό κλικ).\n4. Κάντε δεξί κλικ στον κενό χώρο.\n5. Επιλέξτε "Επικόλληση".',
+            initialFiles: [
+                { id: 'note1', name: 'Σημείωση.txt', type: 'text', parentId: 'root' },
+                { id: 'work-folder', name: 'Εργασία', type: 'folder', parentId: 'root' }
+            ]
         },
         enabled: true,
         requiredLessonId: 'module4-lesson4'
@@ -153,7 +158,12 @@ export const module4Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'drag-drop-file',
-            initialApps: ['explorer']
+            initialApps: ['explorer'],
+            instructions: '1. Κρατήστε πατημένο το αριστερό κλικ πάνω στο "Φωτογραφία.jpg".\n2. Σύρετέ το (χωρίς να αφήσετε το κλικ) πάνω από τον φάκελο "Φωτογραφίες".\n3. Αφήστε το κουμπί του ποντικιού για να μετακινηθεί το αρχείο.',
+            initialFiles: [
+                { id: 'photo1', name: 'Φωτογραφία.jpg', type: 'image', parentId: 'root' },
+                { id: 'photos-folder', name: 'Φωτογραφίες', type: 'folder', parentId: 'root' }
+            ]
         },
         enabled: true,
         requiredLessonId: 'module4-lesson7'
