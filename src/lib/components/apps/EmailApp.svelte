@@ -103,6 +103,7 @@
 	let composeTo = $state('');
 	let composeSubject = $state('');
 	let composeBody = $state('');
+	let attachments = $state<{ name: string; size: string }[]>([]);
 
 	let selectedEmail = $derived(emailList.find((e) => e.id === selectedEmailId));
 	let filteredEmails = $derived(emailList.filter((e) => (e.folder || 'inbox') === currentView));
@@ -175,6 +176,17 @@
 		composeTo = '';
 		composeSubject = '';
 		composeBody = '';
+		attachments = [];
+	}
+
+	function addAttachment() {
+		// Simulate file picker
+		const fileName = 'document.pdf';
+		if (!attachments.some((a) => a.name === fileName)) {
+			attachments = [...attachments, { name: fileName, size: '450 KB' }];
+			toast.success(`Επισυνάφθηκε το αρχείο: ${fileName}`);
+			onAction('attach-file', { fileName });
+		}
 	}
 
 	function sendEmail() {
@@ -247,9 +259,36 @@
 						placeholder="Γράψτε το μήνυμά σας εδώ..."
 						bind:value={composeBody}
 					></textarea>
+
+					{#if attachments.length > 0}
+						<div class="mt-2 flex flex-wrap gap-2">
+							{#each attachments as att}
+								<div
+									class="flex items-center gap-2 rounded border border-slate-200 bg-slate-100 px-2 py-1 text-xs text-slate-600"
+								>
+									<Paperclip class="h-3 w-3" />
+									{att.name}
+									<button onclick={() => (attachments = attachments.filter((a) => a !== att))}>
+										<X class="h-3 w-3 hover:text-red-500" />
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				</div>
 				<div class="flex items-center justify-between border-t bg-slate-50 px-4 py-3">
-					<Button variant="ghost" onclick={saveDraft}>Αποθήκευση</Button>
+					<div class="flex gap-1">
+						<Button
+							variant="ghost"
+							size="icon"
+							onclick={addAttachment}
+							title="Επισύναψη αρχείου"
+							class="text-slate-600"
+						>
+							<Paperclip class="h-5 w-5" />
+						</Button>
+						<Button variant="ghost" onclick={saveDraft}>Αποθήκευση</Button>
+					</div>
 					<div class="flex gap-2">
 						<Button variant="ghost" onclick={() => (isComposing = false)}>Ακύρωση</Button>
 						<Button class="bg-blue-600 text-white hover:bg-blue-700" onclick={sendEmail}>

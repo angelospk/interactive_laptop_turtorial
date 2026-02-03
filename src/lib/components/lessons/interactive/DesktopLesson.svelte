@@ -252,6 +252,9 @@
 			if (action === 'open-task-view' && goal === 'open-task-view') {
 				success = true;
 			}
+			if (action === 'attach-file' && (goal === 'attach-file' || goal === 'email-attachment')) {
+				success = true;
+			}
 			// Module 8 New Goals
 			if (
 				action === 'cookie-choice' &&

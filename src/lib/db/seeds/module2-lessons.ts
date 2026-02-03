@@ -95,6 +95,44 @@ export const module2Lessons: NewLesson[] = [
         requiredLessonId: 'module2-lesson5'
     },
 
+    // Lesson 6b: Copy & Paste
+    {
+        id: 'module2-lesson6b',
+        moduleId: 'module2',
+        lessonKey: 'copy-paste-basic',
+        titleKey: 'module2_lesson6b_title',
+        descriptionKey: 'module2_lesson6b_desc',
+        difficulty: 'beginner',
+        orderIndex: 6.5,
+        lessonType: 'keyboard-action',
+        config: {
+            action: 'copy-paste',
+            sampleText: 'Καλημέρα κόσμε!',
+            targetField: 'empty-textarea'
+        },
+        enabled: true,
+        requiredLessonId: 'module2-lesson6'
+    },
+
+    // Lesson 6c: Cut & Paste
+    {
+        id: 'module2-lesson6c',
+        moduleId: 'module2',
+        lessonKey: 'cut-paste-basic',
+        titleKey: 'module2_lesson6c_title',
+        descriptionKey: 'module2_lesson6c_desc',
+        difficulty: 'beginner',
+        orderIndex: 6.6,
+        lessonType: 'keyboard-action',
+        config: {
+            action: 'cut-paste',
+            sourceField: 'text-to-cut',
+            targetField: 'empty-textarea'
+        },
+        enabled: true,
+        requiredLessonId: 'module2-lesson6b'
+    },
+
     // Lesson 7: Special Characters
     {
         id: 'module2-lesson7',

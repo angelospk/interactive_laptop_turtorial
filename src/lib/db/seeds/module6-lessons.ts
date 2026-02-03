@@ -126,5 +126,27 @@ export const module6Lessons: NewLesson[] = [
         },
         enabled: true,
         requiredLessonId: 'module6-lesson4'
+    },
+
+    // Lesson 6: Email Attachments
+    {
+        id: 'module6-lesson6',
+        moduleId: 'module6',
+        lessonKey: 'email-attachments',
+        titleKey: 'module6_lesson6_title',
+        descriptionKey: 'module6_lesson6_desc',
+        difficulty: 'intermediate',
+        orderIndex: 6,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'attach-file',
+            initialApps: ['email'],
+            instructions: 'Συνθέστε ένα νέο email και επισυνάψτε ένα αρχείο.',
+            availableFiles: [
+                { id: 'doc1', name: 'Έγγραφο.pdf', size: '1.2 MB' }
+            ]
+        },
+        enabled: true,
+        requiredLessonId: 'module6-lesson5'
     }
 ];
