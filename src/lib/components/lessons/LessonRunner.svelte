@@ -32,7 +32,43 @@
 	// All lessons are now unlocked - users can navigate freely
 	let isLocked = $derived(false);
 
+	// Setup countdown state
+	let countdownRemaining = $state<number | null>(null);
+	let countdownInterval = $state<number | null>(null);
+
+	$effect(() => {
+		return () => {
+			if (countdownInterval !== null) clearInterval(countdownInterval);
+		};
+	});
+
+	function startAutoAdvance() {
+		countdownRemaining = 5; // 5 seconds
+		if (countdownInterval !== null) clearInterval(countdownInterval);
+
+		countdownInterval = setInterval(() => {
+			if (countdownRemaining !== null) {
+				countdownRemaining -= 1;
+				if (countdownRemaining <= 0) {
+					clearInterval(countdownInterval as number);
+					countdownRemaining = null;
+					nextLesson(); // If it's the last lesson, nextLesson() calls onExit()
+				}
+			}
+		}, 1000) as unknown as number;
+	}
+
+	function cancelAutoAdvance() {
+		if (countdownInterval !== null) {
+			clearInterval(countdownInterval);
+			countdownInterval = null;
+		}
+		countdownRemaining = null;
+	}
+
 	async function handleLessonComplete(score: number) {
+		const isFirstCompletion = !mergedProgress[currentLesson.id]?.completed;
+
 		// Optimistically update UI immediately
 		localUpdates[currentLesson.id] = {
 			completed: true,
@@ -57,6 +93,11 @@
 			if (data.progress) {
 				localUpdates[currentLesson.id] = data.progress;
 			}
+
+			if (isFirstCompletion) {
+				startAutoAdvance();
+			}
+
 			await invalidateAll(); // Refresh data to get updated progress
 		} else {
 			// Revert optimistic update on failure
@@ -67,6 +108,7 @@
 	}
 
 	async function handleRetry() {
+		cancelAutoAdvance();
 		// Clear local state immediately for instant UI feedback
 		const { [currentLesson.id]: _, ...rest } = localUpdates;
 		localUpdates = rest;
@@ -90,6 +132,7 @@
 	}
 
 	function nextLesson() {
+		cancelAutoAdvance();
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
 		} else if (onExit) {
@@ -98,12 +141,14 @@
 	}
 
 	function prevLesson() {
+		cancelAutoAdvance();
 		if (currentLessonIndex > 0) {
 			currentLessonIndex--;
 		}
 	}
 
 	function handleBack() {
+		cancelAutoAdvance();
 		if (onExit) {
 			onExit();
 		}
@@ -120,12 +165,11 @@
 	let lessonContainer: HTMLElement;
 
 	function toggleFullscreen() {
-		if (!lessonContainer) return;
-		if (!document.fullscreenElement) {
-			lessonContainer.requestFullscreen().catch((err) => {
+		if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+			document.documentElement.requestFullscreen().catch((err) => {
 				console.error('Fullscreen failed:', err);
 			});
-		} else {
+		} else if (document.fullscreenElement && document.exitFullscreen) {
 			document.exitFullscreen();
 		}
 	}
@@ -232,6 +276,17 @@
 							{getMessage('score')}: {mergedProgress[currentLesson.id].score}
 						</p>
 					{/if}
+					{#if countdownRemaining !== null}
+						<div class="mt-1 flex items-center gap-2 text-sm font-medium text-green-800">
+							<span class="animate-pulse">
+								{getMessage('auto_advancing_in', { seconds: String(countdownRemaining) }) ||
+									`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
+							</span>
+							<button class="underline hover:text-green-900" onclick={cancelAutoAdvance}>
+								{getMessage('cancel') || 'Ακύρωση'}
+							</button>
+						</div>
+					{/if}
 				</div>
 			</div>
 
@@ -270,6 +325,12 @@
 
 <style>
 	.fullscreen-active {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 50;
 		height: 100vh;
 		width: 100vw;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

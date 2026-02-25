@@ -23,6 +23,11 @@
 
 	function selectLesson(lessonId: string) {
 		selectedLessonId = lessonId;
+		if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+			document.documentElement.requestFullscreen().catch((err) => {
+				console.error('Fullscreen failed:', err);
+			});
+		}
 	}
 
 	async function backToGrid() {

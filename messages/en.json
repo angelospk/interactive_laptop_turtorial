@@ -153,5 +153,7 @@
 	"wrong_click_need_double": "Double click required!",
 	"wrong_click_need_right": "Right click required!",
 	"fullscreen_enter": "Enter fullscreen",
-	"fullscreen_exit": "Exit fullscreen"
+	"fullscreen_exit": "Exit fullscreen",
+	"auto_advancing_in": "Next in {seconds} seconds...",
+	"cancel": "Cancel"
 }

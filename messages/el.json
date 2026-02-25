@@ -310,5 +310,7 @@
 	"wrong_click_need_double": "Χρειάζεται διπλό κλικ!",
 	"wrong_click_need_right": "Χρειάζεται δεξί κλικ!",
 	"fullscreen_enter": "Πλήρης οθόνη",
-	"fullscreen_exit": "Έξοδος πλήρους οθόνης"
+	"fullscreen_exit": "Έξοδος πλήρους οθόνης",
+	"auto_advancing_in": "Επόμενο σε {seconds} δευτερόλεπτα...",
+	"cancel": "Ακύρωση"
 }
