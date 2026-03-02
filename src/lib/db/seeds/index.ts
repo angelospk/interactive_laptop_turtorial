@@ -9,6 +9,9 @@ import { module7Lessons } from './module7-lessons';
 import { module8Lessons } from './module8-lessons';
 import { module9Lessons } from './module9-lessons';
 import { module10Lessons } from './module10-lessons';
+import { module11Lessons } from './module11-lessons';
+import { module12Lessons } from './module12-lessons';
+import { module13Lessons } from './module13-lessons';
 
 /**
  * All lesson seed data
@@ -23,7 +26,10 @@ export const allLessons: NewLesson[] = [
     ...module7Lessons,
     ...module8Lessons,
     ...module9Lessons,
-    ...module10Lessons
+    ...module10Lessons,
+    ...module11Lessons,
+    ...module12Lessons,
+    ...module13Lessons
 ];
 
 export {
@@ -36,5 +42,8 @@ export {
     module7Lessons,
     module8Lessons,
     module9Lessons,
-    module10Lessons
+    module10Lessons,
+    module11Lessons,
+    module12Lessons,
+    module13Lessons
 };

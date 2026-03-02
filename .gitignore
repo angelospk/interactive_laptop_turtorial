@@ -36,3 +36,5 @@ drizzle/
 *.md
 .gemini/
 .env.example
+out/svelte-mcp
+openspec/

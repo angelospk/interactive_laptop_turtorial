@@ -204,9 +204,6 @@
 
 			let success = false;
 
-			// Direct match
-			if (goal === action) success = true;
-
 			// Specific matches based on config
 			if (
 				action === 'navigate' &&
@@ -216,6 +213,14 @@
 				success = true;
 			}
 			if (action === 'report-phishing' && goal === 'identify-phishing' && data.correct) {
+				success = true;
+			}
+			if (action === 'update-cell' && goal === 'update-cell') {
+				const cellOk = !config.targetCell || data.cellId === config.targetCell;
+				const valueOk = !config.targetValue || data.value?.trim() === config.targetValue.trim();
+				if (cellOk && valueOk) success = true;
+			}
+			if (action === 'format-cell' && goal === 'format-cell') {
 				success = true;
 			}
 			if (action === 'formula-success' && goal === 'enter-formula') {

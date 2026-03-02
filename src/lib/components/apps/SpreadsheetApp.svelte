@@ -30,14 +30,19 @@
 	};
 
 	let cells = $state<Record<string, string>>(initialData);
+	let formulas = $state<Record<string, string>>({});
 	let cellStyles = $state<Record<string, CellStyle>>({});
 	let selectedCell = $state<string | null>(null);
 	let formulaBar = $state('');
 
 	// Grid configuration
 	const rows = 20;
-	const cols = 8;
 	const colLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+	// Column widths (resizable)
+	let colWidths = $state<Record<string, number>>(
+		Object.fromEntries(colLabels.map((l) => [l, 120]))
+	);
 
 	let currentStyle = $derived(
 		selectedCell
@@ -45,74 +50,124 @@
 			: { bold: false, italic: false, underline: false, align: 'left' }
 	);
 
+	// --- Column resize ---
+	function startResize(col: string, e: MouseEvent) {
+		e.preventDefault();
+		const startX = e.clientX;
+		const startW = colWidths[col];
+
+		function onMove(e: MouseEvent) {
+			colWidths[col] = Math.max(60, startW + e.clientX - startX);
+		}
+		function onUp() {
+			window.removeEventListener('mousemove', onMove);
+			window.removeEventListener('mouseup', onUp);
+		}
+		window.addEventListener('mousemove', onMove);
+		window.addEventListener('mouseup', onUp);
+	}
+
+	// --- Formula calculation ---
+	function parseRange(range: string): string[] {
+		const match = range.match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
+		if (!match) return [range];
+		const [, sc, sr, ec, er] = match;
+		const result: string[] = [];
+		for (let c = sc.charCodeAt(0); c <= ec.charCodeAt(0); c++) {
+			for (let r = parseInt(sr); r <= parseInt(er); r++) {
+				result.push(`${String.fromCharCode(c)}${r}`);
+			}
+		}
+		return result;
+	}
+
+	function getCellNums(ids: string[]): number[] {
+		return ids.map((id) => parseFloat(cells[id] || '')).filter((n) => !isNaN(n));
+	}
+
+	function calcFormula(formula: string): string | null {
+		const clean = formula.toUpperCase().replace(/\s/g, '').slice(1);
+		const m = (fn: string) => clean.match(new RegExp(`^${fn}\\((.+)\\)$`));
+
+		const sumM = m('SUM');
+		if (sumM) {
+			const nums = getCellNums(parseRange(sumM[1]));
+			return String(nums.reduce((a, b) => a + b, 0));
+		}
+		const avgM = m('AVERAGE');
+		if (avgM) {
+			const nums = getCellNums(parseRange(avgM[1]));
+			return nums.length ? String(nums.reduce((a, b) => a + b, 0) / nums.length) : '0';
+		}
+		const maxM = m('MAX');
+		if (maxM) {
+			const nums = getCellNums(parseRange(maxM[1]));
+			return nums.length ? String(Math.max(...nums)) : '0';
+		}
+		const minM = m('MIN');
+		if (minM) {
+			const nums = getCellNums(parseRange(minM[1]));
+			return nums.length ? String(Math.min(...nums)) : '0';
+		}
+		return null;
+	}
+
+	// --- Cell actions ---
 	function selectCell(cellId: string) {
 		selectedCell = cellId;
-		formulaBar = cells[cellId] || '';
+		formulaBar = formulas[cellId] || cells[cellId] || '';
 		onAction('select-cell', { cellId });
 	}
 
 	function updateCell(value: string) {
-		if (selectedCell) {
-			cells[selectedCell] = value;
-			onAction('update-cell', { cellId: selectedCell, value });
-		}
+		if (!selectedCell) return;
+		cells[selectedCell] = value;
+		if (!value.startsWith('=')) delete formulas[selectedCell];
+		onAction('update-cell', { cellId: selectedCell, value });
 	}
 
 	function handleFormula(cellId: string, formula: string) {
-		const cleanFormula = formula.toUpperCase().replace('=', '');
+		const cleanUpper = formula.toUpperCase().replace(/\s/g, '').slice(1);
+		const result = calcFormula(formula);
 
-		// Simple arithmetic mocking
-		// =SUM(A1, B1)
-		if (config.targetFormula && cleanFormula.includes(config.targetFormula)) {
-			toast.success('Σωστός τύπος!');
+		if (result !== null) {
+			formulas[cellId] = formula;
+			cells[cellId] = result;
+		}
+
+		if (config.targetFormula && cleanUpper.includes(config.targetFormula)) {
+			toast.success('Σωστός τύπος! Αποτέλεσμα: ' + (result ?? ''));
 			onAction('formula-success', { formula });
-		} else if (cleanFormula.startsWith('SUM')) {
-			// Simulate calculation
-			toast.success('Ο τύπος SUM εφαρμόστηκε');
-		} else if (cleanFormula.startsWith('AVERAGE')) {
-			toast.success('Ο τύπος AVERAGE εφαρμόστηκε');
+		} else if (result !== null) {
+			toast.success(`Αποτέλεσμα: ${result}`);
 		}
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter' && selectedCell) {
-			// Check formula on Enter
 			const value = cells[selectedCell];
 			if (value && value.startsWith('=')) {
 				handleFormula(selectedCell, value);
 			}
-
 			// Move down
 			const col = selectedCell.charAt(0);
 			const row = parseInt(selectedCell.substring(1));
-			if (row < rows) {
-				selectCell(`${col}${row + 1}`);
-			}
+			if (row < rows) selectCell(`${col}${row + 1}`);
 		}
 	}
 
 	function toggleStyle(prop: keyof CellStyle, value?: any) {
 		if (!selectedCell) return;
-
 		const current = cellStyles[selectedCell] || {
 			bold: false,
 			italic: false,
 			underline: false,
 			align: 'left'
 		};
-		let newValue;
-
-		if (value !== undefined) {
-			newValue = value;
-		} else {
-			newValue = !current[prop];
-		}
-
 		cellStyles[selectedCell] = {
 			...current,
-			[prop]: newValue
+			[prop]: value !== undefined ? value : !current[prop]
 		};
-
 		onAction('format-cell', { cellId: selectedCell, style: cellStyles[selectedCell] });
 	}
 </script>
@@ -125,7 +180,6 @@
 		</Button>
 		<div class="h-6 w-px bg-slate-300"></div>
 
-		<!-- Formatting Buttons -->
 		<Button
 			variant="ghost"
 			size="icon"
@@ -153,7 +207,6 @@
 
 		<div class="h-6 w-px bg-slate-300"></div>
 
-		<!-- Alignment -->
 		<Button
 			variant="ghost"
 			size="icon"
@@ -204,13 +257,21 @@
 
 	<!-- Grid -->
 	<div class="flex-1 overflow-auto select-none">
-		<table class="w-full border-collapse text-sm">
+		<table class="border-collapse text-sm" style="table-layout: fixed;">
 			<thead>
 				<tr>
 					<th class="w-10 border bg-slate-100"></th>
 					{#each colLabels as label}
-						<th class="min-w-[80px] border bg-slate-100 px-2 py-1 font-normal text-slate-600">
+						<th
+							class="relative border bg-slate-100 px-2 py-1 font-normal text-slate-600 overflow-hidden"
+							style="width: {colWidths[label]}px;"
+						>
 							{label}
+							<!-- Resize handle -->
+							<div
+								class="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400"
+								onmousedown={(e) => startResize(label, e)}
+							></div>
 						</th>
 					{/each}
 				</tr>
@@ -219,34 +280,47 @@
 				{#each Array(rows) as _, r}
 					{@const rowNum = r + 1}
 					<tr>
-						<td class="border bg-slate-100 text-center text-xs text-slate-500">{rowNum}</td>
+						<td class="border bg-slate-100 text-center text-xs text-slate-500 w-10">{rowNum}</td>
 						{#each colLabels as col}
 							{@const cellId = `${col}${rowNum}`}
 							{@const style = cellStyles[cellId]}
+							{@const isSelected = selectedCell === cellId}
+							{@const hasFormula = !!formulas[cellId]}
 							<td
-								class="border p-0 {selectedCell === cellId ? 'z-10 ring-2 ring-green-500' : ''}"
+								class="border p-0 overflow-hidden {isSelected ? 'z-10 ring-2 ring-inset ring-green-500' : ''}"
+								style="width: {colWidths[col]}px;"
 								onclick={() => selectCell(cellId)}
 							>
-								<input
-									type="text"
-									class="h-full w-full bg-transparent px-2 py-1 outline-none
-                                    {style?.bold ? 'font-bold' : ''}
-                                    {style?.italic ? 'italic' : ''}
-                                    {style?.underline ? 'underline' : ''}
-                                    {style?.align === 'center'
-										? 'text-center'
-										: style?.align === 'right'
-											? 'text-right'
-											: 'text-left'}
-                                    "
-									value={cells[cellId] || ''}
-									oninput={(e) => {
-										selectedCell = cellId;
-										updateCell(e.currentTarget.value);
-									}}
-									onfocus={() => selectCell(cellId)}
-									onkeydown={handleKeyDown}
-								/>
+								{#if isSelected}
+									<input
+										type="text"
+										class="h-full w-full bg-transparent px-2 py-1 outline-none
+											{style?.bold ? 'font-bold' : ''}
+											{style?.italic ? 'italic' : ''}
+											{style?.underline ? 'underline' : ''}
+											{style?.align === 'center' ? 'text-center' : style?.align === 'right' ? 'text-right' : 'text-left'}"
+										value={formulas[cellId] || cells[cellId] || ''}
+										oninput={(e) => {
+											const v = e.currentTarget.value;
+											cells[cellId] = v;
+											formulaBar = v;
+											if (!v.startsWith('=')) delete formulas[cellId];
+											onAction('update-cell', { cellId, value: v });
+										}}
+										onfocus={() => selectCell(cellId)}
+										onkeydown={handleKeyDown}
+									/>
+								{:else}
+									<div
+										class="px-2 py-1 truncate
+											{style?.bold ? 'font-bold' : ''}
+											{style?.italic ? 'italic' : ''}
+											{style?.underline ? 'underline' : ''}
+											{hasFormula ? 'text-right' : style?.align === 'center' ? 'text-center' : style?.align === 'right' ? 'text-right' : 'text-left'}"
+									>
+										{cells[cellId] || ''}
+									</div>
+								{/if}
 							</td>
 						{/each}
 					</tr>

@@ -142,5 +142,62 @@ export const module5Lessons: NewLesson[] = [
         },
         enabled: true,
         requiredLessonId: 'module5-lesson6'
+    },
+
+    // Lesson 8: Download a File
+    {
+        id: 'module5-lesson8',
+        moduleId: 'module5',
+        lessonKey: 'download-file',
+        titleKey: 'module5_lesson8_title',
+        descriptionKey: 'module5_lesson8_desc',
+        difficulty: 'intermediate',
+        orderIndex: 8,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'download-file',
+            initialApps: ['browser'],
+            instructions: 'Κατεβάστε ένα αρχείο: Βρείτε το σύνδεσμο λήψης και πατήστε "Λήψη".'
+        },
+        enabled: true,
+        requiredLessonId: 'module5-lesson7'
+    },
+
+    // Lesson 9: Zoom In/Out
+    {
+        id: 'module5-lesson9',
+        moduleId: 'module5',
+        lessonKey: 'zoom-page',
+        titleKey: 'module5_lesson9_title',
+        descriptionKey: 'module5_lesson9_desc',
+        difficulty: 'beginner',
+        orderIndex: 9,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'zoom-page',
+            initialApps: ['browser'],
+            instructions: 'Μεγεθύνετε τη σελίδα: Χρησιμοποιήστε Ctrl+ για μεγέθυνση ή Ctrl- για σμίκρυνση.'
+        },
+        enabled: true,
+        requiredLessonId: 'module5-lesson8'
+    },
+
+    // Lesson 10: Find on Page
+    {
+        id: 'module5-lesson10',
+        moduleId: 'module5',
+        lessonKey: 'find-on-page',
+        titleKey: 'module5_lesson10_title',
+        descriptionKey: 'module5_lesson10_desc',
+        difficulty: 'intermediate',
+        orderIndex: 10,
+        lessonType: 'desktop-simulation',
+        config: {
+            goal: 'find-on-page',
+            initialApps: ['browser'],
+            instructions: 'Αναζήτηση στη σελίδα: Πατήστε Ctrl+F για να ανοίξετε τη γραμμή αναζήτησης.'
+        },
+        enabled: true,
+        requiredLessonId: 'module5-lesson9'
     }
 ];
