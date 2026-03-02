@@ -13,7 +13,12 @@
 		History,
 		Lock,
 		Unlock,
-		ShieldAlert
+		ShieldAlert,
+		ZoomIn,
+		ZoomOut,
+		Download,
+		Shield,
+		Send
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
@@ -27,7 +32,7 @@
 		id: number;
 		title: string;
 		url: string;
-		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking' | 'history';
+		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking' | 'history' | 'browser-settings';
 		isSecure: boolean;
 	};
 
@@ -174,6 +179,9 @@
 		} else if (url === 'home') {
 			type = 'home';
 			title = 'Αρχική';
+		} else if (url.includes('settings') || url.includes('privacy')) {
+			type = 'browser-settings';
+			title = 'Ρυθμίσεις Browser';
 		}
 
 		// Simulate insecure site
@@ -279,6 +287,44 @@
 		}
 		govState = 'success';
 		onAction('gov-submit', { name: govName, afm: govAFM });
+	}
+
+	// Browser goal state
+	let findBarInput = $state('');
+	let aiChatInput = $state('');
+	let aiChatMessages = $state<{ role: 'user' | 'ai'; text: string }[]>([
+		{ role: 'ai', text: 'Γεια σας! Πώς μπορώ να σας βοηθήσω σήμερα;' }
+	]);
+
+	function handleDownload() {
+		onAction('download-file', { filename: config.targetFilename || 'document.pdf' });
+		toast.success('Λήψη ξεκίνησε!');
+	}
+
+	function handleZoom(direction: 'in' | 'out') {
+		onAction('zoom-page', { direction });
+	}
+
+	function handleFindOnPage() {
+		if (findBarInput.trim()) {
+			onAction('find-on-page', { term: findBarInput });
+		}
+	}
+
+	function handlePrivacySettings() {
+		onAction('open-privacy-settings', {});
+	}
+
+	function handleAiQuestion() {
+		if (aiChatInput.trim()) {
+			const msg = aiChatInput.trim();
+			aiChatMessages.push({ role: 'user', text: msg });
+			aiChatInput = '';
+			onAction('type-ai-question', { message: msg });
+			setTimeout(() => {
+				aiChatMessages.push({ role: 'ai', text: 'Ευχαριστώ! Επεξεργάζομαι την απάντηση...' });
+			}, 500);
+		}
 	}
 
 	// Helper to get localized string safely
@@ -387,11 +433,46 @@
 			<button class="rounded-full p-2 hover:bg-slate-100" onclick={openHistory} title="Ιστορικό">
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
+			{#if config.goal === 'zoom-page'}
+				<button class="rounded-full p-2 hover:bg-slate-100" onclick={() => handleZoom('out')} title="Σμίκρυνση">
+					<ZoomOut class="h-5 w-5 text-slate-400" />
+				</button>
+				<button class="rounded-full p-2 hover:bg-slate-100" onclick={() => handleZoom('in')} title="Μεγέθυνση">
+					<ZoomIn class="h-5 w-5 text-slate-400" />
+				</button>
+			{/if}
 		</div>
 	</div>
 
+	<!-- Find Bar -->
+	{#if config.goal === 'find-on-page'}
+		<div class="flex items-center gap-2 border-b bg-yellow-50 px-4 py-2">
+			<Search class="h-4 w-4 text-slate-400" />
+			<input
+				type="text"
+				class="flex-1 rounded border px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+				placeholder="Αναζήτηση στη σελίδα..."
+				bind:value={findBarInput}
+				onkeydown={(e) => e.key === 'Enter' && handleFindOnPage()}
+			/>
+			<Button size="sm" onclick={handleFindOnPage}>Εύρεση</Button>
+		</div>
+	{/if}
+
 	<!-- 3. Content Area -->
 	<div class="relative flex-1 overflow-y-auto bg-slate-50">
+		{#if config.goal === 'download-file'}
+			<div class="absolute right-4 bottom-4 z-10 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 shadow-md">
+				<Download class="h-5 w-5 text-blue-600" />
+				<span class="text-sm font-medium text-blue-900">{config.targetFilename || 'document.pdf'}</span>
+				<button
+					class="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+					onclick={handleDownload}
+				>
+					Λήψη
+				</button>
+			</div>
+		{/if}
 		{#if activeTab.type === 'home'}
 			<!-- Google Simulator -->
 			<div class="flex h-full flex-col items-center justify-center p-4">
@@ -764,6 +845,65 @@
 					>
 						Διαγραφή ιστορικού
 					</Button>
+				</div>
+			</div>
+		{:else if config.goal === 'type-ai-question'}
+			<!-- AI Chat Simulation -->
+			<div class="flex h-full flex-col bg-white">
+				<header class="border-b bg-slate-800 px-6 py-4 text-white">
+					<h1 class="text-lg font-bold">🤖 AI Assistant</h1>
+					<p class="text-sm text-slate-300">Ρωτήστε οτιδήποτε</p>
+				</header>
+				<div class="flex-1 space-y-4 overflow-y-auto p-4">
+					{#each aiChatMessages as msg}
+						<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
+							<div
+								class="max-w-xs rounded-2xl px-4 py-2 text-sm {msg.role === 'user'
+									? 'bg-blue-600 text-white'
+									: 'bg-slate-100 text-slate-900'}"
+							>
+								{msg.text}
+							</div>
+						</div>
+					{/each}
+				</div>
+				<div class="flex items-center gap-2 border-t p-4">
+					<input
+						type="text"
+						class="flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+						placeholder="Γράψτε την ερώτησή σας..."
+						bind:value={aiChatInput}
+						onkeydown={(e) => e.key === 'Enter' && handleAiQuestion()}
+					/>
+					<button
+						class="rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:opacity-50"
+						onclick={handleAiQuestion}
+					>
+						<Send class="h-4 w-4" />
+					</button>
+				</div>
+			</div>
+		{:else if activeTab.type === 'browser-settings'}
+			<!-- Browser Settings Page -->
+			<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
+				<h2 class="mb-6 text-2xl font-bold text-slate-900">Ρυθμίσεις</h2>
+				<div class="space-y-2">
+					{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i}
+						<button
+							class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i === 1 ? 'border-blue-300 bg-blue-50' : ''}"
+							onclick={() => i === 1 && handlePrivacySettings()}
+						>
+							<div class="flex items-center gap-3">
+								{#if i === 1}
+									<Shield class="h-4 w-4 text-blue-600" />
+								{:else}
+									<Globe class="h-4 w-4 text-slate-400" />
+								{/if}
+								<span class="{i === 1 ? 'font-medium text-blue-700' : 'text-slate-700'}">{section}</span>
+							</div>
+							<ArrowRight class="h-4 w-4 text-slate-400" />
+						</button>
+					{/each}
 				</div>
 			</div>
 		{:else}

@@ -133,7 +133,6 @@ export const module9Lessons: NewLesson[] = [
         config: {
             goal: 'open-display-settings',
             initialApps: ['settings'],
-            initialPage: 'display',
             instructions: 'Ρυθμίσεις Οθόνης: Ανοίξτε τις Ρυθμίσεις → Εμφάνιση και προσαρμόστε φωτεινότητα και μέγεθος κειμένου.'
         },
         enabled: true,
@@ -153,7 +152,6 @@ export const module9Lessons: NewLesson[] = [
         config: {
             goal: 'open-accessibility',
             initialApps: ['settings'],
-            initialPage: 'accessibility',
             instructions: 'Ρυθμίσεις Προσβασιμότητας: Ανοίξτε τις Ρυθμίσεις → Προσβασιμότητα για μεγαλύτερο κείμενο και υψηλή αντίθεση.'
         },
         enabled: true,
@@ -173,7 +171,6 @@ export const module9Lessons: NewLesson[] = [
         config: {
             goal: 'open-sound-settings',
             initialApps: ['settings'],
-            initialPage: 'sound',
             instructions: 'Ρυθμίσεις Ήχου: Ανοίξτε τις Ρυθμίσεις → Ήχος και ρυθμίστε την ένταση και τις ειδοποιήσεις.'
         },
         enabled: true,

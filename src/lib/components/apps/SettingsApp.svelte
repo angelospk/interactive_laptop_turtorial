@@ -10,7 +10,11 @@
 		Globe,
 		AppWindow,
 		Trash2,
-		Box
+		Box,
+		Bluetooth,
+		Monitor as MonitorIcon,
+		Accessibility,
+		RefreshCw
 	} from 'lucide-svelte';
 	import { Switch } from '$lib/components/ui/switch';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -46,6 +50,26 @@
 	let wifiPassword = $state('');
 	let showWifiDialog = $state(false);
 	let selectedNetwork = $state<string | null>(null);
+
+	// Bluetooth state
+	let bluetoothEnabled = $state(false);
+	const bluetoothDevices = [
+		{ id: 'bt1', name: 'JBL Speaker', type: 'Ηχείο' },
+		{ id: 'bt2', name: 'Sony WH-1000XM5', type: 'Ακουστικά' },
+		{ id: 'bt3', name: 'Apple Magic Mouse', type: 'Ποντίκι' }
+	];
+	let connectedBtDevice = $state<string | null>(null);
+
+	function connectBluetooth(deviceId: string) {
+		const device = bluetoothDevices.find((d) => d.id === deviceId);
+		if (!device) return;
+		toast.loading(`Σύνδεση στο ${device.name}...`);
+		setTimeout(() => {
+			connectedBtDevice = deviceId;
+			toast.success(`Συνδέθηκε: ${device.name}`);
+			onAction('connect-bluetooth', { device: device.name });
+		}, 1500);
+	}
 
 	function connectWifi(ssid: string) {
 		if (!osState.wifiEnabled) return;
@@ -163,6 +187,42 @@
 				onclick={() => (activeSection = 'apps')}
 			>
 				<AppWindow class="h-4 w-4" /> Εφαρμογές
+			</button>
+			<button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
+				'bluetooth'
+					? 'bg-blue-50 text-blue-700'
+					: 'text-slate-700 hover:bg-slate-100'}"
+				onclick={() => { activeSection = 'bluetooth'; onAction('open-bluetooth-settings', {}); }}
+			>
+				<Bluetooth class="h-4 w-4" /> Bluetooth
+			</button>
+			<button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
+				'display'
+					? 'bg-blue-50 text-blue-700'
+					: 'text-slate-700 hover:bg-slate-100'}"
+				onclick={() => { activeSection = 'display'; onAction('open-display-settings', {}); }}
+			>
+				<MonitorIcon class="h-4 w-4" /> Οθόνη
+			</button>
+			<button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
+				'accessibility'
+					? 'bg-blue-50 text-blue-700'
+					: 'text-slate-700 hover:bg-slate-100'}"
+				onclick={() => { activeSection = 'accessibility'; onAction('open-accessibility', {}); }}
+			>
+				<Accessibility class="h-4 w-4" /> Προσβασιμότητα
+			</button>
+			<button
+				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
+				'sound'
+					? 'bg-blue-50 text-blue-700'
+					: 'text-slate-700 hover:bg-slate-100'}"
+				onclick={() => { activeSection = 'sound'; onAction('open-sound-settings', {}); }}
+			>
+				<Volume2 class="h-4 w-4" /> Ήχος
 			</button>
 		</nav>
 	</div>
@@ -289,16 +349,99 @@
 									<div class="text-xs text-slate-500">{app.version} • {app.size}</div>
 								</div>
 							</div>
-							<Button
-								variant="outline"
-								class="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-								onclick={() => uninstallApp(app.id)}
-							>
-								<Trash2 class="mr-2 h-4 w-4" />
-								Απεγκατάσταση
-							</Button>
+							<div class="flex gap-2">
+								{#if config.goal === 'update-app' && (!config.targetAppId || config.targetAppId === app.id)}
+									<Button
+										variant="outline"
+										class="border-green-200 text-green-700 hover:bg-green-50"
+										onclick={() => onAction('update-app', { appId: app.id })}
+									>
+										<RefreshCw class="mr-2 h-4 w-4" />
+										Ενημέρωση
+									</Button>
+								{/if}
+								<Button
+									variant="outline"
+									class="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+									onclick={() => uninstallApp(app.id)}
+								>
+									<Trash2 class="mr-2 h-4 w-4" />
+									Απεγκατάσταση
+								</Button>
+							</div>
 						</div>
 					{/each}
+				</div>
+			</div>
+		{:else if activeSection === 'bluetooth'}
+			<div class="space-y-6">
+				<h3 class="text-xl font-semibold">Bluetooth</h3>
+				<div class="rounded-lg border bg-white p-4">
+					<div class="mb-4 flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<Bluetooth class="h-5 w-5 text-slate-500" />
+							<span>Bluetooth</span>
+						</div>
+						<Switch checked={bluetoothEnabled} onCheckedChange={(v) => (bluetoothEnabled = v)} />
+					</div>
+					{#if bluetoothEnabled}
+						<div class="mt-4 space-y-2 border-t pt-4">
+							<p class="mb-2 text-sm text-slate-500">Διαθέσιμες συσκευές</p>
+							{#each bluetoothDevices as device}
+								<div class="flex items-center justify-between rounded p-2 hover:bg-slate-50">
+									<div>
+										<div class="font-medium">{device.name}</div>
+										<div class="text-xs text-slate-500">{device.type}</div>
+									</div>
+									{#if connectedBtDevice === device.id}
+										<span class="text-xs font-medium text-green-600">Συνδέθηκε</span>
+									{:else}
+										<Button size="sm" variant="outline" onclick={() => connectBluetooth(device.id)}>Σύνδεση</Button>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			</div>
+		{:else if activeSection === 'display'}
+			<div class="space-y-6">
+				<h3 class="text-xl font-semibold">Οθόνη</h3>
+				<div class="rounded-lg border bg-white p-4 space-y-4">
+					<div class="flex items-center justify-between">
+						<span class="text-sm font-medium">Φωτεινότητα</span>
+						<span class="text-sm text-slate-500">75%</span>
+					</div>
+					<input type="range" min="0" max="100" value="75" class="w-full" />
+					<div class="flex items-center justify-between border-t pt-4">
+						<span class="text-sm font-medium">Ανάλυση</span>
+						<span class="text-sm text-slate-500">1920 × 1080</span>
+					</div>
+				</div>
+			</div>
+		{:else if activeSection === 'accessibility'}
+			<div class="space-y-6">
+				<h3 class="text-xl font-semibold">Προσβασιμότητα</h3>
+				<div class="rounded-lg border bg-white p-4 space-y-4">
+					{#each [['Μεγαλύτερο κείμενο', false], ['Υψηλή αντίθεση', false], ['Αναγνώστης οθόνης', false]] as [label]}
+						<div class="flex items-center justify-between py-1">
+							<span class="text-sm font-medium">{label}</span>
+							<Switch checked={false} onCheckedChange={() => {}} />
+						</div>
+					{/each}
+				</div>
+			</div>
+		{:else if activeSection === 'sound'}
+			<div class="space-y-6">
+				<h3 class="text-xl font-semibold">Ήχος</h3>
+				<div class="rounded-lg border bg-white p-4 space-y-4">
+					<div class="flex items-center gap-3 mb-2">
+						<Volume2 class="h-5 w-5 text-slate-500" />
+						<span>Ένταση εξόδου</span>
+					</div>
+					<input type="range" min="0" max="100" bind:value={osState.volume} class="w-full"
+						oninput={() => onAction('change-volume', { value: osState.volume })} />
+					<div class="text-right text-sm text-slate-500">{osState.volume}%</div>
 				</div>
 			</div>
 		{/if}

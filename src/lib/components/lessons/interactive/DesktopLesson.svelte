@@ -20,9 +20,10 @@
 	import SpreadsheetApp from '$lib/components/apps/SpreadsheetApp.svelte';
 	import InstallerApp from '$lib/components/apps/InstallerApp.svelte';
 	import SettingsApp from '$lib/components/apps/SettingsApp.svelte';
+	import VideoCallApp from '$lib/components/apps/VideoCallApp.svelte';
 
 	// Icons
-	import { Folder, Globe, Mail, Grid3X3, Download, Settings, FileText } from 'lucide-svelte';
+	import { Folder, Globe, Mail, Grid3X3, Download, Settings, FileText, Phone } from 'lucide-svelte';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
@@ -43,7 +44,8 @@
 		{ id: 'excel', name: 'Υπολογιστικά Φύλλα', icon: Grid3X3, component: SpreadsheetApp },
 		{ id: 'installer', name: 'Εγκατάσταση', icon: Download, component: InstallerApp },
 		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
-		{ id: 'notepad', name: 'Σημειωματάριο', icon: FileText, component: null } // Placeholder
+		{ id: 'notepad', name: 'Σημειωματάριο', icon: FileText, component: null }, // Placeholder
+		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp }
 	];
 
 	// Pinned Apps (Default set)
@@ -307,6 +309,25 @@
 			if (action === 'read-all-unread-complete' && goal === 'read-all-unread') {
 				success = true;
 			}
+
+			// Browser new goals
+			if (action === 'download-file' && goal === 'download-file') success = true;
+			if (action === 'zoom-page' && goal === 'zoom-page') success = true;
+			if (action === 'find-on-page' && goal === 'find-on-page') success = true;
+			if (action === 'open-privacy-settings' && goal === 'open-privacy-settings') success = true;
+			if (action === 'type-ai-question' && goal === 'type-ai-question') success = true;
+
+			// Settings new goals
+			if (action === 'connect-bluetooth' && goal === 'connect-bluetooth') success = true;
+			if (action === 'open-display-settings' && goal === 'open-display-settings') success = true;
+			if (action === 'open-accessibility' && goal === 'open-accessibility') success = true;
+			if (action === 'open-sound-settings' && goal === 'open-sound-settings') success = true;
+			if (action === 'update-app' && goal === 'update-app') success = true;
+
+			// VideoCall goals
+			if (action === 'start-videocall' && goal === 'start-videocall') success = true;
+			if (action === 'mute-call' && goal === 'mute-call') success = true;
+			if (action === 'end-call' && goal === 'end-call') success = true;
 
 			if (success) {
 				completed = true;
