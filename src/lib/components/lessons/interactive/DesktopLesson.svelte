@@ -209,7 +209,7 @@
 			// Specific matches based on config
 			if (
 				action === 'navigate' &&
-				goal === 'navigate-site' &&
+				(goal === 'navigate-site' || goal === 'navigate') &&
 				data.url?.includes(config.targetUrl)
 			) {
 				success = true;
@@ -328,7 +328,17 @@
 				success = true;
 			}
 
-			// Browser new goals
+			// Browser goals
+			if (action === 'new-tab' && goal === 'new-tab') success = true;
+			if (action === 'search' && goal === 'search') success = true;
+			if (action === 'switch-tab' && goal === 'switch-tab') success = true;
+			if (action === 'close-tab' && goal === 'close-tab') success = true;
+			if (action === 'bookmark' && goal === 'bookmark') {
+				const targetSite = config.targetSite || config.targetUrl;
+				if (!targetSite || data.url?.includes(targetSite)) {
+					success = true;
+				}
+			}
 			if (action === 'download-file' && goal === 'download-file') success = true;
 			if (action === 'zoom-page' && goal === 'zoom-page') success = true;
 			if (action === 'find-on-page' && goal === 'find-on-page') success = true;
