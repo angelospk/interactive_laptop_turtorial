@@ -17,7 +17,7 @@ export const module3Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'open-app',
-            targetAppId: 'notepad',
+            targetAppId: 'explorer',
             initialApps: []
         },
         enabled: true,
