@@ -316,6 +316,9 @@
 			if (action === 'paste-cut' && goal === 'paste-cut-file') {
 				success = true;
 			}
+			if (action === 'paste-copy' && goal === 'paste-copy') {
+				success = true;
+			}
 			if (action === 'drag-drop' && goal === 'drag-drop-file') {
 				success = true;
 			}
