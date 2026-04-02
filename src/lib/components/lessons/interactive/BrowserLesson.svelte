@@ -13,7 +13,7 @@
 	}>();
 
 	const config = lesson.config as any;
-	const action = config?.action || 'new-tab';
+	const action = config?.goal || config?.action || 'new-tab';
 
 	type Tab = {
 		id: number;
@@ -22,7 +22,21 @@
 		type: 'home' | 'search' | 'news' | 'weather' | 'gov';
 	};
 
-	let tabs = $state<Tab[]>([{ id: 1, title: 'Αρχική', url: 'home', type: 'home' }]);
+	function buildInitialTabs(): Tab[] {
+		const initial: string[] = config?.initialTabs || [];
+		if (initial.length === 0) return [{ id: 1, title: 'Αρχική', url: 'home', type: 'home' }];
+		return initial.map((url, i) => {
+			let type: Tab['type'] = 'search';
+			let title = url;
+			if (url === 'home') { type = 'home'; title = 'Αρχική'; }
+			else if (url.includes('news')) { type = 'news'; title = 'Ειδήσεις'; }
+			else if (url.includes('weather')) { type = 'weather'; title = 'Καιρός'; }
+			else if (url.includes('gov')) { type = 'gov'; title = 'Gov.gr'; }
+			return { id: i + 1, title, url, type };
+		});
+	}
+
+	let tabs = $state<Tab[]>(buildInitialTabs());
 	let activeTabId = $state(1);
 	let addressBarInput = $state('');
 	let searchBarInput = $state('');
@@ -103,7 +117,7 @@
 			addressBarInput = tab.url === 'home' ? '' : tab.url;
 		}
 
-		if (action === 'switch-tabs' && tabs.length > 1 && !completed) {
+		if ((action === 'switch-tab' || action === 'switch-tabs') && tabs.length > 1 && !completed) {
 			checkCompletion();
 		}
 	}
@@ -137,6 +151,7 @@
 		'new-tab': 'Κάνε κλικ στο κουμπί "+" για να ανοίξεις μια νέα καρτέλα.',
 		navigate: `Γράψε "${config?.targetUrl || 'news.gr'}" στη γραμμή διευθύνσεων και πάτησε Enter.`,
 		search: 'Κάνε αναζήτηση γράφοντας "καιρός" στο Google.',
+		'switch-tab': 'Άλλαξε καρτέλα κάνοντας κλικ σε μια άλλη καρτέλα από αυτή που είσαι.',
 		'switch-tabs': 'Άλλαξε καρτέλα κάνοντας κλικ σε μια άλλη καρτέλα από αυτή που είσαι.',
 		'close-tab': 'Κλείσε μια καρτέλα πατώντας το X δίπλα στο όνομά της.',
 		bookmark: `Πρόσθεσε στα Αγαπημένα το ${config?.targetSite || 'gov.gr'}.`

@@ -36,7 +36,6 @@ export const module4Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'create-folder',
-            targetName: 'Εργασία',
             initialApps: ['explorer']
         },
         enabled: true,
