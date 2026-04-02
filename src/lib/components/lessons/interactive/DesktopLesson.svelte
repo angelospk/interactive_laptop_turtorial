@@ -259,6 +259,21 @@
 			if (action === 'open-task-view' && goal === 'open-task-view') {
 				success = true;
 			}
+			if (action === 'minimize-app' && goal === 'minimize-app' && data.appId === config.targetAppId) {
+				success = true;
+			}
+			if (action === 'restore-app' && goal === 'restore-app' && data.appId === config.targetAppId) {
+				success = true;
+			}
+			if (action === 'maximize-app' && goal === 'maximize-app' && data.appId === config.targetAppId) {
+				success = true;
+			}
+			if (action === 'close-app' && goal === 'close-app' && data.appId === config.targetAppId) {
+				success = true;
+			}
+			if (action === 'open-start-menu' && goal === 'open-start-menu') {
+				success = true;
+			}
 			if (action === 'attach-file' && (goal === 'attach-file' || goal === 'email-attachment')) {
 				success = true;
 			}
