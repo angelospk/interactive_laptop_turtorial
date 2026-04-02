@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, goto } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
@@ -11,12 +11,16 @@
 		lessons,
 		progress,
 		startIndex = 0,
-		onExit
+		onExit,
+		nextModuleId = null,
+		isLastModule = false
 	} = $props<{
 		lessons: Lesson[];
 		progress: Record<string, any>;
 		startIndex?: number;
 		onExit?: () => void;
+		nextModuleId?: string | null;
+		isLastModule?: boolean;
 	}>();
 
 	let currentLessonIndex = $state(startIndex);
@@ -34,7 +38,7 @@
 
 	// Setup countdown state
 	let countdownRemaining = $state<number | null>(null);
-	let countdownInterval = $state<number | null>(null);
+	let countdownInterval: any = null;
 
 	$effect(() => {
 		return () => {
@@ -50,12 +54,14 @@
 			if (countdownRemaining !== null) {
 				countdownRemaining -= 1;
 				if (countdownRemaining <= 0) {
-					clearInterval(countdownInterval as number);
+					clearInterval(countdownInterval);
+					countdownInterval = null;
 					countdownRemaining = null;
-					nextLesson(); // If it's the last lesson, nextLesson() calls onExit()
+					// Call nextLesson after layout is updated to prevent reactive jump bugs
+					setTimeout(() => nextLesson(), 10);
 				}
 			}
-		}, 1000) as unknown as number;
+		}, 1000);
 	}
 
 	function cancelAutoAdvance() {
@@ -68,6 +74,7 @@
 
 	async function handleLessonComplete(score: number) {
 		const isFirstCompletion = !mergedProgress[currentLesson.id]?.completed;
+		const isSuccess = score >= 50;
 
 		// Optimistically update UI immediately
 		localUpdates[currentLesson.id] = {
@@ -94,7 +101,7 @@
 				localUpdates[currentLesson.id] = data.progress;
 			}
 
-			if (isFirstCompletion) {
+			if (isFirstCompletion && isSuccess) {
 				startAutoAdvance();
 			}
 
@@ -135,6 +142,8 @@
 		cancelAutoAdvance();
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
+		} else if (nextModuleId) {
+			goto(`/modules/${nextModuleId}`);
 		} else if (onExit) {
 			onExit();
 		}
@@ -230,9 +239,9 @@
 				{/if}
 			</Button>
 		</div>
-		<Button onclick={nextLesson} disabled={currentLessonIndex === lessons.length - 1 && !onExit}>
+		<Button onclick={nextLesson} disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}>
 			{currentLessonIndex === lessons.length - 1
-				? getMessage('nav_finish')
+				? (nextModuleId ? 'Επόμενη Ενότητα' : getMessage('nav_finish'))
 				: getMessage('nav_next')}
 		</Button>
 	</div>
@@ -249,75 +258,97 @@
 					</div>
 				{:else}
 					<!-- Use the new LessonRenderer component -->
-					<LessonRenderer
-						lesson={currentLesson}
-						onComplete={handleLessonComplete}
-						onBack={handleBack}
-					/>
+					{#key currentLesson.id}
+						<LessonRenderer
+							lesson={currentLesson}
+							onComplete={handleLessonComplete}
+							onBack={handleBack}
+						/>
+					{/key}
 				{/if}
 			</CardContent>
 		</Card>
 	</div>
 
 	{#if mergedProgress[currentLesson.id]?.completed}
+		{@const isSuccess = (mergedProgress[currentLesson.id]?.score ?? 100) >= 50}
 		<div
-			class="fixed right-0 bottom-0 left-0 z-50 flex animate-in items-center justify-between border-t border-green-200 bg-green-50 p-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] duration-500 slide-in-from-bottom-full"
+			class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-300 pointer-events-auto"
 		>
-			<div class="flex items-center gap-4">
-				<div
-					class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600"
-				>
-					<span class="text-2xl">✓</span>
-				</div>
-				<div>
-					<h3 class="text-lg font-bold text-green-800">{getMessage('lesson_completed')}</h3>
-					{#if mergedProgress[currentLesson.id]?.score}
-						<p class="text-sm text-green-700">
-							{getMessage('score')}: {mergedProgress[currentLesson.id].score}
-						</p>
-					{/if}
-					{#if countdownRemaining !== null}
-						<div class="mt-1 flex items-center gap-2 text-sm font-medium text-green-800">
-							<span class="animate-pulse">
-								{getMessage('auto_advancing_in', { seconds: String(countdownRemaining) }) ||
-									`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
-							</span>
-							<button class="underline hover:text-green-900" onclick={cancelAutoAdvance}>
-								{getMessage('cancel') || 'Ακύρωση'}
-							</button>
-						</div>
-					{/if}
-				</div>
-			</div>
+			<div class="w-full max-w-xl mx-auto rounded-xl shadow-2xl p-10 text-center {isSuccess ? 'bg-green-50 border-t-8 border-green-500' : 'bg-red-50 border-t-8 border-red-500'} animate-in zoom-in-95 duration-500">
+				<div class="flex flex-col items-center gap-6">
+					<div class="flex h-20 w-20 items-center justify-center rounded-full {isSuccess ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+						{#if isSuccess}
+							<span class="text-4xl">✓</span>
+						{:else}
+							<span class="text-4xl">✕</span>
+						{/if}
+					</div>
+					
+					<div>
+						<h3 class="text-3xl font-extrabold {isSuccess ? 'text-green-800' : 'text-red-800'}">
+							{isSuccess ? (getMessage('lesson_completed') || 'Μπράβο, τα κατάφερες!') : 'Το μάθημα δεν ολοκληρώθηκε επιτυχώς'}
+						</h3>
+						{#if mergedProgress[currentLesson.id]?.score !== undefined && mergedProgress[currentLesson.id]?.score !== 100}
+							<p class="mt-2 text-lg {isSuccess ? 'text-green-700' : 'text-red-700'}">
+								{getMessage('score')}: {mergedProgress[currentLesson.id].score}%
+							</p>
+						{/if}
 
-			<div class="flex items-center gap-3">
-				<Button
-					variant="ghost"
-					onclick={handleRetry}
-					class="text-green-700 hover:bg-green-100 hover:text-green-900"
-				>
-					{getMessage('try_again') || 'Retry'}
-				</Button>
+						{#if isSuccess && countdownRemaining !== null}
+							<div class="mt-4 flex flex-col items-center gap-2 text-lg font-medium text-green-800">
+								<span class="animate-pulse">
+									{getMessage('auto_advancing_in', { seconds: String(countdownRemaining) }) ||
+										`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
+								</span>
+								<button class="underline hover:text-green-900 cursor-pointer" onclick={cancelAutoAdvance}>
+									{getMessage('cancel') || 'Ακύρωση'}
+								</button>
+							</div>
+						{/if}
+					</div>
 
-				{#if currentLessonIndex < lessons.length - 1}
-					<Button
-						size="lg"
-						onclick={nextLesson}
-						class="gap-2 bg-green-600 text-white shadow-md hover:bg-green-700"
-					>
-						{getMessage('next_lesson') || 'Next Lesson'}
-						<span class="text-xl">→</span>
-					</Button>
-				{:else}
-					<Button
-						size="lg"
-						onclick={onExit}
-						variant="outline"
-						class="gap-2 border-green-200 bg-white text-green-700 hover:bg-green-50"
-					>
-						{getMessage('back_to_modules') || 'Back to Modules'}
-					</Button>
-				{/if}
+					<div class="mt-4 flex flex-wrap items-center justify-center gap-4 w-full">
+						<Button
+							variant="outline"
+							size="lg"
+							onclick={handleRetry}
+							class="{isSuccess ? 'text-green-700 hover:bg-green-100 border-green-300' : 'text-red-700 hover:bg-red-100 border-red-300'} w-[200px] text-lg py-6"
+						>
+							{getMessage('try_again') || 'Δοκίμασε ξανά'}
+						</Button>
+
+						{#if isSuccess}
+							{#if currentLessonIndex < lessons.length - 1}
+								<Button
+									size="lg"
+									onclick={nextLesson}
+									class="bg-green-600 text-white shadow-md hover:bg-green-700 w-[200px] text-lg py-6 flex-1 gap-2"
+								>
+									{getMessage('next_lesson') || 'Επόμενο Μάθημα'}
+									<span class="text-2xl">→</span>
+								</Button>
+							{:else if nextModuleId}
+								<Button
+									size="lg"
+									onclick={nextLesson}
+									class="bg-blue-600 text-white shadow-md hover:bg-blue-700 w-[200px] text-lg py-6 flex-1 gap-2"
+								>
+									{'Επόμενη Ενότητα'}
+									<span class="text-2xl">→</span>
+								</Button>
+							{:else}
+								<Button
+									size="lg"
+									onclick={onExit}
+									class="bg-blue-600 text-white shadow-md hover:bg-blue-700 w-[200px] text-lg py-6 flex-1 gap-2"
+								>
+									{getMessage('back_to_modules') || 'Πίσω στις Ενότητες'}
+								</Button>
+							{/if}
+						{/if}
+					</div>
+				</div>
 			</div>
 		</div>
 	{/if}

@@ -14,8 +14,29 @@ export const load: PageServerLoad = async ({ parent, params }) => {
         .where(and(eq(lessons.moduleId, moduleId), eq(lessons.enabled, true)))
         .orderBy(asc(lessons.orderIndex));
 
+    // Find the next module
+    const allModules = await db
+        .selectDistinct({ moduleId: lessons.moduleId })
+        .from(lessons)
+        .where(eq(lessons.enabled, true));
+        
+    const sortedModuleIds = allModules
+        .map(m => m.moduleId)
+        .sort((a, b) => {
+            const numA = parseInt(a.replace('module', '')) || 0;
+            const numB = parseInt(b.replace('module', '')) || 0;
+            return numA - numB;
+        });
+
+    const currentIndex = sortedModuleIds.indexOf(moduleId);
+    const nextModuleId = currentIndex !== -1 && currentIndex < sortedModuleIds.length - 1 
+        ? sortedModuleIds[currentIndex + 1] 
+        : null;
+
     return {
         ...layoutData,
-        moduleLessons
+        moduleLessons,
+        nextModuleId,
+        isLastModule: currentIndex === sortedModuleIds.length - 1
     };
-};
+}
