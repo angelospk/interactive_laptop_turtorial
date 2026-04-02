@@ -14,7 +14,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson1_desc',
         difficulty: 'beginner',
         orderIndex: 1,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'new-tab',
             initialApps: ['browser'],
@@ -33,7 +33,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson2_desc',
         difficulty: 'beginner',
         orderIndex: 2,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'navigate',
             targetUrl: 'news.gr',
@@ -53,7 +53,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson3_desc',
         difficulty: 'beginner',
         orderIndex: 3,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'search',
             initialApps: ['browser'],
@@ -72,7 +72,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson4_desc',
         difficulty: 'intermediate',
         orderIndex: 4,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'switch-tab', // Simplified goal, simulation should track switching
             initialApps: ['browser'],
@@ -92,7 +92,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson5_desc',
         difficulty: 'intermediate',
         orderIndex: 5,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'close-tab',
             initialApps: ['browser'],
@@ -112,7 +112,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson6_desc',
         difficulty: 'intermediate',
         orderIndex: 6,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'bookmark',
             targetSite: 'gov.gr',
@@ -132,7 +132,7 @@ export const module5Lessons: NewLesson[] = [
         descriptionKey: 'module5_lesson7_desc',
         difficulty: 'intermediate',
         orderIndex: 7,
-        lessonType: 'desktop-simulation',
+        lessonType: 'browser',
         config: {
             goal: 'navigate',
             targetUrl: 'history',
