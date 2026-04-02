@@ -195,7 +195,7 @@ export const module5Lessons: NewLesson[] = [
         config: {
             goal: 'find-on-page',
             initialApps: ['browser'],
-            instructions: 'Αναζήτηση στη σελίδα: Πατήστε Ctrl+F για να ανοίξετε τη γραμμή αναζήτησης.'
+            instructions: 'Αναζήτηση στη σελίδα: Πατήστε Ctrl+F για να εμφανιστεί το πεδίο αναζήτησης, και γράψτε στο πεδίο αναζήτησης στη σελίδα.'
         },
         enabled: true,
         requiredLessonId: 'module5-lesson9'
