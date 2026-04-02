@@ -240,11 +240,7 @@
 			if (action === 'add-printer' && goal === 'add-printer') {
 				success = true;
 			}
-			if (
-				action === 'create-folder' &&
-				goal === 'create-folder' &&
-				(!config.targetName || data.name === config.targetName)
-			) {
+			if (action === 'create-folder' && goal === 'create-folder') {
 				success = true;
 			}
 			if (action === 'select-file' && goal === 'select-file') {
