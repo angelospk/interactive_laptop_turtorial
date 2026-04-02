@@ -53,6 +53,7 @@
 	let selectedItemId = $state<string | null>(null);
 	let isRenaming = $state(false);
 	let isCreatingFolder = $state(false);
+	let folderJustCreated = $state(false);
 	let newItemName = $state('');
 
 	// Get fullscreen portal target when in fullscreen mode (client-side only)
@@ -110,6 +111,7 @@
 
 	function createFolder() {
 		if (newItemName.trim()) {
+			folderJustCreated = true;
 			const newFolder = {
 				id: crypto.randomUUID(),
 				name: newItemName,
@@ -124,6 +126,8 @@
 			toast.success(`Ο φάκελος '${newItemName}' δημιουργήθηκε!`);
 			onAction('create-folder', { name: newItemName });
 			newItemName = '';
+			// Reset guard after reactivity settles
+			setTimeout(() => { folderJustCreated = false; }, 100);
 		}
 	}
 
@@ -235,8 +239,10 @@
 			variant="outline"
 			size="sm"
 			onclick={() => {
-				isCreatingFolder = true;
-				newItemName = '';
+				if (!folderJustCreated) {
+					isCreatingFolder = true;
+					newItemName = '';
+				}
 			}}
 		>
 			<Folder class="mr-2 h-4 w-4" /> Νέος Φάκελος
@@ -406,8 +412,10 @@
 		<ContextMenu.Content>
 			<ContextMenu.Item
 				onclick={() => {
-					isCreatingFolder = true;
-					newItemName = '';
+					if (!folderJustCreated) {
+						isCreatingFolder = true;
+						newItemName = '';
+					}
 				}}
 			>
 				<Folder class="mr-2 h-4 w-4" /> Νέος Φάκελος
