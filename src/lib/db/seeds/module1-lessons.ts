@@ -17,7 +17,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'hover',
         config: {
             targetCount: 5,
-            timeLimit: 45,
+            timeLimit: 300,
             gameMode: true,
             theme: 'balloons',
             instructions: 'Μετακινήστε το ποντίκι πάνω από τα μπαλόνια για να σκάσουν!'
@@ -38,7 +38,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'click',
         config: {
             targetCount: 10,
-            timeLimit: 60,
+            timeLimit: 300,
             theme: 'moles',
             gameMode: true,
             instructions: 'Κάντε κλικ στους τυφλοπόντικες πριν κρυφτούν!'
@@ -59,7 +59,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'double-click',
         config: {
             targetCount: 5,
-            timeLimit: 40,
+            timeLimit: 300,
             theme: 'chests',
             gameMode: true,
             instructions: 'Κάντε διπλό κλικ στα σεντούκια για να βρείτε τον θησαυρό!'
@@ -101,7 +101,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'right-click',
         config: {
             targetCount: 6,
-            timeLimit: 50,
+            timeLimit: 300,
             theme: 'mystery',
             instructions: 'Κάντε δεξί κλικ στα κουτιά για να δείτε τι έχουν μέσα.'
         },
@@ -141,7 +141,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'click',
         config: {
             targetCount: 15,
-            timeLimit: 45,
+            timeLimit: 300,
             targetSize: 'small',
             theme: 'flies',
             gameMode: true,
@@ -184,7 +184,7 @@ export const module1Lessons: NewLesson[] = [
         lessonType: 'hover',
         config: {
             targetCount: 20,
-            timeLimit: 60,
+            timeLimit: 300,
             gameMode: true,
             theme: 'default', // TODO: Implement shape path theme
             instructions: 'Ακολουθήστε τη διαδρομή με το ποντίκι χωρίς να βγείτε έξω!'
