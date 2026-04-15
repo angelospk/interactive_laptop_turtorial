@@ -58,4 +58,4 @@ export const db = dbInstance instanceof Database
     ? drizzleSQLite(dbInstance, { schema })
     : drizzleLibSQL(dbInstance, { schema });
 
-export { users, lessons, userProgress, lessonViews, type User, type NewUser, type Lesson, type NewLesson, type UserProgress, type NewUserProgress, type LessonView, type NewLessonView } from './schema';
+export { modules, users, lessons, userProgress, lessonViews, type Module, type NewModule, type User, type NewUser, type Lesson, type NewLesson, type UserProgress, type NewUserProgress, type LessonView, type NewLessonView } from './schema';

@@ -122,7 +122,23 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	// ── Video call ─────────────────────────────────────────────────────────
 	'start-videocall': (action) => action === 'start-videocall',
 	'mute-call': (action) => action === 'mute-call',
-	'end-call': (action) => action === 'end-call'
+	'end-call': (action) => action === 'end-call',
+
+	// ── Word Processor ─────────────────────────────────────────────────────
+	'update-text': (action, data, config) => {
+		if (action !== 'update-text') return false;
+		if (!config.targetText) return true;
+		return typeof data.text === 'string' && data.text.includes(config.targetText as string);
+	},
+	'format-text-bold': (action) => action === 'format-bold',
+	'format-text-italic': (action) => action === 'format-italic',
+	'format-text-underline': (action) => action === 'format-underline',
+	'format-text-align': (action, data, config) =>
+		action === 'format-align' && data.align === config.targetAlign,
+	'format-font-size': (action, data, config) =>
+		action === 'format-font-size' && String(data.size) === String(config.targetSize),
+	'insert-bullet-list': (action) => action === 'insert-bullet-list',
+	'save-document': (action) => action === 'save-document'
 };
 
 /**

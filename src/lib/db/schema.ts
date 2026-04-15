@@ -1,6 +1,19 @@
 import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
+// Modules table - ordered list of learning modules
+export const modules = sqliteTable('modules', {
+    id: text('id').primaryKey(),                    // 'module1', 'word', etc.
+    titleKey: text('title_key').notNull(),           // i18n key
+    descriptionKey: text('description_key'),         // i18n key
+    iconName: text('icon_name'),                    // lucide icon name
+    orderIndex: integer('order_index').notNull(),   // controls display order
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date())
+});
+
 // Users table - simple username-based authentication
 export const users = sqliteTable('users', {
     id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -67,6 +80,9 @@ export const lessonViews = sqliteTable('lesson_views', {
 }));
 
 // Types inferred from schema
+export type Module = typeof modules.$inferSelect;
+export type NewModule = typeof modules.$inferInsert;
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 

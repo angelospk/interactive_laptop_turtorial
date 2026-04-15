@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { db, lessons } from '$lib/db/client';
+import { db, lessons, modules } from '$lib/db/client';
 import { eq, and, asc } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ parent, params }) => {
@@ -14,24 +14,19 @@ export const load: PageServerLoad = async ({ parent, params }) => {
         .where(and(eq(lessons.moduleId, moduleId), eq(lessons.enabled, true)))
         .orderBy(asc(lessons.orderIndex));
 
-    // Find the next module
+    // Find the next module using the modules table (ordered by orderIndex)
     const allModules = await db
-        .selectDistinct({ moduleId: lessons.moduleId })
-        .from(lessons)
-        .where(eq(lessons.enabled, true));
-        
-    const sortedModuleIds = allModules
-        .map(m => m.moduleId)
-        .sort((a, b) => {
-            const numA = parseInt(a.replace('module', '')) || 0;
-            const numB = parseInt(b.replace('module', '')) || 0;
-            return numA - numB;
-        });
+        .select({ id: modules.id })
+        .from(modules)
+        .where(eq(modules.enabled, true))
+        .orderBy(asc(modules.orderIndex));
 
+    const sortedModuleIds = allModules.map((m) => m.id);
     const currentIndex = sortedModuleIds.indexOf(moduleId);
-    const nextModuleId = currentIndex !== -1 && currentIndex < sortedModuleIds.length - 1 
-        ? sortedModuleIds[currentIndex + 1] 
-        : null;
+    const nextModuleId =
+        currentIndex !== -1 && currentIndex < sortedModuleIds.length - 1
+            ? sortedModuleIds[currentIndex + 1]
+            : null;
 
     return {
         ...layoutData,
@@ -39,4 +34,4 @@ export const load: PageServerLoad = async ({ parent, params }) => {
         nextModuleId,
         isLastModule: currentIndex === sortedModuleIds.length - 1
     };
-}
+};

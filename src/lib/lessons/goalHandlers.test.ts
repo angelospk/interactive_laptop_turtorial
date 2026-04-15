@@ -225,6 +225,84 @@ describe('secure-login', () => {
 	});
 });
 
+// ── Word Processor ─────────────────────────────────────────────────────────────
+
+describe('update-text', () => {
+	it('matches when no targetText configured', () => {
+		expect(checkGoalMatch('update-text', 'update-text', { text: 'anything' }, {})).toBe(true);
+	});
+
+	it('matches when text includes targetText', () => {
+		expect(checkGoalMatch('update-text', 'update-text', { text: 'ΑΙΤΗΣΗ\nΚείμενο' }, { targetText: 'ΑΙΤΗΣΗ' })).toBe(true);
+	});
+
+	it('does not match when text missing targetText', () => {
+		expect(checkGoalMatch('update-text', 'update-text', { text: 'Κείμενο' }, { targetText: 'ΑΙΤΗΣΗ' })).toBe(false);
+	});
+
+	it('does not match wrong action', () => {
+		expect(checkGoalMatch('update-text', 'format-bold', { text: 'ΑΙΤΗΣΗ' }, {})).toBe(false);
+	});
+});
+
+describe('format-text-bold', () => {
+	it('matches format-bold action', () => {
+		expect(checkGoalMatch('format-text-bold', 'format-bold', {}, {})).toBe(true);
+	});
+
+	it('does not match other actions', () => {
+		expect(checkGoalMatch('format-text-bold', 'format-italic', {}, {})).toBe(false);
+	});
+});
+
+describe('format-text-italic', () => {
+	it('matches format-italic action', () => {
+		expect(checkGoalMatch('format-text-italic', 'format-italic', {}, {})).toBe(true);
+	});
+});
+
+describe('format-text-underline', () => {
+	it('matches format-underline action', () => {
+		expect(checkGoalMatch('format-text-underline', 'format-underline', {}, {})).toBe(true);
+	});
+});
+
+describe('format-text-align', () => {
+	it('matches when align equals targetAlign', () => {
+		expect(checkGoalMatch('format-text-align', 'format-align', { align: 'center' }, { targetAlign: 'center' })).toBe(true);
+	});
+
+	it('does not match wrong align', () => {
+		expect(checkGoalMatch('format-text-align', 'format-align', { align: 'left' }, { targetAlign: 'center' })).toBe(false);
+	});
+});
+
+describe('format-font-size', () => {
+	it('matches when size equals targetSize', () => {
+		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: '18' }, { targetSize: '18' })).toBe(true);
+	});
+
+	it('matches when size is number and targetSize is string', () => {
+		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: 18 }, { targetSize: '18' })).toBe(true);
+	});
+
+	it('does not match wrong size', () => {
+		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: '12' }, { targetSize: '18' })).toBe(false);
+	});
+});
+
+describe('insert-bullet-list', () => {
+	it('matches insert-bullet-list action', () => {
+		expect(checkGoalMatch('insert-bullet-list', 'insert-bullet-list', {}, {})).toBe(true);
+	});
+});
+
+describe('save-document', () => {
+	it('matches save-document action', () => {
+		expect(checkGoalMatch('save-document', 'save-document', {}, {})).toBe(true);
+	});
+});
+
 // ── Unknown goal guard ─────────────────────────────────────────────────────────
 
 describe('unknown goal', () => {

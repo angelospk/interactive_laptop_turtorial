@@ -2,7 +2,7 @@
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '../src/lib/db/schema.ts';
-import { allLessons } from '../src/lib/db/seeds/index.ts';
+import { allLessons, allModules } from '../src/lib/db/seeds/index.ts';
 import { eq } from 'drizzle-orm';
 import { config } from 'dotenv';
 
@@ -15,9 +15,30 @@ const authToken = process.env.TURSO_AUTH_TOKEN;
 const client = createClient({ url, authToken });
 const db = drizzle(client, { schema });
 
+async function seedModules() {
+    console.log(`\n📦 Seeding ${allModules.length} modules...`);
+    for (const mod of allModules) {
+        try {
+            const existing = await db.query.modules?.findFirst({
+                where: eq(schema.modules.id, mod.id)
+            });
+            if (existing) {
+                await db.update(schema.modules).set(mod).where(eq(schema.modules.id, mod.id));
+                console.log(`🔄 Updated module: ${mod.id}`);
+            } else {
+                await db.insert(schema.modules).values(mod);
+                console.log(`✅ Inserted module: ${mod.id}`);
+            }
+        } catch (error) {
+            console.error(`❌ Error processing module ${mod.id}:`, error);
+        }
+    }
+}
+
 async function seed() {
     console.log('🌱 Starting database seed...');
-    console.log(`📚 Total lessons to seed: ${allLessons.length}`);
+    await seedModules();
+    console.log(`\n📚 Total lessons to seed: ${allLessons.length}`);
 
     let inserted = 0;
     let skipped = 0;

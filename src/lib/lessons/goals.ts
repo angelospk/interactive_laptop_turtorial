@@ -78,7 +78,17 @@ export const GOALS = {
 	// Video call
 	'start-videocall': { requiresAppId: false },
 	'mute-call': { requiresAppId: false },
-	'end-call': { requiresAppId: false }
+	'end-call': { requiresAppId: false },
+
+	// Word Processor
+	'update-text': { requiresAppId: false },
+	'format-text-bold': { requiresAppId: false },
+	'format-text-italic': { requiresAppId: false },
+	'format-text-underline': { requiresAppId: false },
+	'format-text-align': { requiresTargetAlign: true },
+	'format-font-size': { requiresTargetSize: true },
+	'insert-bullet-list': { requiresAppId: false },
+	'save-document': { requiresAppId: false }
 } as const;
 
 export type GoalId = keyof typeof GOALS;

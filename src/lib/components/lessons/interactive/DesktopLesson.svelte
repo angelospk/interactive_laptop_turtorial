@@ -23,6 +23,7 @@
 	import InstallerApp from '$lib/components/apps/InstallerApp.svelte';
 	import SettingsApp from '$lib/components/apps/SettingsApp.svelte';
 	import VideoCallApp from '$lib/components/apps/VideoCallApp.svelte';
+	import WordProcessorApp from '$lib/components/apps/WordProcessorApp.svelte';
 
 	// Icons
 	import { Folder, Globe, Mail, Grid3X3, Download, Settings, FileText, Phone } from 'lucide-svelte';
@@ -46,7 +47,7 @@
 		{ id: 'excel', name: 'Υπολογιστικά Φύλλα', icon: Grid3X3, component: SpreadsheetApp },
 		{ id: 'installer', name: 'Εγκατάσταση', icon: Download, component: InstallerApp },
 		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
-		{ id: 'notepad', name: 'Σημειωματάριο', icon: FileText, component: null }, // Placeholder
+		{ id: 'word', name: 'Επεξεργασία Κειμένου', icon: FileText, component: WordProcessorApp },
 		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp }
 	];
 

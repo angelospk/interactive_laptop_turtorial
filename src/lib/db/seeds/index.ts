@@ -13,6 +13,8 @@ import { module10Lessons } from './module10-lessons';
 import { module11Lessons } from './module11-lessons';
 import { module12Lessons } from './module12-lessons';
 import { module13Lessons } from './module13-lessons';
+import { wordLessons } from './module-word-lessons';
+export { allModules } from './modules';
 
 /**
  * Validate all lessons at import time.
@@ -39,6 +41,7 @@ const _allLessons: NewLesson[] = [
     ...module4Lessons,
     ...module5Lessons,
     ...module6Lessons,
+    ...wordLessons,
     ...module7Lessons,
     ...module8Lessons,
     ...module9Lessons,
@@ -63,6 +66,7 @@ export {
     module4Lessons,
     module5Lessons,
     module6Lessons,
+    wordLessons,
     module7Lessons,
     module8Lessons,
     module9Lessons,
