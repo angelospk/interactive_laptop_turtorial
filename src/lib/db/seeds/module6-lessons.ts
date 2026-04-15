@@ -13,7 +13,7 @@ export const module6Lessons: NewLesson[] = [
         difficulty: 'beginner',
         orderIndex: 1,
         lessonType: 'desktop-simulation',
-        config: { goal: 'open-app', targetAppId: 'email' },
+        config: { goal: 'open-app', targetAppId: 'email', fullscreen: true },
         enabled: true,
         requiredLessonId: null
     },
@@ -28,6 +28,7 @@ export const module6Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'read-all-unread',
+            fullscreen: true,
             initialApps: ['email'],
             instructions: 'Κάντε κλικ σε κάθε μη αναγνωσμένο μήνυμα (με έντονη γραμματοσειρά) για να το διαβάσετε.\n\n💡 Τα μη αναγνωσμένα μηνύματα έχουν έντονο τίτλο.',
             emails: [
@@ -50,6 +51,7 @@ export const module6Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'reply-email',
+            fullscreen: true,
             initialApps: ['email'],
             instructions: 'Ανοίξτε το email από τον "Γιάννη" και πατήστε "Απάντηση".',
             emails: [
@@ -80,6 +82,7 @@ export const module6Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'forward-email',
+            fullscreen: true,
             initialApps: ['email'],
             instructions: 'Προωθήστε το email της "Εφορίας" στον λογιστή σας.',
             emails: [
@@ -110,6 +113,7 @@ export const module6Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'delete-email',
+            fullscreen: true,
             initialApps: ['email'],
             instructions: 'Διαγράψτε το διαφημιστικό email.',
             emails: [
@@ -140,6 +144,7 @@ export const module6Lessons: NewLesson[] = [
         lessonType: 'desktop-simulation',
         config: {
             goal: 'attach-file',
+            fullscreen: true,
             initialApps: ['email'],
             instructions: 'Συνθέστε ένα νέο email και επισυνάψτε ένα αρχείο.',
             availableFiles: [

@@ -172,6 +172,23 @@
 	// Fullscreen state
 	let isFullscreen = $state(false);
 	let lessonContainer: HTMLElement;
+	let dismissedFullscreenPrompt = $state(false);
+
+	// True when the current lesson recommends fullscreen
+	let fullscreenRecommended = $derived(
+		!!(currentLesson?.config as any)?.fullscreen
+	);
+
+	// Reset dismissal when lesson changes so prompt re-appears on each new lesson
+	$effect(() => {
+		const _ = currentLesson?.id;
+		dismissedFullscreenPrompt = false;
+	});
+
+	// Show banner when lesson recommends fullscreen and we're not already there
+	let showFullscreenBanner = $derived(
+		fullscreenRecommended && !isFullscreen && !dismissedFullscreenPrompt
+	);
 
 	function toggleFullscreen() {
 		if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
@@ -181,6 +198,11 @@
 		} else if (document.fullscreenElement && document.exitFullscreen) {
 			document.exitFullscreen();
 		}
+	}
+
+	function enterFullscreenFromBanner() {
+		dismissedFullscreenPrompt = true;
+		toggleFullscreen();
 	}
 
 	// Listen for fullscreen changes
@@ -245,6 +267,28 @@
 				: getMessage('nav_next')}
 		</Button>
 	</div>
+
+	{#if showFullscreenBanner}
+		<div class="flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm">
+			<div class="flex items-center gap-2">
+				<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
+				<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
+			</div>
+			<div class="flex items-center gap-2 shrink-0">
+				<Button size="sm" onclick={enterFullscreenFromBanner} class="bg-blue-600 text-white hover:bg-blue-700">
+					Πλήρης οθόνη
+				</Button>
+				<button
+					class="rounded p-1 text-blue-500 hover:text-blue-700"
+					onclick={() => (dismissedFullscreenPrompt = true)}
+					title="Κλείσιμο"
+					aria-label="Κλείσιμο"
+				>
+					✕
+				</button>
+			</div>
+		</div>
+	{/if}
 
 	<div bind:this={lessonCard}>
 		<Card>
