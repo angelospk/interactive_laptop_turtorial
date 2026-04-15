@@ -1,4 +1,5 @@
 import type { NewLesson } from '../schema';
+import { GOALS, isValidGoalId } from '$lib/lessons/goals';
 import { module1Lessons } from './module1-lessons';
 import { module2Lessons } from './module2-lessons';
 import { module3Lessons } from './module3-lessons';
@@ -14,9 +15,24 @@ import { module12Lessons } from './module12-lessons';
 import { module13Lessons } from './module13-lessons';
 
 /**
- * All lesson seed data
+ * Validate all lessons at import time.
+ * A lesson with an unknown goal fails immediately instead of silently breaking at runtime.
  */
-export const allLessons: NewLesson[] = [
+function validateLessons(lessons: NewLesson[]): void {
+	for (const lesson of lessons) {
+		const config = lesson.config as Record<string, unknown> | null | undefined;
+		if (!config) continue;
+		const goal = config.goal;
+		if (typeof goal === 'string' && !isValidGoalId(goal)) {
+			throw new Error(
+				`Seed error in lesson "${lesson.id}": unknown goal "${goal}". ` +
+				`Valid goals: ${Object.keys(GOALS).join(', ')}`
+			);
+		}
+	}
+}
+
+const _allLessons: NewLesson[] = [
     ...module1Lessons,
     ...module2Lessons,
     ...module3Lessons,
@@ -31,6 +47,14 @@ export const allLessons: NewLesson[] = [
     ...module12Lessons,
     ...module13Lessons
 ];
+
+// Fail fast at import time if any lesson references an unknown goal.
+validateLessons(_allLessons);
+
+/**
+ * All lesson seed data — validated.
+ */
+export const allLessons: NewLesson[] = _allLessons;
 
 export {
     module1Lessons,

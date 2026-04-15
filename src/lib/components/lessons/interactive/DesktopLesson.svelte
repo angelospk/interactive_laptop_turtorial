@@ -12,6 +12,8 @@
 
 	import { untrack } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
+	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
 
 	// Import Apps
 	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';
@@ -202,158 +204,12 @@
 		if (completed) return;
 
 		try {
-			// console.log('Action:', action, 'Data:', data, 'Goal:', goal);
-
-			let success = false;
-
-			// Specific matches based on config
-			if (
-				action === 'navigate' &&
-				(goal === 'navigate-site' || goal === 'navigate') &&
-				data.url?.includes(config.targetUrl)
-			) {
-				success = true;
-			}
-			if (action === 'report-phishing' && goal === 'identify-phishing' && data.correct) {
-				success = true;
-			}
-			if (action === 'update-cell' && goal === 'update-cell') {
-				const cellOk = !config.targetCell || data.cellId === config.targetCell;
-				const valueOk = !config.targetValue || data.value?.trim() === config.targetValue.trim();
-				if (cellOk && valueOk) success = true;
-			}
-			if (action === 'format-cell' && goal === 'format-cell') {
-				success = true;
-			}
-			if (action === 'formula-success' && goal === 'enter-formula') {
-				success = true;
-			}
-			if (action === 'install-complete' && goal === 'install-app') {
-				success = true;
-			}
-			if (action === 'uninstall-app' && goal === 'uninstall-app') {
-				success = true;
-			}
-			if (action === 'connect-wifi' && goal === 'connect-wifi') {
-				success = true;
-			}
-			if (action === 'add-printer' && goal === 'add-printer') {
-				success = true;
-			}
-			if (action === 'create-folder' && goal === 'create-folder') {
-				success = true;
-			}
-			if (action === 'select-file' && goal === 'select-file') {
-				success = true;
-			}
-			if (action === 'open-app' && goal === 'open-app' && data.appId === config.targetAppId) {
-				success = true;
-			}
-			if (action === 'open-quick-settings' && goal === 'open-quick-settings') {
-				success = true;
-			}
-			if (action === 'open-task-view' && goal === 'open-task-view') {
-				success = true;
-			}
-			if (action === 'minimize-app' && goal === 'minimize-app' && data.appId === config.targetAppId) {
-				success = true;
-			}
-			if (action === 'restore-app' && goal === 'restore-app' && data.appId === config.targetAppId) {
-				success = true;
-			}
-			if (action === 'maximize-app' && goal === 'maximize-app' && data.appId === config.targetAppId) {
-				success = true;
-			}
-			if (action === 'close-app' && goal === 'close-app' && data.appId === config.targetAppId) {
-				success = true;
-			}
-			if (action === 'open-start-menu' && goal === 'open-start-menu') {
-				success = true;
-			}
-			if (action === 'attach-file' && (goal === 'attach-file' || goal === 'email-attachment')) {
-				success = true;
-			}
-			// Module 8 New Goals
-			if (
-				action === 'cookie-choice' &&
-				goal === 'handle-cookies' &&
-				data.choice === config.targetChoice
-			) {
-				success = true;
-			}
-			if (
-				action === 'bank-login' &&
-				goal === 'secure-login' &&
-				data.success &&
-				data.strength === 'strong'
-			) {
-				success = true;
-			}
-			if (action === 'bank-transfer' && goal === 'make-transfer') {
-				success = true;
-			}
-			if (action === 'gov-submit' && goal === 'gov-service') {
-				success = true;
+			if (!goal || !isValidGoalId(goal)) {
+				console.warn(`[DesktopLesson] Unknown goal "${goal}" — skipping check`);
+				return;
 			}
 
-			// Missing Goal Checks
-			if (action === 'reply-email' && goal === 'reply-email') success = true;
-			if (action === 'forward-email' && goal === 'forward-email') success = true;
-			if (action === 'delete-email' && goal === 'delete-email') success = true;
-			if (action === 'download-attachment' && goal === 'download-attachment') success = true;
-			if (action === 'rename' && goal === 'rename-file') {
-				success = true;
-			}
-			if (action === 'delete' && goal === 'delete-file') {
-				success = true;
-			}
-
-			// Module 4: File operations
-			if (action === 'paste-cut' && goal === 'paste-cut-file') {
-				success = true;
-			}
-			if (action === 'paste-copy' && goal === 'paste-copy') {
-				success = true;
-			}
-			if (action === 'drag-drop' && goal === 'drag-drop-file') {
-				success = true;
-			}
-
-			// Module 6: Email - complete when all unread are read
-			if (action === 'read-all-unread-complete' && goal === 'read-all-unread') {
-				success = true;
-			}
-
-			// Browser goals
-			if (action === 'new-tab' && goal === 'new-tab') success = true;
-			if (action === 'search' && goal === 'search') success = true;
-			if (action === 'switch-tab' && goal === 'switch-tab') success = true;
-			if (action === 'close-tab' && goal === 'close-tab') success = true;
-			if (action === 'bookmark' && goal === 'bookmark') {
-				const targetSite = config.targetSite || config.targetUrl;
-				if (!targetSite || data.url?.includes(targetSite)) {
-					success = true;
-				}
-			}
-			if (action === 'download-file' && goal === 'download-file') success = true;
-			if (action === 'zoom-page' && goal === 'zoom-page') success = true;
-			if (action === 'find-on-page' && goal === 'find-on-page') success = true;
-			if (action === 'open-privacy-settings' && goal === 'open-privacy-settings') success = true;
-			if (action === 'type-ai-question' && goal === 'type-ai-question') success = true;
-
-			// Settings new goals
-			if (action === 'connect-bluetooth' && goal === 'connect-bluetooth') success = true;
-			if (action === 'open-display-settings' && goal === 'open-display-settings') success = true;
-			if (action === 'open-accessibility' && goal === 'open-accessibility') success = true;
-			if (action === 'open-sound-settings' && goal === 'open-sound-settings') success = true;
-			if (action === 'update-app' && goal === 'update-app') success = true;
-
-			// VideoCall goals
-			if (action === 'start-videocall' && goal === 'start-videocall') success = true;
-			if (action === 'mute-call' && goal === 'mute-call') success = true;
-			if (action === 'end-call' && goal === 'end-call') success = true;
-
-			if (success) {
+			if (checkGoalMatch(goal as GoalId, action, data, config)) {
 				completed = true;
 				toast.success('Μπράβο! Ολοκλήρωσες τη δραστηριότητα!');
 				setTimeout(() => {
