@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "interactive_laptop_turtorial",
+  "project_id": "1d44b625-9212-491d-8bcc-8ada5debf18f"
+}
