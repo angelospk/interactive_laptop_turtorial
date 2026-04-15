@@ -34,6 +34,9 @@ drizzle/
 
 .mcp.json
 *.md
+!CLAUDE.md
+!AGENTS.md
+!README.md
 .gemini/
 .env.example
 out/svelte-mcp
