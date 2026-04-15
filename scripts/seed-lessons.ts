@@ -15,6 +15,22 @@ const authToken = process.env.TURSO_AUTH_TOKEN;
 const client = createClient({ url, authToken });
 const db = drizzle(client, { schema });
 
+async function migrate() {
+    console.log('🔧 Running migrations...');
+    await client.execute(`
+        CREATE TABLE IF NOT EXISTS modules (
+            id TEXT PRIMARY KEY,
+            title_key TEXT NOT NULL,
+            description_key TEXT,
+            icon_name TEXT,
+            order_index INTEGER NOT NULL,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            created_at INTEGER NOT NULL DEFAULT (unixepoch())
+        )
+    `);
+    console.log('✅ modules table ready');
+}
+
 async function seedModules() {
     console.log(`\n📦 Seeding ${allModules.length} modules...`);
     for (const mod of allModules) {
@@ -37,6 +53,7 @@ async function seedModules() {
 
 async function seed() {
     console.log('🌱 Starting database seed...');
+    await migrate();
     await seedModules();
     console.log(`\n📚 Total lessons to seed: ${allLessons.length}`);
 
