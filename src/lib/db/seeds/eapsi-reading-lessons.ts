@@ -215,17 +215,6 @@ const _readingLessons: Omit<NewLesson, 'orderIndex' | 'requiredLessonId'>[] = [
         enabled: true,
     },
     {
-        id: "read-esm002-c4-s1-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm002-c4-s1",
-        titleKey: "Επισκόπηση",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c4/s1.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@5e5738525617432d881ba817e50fbf2f" },
-        enabled: true,
-    },
-    {
         id: "read-esm002-c4-s2-module8",
         moduleId: "module8",
         lessonKey: "read-esm002-c4-s2",

@@ -262,16 +262,6 @@
           "title": "Ηλεκτρονικές συναλλαγές",
           "subsections": [
             {
-              "id": "esm002-c4-s1",
-              "title": "Επισκόπηση",
-              "mdPath": "md/esm002/c4/s1.md",
-              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@5e5738525617432d881ba817e50fbf2f",
-              "modules": [
-                "module8"
-              ],
-              "kind": "theory+quiz"
-            },
-            {
               "id": "esm002-c4-s2",
               "title": "Ηλεκτρονικές αγορές",
               "mdPath": "md/esm002/c4/s2.md",

@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Build content/md/** (ascii paths) + content/manifest.json from cached EAPSI data."""
+"""Build content/md/** (ascii paths) + content/manifest.json from cached EAPSI data.
+
+WARNING — DO NOT re-run blindly. After initial generation, content/md/** received
+243 manual editorial corrections (Phase C) that are NOT in this script; re-running
+overwrites them. Also overview esm002-c4-s1 was removed by hand (manifest + seed + DB).
+content/md + content/manifest.json are now the source of truth; this script is kept
+for history. If a regenerate is ever needed, re-run the content review afterwards too.
+"""
 import json, re, os, shutil
 from bs4 import BeautifulSoup
 from markdownify import markdownify as md
