@@ -2,7 +2,7 @@
 	let { data } = $props();
 </script>
 
-<div class="mx-auto max-w-3xl p-6">
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
 	<h1 class="mb-6 text-3xl font-bold">Βιβλιοθήκη Θεωρίας</h1>
 	{#each data.manifest.courses as course}
 		<section class="mb-8">

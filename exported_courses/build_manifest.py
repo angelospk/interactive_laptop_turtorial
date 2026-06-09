@@ -83,15 +83,28 @@ def clean_html_to_md(html):
             img["alt"] = "εικόνα"
     for ifr in soup.find_all("iframe"):
         src = (ifr.get("src", "") or ifr.get("data-src", "")).replace("&amp;", "&")
-        m2 = re.search(r"vimeo\.com/video/(\d+)", src)
-        clean = f"https://vimeo.com/{m2.group(1)}" if m2 else (src.split("?")[0] if src else "")
-        p = soup.new_tag("p")
-        p.string = f"🎬 Βίντεο: {clean}" if clean else "🎬 Βίντεο"
-        ifr.replace_with(p)
+        if "player.vimeo.com" in src:
+            marker = soup.new_string(f"[[VIDEO:{src}]]")
+            ifr.replace_with(marker)
+        else:
+            ifr.decompose()  # drop SCORM / non-video iframes
     for t in soup.find_all(["script", "style"]):
         t.decompose()
     text = md(str(soup), heading_style="ATX", bullets="-", strip=["span"])
-    return re.sub(r"\n{3,}", "\n\n", text).strip()
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    # [[VIDEO:url]] -> responsive iframe embed
+    def _video(m):
+        url = m.group(1).replace("&amp;", "&")
+        return ('<div class="video-wrap"><iframe src="' + url +
+                '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>')
+    text = re.sub(r"\[\[VIDEO:([^\]]+)\]\]", _video, text)
+    # image + "Εικόνα N: ..." caption -> <figure>
+    def _figure(m):
+        alt, url, cap = m.group(1), m.group(2), m.group(3).strip()
+        return ('<figure><img src="' + url + '" alt="' + alt + '" />' +
+                '<figcaption>' + cap + '</figcaption></figure>')
+    text = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)\s*\n\s*\n(Εικόνα[^\n]+)", _figure, text)
+    return text
 
 
 def main():
@@ -123,9 +136,9 @@ def main():
                 seq_name = seq["display_name"]
                 if SKIP.search(seq_name):
                     continue
-                parts = [f"# {course_title}\n", f"## Ενότητα: {ch_name}\n",
-                         f"## Υποενότητα: {seq_name}\n"]
+                parts = []
                 has = False
+                first_v = True
                 for v in seq.get("children", []):
                     vb = blocks.get(v)
                     if not vb or vb.get("type") != "vertical" or SKIP.search(vb["display_name"]):
@@ -139,9 +152,12 @@ def main():
                         if body:
                             sub.append(body)
                     if sub:
-                        parts.append(f"### {vb['display_name']}\n")
+                        if not first_v:
+                            parts.append("---\n")
+                        parts.append(f"## {vb['display_name']}\n")
                         parts.append("\n\n".join(sub))
                         parts.append("")
+                        first_v = False
                         has = True
                 if not has:
                     continue

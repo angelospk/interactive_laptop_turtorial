@@ -2,6 +2,8 @@
 
 @import "tw-animate-css";
 
+@plugin "@tailwindcss/typography";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -138,4 +140,32 @@ body:has(:fullscreen) [data-slot="dialog-overlay"] {
 
 body:has(:fullscreen) [data-slot="dialog-content"] {
   z-index: 2147483647;
+}
+
+/* Responsive 16:9 video embeds inside markdown content */
+.video-wrap {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	margin: 1.5rem 0;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	background: #000;
+}
+.video-wrap iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+/* Figure captions for course images */
+.prose figure { margin: 1.5rem 0; }
+.prose figure img { margin: 0 auto; border-radius: 0.5rem; }
+.prose figure figcaption {
+	margin-top: 0.5rem;
+	text-align: center;
+	font-size: 0.875rem;
+	font-style: italic;
+	color: var(--muted-foreground);
 }
