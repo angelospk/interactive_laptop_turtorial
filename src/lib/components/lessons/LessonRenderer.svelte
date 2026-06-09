@@ -40,6 +40,7 @@
 
 			// New Quiz Type
 			quiz: () => import('./interactive/QuizLesson.svelte'),
+			reading: () => import('./interactive/ReadingLesson.svelte'),
 
 			'legacy-module-3': () => import('./legacy/LegacyModule3Lesson.svelte'),
 			'legacy-module-4': () => import('./legacy/LegacyModule4Lesson.svelte')
