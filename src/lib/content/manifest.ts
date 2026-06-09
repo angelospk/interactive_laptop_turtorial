@@ -38,3 +38,7 @@ export function findSubsection(manifest: Manifest, courseId: string, subId: stri
 	}
 	return null;
 }
+
+export function flattenSubsections(course: Course): Subsection[] {
+	return course.chapters.flatMap((ch) => ch.subsections);
+}
