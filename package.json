@@ -36,6 +36,7 @@
 		"@tailwindcss/vite": "^4.1.14",
 		"@tanstack/table-core": "^8.20.5",
 		"@types/better-sqlite3": "^7.6.13",
+		"@types/dompurify": "^3.2.0",
 		"@types/node": "^24",
 		"@vitest/browser-playwright": "^4.0.5",
 		"better-sqlite3": "^12.4.6",
@@ -73,8 +74,10 @@
 	},
 	"dependencies": {
 		"@libsql/client": "^0.15.15",
+		"dompurify": "^3.4.8",
 		"drizzle-orm": "^0.44.7",
 		"lucide-svelte": "^0.554.0",
+		"marked": "^18.0.5",
 		"pocketbase": "^0.26.3"
 	}
 }
