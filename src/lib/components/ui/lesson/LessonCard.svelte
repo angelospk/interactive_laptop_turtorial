@@ -48,9 +48,16 @@
 		</CardHeader>
 		<CardContent>
 			<div class="flex items-center justify-between">
-				<Badge variant={isLocked ? 'outline' : 'secondary'} class="capitalize">
-					{lesson.difficulty}
-				</Badge>
+				<div class="flex items-center gap-2">
+					{#if lesson.lessonType === 'reading'}
+						<Badge class="border-blue-200 bg-blue-100 text-blue-700 hover:bg-blue-100">
+							📖 Θεωρία
+						</Badge>
+					{/if}
+					<Badge variant={isLocked ? 'outline' : 'secondary'} class="capitalize">
+						{lesson.difficulty}
+					</Badge>
+				</div>
 
 				{#if progress?.completed && progress.score}
 					<div class="flex items-center gap-1 text-sm font-medium text-amber-600">
