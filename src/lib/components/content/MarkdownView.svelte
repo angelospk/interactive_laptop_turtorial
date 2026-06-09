@@ -42,7 +42,7 @@
 {:else if error}
 	<p class="text-red-500">Σφάλμα φόρτωσης περιεχομένου: {error}</p>
 {:else}
-	<article class="prose prose-slate dark:prose-invert max-w-none">
+	<article class="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-img:rounded-lg">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html html}
 	</article>
