@@ -78,7 +78,7 @@
 - Νέος `lessonType: "reading"`.
 - Component `lib/components/lessons/interactive/ReadingLesson.svelte` (χρησιμοποιεί `MarkdownView`).
 - `config: { mdPath, sourceUrl }`.
-- Ολοκλήρωση: goal **`read-content`** (scroll-to-end + κουμπί «Το διάβασα»). Νέος goal handler στο `goalHandlers.ts` + test.
+- Ολοκλήρωση: standalone (όπως το υπάρχον `QuizLesson`) — κουμπί «Το διάβασα ✓» καλεί `onComplete(100)`. **Χωρίς** goal/goalHandler (απλούστερο· δεν περνά από το desktop-simulation goal system).
 - Seed: για κάθε υποενότητα με `kind` που περιλαμβάνει theory & module(s), δημιουργείται reading lesson στα αντίστοιχα modules, με `orderIndex` πριν τα σχετικά challenges.
 
 ### 3.5 Βιβλιοθήκη Θεωρίας
