@@ -14,6 +14,7 @@ import { module11Lessons } from './module11-lessons';
 import { module12Lessons } from './module12-lessons';
 import { module13Lessons } from './module13-lessons';
 import { wordLessons } from './module-word-lessons';
+import { eapsiReadingLessons } from './eapsi-reading-lessons';
 export { allModules } from './modules';
 
 /**
@@ -48,7 +49,8 @@ const _allLessons: NewLesson[] = [
     ...module10Lessons,
     ...module11Lessons,
     ...module12Lessons,
-    ...module13Lessons
+    ...module13Lessons,
+    ...eapsiReadingLessons
 ];
 
 // Fail fast at import time if any lesson references an unknown goal.
@@ -73,5 +75,6 @@ export {
     module10Lessons,
     module11Lessons,
     module12Lessons,
-    module13Lessons
+    module13Lessons,
+    eapsiReadingLessons
 };
