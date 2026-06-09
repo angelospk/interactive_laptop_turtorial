@@ -37,8 +37,9 @@ drizzle/
 !CLAUDE.md
 !AGENTS.md
 !README.md
+!docs/**/*.md
+!content/**/*.md
 .gemini/
-.env.example
 out/svelte-mcp
 openspec/
 

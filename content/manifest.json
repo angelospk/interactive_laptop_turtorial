@@ -1,0 +1,1011 @@
+{
+  "courses": [
+    {
+      "id": "esm001",
+      "moduleNumber": 1,
+      "title": "Μάθημα 1: Εισαγωγή",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Χρήση Υπολογιστή",
+          "subsections": [
+            {
+              "id": "esm001-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm001/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@d5f508d6cb074d5281cbf718bdf2f975",
+              "modules": [
+                "module3",
+                "module1"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm001-c1-s2",
+              "title": "Ο Υπολογιστής",
+              "mdPath": "md/esm001/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@5766ada1f0a44c3190f7e3544c70fe3a",
+              "modules": [
+                "module3",
+                "module1"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm001-c1-s3",
+              "title": "Περιήγηση στα Windows 11",
+              "mdPath": "md/esm001/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fc4155a1109d4f9185b0587f5a2babe4",
+              "modules": [
+                "module3",
+                "module1"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm001-c1-s4",
+              "title": "Ρυθμίσεις προσβασιμότητας",
+              "mdPath": "md/esm001/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@5026b7bafa2b41938364575e256b5474",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Χρήση έξυπνου κινητού",
+          "subsections": [
+            {
+              "id": "esm001-c2-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm001/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@44af4032cbc44729bb4d05eca9957c48",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s2",
+              "title": "Λειτουργικό σύστημα",
+              "mdPath": "md/esm001/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fa7ea78806cd4c6e8ef1653fb7be5383",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s3",
+              "title": "Πλοήγηση και αλληλεπίδραση",
+              "mdPath": "md/esm001/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@1a6ee71226c04980afc6d4a02cbfd18a",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s4",
+              "title": "Εφαρμογές",
+              "mdPath": "md/esm001/c2/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@c45f555f88c64e4abaa074127109ed80",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s5",
+              "title": "Διαχείριση εφαρμογών",
+              "mdPath": "md/esm001/c2/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@2233c1d70d63434b9e09f0d35f216211",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s6",
+              "title": "Γρήγορες ρυθμίσεις και ειδοποιήσεις",
+              "mdPath": "md/esm001/c2/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@4cce03a7a07a47f791e1ce3655a18e57",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm001-c2-s7",
+              "title": "Ρυθμίσεις προσβασιμότητας κινητών συσκευών",
+              "mdPath": "md/esm001/c2/s7.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@ef1a29a413ef42e5abe66d7922ca22e1",
+              "modules": [],
+              "kind": "theory+quiz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "esm002",
+      "moduleNumber": 2,
+      "title": "Μάθημα 2: Πληροφορίες και δεδομένα",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Το διαδίκτυο",
+          "subsections": [
+            {
+              "id": "esm002-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm002/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@f64d55f1c7464f6fa510d8308367647b",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c1-s2",
+              "title": "Το διαδίκτυο",
+              "mdPath": "md/esm002/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@7ae0bf52d95746808ce80264df168ccd",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c1-s3",
+              "title": "Ιστοσελίδες και προγράμματα περιήγησης",
+              "mdPath": "md/esm002/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@423188c92bed4bef82481d6184c3f11a",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c1-s4",
+              "title": "Λειτουργίες προγράμματος περιήγησης",
+              "mdPath": "md/esm002/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@f4164070f5e34be18355a069a4ba48ee",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c1-s5",
+              "title": "Οργάνωση πληροφορίας",
+              "mdPath": "md/esm002/c1/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@ff2887f4f9844528b42cef5df580cdbf",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Αναζήτηση πληροφοριών",
+          "subsections": [
+            {
+              "id": "esm002-c2-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm002/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@bcadacb3cefd47cd9e8f5f67cfbac004",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c2-s2",
+              "title": "Μηχανές αναζήτησης",
+              "mdPath": "md/esm002/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@9674f6a2c276402d85d8d6d588993c89",
+              "modules": [
+                "module5"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c2-s3",
+              "title": "Αναζήτηση πληροφοριών με Μεγάλα Γλωσσικά Μοντέλα",
+              "mdPath": "md/esm002/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8899da4760940a59a9fc425e9bfb11c",
+              "modules": [
+                "module13"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Πλοήγηση σε χρήσιμους διαδικτυακούς τόπους",
+          "subsections": [
+            {
+              "id": "esm002-c3-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm002/c3/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@f705098167264d1f82f82a172b69e062",
+              "modules": [
+                "module12"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c3-s2",
+              "title": "Χρήση επιλεγμένων ιστότοπων",
+              "mdPath": "md/esm002/c3/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@cdb28419f7984a9fade0697580a422f7",
+              "modules": [
+                "module12"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c3-s3",
+              "title": "Χρήση διαδικτυακών υπηρεσιών του δημοσίου",
+              "mdPath": "md/esm002/c3/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8b318dbee184ed785175251d48562d5",
+              "modules": [
+                "module12"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm002-c3-s4",
+              "title": "Χρήση εξειδικευμένων ψηφιακών υπηρεσιών για άτομα με αναπηρία",
+              "mdPath": "md/esm002/c3/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@4a101a852f134bc7b1a2591606104004",
+              "modules": [
+                "module12"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Ηλεκτρονικές συναλλαγές",
+          "subsections": [
+            {
+              "id": "esm002-c4-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm002/c4/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@5e5738525617432d881ba817e50fbf2f",
+              "modules": [
+                "module8"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm002-c4-s2",
+              "title": "Ηλεκτρονικές αγορές",
+              "mdPath": "md/esm002/c4/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@96dbd9c7713940359b8a3161b814c604",
+              "modules": [
+                "module8"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm002-c4-s3",
+              "title": "Τραπεζικές συναλλαγές",
+              "mdPath": "md/esm002/c4/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@48b8d096f22c4a1e9e1644c921e55db0",
+              "modules": [
+                "module8"
+              ],
+              "kind": "theory+quiz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eapsi001",
+      "moduleNumber": 3,
+      "title": "Μάθημα 3: Επικοινωνία και Συνεργασία",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Ηλεκτρονική επικοινωνία",
+          "subsections": [
+            {
+              "id": "eapsi001-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/eapsi001/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@e5d33acdf44f4cf88f260aa0d09ebe0b",
+              "modules": [
+                "module6"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c1-s2",
+              "title": "Τρόποι ηλεκτρονικής επικοινωνίας",
+              "mdPath": "md/eapsi001/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@3bc79e424a1d48c5ba7aae2d90a4a9d2",
+              "modules": [
+                "module6"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c1-s3",
+              "title": "Το ηλεκτρονικό ταχυδρομείο",
+              "mdPath": "md/eapsi001/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@7eabb481930b49c3806bcc2d0cebe611",
+              "modules": [
+                "module6"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c1-s4",
+              "title": "H εφαρμογή Messenger",
+              "mdPath": "md/eapsi001/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@6290c9f668f14aa5a4e4a2ef59dc4036",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c1-s5",
+              "title": "H εφαρμογή Viber",
+              "mdPath": "md/eapsi001/c1/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@0db3a7d131894bca8b4d45e053abe9b1",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Μέσα κοινωνικής δικτύωσης",
+          "subsections": [
+            {
+              "id": "eapsi001-c2-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/eapsi001/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@9ac731c39c51467c94085755684b3614",
+              "modules": [],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "eapsi001-c2-s2",
+              "title": "Facebook σε υπολογιστή",
+              "mdPath": "md/eapsi001/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@0e1cc3dc2001465da07b3a87af5d3901",
+              "modules": [],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "eapsi001-c2-s3",
+              "title": "Facebook σε κινητό",
+              "mdPath": "md/eapsi001/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@ae44685ce54a4ff386f105e1479c8ed0",
+              "modules": [],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "eapsi001-c2-s4",
+              "title": "YouTube σε υπολογιστή",
+              "mdPath": "md/eapsi001/c2/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@122894307dc1428382750f7f176bd315",
+              "modules": [],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "eapsi001-c2-s5",
+              "title": "YouTube σε κινητό",
+              "mdPath": "md/eapsi001/c2/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@81505d08172247cabcb0a9f5a7c8bec9",
+              "modules": [],
+              "kind": "theory+challenge"
+            }
+          ]
+        },
+        {
+          "title": "Χρήσιμες εφαρμογές",
+          "subsections": [
+            {
+              "id": "eapsi001-c3-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/eapsi001/c3/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@031e444eeacc45f28e68570568494544",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s2",
+              "title": "Ηλεκτρονικό ημερολόγιο",
+              "mdPath": "md/eapsi001/c3/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@71e2b12a000a43b9afb7a202aa963833",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s3",
+              "title": "Η εφαρμογή Microsoft Teams",
+              "mdPath": "md/eapsi001/c3/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@d379e5ec271c4dbaa279a36c3ca51553",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s4",
+              "title": "Η εφαρμογή Google Meet",
+              "mdPath": "md/eapsi001/c3/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@42f63d09c9f3429193d5368f2b8f5d82",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s5",
+              "title": "Η εφαρμογή Zoom",
+              "mdPath": "md/eapsi001/c3/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@c3324251adf84a4591bfc10a6a2bbc30",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s6",
+              "title": "Η πλατφόρμα Google Docs",
+              "mdPath": "md/eapsi001/c3/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@2d3578f9b3904a25a52f47b1951b1c1e",
+              "modules": [
+                "word",
+                "module4"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s7",
+              "title": "Η πλατφόρμα Google Drive",
+              "mdPath": "md/eapsi001/c3/s7.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@4c02caddb39641f6a0e44889cbcaf6e5",
+              "modules": [
+                "module4"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "eapsi001-c3-s8",
+              "title": "Η πλατφόρμα Spotify",
+              "mdPath": "md/eapsi001/c3/s8.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@a57bd7707c0f4cdd951888a5d2dd6403",
+              "modules": [
+                "module11"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Προσωπικά δεδομένα και κανόνες συμπεριφοράς",
+          "subsections": [
+            {
+              "id": "eapsi001-c4-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/eapsi001/c4/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@474d5c3387654318905458d1204f3f4a",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "eapsi001-c4-s2",
+              "title": "Προσωπικά δεδομένα",
+              "mdPath": "md/eapsi001/c4/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@fdfb4b9320bd4d1f9de664adcf76be56",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "eapsi001-c4-s3",
+              "title": "Βασικές έννοιες και κανόνες καλής συμπεριφοράς στο διαδίκτυο",
+              "mdPath": "md/eapsi001/c4/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@204678c252d2495aa7be05792ee771af",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "esm004",
+      "moduleNumber": 4,
+      "title": "Μάθημα 4: Δημιουργία ψηφιακού περιεχομένου",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Χρήση εφαρμογών γραφείου",
+          "subsections": [
+            {
+              "id": "esm004-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm004/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@4c0711fd950c4ae18b5def3f3c3b4388",
+              "modules": [
+                "word",
+                "module7"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm004-c1-s2",
+              "title": "Επεξεργαστής κειμένου",
+              "mdPath": "md/esm004/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@fb2a20fabed74157aad31dd891fca4dc",
+              "modules": [
+                "word"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm004-c1-s3",
+              "title": "Εφαρμογή υπολογιστικών φύλλων",
+              "mdPath": "md/esm004/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@64ba9c2d26ea497088cf16c212a3babc",
+              "modules": [
+                "module7"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm004-c1-s4",
+              "title": "Εφαρμογή παρουσιάσεων",
+              "mdPath": "md/esm004/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@877f1e703d28472cb84b93d6506e4158",
+              "modules": [],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm004-c1-s5",
+              "title": "Οδηγίες ανάπτυξης προσβάσιμου περιεχομένου",
+              "mdPath": "md/esm004/c1/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@011494d1917747689a30425bd0f4109a",
+              "modules": [
+                "word",
+                "module7"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Πολυμέσα",
+          "subsections": [
+            {
+              "id": "esm004-c2-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm004/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@9063ba1730bc4de09bb96ca4fbf22146",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c2-s2",
+              "title": "Βασικά είδη πολυμέσων",
+              "mdPath": "md/esm004/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@1ddd8c73817f4b288af62774323aa0ee",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c2-s3",
+              "title": "Εφαρμογές πολυμέσων",
+              "mdPath": "md/esm004/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@5e23f1b77640411aa3699874fa35b463",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c2-s4",
+              "title": "Δημιουργία προσβάσιμων πολυμέσων",
+              "mdPath": "md/esm004/c2/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@7764c09c33c64e418b8a16e67900b0ae",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c2-s5",
+              "title": "Αναζήτηση προσβάσιμου πολυμεσικού περιεχομένου στο διαδίκτυο",
+              "mdPath": "md/esm004/c2/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@4244250be6044fa09703392b3146c28c",
+              "modules": [],
+              "kind": "theory+quiz"
+            }
+          ]
+        },
+        {
+          "title": "Πνευματικά δικαιώματα",
+          "subsections": [
+            {
+              "id": "esm004-c3-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm004/c3/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@aa1d1164419143c8a6a3a945b2f0fa9d",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s2",
+              "title": "Βασικές έννοιες των πνευματικών δικαιωμάτων",
+              "mdPath": "md/esm004/c3/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@c65f714ad11042169e2d345152db3d71",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s3",
+              "title": "Νομοθετικό πλαίσιο",
+              "mdPath": "md/esm004/c3/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@0cf2d4989aff498f8a5cd7f0b4638d8b",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s4",
+              "title": "Παραβιάσεις πνευματικών δικαιωμάτων στο διαδίκτυο",
+              "mdPath": "md/esm004/c3/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@9f7249e895e94ddeba061feab09182bd",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s5",
+              "title": "Προκλήσεις στο ψηφιακό περιβάλλον",
+              "mdPath": "md/esm004/c3/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@34dccf99121f4cb0951ec9c4ea7f88e7",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s6",
+              "title": "Συνέπειες της παραβίασης πνευματικών δικαιωμάτων",
+              "mdPath": "md/esm004/c3/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@ae7ca116d6c148c181ad16513b33ca51",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s7",
+              "title": "Εναλλακτικά μοντέλα αδειοδότησης",
+              "mdPath": "md/esm004/c3/s7.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@cd5f9bb0622e4b84a4868b293120d978",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s8",
+              "title": "Τεχνολογικά μέτρα προστασίας",
+              "mdPath": "md/esm004/c3/s8.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@5ed0a744161c4895a4d3b5c7d2f41516",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s9",
+              "title": "Η έννοια της δίκαιης χρήσης",
+              "mdPath": "md/esm004/c3/s9.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@93814c7415e64a8f865626d58081b77e",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s10",
+              "title": "Πνευματικά δικαιώματα και τεχνητή νοημοσύνη",
+              "mdPath": "md/esm004/c3/s10.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@83cef002351a44ec8bbe4e73b88f7e26",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm004-c3-s11",
+              "title": "Συμπεράσματα και μελλοντικές τάσεις",
+              "mdPath": "md/esm004/c3/s11.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@b645df12e6ac41439a7585cb66293469",
+              "modules": [
+                "module10"
+              ],
+              "kind": "theory+quiz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "esm005",
+      "moduleNumber": 5,
+      "title": "Μάθημα 5: Ασφάλεια",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Κυβερνοασφάλεια και προστασία δεδομένων",
+          "subsections": [
+            {
+              "id": "esm005-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm005/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@0ae1fd5bd46f4c1abca75e97e78010dc",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm005-c1-s2",
+              "title": "Βασικές έννοιες της κυβερνοασφάλειας",
+              "mdPath": "md/esm005/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@eb20e51b53cb4f709151b15fb1202f1f",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm005-c1-s3",
+              "title": "Ασφαλής χρήση ψηφιακών τεχνολογιών",
+              "mdPath": "md/esm005/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@398e4513a67e43a9ac6c4a80017c4b0f",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm005-c1-s4",
+              "title": "Αντιμετώπιση περιστατικών παραβίασης δεδομένων",
+              "mdPath": "md/esm005/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@4b5f87dea5fb4e6ebb1951dab2e7016b",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory"
+            },
+            {
+              "id": "esm005-c1-s5",
+              "title": "Συμπεράσματα",
+              "mdPath": "md/esm005/c1/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@b1eaac58de114859aebe7a110ea6fdfc",
+              "modules": [
+                "module8",
+                "module10"
+              ],
+              "kind": "theory"
+            }
+          ]
+        },
+        {
+          "title": "Η τεχνολογία στη ζωή μας",
+          "subsections": [
+            {
+              "id": "esm005-c2-s1",
+              "title": "Επισκόπιση",
+              "mdPath": "md/esm005/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@e3f3141549b849d19b3ae73d64e232bc",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm005-c2-s2",
+              "title": "Η τεχνολογία στον σύγχρονο κόσμο",
+              "mdPath": "md/esm005/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@e1e1e1bdbc184e68838fb7f07c3de5e1",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm005-c2-s3",
+              "title": "Θετικές επιπτώσεις της τεχνολογίας",
+              "mdPath": "md/esm005/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@5a734a63cb8c485aac5a7a541ac7bc30",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm005-c2-s4",
+              "title": "Αρνητικές επιπτώσεις της τεχνολογίας",
+              "mdPath": "md/esm005/c2/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@b008392a5dc644d98494eeb86465a77b",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm005-c2-s5",
+              "title": "Εργονομία και ασφάλεια στη χρήση",
+              "mdPath": "md/esm005/c2/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@19dbc21cb80544cf823b7bc19df9f739",
+              "modules": [],
+              "kind": "theory+quiz"
+            },
+            {
+              "id": "esm005-c2-s6",
+              "title": "Συμπεράσματα",
+              "mdPath": "md/esm005/c2/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@cdc5c181cc884188a7e2b89a728ba408",
+              "modules": [],
+              "kind": "theory+quiz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "esm006",
+      "moduleNumber": 6,
+      "title": "Μάθημα 6: Επίλυση προβλημάτων",
+      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/course/",
+      "chapters": [
+        {
+          "title": "Συχνά προβλήματα και τρόποι επίλυσης",
+          "subsections": [
+            {
+              "id": "esm006-c1-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm006/c1/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@9c3e13e4ec4f49f9a7c1987da3170625",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s2",
+              "title": "Κοινά προβλήματα υπολογιστή και πιθανές λύσεις",
+              "mdPath": "md/esm006/c1/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@08cfb9ee24f44f688547f8ab14c582c1",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s3",
+              "title": "Κοινά προβλήματα κινητών συσκευών και πιθανές λύσεις",
+              "mdPath": "md/esm006/c1/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@85e0f54cc9d14e98865a2dc1330bf6d5",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s4",
+              "title": "Απλοί τρόποι επίλυσης",
+              "mdPath": "md/esm006/c1/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@87d43801a932408881c224e2003f0403",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s5",
+              "title": "Άλλα χρήσιμα εργαλεία επίλυσης προβλημάτων",
+              "mdPath": "md/esm006/c1/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@db23e6fcdb794f59812e6c120516a074",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s6",
+              "title": "Βοήθεια από το διαδίκτυο",
+              "mdPath": "md/esm006/c1/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@46e071a15f9f48848aa5d01192684548",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            },
+            {
+              "id": "esm006-c1-s7",
+              "title": "Συμβουλές για πρόληψη προβλημάτων",
+              "mdPath": "md/esm006/c1/s7.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@472064722a1b420a8982c85d6e5330d2",
+              "modules": [
+                "module9"
+              ],
+              "kind": "theory+challenge"
+            }
+          ]
+        },
+        {
+          "title": "Επιμόρφωση και εκπαίδευση",
+          "subsections": [
+            {
+              "id": "esm006-c2-s1",
+              "title": "Επισκόπηση",
+              "mdPath": "md/esm006/c2/s1.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@66aa9776e3fd4c2badd0da1c4297dec6",
+              "modules": [],
+              "kind": "theory"
+            },
+            {
+              "id": "esm006-c2-s2",
+              "title": "Βασικές μορφές ηλεκτρονικής μάθησης",
+              "mdPath": "md/esm006/c2/s2.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@8756279a85754223b1a862a5910fd618",
+              "modules": [],
+              "kind": "theory"
+            },
+            {
+              "id": "esm006-c2-s3",
+              "title": "Πλεονεκτήματα της διαδικτυακής εκπαίδευσης",
+              "mdPath": "md/esm006/c2/s3.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@1b2eb2d6452148c7bd49631ea89ec8f4",
+              "modules": [],
+              "kind": "theory"
+            },
+            {
+              "id": "esm006-c2-s4",
+              "title": "Προκλήσεις και περιορισμοί",
+              "mdPath": "md/esm006/c2/s4.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@ba531b87c8af4cefa14180252d79c7a5",
+              "modules": [],
+              "kind": "theory"
+            },
+            {
+              "id": "esm006-c2-s5",
+              "title": "Μελλοντικές τάσεις",
+              "mdPath": "md/esm006/c2/s5.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@fb7b043079eb43e0822a198488deb9d0",
+              "modules": [],
+              "kind": "theory"
+            },
+            {
+              "id": "esm006-c2-s6",
+              "title": "Συμπεράσματα",
+              "mdPath": "md/esm006/c2/s6.md",
+              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@8a346e17afcb49998a6e586f94fc14c7",
+              "modules": [],
+              "kind": "theory"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
