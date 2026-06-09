@@ -30,7 +30,10 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		!event.locals.admin &&
 		!event.url.pathname.startsWith('/login') &&
 		!event.url.pathname.startsWith('/api') &&
-		!event.url.pathname.startsWith('/admin/login')
+		!event.url.pathname.startsWith('/admin/login') &&
+		// Public theory library (serves only public manifest/content, no user data)
+		!event.url.pathname.startsWith('/library') &&
+		!event.url.pathname.startsWith('/content')
 	) {
 		return Response.redirect(new URL('/login', event.url), 302);
 	}

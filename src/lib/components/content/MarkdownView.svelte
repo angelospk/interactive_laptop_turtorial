@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { resolveContentUrl } from '$lib/content/contentUrl';
-	import { renderMarkdown } from './renderMarkdown';
+	import { renderMarkdown, type TocEntry } from './renderMarkdown';
 
 	interface Props {
 		mdPath: string;
 		sourceUrl?: string;
+		/** Bindable: table of contents extracted from the rendered markdown. */
+		toc?: TocEntry[];
 	}
-	let { mdPath, sourceUrl }: Props = $props();
+	let { mdPath, sourceUrl, toc = $bindable([]) }: Props = $props();
 
 	let html = $state('');
 	let error = $state('');
@@ -16,13 +18,16 @@
 		const url = resolveContentUrl(mdPath);
 		loading = true;
 		error = '';
+		toc = [];
 		fetch(url)
 			.then((r) => {
 				if (!r.ok) throw new Error(`HTTP ${r.status}`);
 				return r.text();
 			})
 			.then((txt) => {
-				html = renderMarkdown(txt);
+				const rendered = renderMarkdown(txt);
+				html = rendered.html;
+				toc = rendered.toc;
 			})
 			.catch((e) => {
 				error = e.message;
