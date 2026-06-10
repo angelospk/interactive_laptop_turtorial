@@ -35,7 +35,7 @@
 
 {#if isOpen}
 	<div
-		class="absolute bottom-14 right-4 z-50 w-80 rounded-xl bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur-md transition-all"
+		class="absolute bottom-14 right-4 z-50 w-80 rounded-xl border border-white/10 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur-xl transition-all [font-family:Segoe_UI,system-ui,sans-serif]"
 		transition:slide={{ duration: 200, axis: 'y' }}
         onclick={(e) => e.stopPropagation()}
 	>
@@ -43,12 +43,12 @@
 		<div class="mb-6 grid grid-cols-3 gap-4">
 			<!-- WiFi -->
 			<button
-				class="flex flex-col items-center gap-2"
+				class="flex w-full flex-col items-center gap-2"
 				onclick={toggleWifi}
 			>
 				<div
-					class="flex h-12 w-24 items-center justify-center rounded-full border transition-all
-                    {osState.wifiEnabled ? 'bg-blue-500 border-blue-500' : 'bg-slate-700 border-slate-600 hover:bg-slate-600'}"
+					class="flex h-12 w-full items-center justify-center rounded-md border transition-all
+                    {osState.wifiEnabled ? 'bg-blue-500 border-blue-400' : 'bg-white/5 border-white/10 hover:bg-white/10'}"
 				>
 					<Wifi class="h-5 w-5 {osState.wifiEnabled ? 'text-white' : 'text-slate-300'}" />
 				</div>
@@ -59,12 +59,12 @@
 
 			<!-- Bluetooth -->
 			<button
-				class="flex flex-col items-center gap-2"
+				class="flex w-full flex-col items-center gap-2"
 				onclick={toggleBluetooth}
 			>
 				<div
-					class="flex h-12 w-24 items-center justify-center rounded-full border transition-all
-                    {osState.bluetoothEnabled ? 'bg-blue-500 border-blue-500' : 'bg-slate-700 border-slate-600 hover:bg-slate-600'}"
+					class="flex h-12 w-full items-center justify-center rounded-md border transition-all
+                    {osState.bluetoothEnabled ? 'bg-blue-500 border-blue-400' : 'bg-white/5 border-white/10 hover:bg-white/10'}"
 				>
 					<Bluetooth class="h-5 w-5 {osState.bluetoothEnabled ? 'text-white' : 'text-slate-300'}" />
 				</div>
@@ -73,12 +73,12 @@
 
             <!-- Airplane Mode -->
 			<button
-				class="flex flex-col items-center gap-2"
+				class="flex w-full flex-col items-center gap-2"
 				onclick={toggleAirplane}
 			>
 				<div
-					class="flex h-12 w-24 items-center justify-center rounded-full border transition-all
-                    {osState.airplaneMode ? 'bg-blue-500 border-blue-500' : 'bg-slate-700 border-slate-600 hover:bg-slate-600'}"
+					class="flex h-12 w-full items-center justify-center rounded-md border transition-all
+                    {osState.airplaneMode ? 'bg-blue-500 border-blue-400' : 'bg-white/5 border-white/10 hover:bg-white/10'}"
 				>
 					<Plane class="h-5 w-5 {osState.airplaneMode ? 'text-white' : 'text-slate-300'}" />
 				</div>

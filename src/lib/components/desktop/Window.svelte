@@ -75,7 +75,7 @@
 {#if isOpen && !isMinimized}
 	<div
 		class={cn(
-			'absolute flex flex-col overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-100',
+			'absolute flex flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl transition-all duration-100 [font-family:Segoe_UI,system-ui,sans-serif]',
 			className
 		)}
 		style="
@@ -91,49 +91,49 @@
 	>
 		<!-- Title Bar -->
 		<div
-			class="flex h-10 cursor-move items-center justify-between border-b bg-slate-100 px-2 select-none"
+			class="flex h-9 cursor-move items-center justify-between border-b border-black/5 bg-neutral-100 pl-3 select-none"
 			onmousedown={startDrag}
 			role="group"
 		>
-			<div class="flex items-center text-sm text-slate-600">
+			<div class="flex items-center text-[13px] leading-none text-neutral-700">
 				{#if Icon}
 					<Icon class="mr-2 h-4 w-4" />
 				{/if}
 				{title}
 			</div>
-			<div class="flex gap-1">
+			<div class="flex h-full items-stretch">
 				<Button
 					variant="ghost"
 					size="icon"
-					class="h-8 w-8 hover:bg-slate-200"
+					class="h-full w-11 rounded-none text-neutral-600 hover:bg-black/5 hover:text-neutral-800"
 					onclick={(e) => {
 						e.stopPropagation();
 						onMinimize();
 					}}
 				>
-					<Minus class="h-4 w-4" />
+					<Minus class="h-4 w-4" strokeWidth={1.5} />
 				</Button>
 				<Button
 					variant="ghost"
 					size="icon"
-					class="h-8 w-8 hover:bg-slate-200"
+					class="h-full w-11 rounded-none text-neutral-600 hover:bg-black/5 hover:text-neutral-800"
 					onclick={(e) => {
 						e.stopPropagation();
 						onMaximize();
 					}}
 				>
-					<Square class="h-4 w-4" />
+					<Square class="h-3.5 w-3.5" strokeWidth={1.5} />
 				</Button>
 				<Button
-					variant="destructive"
+					variant="ghost"
 					size="icon"
-					class="h-8 w-8"
+					class="h-full w-11 rounded-none text-neutral-600 hover:bg-[#c42b1c] hover:text-white"
 					onclick={(e) => {
 						e.stopPropagation();
 						onClose();
 					}}
 				>
-					<X class="h-4 w-4" />
+					<X class="h-4 w-4" strokeWidth={1.5} />
 				</Button>
 			</div>
 		</div>

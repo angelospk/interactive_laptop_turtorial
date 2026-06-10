@@ -18,7 +18,13 @@
 		ZoomOut,
 		Download,
 		Shield,
-		Send
+		Send,
+		Newspaper,
+		Landmark,
+		Cloud,
+		Mic,
+		MoreVertical,
+		Settings
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
@@ -34,6 +40,9 @@
 		url: string;
 		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking' | 'history' | 'browser-settings';
 		isSecure: boolean;
+		// Per-tab visual history stack (back/forward). Purely cosmetic — never emits onAction.
+		stack: string[];
+		stackIndex: number;
 	};
 
 	type HistoryItem = {
@@ -42,7 +51,9 @@
 		time: string;
 	};
 
-	let tabs = $state<Tab[]>([{ id: 1, title: 'Αρχική', url: 'home', type: 'home', isSecure: true }]);
+	let tabs = $state<Tab[]>([
+		{ id: 1, title: 'Αρχική', url: 'home', type: 'home', isSecure: true, stack: ['home'], stackIndex: 0 }
+	]);
 	let activeTabId = $state(1);
 	let addressBarInput = $state('');
 	let searchBarInput = $state('');
@@ -74,7 +85,10 @@
 					id: index + 1,
 					title,
 					url,
-					type
+					type,
+					isSecure: true,
+					stack: [url],
+					stackIndex: 0
 				};
 			});
 			activeTabId = 1;
@@ -124,7 +138,15 @@
 	function addTab() {
 		const newId = Math.max(...tabs.map((t) => t.id)) + 1;
 		// Start with empty/home tab
-		tabs.push({ id: newId, title: 'Νέα καρτέλα', url: '', type: 'home', isSecure: true });
+		tabs.push({
+			id: newId,
+			title: 'Νέα καρτέλα',
+			url: '',
+			type: 'home',
+			isSecure: true,
+			stack: [''],
+			stackIndex: 0
+		});
 		activeTabId = newId;
 		addressBarInput = '';
 		searchBarInput = '';
@@ -145,19 +167,15 @@
 		onAction('close-tab');
 	}
 
-	function navigate(url: string) {
+	// Derive page type/title/security from a URL string (mirrors the original navigate() logic exactly)
+	function classify(url: string): { type: Tab['type']; title: string; isSecure: boolean } {
 		let type: Tab['type'] = 'search';
 		let title = url;
 		let isSecure = true;
-		showCookieBanner = false; // Reset cookie banner
 
 		if (url.includes('news') || url.includes('eidiseis')) {
 			type = 'news';
 			title = 'Ειδήσεις';
-			// Show cookie banner for news site
-			setTimeout(() => {
-				if (activeTab.type === 'news') showCookieBanner = true;
-			}, 1000);
 		} else if (url.includes('weather') || url.includes('kairos')) {
 			type = 'weather';
 			title = 'Καιρός';
@@ -167,12 +185,6 @@
 		} else if (url.includes('bank')) {
 			type = 'banking';
 			title = 'e-Banking';
-			// Reset bank state if navigating freshly
-			if (activeTab.type !== 'banking') {
-				bankState = 'login';
-				bankUsername = '';
-				bankPassword = '';
-			}
 		} else if (url === 'history') {
 			type = 'history';
 			title = 'Ιστορικό';
@@ -189,12 +201,58 @@
 			isSecure = false;
 		}
 
+		return { type, title, isSecure };
+	}
+
+	// Fake loading progress bar (purely visual)
+	let isLoading = $state(false);
+	let loadProgress = $state(0);
+	let loadTimers: ReturnType<typeof setTimeout>[] = [];
+	function startLoading() {
+		loadTimers.forEach(clearTimeout);
+		loadTimers = [];
+		isLoading = true;
+		loadProgress = 8;
+		loadTimers.push(setTimeout(() => (loadProgress = 75), 50));
+		loadTimers.push(setTimeout(() => (loadProgress = 100), 450));
+		loadTimers.push(
+			setTimeout(() => {
+				isLoading = false;
+				loadProgress = 0;
+			}, 650)
+		);
+	}
+
+	function navigate(url: string) {
+		showCookieBanner = false; // Reset cookie banner
+		const { type, title, isSecure } = classify(url);
+
+		if (type === 'news') {
+			// Show cookie banner for news site
+			setTimeout(() => {
+				if (activeTab.type === 'news') showCookieBanner = true;
+			}, 1000);
+		} else if (type === 'banking') {
+			// Reset bank state if navigating freshly
+			if (activeTab.type !== 'banking') {
+				bankState = 'login';
+				bankUsername = '';
+				bankPassword = '';
+			}
+		}
+
 		const tab = tabs.find((t) => t.id === activeTabId);
 		if (tab) {
 			tab.url = url;
 			tab.type = type;
 			tab.title = title;
 			tab.isSecure = isSecure;
+			// Record in the per-tab back/forward stack (visual only)
+			if (tab.stackIndex < tab.stack.length - 1) {
+				tab.stack = tab.stack.slice(0, tab.stackIndex + 1);
+			}
+			tab.stack.push(url);
+			tab.stackIndex = tab.stack.length - 1;
 		}
 
 		// Add to history if it's a real page
@@ -206,8 +264,60 @@
 			});
 		}
 
+		startLoading();
 		onAction('navigate', { url, isSecure });
 	}
+
+	// Back/Forward: cosmetic only. Deliberately NEVER call onAction (no false lesson completions)
+	// and never touch the global history list or cookie banner timers.
+	let canGoBack = $derived((activeTab?.stackIndex ?? 0) > 0);
+	let canGoForward = $derived(
+		activeTab ? activeTab.stackIndex < (activeTab.stack?.length ?? 1) - 1 : false
+	);
+
+	function applyStackUrl(tab: Tab, url: string) {
+		showCookieBanner = false;
+		if (url === '') {
+			tab.url = '';
+			tab.type = 'home';
+			tab.title = 'Νέα καρτέλα';
+			tab.isSecure = true;
+			addressBarInput = '';
+		} else {
+			const { type, title, isSecure } = classify(url);
+			tab.url = url;
+			tab.type = type;
+			tab.title = title;
+			tab.isSecure = isSecure;
+			addressBarInput = url === 'home' ? '' : url;
+		}
+		startLoading();
+	}
+
+	function goBack() {
+		const tab = tabs.find((t) => t.id === activeTabId);
+		if (!tab || tab.stackIndex <= 0) return;
+		tab.stackIndex--;
+		applyStackUrl(tab, tab.stack[tab.stackIndex]);
+	}
+
+	function goForward() {
+		const tab = tabs.find((t) => t.id === activeTabId);
+		if (!tab || tab.stackIndex >= tab.stack.length - 1) return;
+		tab.stackIndex++;
+		applyStackUrl(tab, tab.stack[tab.stackIndex]);
+	}
+
+	// Refresh: cosmetic spin + loading bar, emits nothing.
+	let refreshSpinning = $state(false);
+	function handleRefresh() {
+		startLoading();
+		refreshSpinning = true;
+		setTimeout(() => (refreshSpinning = false), 650);
+	}
+
+	// Visual-only three-dot menu
+	let showMoreMenu = $state(false);
 
 	function handleSearch() {
 		if (searchBarInput.trim()) {
@@ -359,44 +469,89 @@
 		</div>
 	{/if}
 
-	<!-- 1. Tab Bar -->
-	<div class="flex items-end gap-1 border-b border-slate-300 bg-slate-100 px-2 pt-2">
+	<!-- 1. Tab Bar (Chrome-like) -->
+	<div class="flex items-end gap-0.5 bg-[#dee1e6] px-2 pt-1.5">
 		{#each tabs as tab}
 			<div
-				class="group relative flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2 text-sm transition-colors select-none {activeTabId ===
+				class="group relative -mb-px flex max-w-[200px] cursor-pointer items-center gap-2 rounded-t-lg px-3 py-2 text-sm transition-colors select-none {activeTabId ===
 				tab.id
-					? 'bg-white font-medium text-slate-900 shadow-sm'
-					: 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
+					? 'bg-white font-medium text-slate-900'
+					: 'text-slate-600 hover:bg-[#cdd1d7]'}"
 				onclick={() => switchTab(tab.id)}
 				role="button"
 				tabindex="0"
 				onkeydown={(e) => e.key === 'Enter' && switchTab(tab.id)}
 			>
-				{#if tab.isSecure}
-					<Lock class="h-3 w-3 text-green-600" />
-				{:else}
-					<ShieldAlert class="h-3 w-3 text-red-500" />
-				{/if}
+				<!-- Favicon per fake site -->
+				<span class="flex h-4 w-4 shrink-0 items-center justify-center">
+					{#if !tab.isSecure}
+						<ShieldAlert class="h-3.5 w-3.5 text-red-500" />
+					{:else if tab.type === 'news'}
+						<Newspaper class="h-3.5 w-3.5 text-red-600" />
+					{:else if tab.type === 'banking'}
+						<Landmark class="h-3.5 w-3.5 text-blue-700" />
+					{:else if tab.type === 'gov'}
+						<Shield class="h-3.5 w-3.5 text-[#003476]" />
+					{:else if tab.type === 'weather'}
+						<Cloud class="h-3.5 w-3.5 text-sky-500" />
+					{:else if tab.type === 'history'}
+						<Clock class="h-3.5 w-3.5 text-slate-500" />
+					{:else if tab.type === 'browser-settings'}
+						<Settings class="h-3.5 w-3.5 text-slate-500" />
+					{:else}
+						<span
+							class="font-sans text-[13px] leading-none font-bold {activeTabId === tab.id
+								? 'text-blue-500'
+								: 'text-blue-500/80'}">G</span
+						>
+					{/if}
+				</span>
 				<span class="max-w-[100px] truncate">{tab.title}</span>
 				<button
-					class="rounded-full p-0.5 opacity-0 group-hover:opacity-100 hover:bg-slate-200"
+					class="rounded-full p-0.5 transition-opacity hover:bg-slate-200 {activeTabId === tab.id
+						? 'opacity-100'
+						: 'opacity-0 group-hover:opacity-100'}"
 					onclick={(e) => closeTab(tab.id, e)}
 				>
 					<X class="h-3 w-3" />
 				</button>
 			</div>
 		{/each}
-		<button class="mb-1 rounded-full p-2 hover:bg-slate-200" onclick={addTab} title="Νέα καρτέλα">
+		<button class="mb-1 ml-1 rounded-full p-1.5 hover:bg-[#cdd1d7]" onclick={addTab} title="Νέα καρτέλα">
 			<Plus class="h-4 w-4 text-slate-600" />
 		</button>
 	</div>
 
 	<!-- 2. Toolbar (Address Bar) -->
-	<div class="flex items-center gap-2 border-b border-slate-200 bg-white p-2">
-		<div class="flex gap-1 text-slate-400">
-			<ArrowLeft class="h-5 w-5 cursor-pointer hover:text-slate-600" />
-			<ArrowRight class="h-5 w-5 cursor-pointer hover:text-slate-600" />
-			<RefreshCw class="h-5 w-5 cursor-pointer hover:text-slate-600" />
+	<div class="flex items-center gap-1.5 bg-white px-2 py-1.5">
+		<div class="flex items-center">
+			<button
+				class="rounded-full p-1.5 {canGoBack
+					? 'text-slate-600 hover:bg-slate-100'
+					: 'cursor-default text-slate-300'}"
+				onclick={goBack}
+				disabled={!canGoBack}
+				title="Πίσω"
+			>
+				<ArrowLeft class="h-5 w-5" />
+			</button>
+			<button
+				class="rounded-full p-1.5 {canGoForward
+					? 'text-slate-600 hover:bg-slate-100'
+					: 'cursor-default text-slate-300'}"
+				onclick={goForward}
+				disabled={!canGoForward}
+				title="Μπροστά"
+			>
+				<ArrowRight class="h-5 w-5" />
+			</button>
+			<button
+				class="rounded-full p-1.5 text-slate-600 hover:bg-slate-100"
+				onclick={handleRefresh}
+				title="Ανανέωση"
+			>
+				<RefreshCw class="h-5 w-5 {refreshSpinning ? 'animate-spin' : ''}" />
+			</button>
 		</div>
 		<div class="relative flex-1">
 			<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
@@ -408,7 +563,7 @@
 			</div>
 			<input
 				type="text"
-				class="w-full rounded-full bg-slate-100 py-1.5 pr-4 pl-9 text-sm outline-none focus:ring-2 {activeTab.isSecure
+				class="w-full rounded-full bg-slate-100 py-1.5 pr-10 pl-9 text-sm outline-none hover:bg-slate-200/70 focus:bg-white focus:ring-2 focus:shadow-md {activeTab.isSecure
 					? 'focus:ring-green-500'
 					: 'focus:ring-red-500'}"
 				placeholder="Πληκτρολογήστε μια διεύθυνση Web"
@@ -417,19 +572,20 @@
 					if (e.key === 'Enter') navigate(addressBarInput);
 				}}
 			/>
-		</div>
-		<div class="flex items-center">
+			<!-- Chrome-style bookmark star inside the address bar -->
 			<button
-				class="rounded-full p-2 hover:bg-slate-100"
+				class="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1 hover:bg-slate-200"
 				onclick={bookmarkSite}
 				title="Προσθήκη στα Αγαπημένα"
 			>
 				<Star
-					class="h-5 w-5 {bookmarkedSites.includes(activeTab.url)
+					class="h-4 w-4 {bookmarkedSites.includes(activeTab.url)
 						? 'fill-yellow-400 text-yellow-400'
 						: 'text-slate-400'}"
 				/>
 			</button>
+		</div>
+		<div class="flex items-center">
 			<button class="rounded-full p-2 hover:bg-slate-100" onclick={openHistory} title="Ιστορικό">
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
@@ -441,7 +597,41 @@
 					<ZoomIn class="h-5 w-5 text-slate-400" />
 				</button>
 			{/if}
+			<!-- Visual-only three-dot menu -->
+			<div class="relative">
+				<button
+					class="rounded-full p-2 hover:bg-slate-100"
+					onclick={() => (showMoreMenu = !showMoreMenu)}
+					title="Μενού"
+				>
+					<MoreVertical class="h-5 w-5 text-slate-400" />
+				</button>
+				{#if showMoreMenu}
+					<div
+						class="absolute top-full right-0 z-40 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+					>
+						{#each ['Νέα καρτέλα', 'Ιστορικό', 'Λήψεις', 'Αγαπημένα', 'Ρυθμίσεις'] as item}
+							<button
+								class="block w-full cursor-default px-4 py-1.5 text-left text-sm text-slate-400"
+								disabled
+							>
+								{item}
+							</button>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</div>
+	</div>
+
+	<!-- Fake loading progress bar (visual only) -->
+	<div class="relative h-0.5 w-full border-b border-slate-200 bg-transparent">
+		{#if isLoading}
+			<div
+				class="absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300 ease-out"
+				style="width: {loadProgress}%"
+			></div>
+		{/if}
 	</div>
 
 	<!-- Find Bar -->
@@ -475,69 +665,87 @@
 		{/if}
 		{#if activeTab.type === 'home'}
 			<!-- Google Simulator -->
-			<div class="flex h-full flex-col items-center justify-center p-4">
-				<h1 class="mb-8 text-4xl font-bold text-slate-700">
-					<span class="text-blue-500">G</span><span class="text-red-500">o</span><span
-						class="text-yellow-500">o</span
-					><span class="text-blue-500">g</span><span class="text-green-500">l</span><span
-						class="text-red-500">e</span
+			<div class="flex h-full flex-col items-center justify-center bg-white p-4">
+				<h1 class="mb-8 text-6xl font-medium tracking-tight">
+					<span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span
+						class="text-[#FBBC05]">o</span
+					><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span
+						class="text-[#EA4335]">e</span
 					>
 				</h1>
-				<div class="relative w-full max-w-md">
+				<div class="relative w-full max-w-xl">
 					<Search class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
 					<input
 						type="text"
-						class="w-full rounded-full border border-slate-300 py-3 pr-4 pl-12 shadow-sm outline-none focus:shadow-md"
+						class="w-full rounded-full border border-slate-200 py-3 pr-12 pl-12 shadow-[0_1px_6px_rgba(32,33,36,0.18)] outline-none hover:shadow-[0_1px_8px_rgba(32,33,36,0.25)] focus:shadow-[0_1px_8px_rgba(32,33,36,0.25)]"
 						placeholder="Αναζήτηση στο Google"
 						bind:value={searchBarInput}
 						onkeydown={(e) => {
 							if (e.key === 'Enter') handleSearch();
 						}}
 					/>
+					<Mic class="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-[#4285F4]" />
 				</div>
-				<div class="mt-6 flex gap-4">
-					<Button variant="secondary" onclick={handleSearch}>Αναζήτηση Google</Button>
-					<Button variant="ghost">Αισθάνομαι τυχερός</Button>
+				<div class="mt-7 flex gap-3">
+					<Button
+						variant="secondary"
+						class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
+						onclick={handleSearch}>Αναζήτηση Google</Button
+					>
+					<Button
+						variant="ghost"
+						class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
+						>Αισθάνομαι τυχερός</Button
+					>
 				</div>
 			</div>
 		{:else if activeTab.type === 'search'}
 			<!-- Search Results Simulation -->
 			<div class="mx-auto min-h-full max-w-4xl bg-white p-6">
-				<div class="mb-6 flex items-center gap-4 border-b pb-4">
-					<div class="text-2xl font-bold">
-						<span class="text-blue-500">G</span><span class="text-red-500">o</span><span
-							class="text-yellow-500">o</span
-						><span class="text-blue-500">g</span><span class="text-green-500">l</span><span
-							class="text-red-500">e</span
+				<div class="mb-3 flex items-center gap-4 border-b pb-4">
+					<div class="text-2xl font-medium">
+						<span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span
+							class="text-[#FBBC05]">o</span
+						><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span
+							class="text-[#EA4335]">e</span
 						>
 					</div>
 					<div class="relative max-w-xl flex-1">
 						<input
 							type="text"
-							class="w-full rounded-full border border-slate-300 px-4 py-2 shadow-sm outline-none"
+							class="w-full rounded-full border border-slate-200 py-2 pr-10 pl-4 shadow-[0_1px_6px_rgba(32,33,36,0.15)] outline-none"
 							value={searchBarInput.replace('search?q=', '') ||
 								addressBarInput.replace('search?q=', '')}
 							readonly
 						/>
+						<Search class="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-[#4285F4]" />
 					</div>
+				</div>
+
+				<div class="mb-6 text-sm text-[#70757a]">
+					Περίπου 1.240.000 αποτελέσματα (0,42 δευτερόλεπτα)
 				</div>
 
 				<div class="space-y-8">
 					<!-- Fake Result 1 -->
 					<div
-						class="group cursor-pointer"
+						class="group max-w-2xl cursor-pointer"
 						onclick={() => navigate('https://www.wikipedia.org')}
 						role="button"
 						tabindex="0"
 						onkeydown={(e) => e.key === 'Enter' && navigate('https://www.wikipedia.org')}
 					>
-						<div class="mb-1 text-sm text-slate-700">https://el.wikipedia.org › wiki</div>
+						<div class="mb-1 text-sm text-[#202124]">
+							<span class="text-[#202124]">el.wikipedia.org</span><span class="text-[#5f6368]">
+								› wiki</span
+							>
+						</div>
 						<div
-							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
+							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
 						>
 							{searchBarInput.replace('search?q=', '') || 'Αποτελέσματα'} - Βικιπαίδεια
 						</div>
-						<div class="mt-1 text-sm text-slate-600">
+						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
 							Η Βικιπαίδεια είναι μια ελεύθερη, διαδικτυακή εγκυκλοπαίδεια που γράφεται και
 							συντηρείται από εθελοντές...
 						</div>
@@ -545,33 +753,41 @@
 
 					<!-- Fake Result 2 -->
 					<div
-						class="group cursor-pointer"
+						class="group max-w-2xl cursor-pointer"
 						onclick={() => navigate('news')}
 						role="button"
 						tabindex="0"
 						onkeydown={(e) => e.key === 'Enter' && navigate('news')}
 					>
-						<div class="mb-1 text-sm text-slate-700">https://www.news247.gr › eidiseis</div>
+						<div class="mb-1 text-sm text-[#202124]">
+							<span class="text-[#202124]">www.news247.gr</span><span class="text-[#5f6368]">
+								› eidiseis</span
+							>
+						</div>
 						<div
-							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
+							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
 						>
 							Ειδήσεις τώρα - Όλες οι εξελίξεις
 						</div>
-						<div class="mt-1 text-sm text-slate-600">
+						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
 							Διαβάστε τις τελευταίες ειδήσεις από την Ελλάδα και τον κόσμο. Πολιτική, Οικονομία,
 							Κοινωνία...
 						</div>
 					</div>
 
 					<!-- Fake Result 3 -->
-					<div class="group cursor-pointer">
-						<div class="mb-1 text-sm text-slate-700">https://www.example.com › info</div>
+					<div class="group max-w-2xl cursor-pointer">
+						<div class="mb-1 text-sm text-[#202124]">
+							<span class="text-[#202124]">www.example.com</span><span class="text-[#5f6368]">
+								› info</span
+							>
+						</div>
 						<div
-							class="text-xl font-medium text-blue-800 group-hover:text-blue-600 visited:text-purple-900 hover:underline"
+							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
 						>
 							Πληροφορίες για {searchBarInput.replace('search?q=', '')}
 						</div>
-						<div class="mt-1 text-sm text-slate-600">
+						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
 							Βρείτε όλα όσα ψάχνετε εδώ. Γρήγορα και εύκολα αποτελέσματα για την αναζήτησή σας.
 						</div>
 					</div>
@@ -579,36 +795,84 @@
 			</div>
 		{:else if activeTab.type === 'news'}
 			<!-- News Site Simulator -->
-			<div class="mx-auto min-h-full max-w-3xl bg-white p-8 shadow-sm">
-				<header class="mb-6 border-b pb-4">
-					<h1 class="font-serif text-3xl font-bold text-slate-900">Ειδήσεις 24/7</h1>
-					<p class="mt-1 text-sm text-slate-500">
-						{new Date().toLocaleDateString('el-GR', {
-							weekday: 'long',
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric'
-						})}
-					</p>
+			<div class="mx-auto min-h-full max-w-3xl bg-white shadow-sm">
+				<!-- Masthead -->
+				<header class="border-b-4 border-red-600">
+					<div class="flex items-end justify-between px-8 pt-6 pb-3">
+						<h1 class="font-serif text-4xl font-black tracking-tight text-slate-900">
+							Ειδήσεις 24/7
+						</h1>
+						<p class="text-sm text-slate-500">
+							{new Date().toLocaleDateString('el-GR', {
+								weekday: 'long',
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric'
+							})}
+						</p>
+					</div>
+					<nav class="flex gap-5 bg-red-600 px-8 py-2 text-sm font-medium text-white">
+						<span>Πολιτική</span>
+						<span>Οικονομία</span>
+						<span>Κοινωνία</span>
+						<span>Τεχνολογία</span>
+						<span>Αθλητικά</span>
+					</nav>
 				</header>
-				<article class="space-y-4">
-					<div class="mb-4 h-48 w-full rounded-lg bg-slate-200"></div>
-					<h2 class="text-2xl font-bold">Νέα πλατφόρμα εκπαίδευσης για αρχάριους</h2>
-					<p class="leading-relaxed text-slate-700">
-						Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την τεχνολογία. Η
-						πλατφόρμα προσφέρει μαθήματα για Windows, Internet, και Email με διαδραστικό τρόπο.
-					</p>
-					<p class="leading-relaxed text-slate-700">
-						Οι χρήστες μπορούν να μάθουν πώς να προστατεύονται από ηλεκτρονικές απάτες και πώς να
-						χρησιμοποιούν αποτελεσματικά τον υπολογιστή τους.
-					</p>
-				</article>
+				<div class="p-8">
+					<article class="space-y-4">
+						<div
+							class="mb-4 flex h-48 w-full items-center justify-center rounded-lg bg-gradient-to-br from-slate-200 to-slate-300"
+						>
+							<Newspaper class="h-10 w-10 text-slate-400" />
+						</div>
+						<h2 class="font-serif text-3xl font-bold leading-tight">
+							Νέα πλατφόρμα εκπαίδευσης για αρχάριους
+						</h2>
+						<p class="leading-relaxed text-slate-700">
+							Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την τεχνολογία.
+							Η πλατφόρμα προσφέρει μαθήματα για Windows, Internet, και Email με διαδραστικό τρόπο.
+						</p>
+						<p class="leading-relaxed text-slate-700">
+							Οι χρήστες μπορούν να μάθουν πώς να προστατεύονται από ηλεκτρονικές απάτες και πώς να
+							χρησιμοποιούν αποτελεσματικά τον υπολογιστή τους.
+						</p>
+					</article>
+					<!-- Secondary article cards -->
+					<div class="mt-8 grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-2">
+						<div class="overflow-hidden rounded-lg border border-slate-200">
+							<div class="flex h-28 items-center justify-center bg-slate-200">
+								<Newspaper class="h-6 w-6 text-slate-400" />
+							</div>
+							<div class="p-4">
+								<h3 class="font-serif text-lg font-bold leading-snug">
+									Ο καιρός το σαββατοκύριακο: Ηλιοφάνεια σε όλη τη χώρα
+								</h3>
+								<p class="mt-1 text-sm text-slate-500">πριν από 2 ώρες</p>
+							</div>
+						</div>
+						<div class="overflow-hidden rounded-lg border border-slate-200">
+							<div class="flex h-28 items-center justify-center bg-slate-200">
+								<Newspaper class="h-6 w-6 text-slate-400" />
+							</div>
+							<div class="p-4">
+								<h3 class="font-serif text-lg font-bold leading-snug">
+									Πώς να αναγνωρίσετε ένα ύποπτο email
+								</h3>
+								<p class="mt-1 text-sm text-slate-500">πριν από 5 ώρες</p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		{:else if activeTab.type === 'gov'}
 			<!-- Gov.gr Simulator -->
 			<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
-				<header class="mb-8 border-b-4 border-blue-600 pb-4">
-					<h1 class="text-3xl font-bold text-blue-900">Gov.gr</h1>
+				<header class="mb-8 border-b border-slate-200 pb-4">
+					<div class="flex items-center gap-3">
+						<span class="rounded bg-[#003476] px-2.5 py-1.5 text-2xl font-bold text-white">ΓΔ</span>
+						<h1 class="text-3xl font-bold lowercase text-[#003476]">Gov.gr</h1>
+					</div>
 					<p class="mt-2 text-slate-600">Ενιαία Ψηφιακή Πύλη της Δημόσιας Διοίκησης</p>
 				</header>
 
@@ -684,9 +948,12 @@
 		{:else if activeTab.type === 'banking'}
 			<!-- Banking Simulator -->
 			<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
-				<header class="mb-8 flex items-center justify-between border-b border-yellow-400 pb-4">
+				<header class="mb-8 flex items-center justify-between border-b-4 border-blue-800 pb-4">
 					<div>
-						<h1 class="text-3xl font-bold text-slate-900">National Bank</h1>
+						<div class="flex items-center gap-3">
+							<span class="rounded bg-blue-800 p-2 text-white"><Landmark class="h-6 w-6" /></span>
+							<h1 class="text-3xl font-bold text-blue-900">National Bank</h1>
+						</div>
 						<p class="mt-2 text-slate-600">e-Banking</p>
 					</div>
 					{#if bankState !== 'login'}
@@ -722,7 +989,7 @@
 								{/if}
 							</div>
 							<Button
-								class="w-full bg-yellow-500 text-black hover:bg-yellow-600"
+								class="w-full bg-blue-800 text-white hover:bg-blue-900"
 								onclick={loginBank}>Login</Button
 							>
 						</div>
@@ -783,7 +1050,7 @@
 										/>
 									</div>
 									<Button
-										class="bg-yellow-500 text-black hover:bg-yellow-600"
+										class="bg-blue-800 text-white hover:bg-blue-900"
 										onclick={transferMoney}
 									>
 										{t('bank_transfer_button')}

@@ -13,7 +13,11 @@
 		ClipboardPaste,
 		ArrowLeft,
 		Home,
-		Scissors
+		Scissors,
+		Search,
+		ChevronRight,
+		Monitor,
+		Download
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
@@ -215,29 +219,12 @@
 </script>
 
 <div class="flex h-full flex-col overflow-hidden bg-white">
-	<!-- Address Bar -->
-	<div class="flex items-center gap-2 border-b bg-slate-100 p-2">
-		<Button variant="ghost" size="icon" onclick={goUp} disabled={currentFolderId === 'root'}>
-			<ArrowLeft class="h-5 w-5" />
-		</Button>
-		<div class="flex flex-1 items-center gap-1 rounded border bg-white px-2 py-1 text-sm">
-			<Home class="h-4 w-4 text-slate-500" />
-			{#each currentPath as part, i}
-				{#if i > 0}
-					<span class="text-slate-400">/</span>
-				{/if}
-				<button class="hover:text-blue-600 hover:underline" onclick={() => navigate(part.id)}>
-					{part.name}
-				</button>
-			{/each}
-		</div>
-	</div>
-
-	<!-- Toolbar -->
-	<div class="flex gap-2 border-b bg-slate-50 p-2">
+	<!-- Command Bar (Win11 style) -->
+	<div class="flex items-center gap-1 border-b bg-slate-50 px-2 py-1.5">
 		<Button
-			variant="outline"
+			variant="ghost"
 			size="sm"
+			class="gap-2 rounded-md text-slate-700 hover:bg-slate-200/70"
 			onclick={() => {
 				if (!folderJustCreated) {
 					isCreatingFolder = true;
@@ -245,12 +232,13 @@
 				}
 			}}
 		>
-			<Folder class="mr-2 h-4 w-4" /> Νέος Φάκελος
+			<Folder class="h-4 w-4 fill-amber-400 text-amber-400" /> Νέος Φάκελος
 		</Button>
-		<div class="h-8 w-px bg-slate-300"></div>
+		<div class="mx-1 h-6 w-px bg-slate-300"></div>
 		<Button
 			variant="ghost"
 			size="icon"
+			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Αποκοπή"
 			onclick={() => copyItem(true)}
 			disabled={!selectedItemId}
@@ -260,6 +248,7 @@
 		<Button
 			variant="ghost"
 			size="icon"
+			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Αντιγραφή"
 			onclick={() => copyItem(false)}
 			disabled={!selectedItemId}
@@ -269,15 +258,18 @@
 		<Button
 			variant="ghost"
 			size="icon"
+			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Επικόλληση"
 			onclick={pasteItem}
 			disabled={!clipboard}
 		>
 			<ClipboardPaste class="h-4 w-4" />
 		</Button>
+		<div class="mx-1 h-6 w-px bg-slate-300"></div>
 		<Button
 			variant="ghost"
 			size="icon"
+			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Μετονομασία"
 			onclick={() => {
 				if (selectedItemId) {
@@ -294,7 +286,7 @@
 			variant="ghost"
 			size="icon"
 			title="Διαγραφή"
-			class="text-red-600 hover:text-red-700"
+			class="h-8 w-8 rounded-md text-red-600 hover:bg-slate-200/70 hover:text-red-700"
 			onclick={deleteItem}
 			disabled={!selectedItemId}
 		>
@@ -302,8 +294,56 @@
 		</Button>
 	</div>
 
-	<!-- Content Area -->
-	<ContextMenu.Root>
+	<!-- Address Bar -->
+	<div class="flex items-center gap-1.5 border-b bg-slate-100 px-2 py-1.5">
+		<Button
+			variant="ghost"
+			size="icon"
+			class="h-8 w-8 rounded-full hover:bg-slate-200"
+			onclick={goUp}
+			disabled={currentFolderId === 'root'}
+		>
+			<ArrowLeft class="h-5 w-5" />
+		</Button>
+		<div class="flex h-8 flex-1 items-center gap-0.5 rounded-md border bg-white px-2 text-sm">
+			<Home class="mr-1 h-4 w-4 shrink-0 text-slate-500" />
+			{#each currentPath as part, i}
+				{#if i > 0}
+					<ChevronRight class="h-3.5 w-3.5 shrink-0 text-slate-400" />
+				{/if}
+				<button
+					class="rounded px-1.5 py-0.5 text-slate-700 hover:bg-slate-100"
+					onclick={() => navigate(part.id)}
+				>
+					{part.name}
+				</button>
+			{/each}
+		</div>
+		<!-- Decorative search box (visual only) -->
+		<div class="flex h-8 w-40 shrink-0 items-center gap-1.5 rounded-md border bg-white px-2">
+			<Search class="h-3.5 w-3.5 shrink-0 text-slate-400" />
+			<input
+				class="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
+				placeholder="Αναζήτηση"
+				readonly
+				tabindex="-1"
+			/>
+		</div>
+	</div>
+
+	<!-- Content Area with decorative navigation pane -->
+	<div class="flex min-h-0 flex-1">
+		<!-- Navigation pane (decorative only) -->
+		<aside class="hidden w-36 shrink-0 border-r bg-slate-50/70 px-1.5 py-2 sm:block" aria-hidden="true">
+			<div class="space-y-0.5 text-sm text-slate-600">
+				<div class="flex items-center gap-2 rounded-md px-2 py-1"><Monitor class="h-4 w-4 shrink-0 text-sky-600" /> <span class="truncate">Επιφάνεια εργασίας</span></div>
+				<div class="flex items-center gap-2 rounded-md px-2 py-1"><Download class="h-4 w-4 shrink-0 text-emerald-600" /> <span class="truncate">Λήψεις</span></div>
+				<div class="flex items-center gap-2 rounded-md px-2 py-1"><FileText class="h-4 w-4 shrink-0 text-blue-500" /> <span class="truncate">Έγγραφα</span></div>
+				<div class="flex items-center gap-2 rounded-md px-2 py-1"><ImageIcon class="h-4 w-4 shrink-0 text-purple-500" /> <span class="truncate">Εικόνες</span></div>
+			</div>
+		</aside>
+
+		<ContextMenu.Root>
 		<ContextMenu.Trigger class="flex-1 overflow-y-auto p-4">
 			<div
 				class="grid h-full grid-cols-4 content-start gap-4"
@@ -314,7 +354,7 @@
 					<ContextMenu.Root>
 						<ContextMenu.Trigger>
 							<div
-								class="group flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-transparent p-4 transition-all hover:border-blue-200 hover:bg-blue-50"
+								class="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-transparent p-3 transition-colors hover:bg-slate-100"
 								class:bg-blue-100={selectedItemId === item.id}
 								class:border-blue-300={selectedItemId === item.id}
 								onclick={(e) => {
@@ -338,17 +378,18 @@
 								}}
 							>
 								{#if item.type === 'folder'}
-									<Folder class="h-12 w-12 fill-yellow-500 text-yellow-500" />
+									<Folder class="h-12 w-12 fill-amber-400 text-amber-500" />
 								{:else if item.type === 'image'}
 									<ImageIcon class="h-12 w-12 text-purple-500" />
 								{:else}
 									<FileText class="h-12 w-12 text-blue-500" />
 								{/if}
 								<span
-									class="line-clamp-2 text-center text-sm leading-tight break-all text-slate-700 group-hover:text-blue-700"
+									class="line-clamp-2 text-center text-sm leading-tight break-all text-slate-700"
 								>
 									{item.name}
 								</span>
+								<span class="text-[10px] leading-none text-slate-400">Τροποποιήθηκε: 5/6/2026</span>
 							</div>
 						</ContextMenu.Trigger>
 						<ContextMenu.Content>
@@ -424,7 +465,16 @@
 				<ClipboardPaste class="mr-2 h-4 w-4" /> Επικόλληση
 			</ContextMenu.Item>
 		</ContextMenu.Content>
-	</ContextMenu.Root>
+		</ContextMenu.Root>
+	</div>
+
+	<!-- Status Bar (display only) -->
+	<div class="flex shrink-0 items-center gap-3 border-t bg-slate-50 px-3 py-1 text-xs text-slate-500">
+		<span>{currentItems.length} {currentItems.length === 1 ? 'στοιχείο' : 'στοιχεία'}</span>
+		{#if selectedItemId}
+			<span class="border-l border-slate-300 pl-3">1 επιλεγμένο στοιχείο</span>
+		{/if}
+	</div>
 
 	<!-- Dialogs -->
 	<Dialog.Root bind:open={isCreatingFolder}>

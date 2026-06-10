@@ -35,7 +35,7 @@
 		role="button"
 		tabindex="-1"
 	>
-		<div class="relative w-full max-w-4xl rounded-lg bg-slate-800/90 p-8 shadow-2xl backdrop-blur">
+		<div class="relative w-full max-w-4xl rounded-xl bg-slate-800/90 p-8 shadow-2xl backdrop-blur [font-family:Segoe_UI,system-ui,sans-serif]">
 			<!-- Header -->
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold text-white">Προβολή Εργασιών</h2>
@@ -57,12 +57,12 @@
 						)}
 						{#if appDef}
 							<button
-								class="group flex flex-col items-center gap-3 rounded-lg bg-slate-700/50 p-6 transition-all hover:scale-105 hover:bg-slate-600/50"
+								class="group flex flex-col items-center gap-3 rounded-xl bg-slate-700/50 p-6 transition-all hover:scale-105 hover:bg-slate-600/50 hover:ring-2 hover:ring-sky-400/70"
 								onclick={() => handleAppClick(app.id)}
 							>
 								<!-- App Icon -->
 								<div
-									class="flex h-16 w-16 items-center justify-center rounded-lg bg-slate-600 text-white transition-colors group-hover:bg-slate-500"
+									class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-600 text-white transition-colors group-hover:bg-slate-500"
 								>
 									<svelte:component this={appDef.icon} class="h-8 w-8" />
 								</div>

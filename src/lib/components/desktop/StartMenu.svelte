@@ -14,11 +14,22 @@
 		onAppClick: (appId: string) => void;
 		onClose: () => void;
 	}>();
+
+	let searchQuery = $state('');
+
+	// Display-only filter: app ids, labels and onAppClick payloads stay unchanged.
+	const filteredApps = $derived(
+		searchQuery.trim() === ''
+			? apps
+			: apps.filter((app: { id: string; name: string; icon: any }) =>
+					app.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+				)
+	);
 </script>
 
 {#if isOpen}
 	<div
-		class="absolute bottom-14 left-4 z-50 flex h-[500px] w-[600px] flex-col overflow-hidden rounded-lg border border-slate-700 bg-slate-900/95 text-white shadow-2xl backdrop-blur animate-in slide-in-from-bottom-5 fade-in duration-200"
+		class="absolute bottom-14 left-1/2 z-50 flex h-[500px] w-[600px] max-w-[calc(100%-2rem)] -translate-x-1/2 flex-col overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 text-white shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5 fade-in duration-200 [font-family:Segoe_UI,system-ui,sans-serif]"
 		onclick={(e) => e.stopPropagation()}
 	>
 		<!-- Search Bar -->
@@ -28,6 +39,7 @@
 				<input
 					type="text"
 					placeholder="Αναζήτηση εφαρμογών, ρυθμίσεων και εγγράφων"
+					bind:value={searchQuery}
 					class="w-full rounded-full border-none bg-slate-800 py-2.5 pl-10 pr-4 text-sm text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500"
 				/>
 			</div>
@@ -43,7 +55,7 @@
 			</div>
 
 			<div class="grid grid-cols-6 gap-4">
-				{#each apps as app}
+				{#each filteredApps as app (app.id)}
 					<button
 						class="flex flex-col items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white/10"
 						onclick={() => {
@@ -56,6 +68,8 @@
 						</div>
 						<span class="truncate text-xs font-medium text-white">{app.name}</span>
 					</button>
+				{:else}
+					<p class="col-span-6 py-4 text-center text-xs text-slate-400">Δεν βρέθηκαν εφαρμογές</p>
 				{/each}
 			</div>
 
