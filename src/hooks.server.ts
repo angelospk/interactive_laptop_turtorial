@@ -33,7 +33,9 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		!event.url.pathname.startsWith('/admin/login') &&
 		// Public theory library (serves only public manifest/content, no user data)
 		!event.url.pathname.startsWith('/library') &&
-		!event.url.pathname.startsWith('/content')
+		!event.url.pathname.startsWith('/content') &&
+		// Public "Απάτη ή Όχι;" scam-spotter practice (seed-only, no user data)
+		!event.url.pathname.startsWith('/apates')
 	) {
 		return Response.redirect(new URL('/login', event.url), 302);
 	}
