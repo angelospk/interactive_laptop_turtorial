@@ -2,7 +2,7 @@
 	import ScamSpotterLesson from '$lib/components/lessons/interactive/ScamSpotterLesson.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { ShieldAlert, Mail, MessageSquare } from 'lucide-svelte';
+	import { ShieldAlert, Mail, MessageSquare, MessageCircle, Phone } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -10,7 +10,7 @@
 	let selected = $state<number | null>(null);
 	let lastScore = $state<number | null>(null);
 
-	const exercises = data.exercises;
+	const exercises = $derived(data.exercises);
 
 	function start(i: number) {
 		lastScore = null;
@@ -26,14 +26,22 @@
 		selected = null;
 	}
 
-	function iconFor(ex: (typeof exercises)[number]) {
-		return ex.config?.cards?.[0]?.channel === 'sms' ? MessageSquare : Mail;
-	}
+	const channelIcons = { email: Mail, sms: MessageSquare, viber: MessageCircle, phone: Phone };
+	const channelTitles = {
+		email: 'Απάτες σε Email',
+		sms: 'Απάτες σε SMS & μηνύματα',
+		viber: 'Απάτες σε Viber & μηνύματα',
+		phone: 'Απάτες σε τηλεφωνικές κλήσεις'
+	};
 
+	function channelOf(ex: (typeof exercises)[number]) {
+		return (ex.config?.cards?.[0]?.channel ?? 'email') as keyof typeof channelIcons;
+	}
+	function iconFor(ex: (typeof exercises)[number]) {
+		return channelIcons[channelOf(ex)] ?? Mail;
+	}
 	function titleFor(ex: (typeof exercises)[number]) {
-		return ex.config?.cards?.[0]?.channel === 'sms'
-			? 'Απάτες σε SMS & μηνύματα'
-			: 'Απάτες σε Email';
+		return channelTitles[channelOf(ex)] ?? 'Απάτες';
 	}
 </script>
 

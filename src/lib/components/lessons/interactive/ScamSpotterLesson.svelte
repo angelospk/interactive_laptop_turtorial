@@ -7,6 +7,8 @@
 		XCircle,
 		Mail,
 		MessageSquare,
+		MessageCircle,
+		Phone,
 		Link as LinkIcon,
 		Lightbulb
 	} from 'lucide-svelte';
@@ -20,7 +22,7 @@
 
 	interface ScamCard {
 		id: string;
-		channel: 'email' | 'sms';
+		channel: 'email' | 'sms' | 'viber' | 'phone';
 		from: string;
 		fromAddress?: string;
 		subject?: string;
@@ -31,6 +33,14 @@
 		explanation: string;
 		takeaway?: string;
 	}
+
+	// Per-channel label shown on the verdict buttons / call screen.
+	const channelLabel: Record<ScamCard['channel'], string> = {
+		email: 'Email',
+		sms: 'SMS',
+		viber: 'Viber',
+		phone: 'Τηλεφωνική κλήση'
+	};
 
 	const config = $derived(lesson.config as { instructions?: string; cards?: ScamCard[] });
 	const cards = $derived(Array.isArray(config?.cards) ? config.cards : []);
@@ -128,6 +138,51 @@
 								>
 									<LinkIcon class="h-4 w-4 shrink-0" aria-hidden="true" />
 									<span><span class="sr-only">Σύνδεσμος: </span>{card.link}</span>
+								</p>
+							{/if}
+						</div>
+					{:else if card.channel === 'viber'}
+						<!-- Viber chat -->
+						<div class="flex items-center gap-2 border-b border-purple-200 bg-purple-50 p-3">
+							<MessageCircle class="h-5 w-5 text-purple-600" aria-hidden="true" />
+							<p class="font-semibold text-slate-900">
+								<span class="sr-only">Επαφή Viber: </span>{card.from}
+							</p>
+							<span class="ml-auto text-xs font-medium text-purple-500">Viber</span>
+						</div>
+						<div class="bg-purple-50/40 p-4">
+							<div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-white p-3 shadow-sm ring-1 ring-purple-100">
+								<p class="whitespace-pre-line leading-relaxed text-slate-800">{card.body}</p>
+								{#if card.link}
+									<p class="mt-1 break-all font-mono text-sm text-blue-700">
+										<span class="sr-only">Σύνδεσμος: </span>{card.link}
+									</p>
+								{/if}
+							</div>
+						</div>
+					{:else if card.channel === 'phone'}
+						<!-- Incoming phone call -->
+						<div class="flex items-center gap-3 border-b border-slate-200 bg-slate-800 p-4 text-white">
+							<div
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/90"
+								aria-hidden="true"
+							>
+								<Phone class="h-5 w-5" />
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="text-xs text-slate-300">Εισερχόμενη κλήση</p>
+								<p class="truncate font-semibold">{card.from}</p>
+								{#if card.fromAddress}
+									<p class="truncate text-sm text-slate-400">{card.fromAddress}</p>
+								{/if}
+							</div>
+						</div>
+						<div class="space-y-2 p-4">
+							<p class="text-sm font-medium text-slate-500">Ο/Η καλών λέει:</p>
+							<p class="whitespace-pre-line leading-relaxed text-slate-700 italic">«{card.body}»</p>
+							{#if card.link}
+								<p class="break-all font-mono text-sm text-blue-700">
+									<span class="sr-only">Αναφέρει: </span>{card.link}
 								</p>
 							{/if}
 						</div>

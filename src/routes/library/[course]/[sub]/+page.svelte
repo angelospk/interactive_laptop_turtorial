@@ -30,14 +30,34 @@
 
 		<MarkdownView mdPath={data.sub.mdPath} sourceUrl={data.sub.sourceUrl} bind:toc />
 
-		{#if data.sub.modules.length}
+		{#if data.sub.lessonLinks?.length}
 			<div class="mt-8 border-t pt-4">
+				<h3 class="mb-3 font-semibold">Δοκιμάστε το στην πράξη</h3>
+				<ul class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+					{#each data.sub.lessonLinks as link}
+						<li>
+							<a
+								class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-lg px-4 py-3 text-base font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+								href="/modules/{link.module}/{link.lesson}"
+							>
+								<span aria-hidden="true">▶</span>
+								{link.label ?? 'Άσκηση'}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+
+		{#if data.sub.modules.length}
+			<div class="mt-6 {data.sub.lessonLinks?.length ? '' : 'border-t pt-4'}">
 				<h3 class="mb-2 font-semibold">Σχετικές ασκήσεις</h3>
 				<ul class="flex flex-wrap gap-2">
 					{#each data.sub.modules as mod}
 						<li>
-							<a class="bg-secondary rounded px-3 py-1 text-sm underline" href="/modules/{mod}"
-								>{mod}</a
+							<a
+								class="bg-secondary hover:bg-secondary/80 focus-visible:ring-ring inline-block rounded-lg px-4 py-2 text-base focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+								href="/modules/{mod}">{mod}</a
 							>
 						</li>
 					{/each}

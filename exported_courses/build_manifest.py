@@ -62,6 +62,16 @@ SUBSECTION_OVERRIDES = {
     "Εφαρμογή παρουσιάσεων": ([], "theory+challenge"),
 }
 
+# Deep links from a library subsection to specific interactive lessons.
+# Keyed by subsection (seq) display name. Each entry: {module, lesson(=lessonKey), label}.
+# Optional — emitted as `lessonLinks` only when present (backwards-compatible).
+LESSON_LINKS = {
+    "Βασικές έννοιες της κυβερνοασφάλειας": [
+        {"module": "module10", "lesson": "scam-spotter-email", "label": "Απάτη ή Όχι; — Email"},
+        {"module": "module10", "lesson": "scam-spotter-sms", "label": "Απάτη ή Όχι; — SMS"},
+    ],
+}
+
 
 def load_structures():
     s = json.load(open(os.path.join(CACHE, "_raw_structure.json")))
@@ -177,10 +187,14 @@ def main():
                     f.write("\n".join(parts).strip() + "\n")
                 mods, kind = SUBSECTION_OVERRIDES.get(seq_name, (ch_modules, ch_kind))
                 source_url = f"{BASE_SITE}/courses/course-v1:EAPSI+{slug}+2025_S2/jump_to/{seq['id']}"
-                chapter_entry["subsections"].append({
+                sub_entry = {
                     "id": sub_id, "title": seq_name, "mdPath": rel_md,
                     "sourceUrl": source_url, "modules": mods, "kind": kind,
-                })
+                }
+                lesson_links = LESSON_LINKS.get(seq_name)
+                if lesson_links:
+                    sub_entry["lessonLinks"] = lesson_links
+                chapter_entry["subsections"].append(sub_entry)
             if chapter_entry["subsections"]:
                 course_entry["chapters"].append(chapter_entry)
         manifest["courses"].append(course_entry)

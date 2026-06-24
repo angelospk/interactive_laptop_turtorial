@@ -3,7 +3,7 @@ import { module10Lessons } from '$lib/db/seeds/module10-lessons';
 
 export interface ScamCard {
 	id: string;
-	channel: 'email' | 'sms';
+	channel: 'email' | 'sms' | 'viber' | 'phone';
 	from: string;
 	fromAddress?: string;
 	subject?: string;

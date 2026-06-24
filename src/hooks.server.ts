@@ -23,9 +23,11 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		event.locals.admin = true;
 	}
 
-	// Redirect to login if not authenticated and not already on login page or API
-	// Allow /admin/login without user session
+	// Redirect to login if not authenticated and not already on login page or API.
+	// Only for navigational GET requests — never bounce actions/data/non-GET to an HTML
+	// login page. Allow /admin/login without a user session.
 	if (
+		event.request.method === 'GET' &&
 		!event.locals.user &&
 		!event.locals.admin &&
 		!event.url.pathname.startsWith('/login') &&
@@ -37,7 +39,13 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		// Public "Απάτη ή Όχι;" scam-spotter practice (seed-only, no user data)
 		!event.url.pathname.startsWith('/apates')
 	) {
-		return Response.redirect(new URL('/login', event.url), 302);
+		// Remember where the user was heading so login can send them back there.
+		const target = (event.url.pathname + event.url.search).slice(0, 512);
+		const loginUrl = new URL('/login', event.url);
+		if (target && target !== '/') {
+			loginUrl.searchParams.set('redirectTo', target);
+		}
+		return Response.redirect(loginUrl, 302);
 	}
 
 	return resolve(event);

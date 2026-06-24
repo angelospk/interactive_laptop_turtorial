@@ -37,7 +37,10 @@ describe('module10 scam-spotter lesson seeds', () => {
 				expect(typeof card.id, `${lesson.id}: card.id`).toBe('string');
 				expect((card.id as string).trim()).not.toBe('');
 
-				expect(['email', 'sms'], `${lesson.id}/${card.id}: channel`).toContain(card.channel);
+				expect(
+					['email', 'sms', 'viber', 'phone'],
+					`${lesson.id}/${card.id}: channel`
+				).toContain(card.channel);
 
 				expect(typeof card.body, `${lesson.id}/${card.id}: body`).toBe('string');
 				expect((card.body as string).trim()).not.toBe('');
@@ -68,5 +71,21 @@ describe('module10 scam-spotter lesson seeds', () => {
 
 		// Existing assessment lessons stay intact.
 		expect(module10Lessons.find((l) => l.id === 'module10-lesson8')?.lessonType).toBe('quiz');
+	});
+
+	it('covers all four channels across the pool', () => {
+		const channels = new Set(
+			scamLessons.flatMap((l) =>
+				((l.config as { cards?: Array<{ channel?: string }> }).cards ?? []).map((c) => c.channel)
+			)
+		);
+		expect(channels).toEqual(new Set(['email', 'sms', 'viber', 'phone']));
+	});
+
+	it('extends the chain: viber after sms, phone after viber', () => {
+		const viber = module10Lessons.find((l) => l.lessonKey === 'scam-spotter-viber');
+		const phone = module10Lessons.find((l) => l.lessonKey === 'scam-spotter-phone');
+		expect(viber?.requiredLessonId).toBe('module10-lesson10');
+		expect(phone?.requiredLessonId).toBe('module10-lesson11');
 	});
 });
