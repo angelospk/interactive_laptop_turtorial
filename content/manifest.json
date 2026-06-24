@@ -707,7 +707,19 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module10",
+                  "lesson": "scam-spotter-email",
+                  "label": "Απάτη ή Όχι; — Email"
+                },
+                {
+                  "module": "module10",
+                  "lesson": "scam-spotter-sms",
+                  "label": "Απάτη ή Όχι; — SMS"
+                }
+              ]
             },
             {
               "id": "esm005-c1-s3",

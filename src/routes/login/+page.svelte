@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -12,7 +13,9 @@
 	} from '$lib/components/ui/card';
 	import * as m from '$lib/paraglide/messages.js';
 	import { toast } from 'svelte-sonner';
+	import { BookOpen } from '@lucide/svelte';
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
+	import { safeRedirect } from '$lib/utils/redirect';
 
 	let username = $state('');
 	let loading = $state(false);
@@ -45,8 +48,9 @@
 			// Force re-run of all load functions to pick up the new session
 			await invalidateAll();
 
-			// Redirect to home
-			goto('/');
+			// Send the user back where they were heading (validated), else home.
+			const target = safeRedirect($page.url.searchParams.get('redirectTo')) ?? '/';
+			goto(target, { replaceState: true });
 		} catch (error) {
 			toast.error(error instanceof Error ? error.message : m.login_error_failed());
 		} finally {
@@ -102,6 +106,14 @@
 
 			<div class="text-center text-sm text-muted-foreground">
 				<p>{m.login_no_password()}</p>
+			</div>
+
+			<div class="border-t pt-4 text-center">
+				<Button variant="outline" href="/library" class="w-full gap-2 p-6 text-lg">
+					<BookOpen class="h-5 w-5" />
+					Βιβλιοθήκη — διαβάστε υλικό
+				</Button>
+				<p class="mt-2 text-sm text-muted-foreground">Ελεύθερη πρόσβαση, χωρίς σύνδεση</p>
 			</div>
 		</CardContent>
 	</Card>

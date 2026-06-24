@@ -1,11 +1,19 @@
 import { resolveContentUrl } from './contentUrl';
 
+/** Deep link from a library subsection straight to a specific interactive lesson. */
+export interface LessonLink {
+	module: string;
+	lesson: string;
+	label?: string;
+}
 export interface Subsection {
 	id: string;
 	title: string;
 	mdPath: string;
 	sourceUrl: string;
 	modules: string[];
+	/** Optional, backwards-compatible: links to specific lessons (not just modules). */
+	lessonLinks?: LessonLink[];
 	kind: string;
 }
 export interface Chapter {

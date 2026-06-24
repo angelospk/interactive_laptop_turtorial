@@ -12,6 +12,8 @@
 		progress,
 		startIndex = 0,
 		onExit,
+		onLessonChange,
+		moduleId = null,
 		nextModuleId = null,
 		isLastModule = false
 	} = $props<{
@@ -19,6 +21,9 @@
 		progress: Record<string, any>;
 		startIndex?: number;
 		onExit?: () => void;
+		/** Called with the new lessonKey when the runner moves within the module (for URL sync). */
+		onLessonChange?: (lessonKey: string) => void;
+		moduleId?: string | null;
 		nextModuleId?: string | null;
 		isLastModule?: boolean;
 	}>();
@@ -138,10 +143,17 @@
 		}
 	}
 
+	// Notify the host route so it can keep the URL in sync with the current lesson.
+	function syncUrl() {
+		const key = lessons[currentLessonIndex]?.lessonKey;
+		if (key) onLessonChange?.(key);
+	}
+
 	function nextLesson() {
 		cancelAutoAdvance();
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
+			syncUrl();
 		} else if (nextModuleId) {
 			goto(`/modules/${nextModuleId}`);
 		} else if (onExit) {
@@ -153,6 +165,7 @@
 		cancelAutoAdvance();
 		if (currentLessonIndex > 0) {
 			currentLessonIndex--;
+			syncUrl();
 		}
 	}
 

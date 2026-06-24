@@ -12,7 +12,7 @@
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { goto } from '$app/navigation';
+	import { BookOpen } from '@lucide/svelte';
 
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
@@ -30,9 +30,13 @@
 
 <main class="container mx-auto p-4 md:p-8">
 	<!-- Header with Language Switcher and Logout -->
-	<div class="mb-8 flex items-center justify-between">
-		<div class="flex gap-4">
+	<div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+		<div class="flex flex-wrap items-center gap-3">
 			<LogoutButton />
+			<Button variant="outline" href="/library" class="gap-2 text-base">
+				<BookOpen class="h-5 w-5" />
+				Βιβλιοθήκη
+			</Button>
 		</div>
 		<LanguageToggle />
 	</div>

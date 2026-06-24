@@ -11,11 +11,13 @@
 	import type { Lesson } from '$lib/db/schema';
 	import * as m from '$lib/paraglide/messages.js';
 
-	let { lesson, progress, isLocked, onclick } = $props<{
+	let { lesson, progress, isLocked, onclick, href } = $props<{
 		lesson: Lesson;
 		progress: any;
 		isLocked: boolean;
-		onclick: () => void;
+		onclick?: (e?: Event) => void;
+		/** When provided (and not locked) the card renders as a real link for deep-linking. */
+		href?: string;
 	}>();
 
 	// Helper to get message safely
@@ -23,13 +25,13 @@
 		// @ts-ignore - Dynamic access to messages
 		return m[key]?.() || key;
 	}
+
+	// Shared visual style for both the link and the disabled-button variants.
+	const wrapperClass =
+		'block w-full text-left transition-all hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100';
 </script>
 
-<button
-	class="w-full text-left transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
-	{onclick}
-	disabled={isLocked}
->
+{#snippet cardBody()}
 	<Card
 		class="h-full overflow-hidden {progress?.completed
 			? 'border-green-200 bg-green-50'
@@ -68,4 +70,14 @@
 			</div>
 		</CardContent>
 	</Card>
-</button>
+{/snippet}
+
+{#if href && !isLocked}
+	<a {href} class={wrapperClass} onclick={(e) => onclick?.(e)} data-sveltekit-preload-data="hover">
+		{@render cardBody()}
+	</a>
+{:else}
+	<button class={wrapperClass} onclick={(e) => onclick?.(e)} disabled={isLocked}>
+		{@render cardBody()}
+	</button>
+{/if}
