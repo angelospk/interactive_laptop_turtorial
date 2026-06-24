@@ -6,6 +6,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { BookOpen, ArrowRight, Check } from '@lucide/svelte';
 	import { reveal } from '$lib/actions/reveal';
+	import { groupModulesByCategory } from '$lib/config/moduleOrganization';
 
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
@@ -18,6 +19,9 @@
 	function getProgress(moduleId: string) {
 		return getModuleProgress(moduleId, data.moduleLessonIds, data.progress);
 	}
+
+	// Group the flat module list into themed categories for easier navigation.
+	let groupedModules = $derived(groupModulesByCategory(data.modules ?? []));
 </script>
 
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
@@ -64,64 +68,83 @@
 			{/if}
 		</section>
 
-		<!-- Module grid -->
-		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-			{#each data.modules as module, i (module.id)}
-				{@const moduleProgress = getProgress(module.id)}
-				{@const done = moduleProgress >= 100}
-				<a
-					href={`/modules/${module.id}`}
-					data-reveal
-					use:reveal={{ delay: 60 + i * 60 }}
-					class="group bezel-shell block shadow-soft transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-soft-lg focus-visible:ring-4 focus-visible:ring-brand/20 focus-visible:outline-none"
-				>
-					<div class="bezel-core flex h-full flex-col gap-5 p-6 sm:p-7">
-						<div class="flex items-start justify-between gap-4">
-							<div
-								class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-bold {done
-									? 'bg-emerald-500/15 text-emerald-600'
-									: 'bg-brand/10 text-brand'}"
-							>
-								{#if done}
-									<Check class="h-6 w-6" strokeWidth={2.5} />
-								{:else}
-									{i + 1}
-								{/if}
-							</div>
-							<span class="text-sm font-semibold tabular-nums text-muted-foreground">
-								{moduleProgress}%
-							</span>
+		<!-- Module grid, grouped into themed categories -->
+		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string }, num: number)}
+			{@const moduleProgress = getProgress(module.id)}
+			{@const done = moduleProgress >= 100}
+			<a
+				href={`/modules/${module.id}`}
+				data-reveal
+				use:reveal={{ delay: 40 + (num % 4) * 50 }}
+				class="group bezel-shell block shadow-soft transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-soft-lg focus-visible:ring-4 focus-visible:ring-brand/20 focus-visible:outline-none"
+			>
+				<div class="bezel-core flex h-full flex-col gap-5 p-6 sm:p-7">
+					<div class="flex items-start justify-between gap-4">
+						<div
+							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-bold {done
+								? 'bg-emerald-500/15 text-emerald-600'
+								: 'bg-brand/10 text-brand'}"
+						>
+							{#if done}
+								<Check class="h-6 w-6" strokeWidth={2.5} />
+							{:else}
+								{num}
+							{/if}
 						</div>
-
-						<div class="flex-1">
-							<h2 class="text-xl font-bold text-foreground sm:text-2xl">
-								{messages[module.titleKey] ? messages[module.titleKey]() : module.id}
-							</h2>
-							<p class="mt-2 line-clamp-2 text-base text-muted-foreground">
-								{messages[module.descriptionKey] ? messages[module.descriptionKey]() : ''}
-							</p>
-						</div>
-
-						<!-- Progress rail -->
-						<div class="h-2 w-full overflow-hidden rounded-full bg-secondary">
-							<div
-								class="h-full rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] {done
-									? 'bg-emerald-500'
-									: 'bg-brand'}"
-								style="width: {Math.max(moduleProgress, 2)}%"
-							></div>
-						</div>
-
-						<div class="flex items-center justify-between">
-							<span class="text-base font-semibold text-foreground">{messages.start_module()}</span>
-							<span
-								class="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-brand transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105"
-							>
-								<ArrowRight class="h-5 w-5" strokeWidth={2} />
-							</span>
-						</div>
+						<span class="text-sm font-semibold tabular-nums text-muted-foreground">
+							{moduleProgress}%
+						</span>
 					</div>
-				</a>
+
+					<div class="flex-1">
+						<h2 class="text-xl font-bold text-foreground sm:text-2xl">
+							{messages[module.titleKey] ? messages[module.titleKey]() : module.id}
+						</h2>
+						<p class="mt-2 line-clamp-2 text-base text-muted-foreground">
+							{messages[module.descriptionKey] ? messages[module.descriptionKey]() : ''}
+						</p>
+					</div>
+
+					<!-- Progress rail -->
+					<div class="h-2 w-full overflow-hidden rounded-full bg-secondary">
+						<div
+							class="h-full rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] {done
+								? 'bg-emerald-500'
+								: 'bg-brand'}"
+							style="width: {Math.max(moduleProgress, 2)}%"
+						></div>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<span class="text-base font-semibold text-foreground">{messages.start_module()}</span>
+						<span
+							class="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-brand transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105"
+						>
+							<ArrowRight class="h-5 w-5" strokeWidth={2} />
+						</span>
+					</div>
+				</div>
+			</a>
+		{/snippet}
+
+		<div class="space-y-12">
+			{#each groupedModules as group (group.category?.id)}
+				<section data-reveal use:reveal>
+					<div class="mb-5 flex items-baseline gap-3">
+						<h2 class="text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+							{group.category?.title}
+						</h2>
+						<span class="h-px flex-1 bg-border"></span>
+						<span class="text-xs font-medium tabular-nums text-muted-foreground">
+							{group.modules.length}
+						</span>
+					</div>
+					<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+						{#each group.modules as module, mi (module.id)}
+							{@render moduleCard(module, mi + 1)}
+						{/each}
+					</div>
+				</section>
 			{/each}
 		</div>
 

@@ -7,6 +7,7 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 - 🔐 Simple username-based authentication with redirect-after-login (deep links survive the login step)
 - 🔗 Deep-linkable lessons — every lesson has its own URL (`/modules/<module>/<lessonKey>`), shareable and bookmarkable
 - 📚 Library ↔ lesson bridge — theory subsections can link straight to the matching interactive lesson
+- 🗂️ Themed module categories on the home page + labelled sub-sections inside long modules, for easy navigation
 - 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)

@@ -6,11 +6,15 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { isLessonLocked } from '$lib/utils/progress';
 	import { reveal } from '$lib/actions/reveal';
+	import { buildLessonSections } from '$lib/config/moduleOrganization';
 
 	let { data } = $props();
 
 	let moduleLessons = $derived(data.moduleLessons || []);
 	let progress = $derived((data.progress || {}) as Record<string, any>);
+
+	// For long modules, split the lessons into labelled sub-sections (null = plain grid).
+	let sections = $derived(buildLessonSections($page.params.id, moduleLessons));
 
 	// Notice surfaced after a guarded redirect from a lesson URL (locked / missing).
 	let notice = $derived($page.url.searchParams.get('notice'));
@@ -83,21 +87,49 @@
 			</div>
 		{/if}
 
-		{#if moduleLessons.length > 0}
-			<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-				{#each moduleLessons as lesson, i (lesson.id)}
-					{@const locked = checkLocked(i, lesson)}
-					<div data-reveal use:reveal={{ delay: i * 50 }}>
-						<LessonCard
-							{lesson}
-							progress={progress[lesson.id]}
-							isLocked={locked}
-							href={`/modules/${$page.params.id}/${encodeURIComponent(lesson.lessonKey)}`}
-							onclick={requestFullscreenOnNavigate}
-						/>
-					</div>
-				{/each}
+		{#snippet lessonItem(lesson: any, index: number)}
+			{@const locked = checkLocked(index, lesson)}
+			<div data-reveal use:reveal={{ delay: (index % 3) * 50 }}>
+				<LessonCard
+					{lesson}
+					progress={progress[lesson.id]}
+					isLocked={locked}
+					href={`/modules/${$page.params.id}/${encodeURIComponent(lesson.lessonKey)}`}
+					onclick={requestFullscreenOnNavigate}
+				/>
 			</div>
+		{/snippet}
+
+		{#if moduleLessons.length > 0}
+			{#if sections}
+				<!-- Long module: lessons grouped into labelled sub-sections -->
+				<div class="space-y-10">
+					{#each sections as section (section.title)}
+						<section data-reveal use:reveal>
+							<div class="mb-5 flex items-baseline gap-3">
+								<h2 class="text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+									{section.title}
+								</h2>
+								<span class="h-px flex-1 bg-border"></span>
+								<span class="text-xs font-medium tabular-nums text-muted-foreground">
+									{section.items.length}
+								</span>
+							</div>
+							<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+								{#each section.items as { lesson, index } (lesson.id)}
+									{@render lessonItem(lesson, index)}
+								{/each}
+							</div>
+						</section>
+					{/each}
+				</div>
+			{:else}
+				<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+					{#each moduleLessons as lesson, i (lesson.id)}
+						{@render lessonItem(lesson, i)}
+					{/each}
+				</div>
+			{/if}
 		{:else}
 			<div class="bezel-shell mx-auto max-w-md shadow-soft" data-reveal use:reveal>
 				<div class="bezel-core px-6 py-12 text-center">

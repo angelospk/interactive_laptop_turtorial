@@ -197,18 +197,20 @@
     filter: blur(0);
   }
 }
-[data-reveal] {
+/* Only hide pre-reveal content when JS is running (.js set by the head script).
+   Without JS — or if hydration never arms the observer — content stays visible. */
+.js [data-reveal]:not(.is-visible) {
   opacity: 0;
 }
-[data-reveal].is-visible {
+.js [data-reveal].is-visible {
   animation: reveal-up 0.8s cubic-bezier(0.32, 0.72, 0, 1) forwards;
   animation-delay: var(--reveal-delay, 0ms);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
+  .js [data-reveal]:not(.is-visible) {
     opacity: 1;
   }
-  [data-reveal].is-visible {
+  .js [data-reveal].is-visible {
     animation: none;
   }
 }

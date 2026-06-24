@@ -17,11 +17,13 @@ export function reveal(node: HTMLElement, options: { delay?: number } = {}) {
 		return;
 	}
 
+	const show = () => node.classList.add('is-visible');
+
 	const observer = new IntersectionObserver(
 		(entries) => {
 			for (const entry of entries) {
 				if (entry.isIntersecting) {
-					node.classList.add('is-visible');
+					show();
 					observer.unobserve(node);
 				}
 			}
@@ -31,8 +33,17 @@ export function reveal(node: HTMLElement, options: { delay?: number } = {}) {
 
 	observer.observe(node);
 
+	// Safety net: never leave content invisible. If something prevents the
+	// observer from firing (silent failure, odd layout), reveal anyway so the
+	// page is always readable — important for the accessibility-first audience.
+	const fallback = setTimeout(() => {
+		if (!node.classList.contains('is-visible')) show();
+		observer.disconnect();
+	}, 2500);
+
 	return {
 		destroy() {
+			clearTimeout(fallback);
 			observer.disconnect();
 		}
 	};
