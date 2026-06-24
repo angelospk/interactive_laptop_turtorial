@@ -11,7 +11,7 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 - 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)
-- 🎣 Phishing & scam-recognition module with "Scam or Not?" (`scam-spotter`) exercises — realistic Greek email/SMS scenarios with per-signal explanations
+- 🎣 Phishing & scam-recognition module with "Scam or Not?" (`scam-spotter`) exercises — 28 realistic Greek scenarios across 4 channels (email, SMS, Viber/messaging, phone/vishing) with per-signal explanations
 - 🎯 Multi-level difficulty system (Beginner/Intermediate/Advanced)
 - 🌍 Bilingual support (English/Greek) via inlang
 - 💾 SQLite database (local dev + Turso for production)
