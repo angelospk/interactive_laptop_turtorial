@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Μάθημα 1 — Ποντίκι, Πληκτρολόγιο & Οθόνη</title>
+<style>
+:root{
+  --bg:#f4f1ea; --ink:#1d2433; --muted:#5a6478; --card:#fff; --line:#e2ddd2;
+  --accent:#2f6f6b; --accent-soft:#e7f0ef; --warn:#a81b28;
+  --shadow:0 10px 30px rgba(20,28,46,.10); --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45;overflow:hidden}
+.deck{height:100vh;width:100vw;position:relative}
+.slide{position:absolute;inset:0;display:none;padding:clamp(18px,3vw,52px) clamp(18px,4vw,76px) 92px;overflow-y:auto;animation:fade .35s ease}
+.slide.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:flex;align-items:center;gap:clamp(14px,1.6vw,24px);border-bottom:4px solid var(--accent);
+  padding-bottom:clamp(10px,1.3vw,18px);margin-bottom:clamp(14px,1.7vw,24px)}
+.badge{flex:none;width:clamp(54px,5vw,84px);height:clamp(54px,5vw,84px);border-radius:20px;background:var(--accent);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:clamp(24px,2.5vw,40px);box-shadow:var(--shadow)}
+.head h1{font-size:clamp(24px,2.9vw,46px);letter-spacing:-.5px;line-height:1.1}
+.head .kicker{color:var(--accent);font-weight:700;font-size:clamp(13px,1.25vw,19px);text-transform:uppercase;letter-spacing:1px}
+.grid{display:grid;grid-template-columns:var(--cols,1.4fr 1fr);gap:clamp(14px,1.6vw,26px);align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(16px,1.6vw,26px);box-shadow:var(--shadow)}
+.card + .card{margin-top:clamp(12px,1.4vw,20px)}
+.card h2{font-size:clamp(18px,1.7vw,27px);margin-bottom:.55em;display:flex;align-items:center;gap:.5em}
+.card h2 .ic{font-size:1.15em}
+.big{font-size:clamp(16px,1.5vw,24px)}
+ul.tips{list-style:none;display:grid;gap:clamp(9px,.9vw,15px)}
+ul.tips li{position:relative;padding-left:1.9em;font-size:clamp(16px,1.45vw,23px)}
+ul.tips li::before{content:"✓";position:absolute;left:0;top:.02em;color:var(--accent);font-weight:900;font-size:1.05em}
+ul.tips.plain li::before{content:"•";font-size:1.3em;top:-.05em}
+ul.tips li b{color:var(--ink)}
+ol.steps{list-style:none;counter-reset:s;display:grid;gap:clamp(9px,.9vw,14px)}
+ol.steps li{position:relative;padding-left:2.4em;font-size:clamp(16px,1.45vw,23px);min-height:1.6em}
+ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:1.7em;height:1.7em;
+  border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.8em}
+.muted{color:var(--muted)}
+.rule{background:var(--accent-soft);border:2px solid var(--accent);border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(16px,1.5vw,24px);font-weight:700;color:var(--accent);
+  margin-bottom:clamp(14px,1.6vw,22px);display:flex;gap:.6em;align-items:flex-start}
+.rule.warn{background:#fbecee;border-color:var(--warn);color:var(--warn)}
+.etym{display:grid;gap:clamp(8px,.8vw,13px)}
+.etym .row{font-size:clamp(15px,1.35vw,21px)}
+.etym .row b{color:var(--accent)}
+.check{background:#fff7e8;border-color:#f0dcab}
+.check h2{color:#9a6b00}
+.check .qs{list-style:none;display:grid;gap:clamp(8px,.8vw,13px)}
+.check .qs li{font-size:clamp(15px,1.35vw,22px);padding-left:1.6em;position:relative}
+.check .qs li::before{content:"?";position:absolute;left:0;font-weight:900;color:#c98a00}
+.scam{background:#fbecee;border-color:#e7b9c0}
+.scam .msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(14px,1.25vw,20px);background:#fff;
+  border:1px dashed #d99;border-radius:10px;padding:.7em .9em;margin:.2em 0 .7em;color:#7a1420;white-space:pre-wrap}
+.tag{display:inline-block;font-size:.78em;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  padding:.18em .6em;border-radius:999px;margin-bottom:.4em}
+.tag.bad{background:var(--warn);color:#fff}.tag.ok{background:#2f6f6b;color:#fff}
+.refs{margin-top:clamp(14px,1.6vw,24px);background:#eef1f6;border:1px dashed #b9c2d4;border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(13px,1.15vw,18px)}
+.refs .lbl{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-size:.82em;margin-bottom:.4em;display:block}
+.refs code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;background:#fff;border:1px solid #d6dce8;border-radius:6px;padding:.08em .45em}
+.refs .ref{display:inline-block;margin:.18em .55em .18em 0}
+.refs .ref b{color:var(--ink)}
+.hint{position:fixed;top:12px;left:16px;font-size:13px;color:var(--muted);z-index:5}
+.counter{position:fixed;top:12px;right:16px;font-size:14px;font-weight:700;color:var(--accent);z-index:5}
+.home{position:fixed;top:10px;right:96px;z-index:5;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:.3em .7em}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:12px;background:linear-gradient(transparent,rgba(244,241,234,.92) 40%);z-index:5}
+.nav button{font-size:16px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:10px;padding:.55em 1.1em;cursor:pointer;box-shadow:var(--shadow)}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:7px;flex-wrap:wrap;max-width:60vw;justify-content:center}
+.dot{width:11px;height:11px;border-radius:50%;border:none;background:#cdd3df;cursor:pointer}
+.dot.active{background:var(--accent);transform:scale(1.25)}
+@media print{
+  body{overflow:visible}.hint,.counter,.home,.nav{display:none}
+  .deck{height:auto}.slide{position:static;display:block!important;page-break-after:always;min-height:96vh}
+}
+
+:root{--accent:#2f6f6b}
+</style>
+</head>
+<body>
+<div class="hint">← → ή σάρωση για αλλαγή · Ctrl+P για εκτύπωση</div>
+<a class="home" href="index.html" title="Όλα τα μαθήματα">☰ Μαθήματα</a>
+<div class="counter"><span id="cur">1</span> / 10</div>
+<div class="deck">
+<section class="slide active">
+  <div class="head"><div class="badge">1</div><div><div class="kicker">Μάθημα 1 · Τα πρώτα βήματα</div><h1>Ποντίκι, Πληκτρολόγιο &amp; Οθόνη</h1></div></div>
+  <div class="rule ">🖐️ Χρυσός κανόνας: <b>Δεν χαλάει τίποτα.</b> Ο υπολογιστής περιμένει <b>εσάς</b> — χωρίς βιασύνη, χωρίς άγχος.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">👋</span> Καλώς ήρθατε</h2><p class="big">Σήμερα πιάνουμε στα χέρια μας τα τρία βασικά εργαλεία: το <b>ποντίκι</b>, το <b>πληκτρολόγιο</b> και την <b>οθόνη</b>. Θα τα δοκιμάσουμε ένα-ένα, με την ησυχία μας.</p></div><div class="card " ><h2><span class="ic">🧭</span> Πώς θα πάμε</h2><ul class="tips plain"><li>Πρώτα κοιτάμε, μετά δοκιμάζουμε μαζί.</li><li>Ό,τι δεν βγαίνει, το ξαναπροσπαθούμε — κανείς δεν βιάζεται.</li><li>Ρωτάτε ελεύθερα· δεν υπάρχει «χαζή» ερώτηση.</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">2</div><div><div class="kicker">Μάθημα 1 · Προσανατολισμός</div><h1>Τι θα μάθουμε σήμερα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🎯</span> Στόχοι</h2><ul class="tips"><li>Να κρατάμε άνετα το <b>ποντίκι</b> και να ξεχωρίζουμε τα κλικ.</li><li>Να γράφουμε με το <b>πληκτρολόγιο</b>: πεζά, κεφαλαία, τόνους.</li><li>Να ρυθμίζουμε την <b>οθόνη</b> για να βλέπουμε ξεκούραστα.</li><li>Να βρίσκουμε το κουμπί <b>Έναρξη</b> των Windows.</li></ul></div><div class="card " ><h2><span class="ic">💬</span> Λεξιλόγιο της ημέρας</h2><div class="etym"><div class="row"><b>Υλικό (hardware):</b> τα μέρη που πιάνεις — οθόνη, ποντίκι.</div><div class="row"><b>Λογισμικό (software):</b> τα προγράμματα μέσα στον υπολογιστή.</div><div class="row"><b>Επιφάνεια εργασίας:</b> η «πρώτη» οθόνη με τα εικονίδια.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">3</div><div><div class="kicker">Μάθημα 1 · Τα μέρη</div><h1>Από τι αποτελείται ο υπολογιστής</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🖥️</span> Τα βασικά μέρη</h2><ul class="tips"><li><b>Οθόνη:</b> εκεί βλέπουμε ό,τι κάνουμε.</li><li><b>Κουτί / πύργος (ή laptop):</b> ο «εγκέφαλος» — εκεί δουλεύουν όλα.</li><li><b>Ποντίκι:</b> δείχνει και επιλέγει.</li><li><b>Πληκτρολόγιο:</b> γράφει γράμματα και αριθμούς.</li></ul></div><div class="card " ><h2><span class="ic">📖</span> Από πού πήραν το όνομα</h2><div class="etym"><div class="row"><b>Ποντίκι (mouse):</b> από το σχήμα του — με «ουρά» το καλώδιο.</div><div class="row"><b>Πληκτρολόγιο:</b> από τα «πλήκτρα» που πατάμε.</div><div class="row"><b>Δρομέας (cursor):</b> λατινικά «αυτός που τρέχει» στην οθόνη.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">4</div><div><div class="kicker">Μάθημα 1 · Το ποντίκι</div><h1>Τα τρία κλικ &amp; το σύρσιμο</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🖱️</span> Τι κάνει κάθε κίνηση</h2><ul class="tips"><li><b>Αριστερό κλικ</b> = επιλέγω / ανοίγω.</li><li><b>Διπλό κλικ</b> (γρήγορα δύο φορές) = ανοίγω αρχείο ή πρόγραμμα.</li><li><b>Δεξί κλικ</b> = εμφανίζει <b>μενού</b> με επιλογές.</li><li><b>Σύρσιμο (drag):</b> κρατάω πατημένο και μετακινώ.</li><li><b>Ροδέλα:</b> την γυρνάω για να «κατεβαίνει» η σελίδα.</li></ul></div><div class="card " ><h2><span class="ic">🎯</span> Στόχος</h2><p class="big">Να νιώσουμε το χέρι στο ποντίκι: πού ακουμπάει, πώς πατάμε χωρίς να το κουνάμε.</p></div><div class="card " ><h2><span class="ic">💡</span> Μικρό μυστικό</h2><p class="big">Λάθος; Το <b>«Αναίρεση» (Ctrl + Z)</b> το επαναφέρει αμέσως.</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">5</div><div><div class="kicker">Μάθημα 1 · Εξάσκηση</div><h1>Παίζουμε με το ποντίκι</h1></div></div>
+  <div class="rule ">🎮 Η εφαρμογή έχει παιχνίδια — μαθαίνουμε παίζοντας, χωρίς φόβο.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🎈</span> Ασκήσεις στην εφαρμογή</h2><ul class="tips"><li><b>Μπαλόνια:</b> περνάω το ποντίκι από πάνω (hover).</li><li><b>Τυφλοπόντικες:</b> κλικ πριν κρυφτούν.</li><li><b>Σεντούκια:</b> διπλό κλικ για να ανοίξουν.</li><li><b>Ανακύκλωση:</b> σύρω τα σκουπίδια στον σωστό κάδο.</li></ul></div><div class="card check" ><h2><span class="ic">❓</span> Ερωτήσεις ελέγχου</h2><ul class="qs"><li>Έχετε ξαναπιάσει ποντίκι;</li><li>Ξεχωρίζετε αριστερό από δεξί κλικ;</li><li>Σας βγαίνει το διπλό κλικ;</li></ul></div></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Εξάσκηση ποντικιού:</b> <code>/modules/module1</code></span></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">6</div><div><div class="kicker">Μάθημα 1 · Το πληκτρολόγιο</div><h1>Γράφουμε γράμματα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">⌨️</span> Τα βασικά πλήκτρα</h2><ul class="tips"><li><b>Κεφαλαία:</b> κρατάω <b>Shift</b> + το γράμμα. Για όλα κεφαλαία: <b>Caps Lock</b>.</li><li><b>Τόνος:</b> πατάω πρώτα το <b>;</b> και μετά το φωνήεν (ά, έ, ή…).</li><li><b>Κενό:</b> η μεγάλη μπάρα κάτω (Space).</li><li><b>Σβήσιμο:</b> <b>Backspace</b> σβήνει το γράμμα πριν.</li><li><b>Νέα γραμμή / «ΟΚ»:</b> <b>Enter</b>.</li></ul></div><div class="card " ><h2><span class="ic">🔤</span> Ελληνικά ↔ Αγγλικά</h2><p class="big">Αλλάζω γλώσσα με <b>Alt + Shift</b>. Κάτω δεξιά γράφει <b>ΕΛ</b> ή <b>EN</b>.</p><div class="etym"><div class="row"><b>Πεζά:</b> τα μικρά γράμματα.</div><div class="row"><b>Κεφαλαία:</b> τα μεγάλα.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">7</div><div><div class="kicker">Μάθημα 1 · Συντομεύσεις</div><h1>Τρία κόλπα που σώζουν χρόνο</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">⚡</span> Οι 3 χρυσές συντομεύσεις</h2><ul class="tips"><li><b>Ctrl + Z</b> — Αναίρεση (πίσω από το λάθος).</li><li><b>Ctrl + C</b> — Αντιγραφή (κρατάω ένα αντίγραφο).</li><li><b>Ctrl + V</b> — Επικόλληση (το «κολλάω» αλλού).</li></ul></div><div class="card " ><h2><span class="ic">🧩</span> Πώς δουλεύει</h2><p class="big">Επιλέγω κείμενο → <b>Ctrl+C</b> → πάω εκεί που θέλω → <b>Ctrl+V</b>. Το ίδιο κείμενο, χωρίς να το ξαναγράψω.</p></div><div class="card " ><h2><span class="ic">🎯</span> Στόχος</h2><p class="big">Να μη φοβόμαστε το λάθος: σχεδόν όλα διορθώνονται.</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">8</div><div><div class="kicker">Μάθημα 1 · Η οθόνη</div><h1>Βλέπω καθαρά &amp; ξεκούραστα</h1></div></div>
+  <div class="rule ">👓 Αν δεν βλέπετε καλά, <b>δεν φταίτε εσείς</b> — μεγαλώνουμε τα γράμματα.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🔍</span> Προσβασιμότητα</h2><ul class="tips"><li><b>Μεγάλα γράμματα:</b> Ρυθμίσεις → Προσβασιμότητα → Μέγεθος κειμένου (έως 225%).</li><li><b>Μεγεθυντικός φακός:</b> πλήκτρο <b>⊞ Windows</b> μαζί με <b>+</b>.</li><li><b>Υψηλή αντίθεση:</b> πιο έντονα χρώματα για τα μάτια.</li><li><b>Μεγέθυνση σελίδας:</b> <b>Ctrl +</b> μεγαλώνει, <b>Ctrl −</b> μικραίνει.</li></ul></div><div class="card check" ><h2><span class="ic">❓</span> Ερωτήσεις ελέγχου</h2><ul class="qs"><li>Βλέπετε καθαρά τα γράμματα τώρα;</li><li>Θέλουμε να τα μεγαλώσουμε λίγο;</li><li>Σας βολεύει το φως της οθόνης;</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">9</div><div><div class="kicker">Μάθημα 1 · Windows</div><h1>Η επιφάνεια εργασίας</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🪟</span> Τα Windows με απλά λόγια</h2><ol class="steps"><li>Κάτω αριστερά είναι το κουμπί <b>Έναρξη</b> (το μπλε εικονίδιο). Κλικ για το μενού.</li><li>Τα <b>εικονίδια</b> στην επιφάνεια ανοίγουν με <b>διπλό κλικ</b>.</li><li>Το <b>«Προβολή Εργασιών»</b> δείχνει όλα τα ανοιχτά παράθυρα.</li><li>Πάνω δεξιά κάθε παραθύρου: <b>−</b> ελαχιστοποίηση, <b>▢</b> μεγέθυνση, <b>✕</b> κλείσιμο.</li></ol></div><div class="card " ><h2><span class="ic">📖</span> Ετυμολογία</h2><div class="etym"><div class="row"><b>Windows:</b> «παράθυρα» — κάθε πρόγραμμα ανοίγει στο δικό του.</div><div class="row"><b>Εικονίδιο (icon):</b> μικρή εικόνα-συντόμευση.</div><div class="row"><b>Μενού:</b> λίστα με επιλογές, όπως στο εστιατόριο.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">10</div><div><div class="kicker">Μάθημα 1 · Ανακεφαλαίωση</div><h1>Τι κρατάμε από σήμερα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">✅</span> Τα πήραμε</h2><ul class="tips"><li>Ξεχωρίζω αριστερό / διπλό / δεξί κλικ.</li><li>Γράφω κεφαλαία, τόνους και σβήνω λάθη.</li><li>Μεγαλώνω τα γράμματα όταν χρειάζεται.</li><li>Βρίσκω το κουμπί Έναρξη.</li></ul></div><div class="card " ><h2><span class="ic">🎯</span> Στόχος</h2><p class="big">Πετύχαμε αν νιώθουμε λίγο πιο άνετα — όχι τέλεια. Η άνεση έρχεται με την επανάληψη.</p></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Ποντίκι:</b> <code>/modules/module1</code></span><span class="ref"><b>Πληκτρολόγιο:</b> <code>/modules/module2</code></span><span class="ref"><b>Windows:</b> <code>/modules/module3</code></span><span class="ref"><b>Βιβλιοθήκη — Προσβασιμότητα:</b> <code>/library/esm001/esm001-c1-s4</code></span></div></div>
+</section>
+</div>
+<nav class="nav">
+  <button id="prev">← Προηγούμενο</button>
+  <div class="dots" id="dots"></div>
+  <button id="next">Επόμενο →</button>
+</nav>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dotsWrap=document.getElementById('dots'),cur=document.getElementById('cur');
+const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
+let i=0;
+slides.forEach((_,n)=>{const d=document.createElement('button');d.className='dot'+(n===0?' active':'');
+  d.setAttribute('aria-label','Διαφάνεια '+(n+1));d.addEventListener('click',()=>go(n));dotsWrap.appendChild(d)});
+const dots=[...dotsWrap.children];
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('active',k===i));
+  cur.textContent=i+1;prevBtn.disabled=i===0;nextBtn.disabled=i===slides.length-1;slides[i].scrollTop=0}
+prevBtn.addEventListener('click',()=>go(i-1));nextBtn.addEventListener('click',()=>go(i+1));
+document.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t instanceof HTMLElement && (t.isContentEditable || ['INPUT','TEXTAREA','SELECT','BUTTON','A'].includes(t.tagName))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){go(i+1);e.preventDefault()}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){go(i-1);e.preventDefault()}
+  if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+let x0=null,y0=null;
+document.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{if(x0===null)return;
+  const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5)go(i+(dx<0?1:-1));
+  x0=null;y0=null},{passive:true});
+go(0);
+</script>
+</body>
+</html>

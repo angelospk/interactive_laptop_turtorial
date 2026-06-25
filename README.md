@@ -157,6 +157,22 @@ bun run test:unit     # Vitest unit tests
 bun run test:e2e      # Playwright e2e tests
 ```
 
+## Παρουσιάσεις ΚΑΠΗ (offline)
+
+Αυτόνομες παρουσιάσεις για διδασκαλία σε ΚΑΠΗ — λειτουργούν **χωρίς ίντερνετ** (`file://`),
+σε οποιοδήποτε mini PC, με διπλό κλικ.
+
+- `static/kapi/index.html` — launcher με τα 4 μαθήματα
+- `static/kapi/mathima-1..4.html` — 4 ξεχωριστές, αναλυτικές παρουσιάσεις (μία ανά μάθημα)
+- `static/kapi/start-minipc.bat` / `static/kapi/start-minipc.sh` — άνοιγμα σε πλήρη οθόνη (kiosk)
+- `static/slides-kapi.html` — σύνοψη «4 σε 1»
+
+Επεξεργασία περιεχομένου: άλλαξε το `scripts/build-kapi-slides.mjs` και ξανατρέξε:
+
+```bash
+node scripts/build-kapi-slides.mjs   # ξαναχτίζει static/kapi/*.html
+```
+
 ## License
 
 MIT

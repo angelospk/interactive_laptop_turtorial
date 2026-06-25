@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Μάθημα 2 — Διαδίκτυο, Email & Βιντεοκλήση</title>
+<style>
+:root{
+  --bg:#f4f1ea; --ink:#1d2433; --muted:#5a6478; --card:#fff; --line:#e2ddd2;
+  --accent:#2f6f6b; --accent-soft:#e7f0ef; --warn:#a81b28;
+  --shadow:0 10px 30px rgba(20,28,46,.10); --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45;overflow:hidden}
+.deck{height:100vh;width:100vw;position:relative}
+.slide{position:absolute;inset:0;display:none;padding:clamp(18px,3vw,52px) clamp(18px,4vw,76px) 92px;overflow-y:auto;animation:fade .35s ease}
+.slide.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:flex;align-items:center;gap:clamp(14px,1.6vw,24px);border-bottom:4px solid var(--accent);
+  padding-bottom:clamp(10px,1.3vw,18px);margin-bottom:clamp(14px,1.7vw,24px)}
+.badge{flex:none;width:clamp(54px,5vw,84px);height:clamp(54px,5vw,84px);border-radius:20px;background:var(--accent);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:clamp(24px,2.5vw,40px);box-shadow:var(--shadow)}
+.head h1{font-size:clamp(24px,2.9vw,46px);letter-spacing:-.5px;line-height:1.1}
+.head .kicker{color:var(--accent);font-weight:700;font-size:clamp(13px,1.25vw,19px);text-transform:uppercase;letter-spacing:1px}
+.grid{display:grid;grid-template-columns:var(--cols,1.4fr 1fr);gap:clamp(14px,1.6vw,26px);align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(16px,1.6vw,26px);box-shadow:var(--shadow)}
+.card + .card{margin-top:clamp(12px,1.4vw,20px)}
+.card h2{font-size:clamp(18px,1.7vw,27px);margin-bottom:.55em;display:flex;align-items:center;gap:.5em}
+.card h2 .ic{font-size:1.15em}
+.big{font-size:clamp(16px,1.5vw,24px)}
+ul.tips{list-style:none;display:grid;gap:clamp(9px,.9vw,15px)}
+ul.tips li{position:relative;padding-left:1.9em;font-size:clamp(16px,1.45vw,23px)}
+ul.tips li::before{content:"✓";position:absolute;left:0;top:.02em;color:var(--accent);font-weight:900;font-size:1.05em}
+ul.tips.plain li::before{content:"•";font-size:1.3em;top:-.05em}
+ul.tips li b{color:var(--ink)}
+ol.steps{list-style:none;counter-reset:s;display:grid;gap:clamp(9px,.9vw,14px)}
+ol.steps li{position:relative;padding-left:2.4em;font-size:clamp(16px,1.45vw,23px);min-height:1.6em}
+ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:1.7em;height:1.7em;
+  border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.8em}
+.muted{color:var(--muted)}
+.rule{background:var(--accent-soft);border:2px solid var(--accent);border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(16px,1.5vw,24px);font-weight:700;color:var(--accent);
+  margin-bottom:clamp(14px,1.6vw,22px);display:flex;gap:.6em;align-items:flex-start}
+.rule.warn{background:#fbecee;border-color:var(--warn);color:var(--warn)}
+.etym{display:grid;gap:clamp(8px,.8vw,13px)}
+.etym .row{font-size:clamp(15px,1.35vw,21px)}
+.etym .row b{color:var(--accent)}
+.check{background:#fff7e8;border-color:#f0dcab}
+.check h2{color:#9a6b00}
+.check .qs{list-style:none;display:grid;gap:clamp(8px,.8vw,13px)}
+.check .qs li{font-size:clamp(15px,1.35vw,22px);padding-left:1.6em;position:relative}
+.check .qs li::before{content:"?";position:absolute;left:0;font-weight:900;color:#c98a00}
+.scam{background:#fbecee;border-color:#e7b9c0}
+.scam .msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(14px,1.25vw,20px);background:#fff;
+  border:1px dashed #d99;border-radius:10px;padding:.7em .9em;margin:.2em 0 .7em;color:#7a1420;white-space:pre-wrap}
+.tag{display:inline-block;font-size:.78em;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  padding:.18em .6em;border-radius:999px;margin-bottom:.4em}
+.tag.bad{background:var(--warn);color:#fff}.tag.ok{background:#2f6f6b;color:#fff}
+.refs{margin-top:clamp(14px,1.6vw,24px);background:#eef1f6;border:1px dashed #b9c2d4;border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(13px,1.15vw,18px)}
+.refs .lbl{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-size:.82em;margin-bottom:.4em;display:block}
+.refs code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;background:#fff;border:1px solid #d6dce8;border-radius:6px;padding:.08em .45em}
+.refs .ref{display:inline-block;margin:.18em .55em .18em 0}
+.refs .ref b{color:var(--ink)}
+.hint{position:fixed;top:12px;left:16px;font-size:13px;color:var(--muted);z-index:5}
+.counter{position:fixed;top:12px;right:16px;font-size:14px;font-weight:700;color:var(--accent);z-index:5}
+.home{position:fixed;top:10px;right:96px;z-index:5;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:.3em .7em}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:12px;background:linear-gradient(transparent,rgba(244,241,234,.92) 40%);z-index:5}
+.nav button{font-size:16px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:10px;padding:.55em 1.1em;cursor:pointer;box-shadow:var(--shadow)}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:7px;flex-wrap:wrap;max-width:60vw;justify-content:center}
+.dot{width:11px;height:11px;border-radius:50%;border:none;background:#cdd3df;cursor:pointer}
+.dot.active{background:var(--accent);transform:scale(1.25)}
+@media print{
+  body{overflow:visible}.hint,.counter,.home,.nav{display:none}
+  .deck{height:auto}.slide{position:static;display:block!important;page-break-after:always;min-height:96vh}
+}
+
+:root{--accent:#1f5fa8}
+</style>
+</head>
+<body>
+<div class="hint">← → ή σάρωση για αλλαγή · Ctrl+P για εκτύπωση</div>
+<a class="home" href="index.html" title="Όλα τα μαθήματα">☰ Μαθήματα</a>
+<div class="counter"><span id="cur">1</span> / 8</div>
+<div class="deck">
+<section class="slide active">
+  <div class="head"><div class="badge">1</div><div><div class="kicker">Μάθημα 2 · Διαδίκτυο &amp; Επικοινωνία</div><h1>Google, Email &amp; Βιντεοκλήση</h1></div></div>
+  <div class="rule ">📶 Με <b>Wi-Fi</b> στο σπίτι το ίντερνετ είναι δωρεάν — δεν ξοδεύετε δεδομένα από το κινητό.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🌍</span> Τι ανοίγει το διαδίκτυο</h2><p class="big">Με μία σύνδεση μπορούμε να <b>ψάχνουμε</b> πληροφορίες, να <b>γράφουμε</b> σε δικούς μας και να τους <b>βλέπουμε</b> με βιντεοκλήση — από το σπίτι.</p></div><div class="card " ><h2><span class="ic">🧭</span> Πώς θα πάμε</h2><ul class="tips plain"><li>Δοκιμάζουμε μαζί μια αναζήτηση στο Google.</li><li>Ανοίγουμε ένα email βήμα-βήμα.</li><li>Κάνουμε μια δοκιμαστική βιντεοκλήση.</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">2</div><div><div class="kicker">Μάθημα 2 · Προσανατολισμός</div><h1>Τι θα μάθουμε σήμερα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🎯</span> Στόχοι</h2><ul class="tips"><li>Να <b>ψάχνω στο Google</b> με απλές λέξεις.</li><li>Να χρησιμοποιώ τον <b>φυλλομετρητή</b>: καρτέλες, αγαπημένα.</li><li>Να <b>διαβάζω &amp; στέλνω email</b>.</li><li>Να κάνω <b>βιντεοκλήση</b> με τους δικούς μου.</li></ul></div><div class="card " ><h2><span class="ic">💬</span> Λεξιλόγιο της ημέρας</h2><div class="etym"><div class="row"><b>Διαδίκτυο (Internet):</b> δια + δίκτυο = «ανάμεσα στα δίκτυα».</div><div class="row"><b>Φυλλομετρητής (browser):</b> το πρόγραμμα που ανοίγει ιστοσελίδες.</div><div class="row"><b>Wi-Fi:</b> η ασύρματη σύνδεση στο σπίτι.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">3</div><div><div class="kicker">Μάθημα 2 · Ο φυλλομετρητής</div><h1>Το «παράθυρο» στο διαδίκτυο</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🧭</span> Τι βλέπω πάνω-πάνω</h2><ul class="tips"><li><b>Γραμμή διευθύνσεων:</b> εκεί γράφω πού θέλω να πάω (π.χ. <i>news.gr</i>) και <b>Enter</b>.</li><li><b>Καρτέλες:</b> με το <b>+</b> ανοίγω νέα· με το <b>✕</b> κλείνω μία.</li><li><b>Αγαπημένα (αστέρι ★):</b> κρατάω μια σελίδα για να τη βρίσκω εύκολα.</li><li><b>Ιστορικό (ρολόι):</b> πού έχω ξαναπάει.</li><li><b>Μεγέθυνση:</b> <b>Ctrl +</b> / <b>Ctrl −</b>.</li></ul></div><div class="card " ><h2><span class="ic">📖</span> Ετυμολογία</h2><div class="etym"><div class="row"><b>Browser:</b> από το «browse» = ξεφυλλίζω, περιηγούμαι.</div><div class="row"><b>Καρτέλα (tab):</b> σαν τα χωρίσματα σε ντοσιέ.</div><div class="row"><b>Σύνδεσμος (link):</b> γαλάζιο κείμενο που με πάει αλλού.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">4</div><div><div class="kicker">Μάθημα 2 · Αναζήτηση</div><h1>Ψάχνω στο Google</h1></div></div>
+  <div class="rule ">🔎 Δεν χρειάζεται να ξέρω διεύθυνση. Γράφω <b>λέξεις</b> και το Google βρίσκει.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">💡</span> Πώς ρωτάω</h2><ul class="tips"><li>Γράφω ό,τι θέλω και πατάω <b>Enter</b>.</li><li>Παραδείγματα: «<i>εφημερεύον φαρμακείο</i>», «<i>καιρός αύριο</i>», «<i>δρομολόγια ΚΤΕΛ</i>».</li><li>Διαβάζω τα πρώτα αποτελέσματα και πατάω αυτό που ταιριάζει.</li><li>Δεν βρήκα; Αλλάζω λίγο τις λέξεις και ξαναψάχνω.</li></ul></div><div class="card check" ><h2><span class="ic">❓</span> Ερωτήσεις ελέγχου</h2><ul class="qs"><li>Έχετε ψάξει ποτέ κάτι μόνοι σας;</li><li>Τι θα θέλατε να βρείτε τώρα;</li><li>Ξεχωρίζετε τη γραμμή αναζήτησης;</li></ul></div></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Περιήγηση &amp; αναζήτηση:</b> <code>/modules/module5</code></span></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">5</div><div><div class="kicker">Μάθημα 2 · Email</div><h1>Το ηλεκτρονικό ταχυδρομείο</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">✉️</span> Τι είναι &amp; πώς διαβάζεται</h2><ul class="tips"><li>Το <b>@</b> χωρίζει το όνομα από την εταιρεία: <i>onoma@gmail.com</i>.</li><li>Τα <b>αδιάβαστα</b> μηνύματα είναι με <b>έντονα</b> γράμματα.</li><li><b>Απάντηση:</b> γράφω πίσω σε αυτόν που μου έστειλε.</li><li><b>Προώθηση:</b> στέλνω το μήνυμα σε άλλον.</li><li><b>Συνημμένο (📎):</b> στέλνω αρχείο ή φωτογραφία.</li></ul></div><div class="card " ><h2><span class="ic">📖</span> Ετυμολογία</h2><div class="etym"><div class="row"><b>Email:</b> electronic mail = ηλεκτρονικό ταχυδρομείο.</div><div class="row"><b>@ (παπάκι):</b> σημαίνει «at» — «στο».</div><div class="row"><b>Συνημμένο:</b> «συν-ημμένο» = κάτι που επισυνάπτεται.</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">6</div><div><div class="kicker">Μάθημα 2 · Email στην πράξη</div><h1>Στέλνω το πρώτο μου μήνυμα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">📝</span> Βήμα-βήμα</h2><ol class="steps"><li>Πατάω <b>«Σύνταξη»</b> (ή «Νέο μήνυμα»).</li><li>Στο <b>«Προς»</b> γράφω τη διεύθυνση του παραλήπτη.</li><li>Γράφω <b>θέμα</b> και το <b>μήνυμα</b>.</li><li>Θέλω φωτογραφία; Πατάω τον <b>συνδετήρα 📎</b> και την επιλέγω.</li><li>Πατάω <b>«Αποστολή»</b>.</li></ol></div><div class="card " ><h2><span class="ic">🎯</span> Στόχος</h2><p class="big">Να στείλουμε ένα απλό email σε δικό μας άνθρωπο — και να πάρουμε απάντηση.</p></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Email στην εφαρμογή:</b> <code>/modules/module6</code></span></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">7</div><div><div class="kicker">Μάθημα 2 · Βιντεοκλήση</div><h1>Βλέπω τους δικούς μου</h1></div></div>
+  <div class="rule ">💙 Δωρεάν, και βλέπετε <b>πρόσωπα</b> — ιδανικό για παιδιά &amp; εγγόνια μακριά.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">📹</span> Με Viber / Messenger</h2><ol class="steps"><li>Ανοίγω το <b>Viber</b> (διπλό κλικ στο εικονίδιο).</li><li>Επιλέγω την <b>επαφή</b> και πατάω το εικονίδιο <b>βιντεοκλήσης 📹</b>.</li><li>Θέλω ησυχία; Πατάω το <b>μικρόφωνο 🎤</b> για σίγαση.</li><li>Τέλος: το <b>κόκκινο κουμπί 📵</b> κλείνει την κλήση.</li></ol></div><div class="card check" ><h2><span class="ic">❓</span> Ερωτήσεις ελέγχου</h2><ul class="qs"><li>Μιλάτε με βιντεοκλήση τώρα; Σε ποια εφαρμογή;</li><li>Με ποιον θα θέλατε να μιλήσετε;</li><li>Έχετε εγκατεστημένο Viber/Messenger;</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">8</div><div><div class="kicker">Μάθημα 2 · Ανακεφαλαίωση</div><h1>Τι κρατάμε από σήμερα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">✅</span> Τα πήραμε</h2><ul class="tips"><li>Ψάχνω στο Google με λέξεις.</li><li>Ανοίγω καρτέλες &amp; κρατάω αγαπημένα.</li><li>Διαβάζω &amp; στέλνω ένα email.</li><li>Κάνω βιντεοκλήση με δικούς μου.</li></ul></div><div class="card " ><h2><span class="ic">🎯</span> Στόχος</h2><p class="big">Το διαδίκτυο μάς φέρνει πιο κοντά στους ανθρώπους και τις πληροφορίες — με ασφάλεια, που θα δούμε στο επόμενο μάθημα.</p></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Περιήγηση:</b> <code>/modules/module5</code></span><span class="ref"><b>Email:</b> <code>/modules/module6</code></span><span class="ref"><b>Βιντεοκλήση:</b> <code>/modules/module11</code></span><span class="ref"><b>Βιβλιοθήκη — Διαδίκτυο:</b> <code>/library/esm002/esm002-c1-s2</code></span></div></div>
+</section>
+</div>
+<nav class="nav">
+  <button id="prev">← Προηγούμενο</button>
+  <div class="dots" id="dots"></div>
+  <button id="next">Επόμενο →</button>
+</nav>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dotsWrap=document.getElementById('dots'),cur=document.getElementById('cur');
+const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
+let i=0;
+slides.forEach((_,n)=>{const d=document.createElement('button');d.className='dot'+(n===0?' active':'');
+  d.setAttribute('aria-label','Διαφάνεια '+(n+1));d.addEventListener('click',()=>go(n));dotsWrap.appendChild(d)});
+const dots=[...dotsWrap.children];
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('active',k===i));
+  cur.textContent=i+1;prevBtn.disabled=i===0;nextBtn.disabled=i===slides.length-1;slides[i].scrollTop=0}
+prevBtn.addEventListener('click',()=>go(i-1));nextBtn.addEventListener('click',()=>go(i+1));
+document.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t instanceof HTMLElement && (t.isContentEditable || ['INPUT','TEXTAREA','SELECT','BUTTON','A'].includes(t.tagName))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){go(i+1);e.preventDefault()}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){go(i-1);e.preventDefault()}
+  if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+let x0=null,y0=null;
+document.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{if(x0===null)return;
+  const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5)go(i+(dx<0?1:-1));
+  x0=null;y0=null},{passive:true});
+go(0);
+</script>
+</body>
+</html>
