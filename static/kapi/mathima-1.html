@@ -80,6 +80,7 @@ ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;lef
 @media print{
   body{overflow:visible}.hint,.counter,.home,.nav{display:none}
   .deck{height:auto}.slide{position:static;display:block!important;page-break-after:always;min-height:96vh}
+  .slide:last-child{page-break-after:auto}
 }
 
 :root{--accent:#2f6f6b}

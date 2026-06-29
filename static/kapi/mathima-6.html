@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Μάθημα 6 — Μηνύματα, Ημερολόγιο & AI</title>
+<style>
+:root{
+  --bg:#f4f1ea; --ink:#1d2433; --muted:#5a6478; --card:#fff; --line:#e2ddd2;
+  --accent:#2f6f6b; --accent-soft:#e7f0ef; --warn:#a81b28;
+  --shadow:0 10px 30px rgba(20,28,46,.10); --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45;overflow:hidden}
+.deck{height:100vh;width:100vw;position:relative}
+.slide{position:absolute;inset:0;display:none;padding:clamp(18px,3vw,52px) clamp(18px,4vw,76px) 92px;overflow-y:auto;animation:fade .35s ease}
+.slide.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:flex;align-items:center;gap:clamp(14px,1.6vw,24px);border-bottom:4px solid var(--accent);
+  padding-bottom:clamp(10px,1.3vw,18px);margin-bottom:clamp(14px,1.7vw,24px)}
+.badge{flex:none;width:clamp(54px,5vw,84px);height:clamp(54px,5vw,84px);border-radius:20px;background:var(--accent);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:clamp(24px,2.5vw,40px);box-shadow:var(--shadow)}
+.head h1{font-size:clamp(24px,2.9vw,46px);letter-spacing:-.5px;line-height:1.1}
+.head .kicker{color:var(--accent);font-weight:700;font-size:clamp(13px,1.25vw,19px);text-transform:uppercase;letter-spacing:1px}
+.grid{display:grid;grid-template-columns:var(--cols,1.4fr 1fr);gap:clamp(14px,1.6vw,26px);align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(16px,1.6vw,26px);box-shadow:var(--shadow)}
+.card + .card{margin-top:clamp(12px,1.4vw,20px)}
+.card h2{font-size:clamp(18px,1.7vw,27px);margin-bottom:.55em;display:flex;align-items:center;gap:.5em}
+.card h2 .ic{font-size:1.15em}
+.big{font-size:clamp(16px,1.5vw,24px)}
+ul.tips{list-style:none;display:grid;gap:clamp(9px,.9vw,15px)}
+ul.tips li{position:relative;padding-left:1.9em;font-size:clamp(16px,1.45vw,23px)}
+ul.tips li::before{content:"✓";position:absolute;left:0;top:.02em;color:var(--accent);font-weight:900;font-size:1.05em}
+ul.tips.plain li::before{content:"•";font-size:1.3em;top:-.05em}
+ul.tips li b{color:var(--ink)}
+ol.steps{list-style:none;counter-reset:s;display:grid;gap:clamp(9px,.9vw,14px)}
+ol.steps li{position:relative;padding-left:2.4em;font-size:clamp(16px,1.45vw,23px);min-height:1.6em}
+ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:1.7em;height:1.7em;
+  border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.8em}
+.muted{color:var(--muted)}
+.rule{background:var(--accent-soft);border:2px solid var(--accent);border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(16px,1.5vw,24px);font-weight:700;color:var(--accent);
+  margin-bottom:clamp(14px,1.6vw,22px);display:flex;gap:.6em;align-items:flex-start}
+.rule.warn{background:#fbecee;border-color:var(--warn);color:var(--warn)}
+.etym{display:grid;gap:clamp(8px,.8vw,13px)}
+.etym .row{font-size:clamp(15px,1.35vw,21px)}
+.etym .row b{color:var(--accent)}
+.check{background:#fff7e8;border-color:#f0dcab}
+.check h2{color:#9a6b00}
+.check .qs{list-style:none;display:grid;gap:clamp(8px,.8vw,13px)}
+.check .qs li{font-size:clamp(15px,1.35vw,22px);padding-left:1.6em;position:relative}
+.check .qs li::before{content:"?";position:absolute;left:0;font-weight:900;color:#c98a00}
+.scam{background:#fbecee;border-color:#e7b9c0}
+.scam .msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(14px,1.25vw,20px);background:#fff;
+  border:1px dashed #d99;border-radius:10px;padding:.7em .9em;margin:.2em 0 .7em;color:#7a1420;white-space:pre-wrap}
+.tag{display:inline-block;font-size:.78em;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  padding:.18em .6em;border-radius:999px;margin-bottom:.4em}
+.tag.bad{background:var(--warn);color:#fff}.tag.ok{background:#2f6f6b;color:#fff}
+.refs{margin-top:clamp(14px,1.6vw,24px);background:#eef1f6;border:1px dashed #b9c2d4;border-radius:14px;
+  padding:clamp(12px,1.2vw,18px) clamp(14px,1.4vw,22px);font-size:clamp(13px,1.15vw,18px)}
+.refs .lbl{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-size:.82em;margin-bottom:.4em;display:block}
+.refs code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;background:#fff;border:1px solid #d6dce8;border-radius:6px;padding:.08em .45em}
+.refs .ref{display:inline-block;margin:.18em .55em .18em 0}
+.refs .ref b{color:var(--ink)}
+.hint{position:fixed;top:12px;left:16px;font-size:13px;color:var(--muted);z-index:5}
+.counter{position:fixed;top:12px;right:16px;font-size:14px;font-weight:700;color:var(--accent);z-index:5}
+.home{position:fixed;top:10px;right:96px;z-index:5;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:.3em .7em}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:12px;background:linear-gradient(transparent,rgba(244,241,234,.92) 40%);z-index:5}
+.nav button{font-size:16px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:10px;padding:.55em 1.1em;cursor:pointer;box-shadow:var(--shadow)}
+.nav button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:7px;flex-wrap:wrap;max-width:60vw;justify-content:center}
+.dot{width:11px;height:11px;border-radius:50%;border:none;background:#cdd3df;cursor:pointer}
+.dot.active{background:var(--accent);transform:scale(1.25)}
+@media print{
+  body{overflow:visible}.hint,.counter,.home,.nav{display:none}
+  .deck{height:auto}.slide{position:static;display:block!important;page-break-after:always;min-height:96vh}
+  .slide:last-child{page-break-after:auto}
+}
+
+:root{--accent:#0e7490}
+</style>
+</head>
+<body>
+<div class="hint">← → ή σάρωση για αλλαγή · Ctrl+P για εκτύπωση</div>
+<a class="home" href="index.html" title="Όλα τα μαθήματα">☰ Μαθήματα</a>
+<div class="counter"><span id="cur">1</span> / 10</div>
+<div class="deck">
+<section class="slide active">
+  <div class="head"><div class="badge">1</div><div><div class="kicker">Μάθημα 6 · Τάξη &amp; Έξυπνα εργαλεία</div><h1>Μηνύματα με τάξη + το κινητό μάς βοηθάει</h1></div></div>
+  <div class="rule ">🧹 Λίγη τάξη στα μηνύματα = ησυχία. Και το κινητό μπορεί να μας <b>θυμίζει</b> και να μας <b>βοηθάει</b> καθημερινά.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">👋</span> Τι θα κάνουμε σήμερα</h2><p class="big">Θα βάλουμε τάξη στα email (προώθηση, καθάρισμα, μπλοκάρισμα) και θα δούμε <b>έξυπνα εργαλεία</b>: μοίρασμα αρχείων, εύρεση χαμένου κινητού, ημερολόγιο και βοηθό AI.</p></div><div class="card " ><h2><span class="ic">🧭</span> Πώς θα πάμε</h2><ul class="tips plain"><li>Με την ησυχία μας, ένα-ένα.</li><li>Δοκιμάζουμε μαζί σε αληθινό παράδειγμα.</li><li>Ό,τι σας φανεί χρήσιμο, το ξανακάνουμε.</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">2</div><div><div class="kicker">Μάθημα 6 · Προσανατολισμός</div><h1>Τι θα μάθουμε σήμερα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🎯</span> Στόχοι</h2><ul class="tips"><li>Να <b>προωθώ</b> &amp; να <b>καθαρίζω</b> τα μηνύματα.</li><li>Να <b>μπλοκάρω</b> ενοχλητικούς &amp; διαφημίσεις.</li><li>Να <b>μοιράζομαι</b> αρχεία και να <b>βρίσκω</b> χαμένο κινητό.</li><li>Να βάζω <b>υπενθυμίσεις</b> με το ημερολόγιο &amp; τον AI.</li></ul></div><div class="card " ><h2><span class="ic">💬</span> Λεξιλόγιο της ημέρας</h2><div class="etym"><div class="row"><b>Προώθηση (forward):</b> στέλνω παρακάτω ένα μήνυμα που έλαβα.</div><div class="row"><b>Ανεπιθύμητα (spam):</b> ενοχλητικά/διαφημιστικά μηνύματα.</div><div class="row"><b>Κατάργηση εγγραφής (unsubscribe):</b> λέω «μη μου ξαναστέλνετε».</div></div></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">3</div><div><div class="kicker">Μάθημα 6 · Email</div><h1>Προώθηση μηνύματος</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">↪️</span> Στέλνω παρακάτω ένα μήνυμα</h2><ol class="steps"><li>Ανοίγω το μήνυμα που θέλω.</li><li>Πατάω <b>«Προώθηση»</b> (Forward).</li><li>Στο <b>«Προς»</b> γράφω σε ποιον το στέλνω.</li><li>Πατάω <b>«Αποστολή»</b>.</li></ol></div><div class="card " ><h2><span class="ic">🔁</span> Απάντηση ή Προώθηση;</h2><p class="big"><b>Απάντηση:</b> πάει πίσω σε αυτόν που μου έστειλε.<br/><b>Προώθηση:</b> στέλνει το ίδιο μήνυμα σε <b>νέο</b> πρόσωπο — π.χ. προωθώ στον λογιστή ένα email της εφορίας.</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">4</div><div><div class="kicker">Μάθημα 6 · Email</div><h1>Καθάρισμα: διαγραφή &amp; φάκελοι</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">🗑️</span> Διώχνω τα παλιά</h2><ul class="tips"><li>Διαγραφή: το εικονίδιο <b>κάδος 🗑️</b>.</li><li>Δεν χάνεται αμέσως — μένει λίγες μέρες στον <b>«Κάδο»</b>, αν το θέλω πίσω.</li><li><b>Πολλά μαζί:</b> κρατάω πατημένο ένα, επιλέγω κι άλλα, μετά διαγραφή.</li></ul></div><div class="card " ><h2><span class="ic">🗂️</span> Βάζω σε φακέλους / ετικέτες</h2><ul class="tips"><li>Βάζω τα σημαντικά σε φάκελο, π.χ. <b>«Τράπεζα»</b>, <b>«Γιατροί»</b>.</li><li>Έτσι τα βρίσκω εύκολα, χωρίς ψάξιμο.</li><li>Η <b>αναζήτηση 🔍</b> βρίσκει μήνυμα γράφοντας μια λέξη.</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">5</div><div><div class="kicker">Μάθημα 6 · Email</div><h1>Μπλοκάρω ενοχλητικούς &amp; διαφημίσεις</h1></div></div>
+  <div class="rule ">🚫 Δεν χρειάζεται να τα ανέχεστε. Ένα-δύο πατήματα και ησυχάζετε.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">⛔</span> Αποκλεισμός αποστολέα</h2><ol class="steps"><li>Ανοίγω ένα μήνυμα του ενοχλητικού.</li><li>Πατάω το μενού <b>(⋮)</b> πάνω δεξιά.</li><li>Επιλέγω <b>«Αποκλεισμός»</b> (Block).</li><li>Δεν ξαναέρχονται μηνύματά του.</li></ol></div><div class="card " ><h2><span class="ic">✋</span> Unsubscribe από διαφημίσεις</h2><p class="big">Στο <b>κάτω μέρος</b> των διαφημιστικών email υπάρχει μικρός σύνδεσμος <b>«Κατάργηση εγγραφής / Unsubscribe»</b>. Τον πατάω και σταματούν.<br/><span class="muted">Προσοχή: σε <b>ύποπτα/απάτες</b> δεν πατάω τίποτα — απλώς διαγράφω &amp; μπλοκάρω.</span></p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">6</div><div><div class="kicker">Μάθημα 6 · Μοίρασμα</div><h1>Στέλνω αρχεία &amp; φωτογραφίες εύκολα</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">📤</span> Το κουμπί «Κοινή χρήση»</h2><ul class="tips"><li>Παντού υπάρχει το κουμπί <b>Κοινή χρήση (Share) ↗️</b> — σε φωτογραφίες, αρχεία, σελίδες.</li><li>Πατάω <b>Share</b> → διαλέγω <b>πού</b>: Viber, email, Bluetooth.</li><li>Παράδειγμα: στέλνω μια φωτογραφία στην κόρη μου με <b>2 πατήματα</b>.</li></ul></div><div class="card check" ><h2><span class="ic">❓</span> Ερωτήσεις ελέγχου</h2><ul class="qs"><li>Ξέρετε πού είναι το κουμπί Share ↗️;</li><li>Έχετε στείλει φωτογραφία σε δικό σας;</li><li>Σε ποια εφαρμογή στέλνετε πιο συχνά;</li></ul></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">7</div><div><div class="kicker">Μάθημα 6 · Χαμένο κινητό</div><h1>Το βρίσκω όταν χαθεί</h1></div></div>
+  <div class="rule ">🔎 Ρυθμίζεται <b>από πριν</b> — μια φορά, και είστε καλυμμένοι.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">📍</span> Εύρεση συσκευής</h2><ul class="tips"><li>Ενεργοποιώ από νωρίς το <b>«Εύρεση συσκευής»</b> (Find My Device / Find My).</li><li>Αν χαθεί: από <b>άλλο κινητό ή υπολογιστή</b> μπαίνω στον λογαριασμό μου.</li><li>Βλέπω <b>στον χάρτη</b> πού είναι — μπορώ να το κάνω να <b>χτυπήσει</b>, ακόμη κι αν είναι αθόρυβο.</li></ul></div><div class="card " ><h2><span class="ic">✅</span> Προϋπόθεση</h2><p class="big">Το κινητό να είναι <b>αναμμένο</b> &amp; στο <b>ίντερνετ</b>, και να έχω λογαριασμό <b>Google</b> (Android) ή <b>Apple</b> (iPhone).</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">8</div><div><div class="kicker">Μάθημα 6 · Ημερολόγιο</div><h1>Γεγονότα (events) &amp; εργασίες (tasks)</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">📅</span> Δύο διαφορετικά πράγματα</h2><ul class="tips"><li><b>Γεγονός (event):</b> κάτι με <b>ώρα</b> — ραντεβού γιατρού, γιορτή, γάμος. Με <b>υπενθύμιση</b> πριν.</li><li><b>Εργασία (task):</b> κάτι που <b>έχω να κάνω</b> — «πληρωμή λογαριασμού». Το <b>τσεκάρω</b> όταν γίνει.</li><li><b>Πώς βοηθούν:</b> το κινητό μου <b>θυμίζει</b> — δεν ξεχνάω ραντεβού ούτε πληρωμές.</li></ul></div><div class="card " ><h2><span class="ic">💡</span> Παράδειγμα</h2><p class="big">Βάζω γεγονός «<i>Καρδιολόγος, Τρίτη 10:00</i>» με υπενθύμιση 1 ώρα πριν. Το κινητό με ειδοποιεί — ήσυχο κεφάλι.</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">9</div><div><div class="kicker">Μάθημα 6 · Βοηθός AI</div><h1>Ζητάω από το κινητό να με βοηθήσει</h1></div></div>
+  <div class="rule ">🤖 Του μιλάω με <b>κανονικά λόγια</b> — γραπτά ή με <b>φωνή</b> 🎤.</div><div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">✨</span> Τι μπορεί να κάνει</h2><ul class="tips"><li>Βάζει <b>ξυπνητήρι</b> ή <b>χρονόμετρο</b> («βάλε ξυπνητήρι στις 7»).</li><li>Φτιάχνει <b>υπενθύμιση</b> («θύμισέ μου αύριο στις 9 τα χάπια»).</li><li><b>Ψάχνει</b> κάτι για εμένα, ανοίγει εφαρμογή.</li><li><b>Παίρνει τηλέφωνο</b> μια επαφή, αν πω καθαρά το όνομα.</li></ul></div><div class="card " ><h2><span class="ic">⚠️</span> Καλό να ξέρω</h2><p class="big">Για κλήσεις/μηνύματα λέω <b>καθαρά</b> το όνομα της επαφής. Τα <b>SMS</b> μπορεί να έχουν χρέωση ανάλογα το πρόγραμμα. Για σημαντικά, <b>επιβεβαιώνω</b> μόνος μου.</p></div></div>
+</section>
+<section class="slide">
+  <div class="head"><div class="badge">10</div><div><div class="kicker">Μάθημα 6 · Ανακεφαλαίωση</div><h1>Τι κρατάμε — και τι δοκιμάζουμε</h1></div></div>
+  <div class="grid" style="--cols:1.4fr 1fr"><div class="card " ><h2><span class="ic">✅</span> Τα πήραμε</h2><ul class="tips"><li>Προωθώ, διαγράφω &amp; μπλοκάρω μηνύματα.</li><li>Μοιράζομαι αρχεία με το κουμπί Share.</li><li>Ξέρω πώς να βρω χαμένο κινητό.</li><li>Βάζω υπενθυμίσεις με ημερολόγιο &amp; AI.</li></ul></div><div class="card " ><h2><span class="ic">🤝</span> Χωρίς ντροπή</h2><p class="big">Διαλέξτε <b>ένα</b> πράγμα να δοκιμάσετε σπίτι αυτή τη βδομάδα. Με την επανάληψη γίνεται συνήθεια.</p></div><div class="refs"><span class="lbl">Δείτε / εξασκηθείτε στην εφαρμογή</span><span class="ref"><b>Βοηθοί AI:</b> <code>/modules/module13</code></span></div></div>
+</section>
+</div>
+<nav class="nav">
+  <button id="prev">← Προηγούμενο</button>
+  <div class="dots" id="dots"></div>
+  <button id="next">Επόμενο →</button>
+</nav>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dotsWrap=document.getElementById('dots'),cur=document.getElementById('cur');
+const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
+let i=0;
+slides.forEach((_,n)=>{const d=document.createElement('button');d.className='dot'+(n===0?' active':'');
+  d.setAttribute('aria-label','Διαφάνεια '+(n+1));d.addEventListener('click',()=>go(n));dotsWrap.appendChild(d)});
+const dots=[...dotsWrap.children];
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('active',k===i));
+  cur.textContent=i+1;prevBtn.disabled=i===0;nextBtn.disabled=i===slides.length-1;slides[i].scrollTop=0}
+prevBtn.addEventListener('click',()=>go(i-1));nextBtn.addEventListener('click',()=>go(i+1));
+document.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t instanceof HTMLElement && (t.isContentEditable || ['INPUT','TEXTAREA','SELECT','BUTTON','A'].includes(t.tagName))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){go(i+1);e.preventDefault()}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){go(i-1);e.preventDefault()}
+  if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+let x0=null,y0=null;
+document.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{if(x0===null)return;
+  const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5)go(i+(dx<0?1:-1));
+  x0=null;y0=null},{passive:true});
+go(0);
+</script>
+</body>
+</html>

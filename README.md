@@ -163,7 +163,7 @@ bun run test:e2e      # Playwright e2e tests
 σε οποιοδήποτε mini PC, με διπλό κλικ.
 
 - `static/kapi/index.html` — launcher με τα 4 μαθήματα
-- `static/kapi/mathima-1..4.html` — 4 ξεχωριστές, αναλυτικές παρουσιάσεις (μία ανά μάθημα)
+- `static/kapi/mathima-1..6.html` — 6 ξεχωριστές, αναλυτικές παρουσιάσεις (μία ανά μάθημα: 1-4 υπολογιστής, 5-6 κινητό)
 - `static/kapi/start-minipc.bat` / `static/kapi/start-minipc.sh` — άνοιγμα σε πλήρη οθόνη (kiosk)
 - `static/slides-kapi.html` — σύνοψη «4 σε 1»
 
