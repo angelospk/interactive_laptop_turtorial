@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/kapi", "destination": "/kapi/", "permanent": false },
+    { "source": "/mathima-:num.html", "destination": "/kapi/mathima-:num.html", "permanent": false }
+  ]
+}

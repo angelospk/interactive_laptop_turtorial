@@ -1065,18 +1065,12 @@ function indexPage() {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ψηφιακές Δεξιότητες — Μαθήματα ΚΑΠΗ</title>
 <script>
-  // Στο web: αν λείπει η κάθετος (π.χ. /kapi αντί /kapi/) τα σχετικά links σπάνε.
-  // Προσθέτουμε την κάθετο. Στο offline (file://) δεν κάνει τίποτα.
-  (function(){
-    if(location.protocol==='file:')return;
-    var p=location.pathname;
-    if(!p.endsWith('/')&&!/\.[a-zA-Z0-9]+$/.test(p)){
-      location.replace(p+'/'+location.search+location.hash);
-    }
-  })();
+  // Web: σταθερή βάση /kapi/ ώστε τα links να δουλεύουν ΚΑΙ χωρίς κάθετο (/kapi).
+  // Offline (file://): δεν κάνουμε τίποτα — τα links μένουν σχετικά.
+  if (location.protocol !== 'file:') document.write('<base href="/kapi/">');
 </script>
+<title>Ψηφιακές Δεξιότητες — Μαθήματα ΚΑΠΗ</title>
 <style>
 ${CSS}
 body{overflow:auto;min-height:100vh}
