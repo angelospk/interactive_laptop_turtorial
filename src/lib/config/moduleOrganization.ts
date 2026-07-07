@@ -30,7 +30,8 @@ export const moduleCategories: ModuleCategory[] = [
 		id: 'digital-life',
 		title: 'Ψηφιακή ζωή & υπηρεσίες',
 		moduleIds: ['module9', 'module12', 'module13']
-	}
+	},
+	{ id: 'mobile', title: 'Κινητό τηλέφωνο', moduleIds: ['android'] }
 ];
 
 // ── Device tags (device-aware prioritisation, ROADMAP Φάση 1) ───────────────
@@ -49,7 +50,8 @@ export const moduleDevices: Record<string, ModuleDevice[]> = {
 	module3: ['windows'], // Περιβάλλον Windows 11 (Windows-only)
 	module4: ['windows', 'mac'], // Αρχεία & Φάκελοι
 	module7: ['windows', 'mac'], // Excel
-	word: ['windows', 'mac'] // Επεξεργασία Κειμένου
+	word: ['windows', 'mac'], // Επεξεργασία Κειμένου
+	android: ['android'] // Android track (ROADMAP Φάση 2)
 };
 
 /** Device tags for a module, or `null` when it is universal (applies to all). */

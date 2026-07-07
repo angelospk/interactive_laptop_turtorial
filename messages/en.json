@@ -279,6 +279,10 @@
 	"quiz_gov_intro_opt_b": "Ask Google or AI: 'ID card renewal gov.gr'",
 	"quiz_gov_intro_opt_c": "Go to the citizen service center without searching online",
 
+	"android_title": "Android Phone [BETA]",
+	"android_description": "Learn to use your Android phone — opening apps, calls, photos and settings",
+	"android_lesson1_title": "1. Open an app",
+	"android_lesson1_desc": "Practice: find and tap the correct icon on the phone home screen",
 	"module13_title": "AI Assistants [BETA]",
 	"module13_description": "Meet AI assistants — what they do, how to ask questions, and when you need them",
 	"module13_lesson1_title": "1. What is an AI Assistant",

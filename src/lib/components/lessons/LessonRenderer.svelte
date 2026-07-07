@@ -38,6 +38,9 @@
 			// The new unified desktop simulation
 			'desktop-simulation': () => import('./interactive/DesktopLesson.svelte'),
 
+			// Mobile (Android/iPhone) tap-to-open-app simulation — ROADMAP Φάση 2
+			'mobile-tap': () => import('./interactive/MobileTapLesson.svelte'),
+
 			// New Quiz Type
 			quiz: () => import('./interactive/QuizLesson.svelte'),
 			reading: () => import('./interactive/ReadingLesson.svelte'),

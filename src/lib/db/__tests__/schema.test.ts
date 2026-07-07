@@ -241,7 +241,8 @@ describe('Database Schema - Seed Data', () => {
             'browser',
             'quiz',
             'scam-spotter',
-            'reading'
+            'reading',
+            'mobile-tap'
         ]);
 
         allLessons.forEach((lesson) => {

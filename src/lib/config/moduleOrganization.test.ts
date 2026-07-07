@@ -39,8 +39,9 @@ describe('groupModulesByCategory', () => {
 		expect(groupModulesByCategory(all).some((g) => g.category?.id === 'other')).toBe(false);
 	});
 
-	it('exposes 5 categories', () => {
-		expect(moduleCategories).toHaveLength(5);
+	it('exposes 6 categories (incl. the mobile track)', () => {
+		expect(moduleCategories).toHaveLength(6);
+		expect(moduleCategories.map((c) => c.id)).toContain('mobile');
 	});
 });
 
