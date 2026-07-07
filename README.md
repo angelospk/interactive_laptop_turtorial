@@ -70,6 +70,7 @@ bun run db:init      # Full initialization (generate + push)
 
 ## Development
 
+- Adding a new module/lesson? See **[docs/i18n-guide.md](docs/i18n-guide.md)** for the i18n key workflow.
 - Uses **local SQLite** (`local.db`) for development
 - All user progress saved locally
 - Database can be viewed with `bun run db:studio`
