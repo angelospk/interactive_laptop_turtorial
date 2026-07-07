@@ -60,6 +60,14 @@ bun run db:studio    # Open Drizzle Studio to view/edit data
 bun run db:init      # Full initialization (generate + push)
 ```
 
+> **Provisioning uses `db:push`, not migrations.** The schema is applied by
+> diffing `src/lib/db/schema.ts` against the database with `drizzle-kit push`
+> (see `scripts/init-db.sh`). The `drizzle/` migration files are gitignored
+> advisory artifacts and are **not** a complete history — e.g. `db:generate`
+> re-emits `CREATE TABLE modules` because that table was only ever provisioned
+> via push. Treat `schema.ts` + `db:push` as the source of truth. When adding a
+> column, run `db:push` against every target database (local **and** Turso).
+
 ## Development
 
 - Uses **local SQLite** (`local.db`) for development
