@@ -2,10 +2,14 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import DeviceOnboarding from '$lib/components/DeviceOnboarding.svelte';
 	import { onMount } from 'svelte';
 	import { setLocale, getLocale } from '$lib/paraglide/runtime';
 
-	let { children } = $props();
+	let { children, data } = $props();
+
+	// First-time device confirmation: logged-in user who hasn't picked a track yet.
+	const needsDeviceOnboarding = $derived(!!data.user && !data.user.preferredDevice);
 
 	// Read saved locale preference on mount, default to Greek
 	onMount(() => {
@@ -26,4 +30,7 @@
 </svelte:head>
 
 <Toaster richColors position="top-right" expand={true} />
+{#if needsDeviceOnboarding}
+	<DeviceOnboarding />
+{/if}
 {@render children()}

@@ -47,4 +47,7 @@ export type UserSession = {
     displayName?: string;
     lastLogin?: Date;
     isAdmin?: boolean;
+    // Preferred learning device (windows|mac|android|iphone); null/undefined = not
+    // chosen yet -> onboarding shows the device-confirmation step. See ROADMAP Φάση 1.
+    preferredDevice?: 'windows' | 'mac' | 'android' | 'iphone' | null;
 };
