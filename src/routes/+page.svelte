@@ -5,8 +5,18 @@
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { BookOpen, ArrowRight, Check } from '@lucide/svelte';
+	import Monitor from '@lucide/svelte/icons/monitor';
+	import Laptop from '@lucide/svelte/icons/laptop';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import TabletSmartphone from '@lucide/svelte/icons/tablet-smartphone';
 	import { reveal } from '$lib/actions/reveal';
-	import { groupModulesByCategory } from '$lib/config/moduleOrganization';
+	import {
+		groupModulesByCategory,
+		getModuleDevices,
+		modulesSpecificToDevice,
+		type ModuleDevice
+	} from '$lib/config/moduleOrganization';
+	import DeviceOnboarding from '$lib/components/DeviceOnboarding.svelte';
 
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
@@ -22,6 +32,22 @@
 
 	// Group the flat module list into themed categories for easier navigation.
 	let groupedModules = $derived(groupModulesByCategory(data.modules ?? []));
+
+	// ── Device-aware prioritisation (ROADMAP Φάση 1) ──────────────────────────
+	const DEVICE_META: Record<ModuleDevice, { label: string; icon: typeof Monitor }> = {
+		windows: { label: 'Windows', icon: Monitor },
+		mac: { label: 'Mac', icon: Laptop },
+		android: { label: 'Android', icon: Smartphone },
+		iphone: { label: 'iPhone', icon: TabletSmartphone }
+	};
+
+	let preferredDevice = $derived((data.user?.preferredDevice ?? null) as ModuleDevice | null);
+	// Focused shortlist of modules made specifically for the user's device.
+	let deviceModules = $derived(
+		preferredDevice ? modulesSpecificToDevice(data.modules ?? [], preferredDevice) : []
+	);
+
+	let changeDeviceOpen = $state(false);
 </script>
 
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
@@ -69,9 +95,10 @@
 		</section>
 
 		<!-- Module grid, grouped into themed categories -->
-		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string }, num: number)}
+		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string | null }, num: number)}
 			{@const moduleProgress = getProgress(module.id)}
 			{@const done = moduleProgress >= 100}
+			{@const deviceTags = getModuleDevices(module.id)}
 			<a
 				href={`/modules/${module.id}`}
 				data-reveal
@@ -101,8 +128,23 @@
 							{messages[module.titleKey] ? messages[module.titleKey]() : module.id}
 						</h2>
 						<p class="mt-2 line-clamp-2 text-base text-muted-foreground">
-							{messages[module.descriptionKey] ? messages[module.descriptionKey]() : ''}
+							{module.descriptionKey && messages[module.descriptionKey]
+							? messages[module.descriptionKey]()
+							: ''}
 						</p>
+						{#if deviceTags}
+							<div class="mt-3 flex flex-wrap gap-1.5">
+								{#each deviceTags as tag (tag)}
+									{@const meta = DEVICE_META[tag]}
+									<span
+										class="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground"
+									>
+										<meta.icon class="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+										{meta.label}
+									</span>
+								{/each}
+							</div>
+						{/if}
 					</div>
 
 					<!-- Progress rail -->
@@ -126,6 +168,39 @@
 				</div>
 			</a>
 		{/snippet}
+
+		<!-- "Για τη συσκευή σου" — device-aware prioritisation (not hiding, ROADMAP §1) -->
+		{#if preferredDevice}
+			{@const dm = DEVICE_META[preferredDevice]}
+			<section class="mb-12" data-reveal use:reveal>
+				<div class="mb-5 flex flex-wrap items-center gap-3">
+					<h2 class="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+						<dm.icon class="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+						Για τη συσκευή σου · {dm.label}
+					</h2>
+					<span class="h-px flex-1 bg-border"></span>
+					<Button
+						variant="ghost"
+						onclick={() => (changeDeviceOpen = true)}
+						class="h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground"
+					>
+						Αλλαγή συσκευής
+					</Button>
+				</div>
+				{#if deviceModules.length}
+					<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+						{#each deviceModules as module, mi (module.id)}
+							{@render moduleCard(module, mi + 1)}
+						{/each}
+					</div>
+				{:else}
+					<div class="rounded-2xl border border-dashed border-border bg-secondary/40 p-6 text-base text-muted-foreground">
+						Τα ξεχωριστά μαθήματα για <strong>{dm.label}</strong> έρχονται σύντομα. Στο μεταξύ,
+						όλα τα μαθήματα πιο κάτω ισχύουν και για τη δική σου συσκευή.
+					</div>
+				{/if}
+			</section>
+		{/if}
 
 		<div class="space-y-12">
 			{#each groupedModules as group (group.category?.id)}
@@ -159,3 +234,8 @@
 		</div>
 	</div>
 </main>
+
+<!-- Change-device modal, opened from the "Για τη συσκευή σου" chip -->
+{#if data.user}
+	<DeviceOnboarding bind:open={changeDeviceOpen} currentDevice={preferredDevice} dismissable />
+{/if}

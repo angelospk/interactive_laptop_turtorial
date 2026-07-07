@@ -33,6 +33,49 @@ export const moduleCategories: ModuleCategory[] = [
 	}
 ];
 
+// ── Device tags (device-aware prioritisation, ROADMAP Φάση 1) ───────────────
+
+export type ModuleDevice = 'windows' | 'mac' | 'android' | 'iphone';
+
+/**
+ * Modules tied to a specific device family. A module NOT listed here is
+ * "universal" — it applies to every device (e.g. internet safety, video calls,
+ * gov services), so existing content needs zero migration. Desktop-input and
+ * desktop-app modules are the ones that genuinely differ per device.
+ */
+export const moduleDevices: Record<string, ModuleDevice[]> = {
+	module1: ['windows', 'mac'], // Ποντίκι & Κλικ
+	module2: ['windows', 'mac'], // Πληκτρολόγιο
+	module3: ['windows'], // Περιβάλλον Windows 11 (Windows-only)
+	module4: ['windows', 'mac'], // Αρχεία & Φάκελοι
+	module7: ['windows', 'mac'], // Excel
+	word: ['windows', 'mac'] // Επεξεργασία Κειμένου
+};
+
+/** Device tags for a module, or `null` when it is universal (applies to all). */
+export function getModuleDevices(moduleId: string): ModuleDevice[] | null {
+	return moduleDevices[moduleId] ?? null;
+}
+
+/** A universal module matches any device; a tagged one only its listed devices. */
+export function isModuleForDevice(moduleId: string, device: ModuleDevice): boolean {
+	const tags = moduleDevices[moduleId];
+	return !tags || tags.includes(device);
+}
+
+/**
+ * Modules explicitly tagged for the given device (universal modules excluded),
+ * preserving input order. This is the focused "Για τη συσκευή σου" shortlist —
+ * it is empty for devices whose dedicated content does not exist yet, which the
+ * UI surfaces honestly rather than padding with universal modules.
+ */
+export function modulesSpecificToDevice<M extends { id: string }>(
+	modules: M[],
+	device: ModuleDevice
+): M[] {
+	return modules.filter((m) => moduleDevices[m.id]?.includes(device));
+}
+
 export interface GroupedModules<M extends { id: string }> {
 	category: ModuleCategory | null;
 	modules: M[];

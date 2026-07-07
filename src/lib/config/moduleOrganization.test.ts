@@ -2,7 +2,10 @@ import { describe, it, expect } from 'vitest';
 import {
 	groupModulesByCategory,
 	buildLessonSections,
-	moduleCategories
+	moduleCategories,
+	getModuleDevices,
+	isModuleForDevice,
+	modulesSpecificToDevice
 } from './moduleOrganization';
 import type { Lesson } from '$lib/db/schema';
 
@@ -75,5 +78,43 @@ describe('buildLessonSections', () => {
 		const total = sections.reduce((n, s) => n + s.items.length, 0);
 		expect(total).toBe(15);
 		expect(sections.at(-1)!.items.at(-1)!.index).toBe(14);
+	});
+});
+
+describe('device tags', () => {
+	it('returns tags for desktop-specific modules and null for universal ones', () => {
+		expect(getModuleDevices('module1')).toEqual(['windows', 'mac']);
+		expect(getModuleDevices('module3')).toEqual(['windows']); // Windows-only
+		expect(getModuleDevices('module10')).toBeNull(); // phishing = universal
+	});
+
+	it('treats untagged (universal) modules as matching every device', () => {
+		for (const d of ['windows', 'mac', 'android', 'iphone'] as const) {
+			expect(isModuleForDevice('module10', d)).toBe(true);
+		}
+	});
+
+	it('matches a tagged module only for its listed devices', () => {
+		expect(isModuleForDevice('module3', 'windows')).toBe(true);
+		expect(isModuleForDevice('module3', 'mac')).toBe(false);
+		expect(isModuleForDevice('module1', 'mac')).toBe(true);
+		expect(isModuleForDevice('module1', 'android')).toBe(false);
+	});
+
+	it('shortlists device-specific modules and excludes universal ones', () => {
+		const all = mods('module1', 'module3', 'module10', 'word');
+		expect(modulesSpecificToDevice(all, 'windows').map((m) => m.id)).toEqual([
+			'module1',
+			'module3',
+			'word'
+		]);
+		// Mac: module3 is Windows-only, so it drops out
+		expect(modulesSpecificToDevice(all, 'mac').map((m) => m.id)).toEqual(['module1', 'word']);
+	});
+
+	it('returns an empty shortlist for devices without dedicated content yet', () => {
+		const all = mods('module1', 'module3', 'module10', 'word');
+		expect(modulesSpecificToDevice(all, 'android')).toEqual([]);
+		expect(modulesSpecificToDevice(all, 'iphone')).toEqual([]);
 	});
 });

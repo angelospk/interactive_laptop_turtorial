@@ -9,9 +9,22 @@
 
 	type ChoosableDevice = Exclude<Device, 'unknown'>;
 
-	// Shown once, after login, while the user has not picked a learning device.
+	// Two modes:
+	//  • First-time onboarding (layout): open defaults true, not dismissable —
+	//    the user must confirm a device before continuing.
+	//  • Change-later (header chip): parent binds `open`, passes the current
+	//    device and `dismissable` so the modal can be closed without choosing.
 	// Auto-detect is only a HINT here — the user confirms (elderly-UX, ROADMAP §3).
-	let open = $state(true);
+	let {
+		open = $bindable(true),
+		currentDevice = null,
+		dismissable = false
+	}: {
+		open?: boolean;
+		currentDevice?: ChoosableDevice | null;
+		dismissable?: boolean;
+	} = $props();
+
 	let saving = $state<ChoosableDevice | null>(null);
 	let error = $state<string | null>(null);
 	let guess = $state<Device>('unknown');
@@ -19,6 +32,9 @@
 	$effect(() => {
 		guess = detectDevice().device;
 	});
+
+	// Which option to highlight: the already-chosen device wins over the guess.
+	const highlighted = $derived<Device>(currentDevice ?? guess);
 
 	const OPTIONS: { device: ChoosableDevice; label: string; icon: typeof Monitor }[] = [
 		{ device: 'windows', label: 'Υπολογιστής Windows', icon: Monitor },
@@ -52,12 +68,14 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		class="max-w-2xl"
-		interactOutsideBehavior="ignore"
-		escapeKeydownBehavior="ignore"
-		showCloseButton={false}
+		interactOutsideBehavior={dismissable ? 'close' : 'ignore'}
+		escapeKeydownBehavior={dismissable ? 'close' : 'ignore'}
+		showCloseButton={dismissable}
 	>
 		<Dialog.Header>
-			<Dialog.Title class="text-2xl">Τι θέλεις να μάθεις να χρησιμοποιείς;</Dialog.Title>
+			<Dialog.Title class="text-2xl">
+				{currentDevice ? 'Άλλαξε συσκευή μαθημάτων' : 'Τι θέλεις να μάθεις να χρησιμοποιείς;'}
+			</Dialog.Title>
 			<Dialog.Description class="text-base">
 				Διάλεξε τη συσκευή για την οποία θέλεις μαθήματα. Μπορείς να την αλλάξεις όποτε
 				θέλεις αργότερα.
@@ -66,15 +84,23 @@
 
 		<div class="grid grid-cols-1 gap-4 py-2 sm:grid-cols-2">
 			{#each OPTIONS as opt (opt.device)}
+				{@const isCurrent = currentDevice === opt.device}
+				{@const isHint = !currentDevice && guess === opt.device}
 				<button
 					type="button"
 					onclick={() => choose(opt.device)}
 					disabled={saving !== null}
 					class="relative flex flex-col items-center gap-3 rounded-2xl border-2 border-gray-200 p-6 text-center transition hover:border-blue-500 hover:bg-blue-50 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none disabled:opacity-50"
-					class:border-blue-500={guess === opt.device}
-					class:bg-blue-50={guess === opt.device}
+					class:border-blue-500={highlighted === opt.device}
+					class:bg-blue-50={highlighted === opt.device}
 				>
-					{#if guess === opt.device}
+					{#if isCurrent}
+						<span
+							class="absolute -top-3 rounded-full bg-emerald-600 px-3 py-1 text-sm font-semibold text-white"
+						>
+							Η συσκευή σου
+						</span>
+					{:else if isHint}
 						<span
 							class="absolute -top-3 rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white"
 						>
