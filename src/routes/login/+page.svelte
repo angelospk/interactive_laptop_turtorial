@@ -137,9 +137,9 @@
 								<BookOpen class="h-5 w-5 text-brand" strokeWidth={1.75} />
 							</span>
 							<span>
-								Βιβλιοθήκη — διαβάστε υλικό
+								{m.library_cta()}
 								<span class="block text-xs font-normal text-muted-foreground">
-									Ελεύθερη πρόσβαση, χωρίς σύνδεση
+									{m.library_cta_sub()}
 								</span>
 							</span>
 						</span>

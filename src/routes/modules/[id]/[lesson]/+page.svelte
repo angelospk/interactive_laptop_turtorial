@@ -26,10 +26,12 @@
 
 <div class="container mx-auto p-4 md:p-8">
 	<!-- Breadcrumb so users always know where they are and how to get back. -->
-	<nav class="text-muted-foreground mb-4 text-sm" aria-label="Διαδρομή">
-		<a class="hover:text-foreground hover:underline" href="/">Αρχική</a>
+	<nav class="text-muted-foreground mb-4 text-sm" aria-label={m.breadcrumb_aria()}>
+		<a class="hover:text-foreground hover:underline" href="/">{m.nav_home()}</a>
 		<span class="mx-1">›</span>
-		<a class="hover:text-foreground hover:underline" href={`/modules/${data.moduleId}`}>Μαθήματα</a>
+		<a class="hover:text-foreground hover:underline" href={`/modules/${data.moduleId}`}
+			>{m.breadcrumb_lessons()}</a
+		>
 	</nav>
 
 	<div class="mb-6">

@@ -78,9 +78,9 @@
 					</span>
 					<p class="text-base text-foreground">
 						{#if notice === 'locked'}
-							Κάντε πρώτα τα προηγούμενα μαθήματα για να ξεκλειδώσετε αυτό.
+							{m.notice_locked()}
 						{:else}
-							Το μάθημα που ζητήσατε δεν βρέθηκε. Διαλέξτε ένα από τη λίστα.
+							{m.notice_missing()}
 						{/if}
 					</p>
 				</div>
@@ -133,8 +133,8 @@
 		{:else}
 			<div class="bezel-shell mx-auto max-w-md shadow-soft" data-reveal use:reveal>
 				<div class="bezel-core px-6 py-12 text-center">
-					<p class="text-base text-muted-foreground">Δεν βρέθηκαν μαθήματα για αυτή την ενότητα.</p>
-					<Button class="mt-6 rounded-full" href="/">Αρχική</Button>
+					<p class="text-base text-muted-foreground">{m.no_lessons_in_module()}</p>
+					<Button class="mt-6 rounded-full" href="/">{m.nav_home()}</Button>
 				</div>
 			</div>
 		{/if}
