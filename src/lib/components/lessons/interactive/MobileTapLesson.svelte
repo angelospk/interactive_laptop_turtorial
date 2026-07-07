@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Lesson } from '$lib/db/schema';
+	import { onDestroy } from 'svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import MobileFrame from '$lib/components/mobile/MobileFrame.svelte';
 
@@ -35,6 +36,11 @@
 	let done = $state(false);
 	let feedback = $state(''); // announced via aria-live
 
+	// The success delay must not fire after the lesson is left/unmounted, or it
+	// would call onComplete on a stale lesson (codex/coderabbit).
+	let completeTimer: ReturnType<typeof setTimeout> | undefined;
+	onDestroy(() => clearTimeout(completeTimer));
+
 	// Elderly-friendly scoring (codex): full marks first try, gentle penalties.
 	function scoreFor(wrong: number, hinted: boolean): number {
 		if (hinted) return 60;
@@ -48,7 +54,8 @@
 			done = true;
 			feedback = config.successMessage ?? 'Μπράβο! Το βρήκες.';
 			// Small pause so the success message is seen before advancing.
-			setTimeout(() => onComplete(scoreFor(wrongTaps, showHint)), 900);
+			clearTimeout(completeTimer);
+			completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps, showHint)), 900);
 			return;
 		}
 
