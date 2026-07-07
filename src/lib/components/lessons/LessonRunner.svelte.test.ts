@@ -30,12 +30,16 @@ const mockLessons = [
 describe('LessonRunner Logic', () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        global.fetch = vi.fn(() => 
-            Promise.resolve({
-                ok: true,
-                json: () => Promise.resolve({ progress: { completed: true, score: 100 } })
-            })
-        ) as any;
+        // In the browser test env there is no Node `global`; stub on globalThis.
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() =>
+                Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ progress: { completed: true, score: 100 } })
+                })
+            )
+        );
     });
 
     // We can test the internal state directly since testing full DOM with complex Svelte components can be tricky without userEvent
