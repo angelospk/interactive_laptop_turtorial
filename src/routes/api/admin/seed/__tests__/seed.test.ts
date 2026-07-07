@@ -1,38 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../+server';
 import type { RequestEvent } from '@sveltejs/kit';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { sql } from 'drizzle-orm';
 import { lessons } from '$lib/db/schema';
 import { allLessons } from '$lib/db/seeds';
+import { createTestDb, type TestDb } from '$lib/db/__tests__/testDb';
 
 describe('POST /api/admin/seed', () => {
-    let db: ReturnType<typeof drizzle>;
-    let sqlite: Database.Database;
+    let db: TestDb;
 
-    beforeEach(() => {
-        // Create in-memory database for testing
-        sqlite = new Database(':memory:');
-        db = drizzle(sqlite);
-
-        // Create tables
-        sqlite.exec(`
-			CREATE TABLE lessons (
-				id TEXT PRIMARY KEY,
-				module_id TEXT NOT NULL,
-				lesson_key TEXT NOT NULL,
-				title_key TEXT NOT NULL,
-				description_key TEXT,
-				difficulty TEXT NOT NULL CHECK(difficulty IN ('beginner', 'intermediate', 'advanced')),
-				order_index INTEGER NOT NULL,
-				lesson_type TEXT NOT NULL,
-				config TEXT,
-				enabled INTEGER NOT NULL DEFAULT 1,
-				required_lesson_id TEXT REFERENCES lessons(id) ON DELETE SET NULL,
-				created_at INTEGER NOT NULL,
-				UNIQUE(module_id, lesson_key)
-			);
-		`);
+    beforeEach(async () => {
+        db = await createTestDb();
     });
 
     it('should insert all lessons from seed data', async () => {
@@ -52,14 +30,14 @@ describe('POST /api/admin/seed', () => {
         expect(data.skipped).toBe(0);
 
         // Verify database
-        const lessonsInDb = db.select().from(lessons).all();
+        const lessonsInDb = await db.select().from(lessons).all();
         expect(lessonsInDb).toHaveLength(allLessons.length);
     });
 
     it('should skip already existing lessons', async () => {
         // Insert first 5 lessons
         for (let i = 0; i < 5; i++) {
-            db.insert(lessons).values(allLessons[i]).run();
+            await db.insert(lessons).values(allLessons[i]).run();
         }
 
         const mockEvent = {
@@ -78,7 +56,7 @@ describe('POST /api/admin/seed', () => {
         expect(data.skipped).toBe(5);
 
         // Verify no duplicates
-        const lessonsInDb = db.select().from(lessons).all();
+        const lessonsInDb = await db.select().from(lessons).all();
         expect(lessonsInDb).toHaveLength(allLessons.length);
     });
 
@@ -97,7 +75,7 @@ describe('POST /api/admin/seed', () => {
 
     it('should handle database errors gracefully', async () => {
         // Drop the table to simulate an error
-        sqlite.exec('DROP TABLE lessons');
+        await db.run(sql`DROP TABLE lessons`);
 
         const mockEvent = {
             locals: {

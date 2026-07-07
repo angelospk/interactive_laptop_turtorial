@@ -1,63 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { lessons, users, userProgress, DEVICE_VALUES, type NewLesson } from '../schema';
 import { allLessons, module1Lessons } from '../seeds';
 import { eq, and } from 'drizzle-orm';
+import { createTestDb, type TestDb } from './testDb';
 
 describe('Database Schema - Lessons Table', () => {
-    let db: ReturnType<typeof drizzle>;
-    let sqlite: Database.Database;
+    let db: TestDb;
 
-    beforeEach(() => {
-        // Create in-memory database for testing
-        sqlite = new Database(':memory:');
-        db = drizzle(sqlite);
-
-        // Create tables
-        sqlite.exec(`
-			CREATE TABLE users (
-				id TEXT PRIMARY KEY,
-				username TEXT UNIQUE NOT NULL,
-				display_name TEXT,
-				created_at INTEGER NOT NULL,
-				last_login INTEGER,
-				is_admin INTEGER DEFAULT 0,
-				preferred_device TEXT
-			);
-
-			CREATE TABLE lessons (
-				id TEXT PRIMARY KEY,
-				module_id TEXT NOT NULL,
-				lesson_key TEXT NOT NULL,
-				title_key TEXT NOT NULL,
-				description_key TEXT,
-				difficulty TEXT NOT NULL CHECK(difficulty IN ('beginner', 'intermediate', 'advanced')),
-				order_index INTEGER NOT NULL,
-				lesson_type TEXT NOT NULL,
-				config TEXT,
-				enabled INTEGER NOT NULL DEFAULT 1,
-				required_lesson_id TEXT REFERENCES lessons(id) ON DELETE SET NULL,
-				created_at INTEGER NOT NULL,
-				UNIQUE(module_id, lesson_key)
-			);
-
-			CREATE TABLE user_progress (
-				id TEXT PRIMARY KEY,
-				user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-				lesson_id TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-				completed INTEGER NOT NULL DEFAULT 0,
-				completed_at INTEGER,
-				score INTEGER,
-				stars INTEGER,
-				attempts INTEGER NOT NULL DEFAULT 0,
-				last_attempt_at INTEGER,
-				UNIQUE(user_id, lesson_id)
-			);
-		`);
+    beforeEach(async () => {
+        db = await createTestDb();
     });
 
-    it('should insert lesson with all new fields', () => {
+    it('should insert lesson with all new fields', async () => {
         const lesson: NewLesson = {
             id: 'test-lesson-1',
             moduleId: 'module1',
@@ -72,9 +26,9 @@ describe('Database Schema - Lessons Table', () => {
             requiredLessonId: null
         };
 
-        db.insert(lessons).values(lesson).run();
+        await db.insert(lessons).values(lesson).run();
 
-        const result = db.select().from(lessons).where(eq(lessons.id, 'test-lesson-1')).get();
+        const result = await db.select().from(lessons).where(eq(lessons.id, 'test-lesson-1')).get();
 
         expect(result).toBeDefined();
         expect(result?.lessonType).toBe('hover');
@@ -83,7 +37,7 @@ describe('Database Schema - Lessons Table', () => {
         expect(result?.requiredLessonId).toBeNull();
     });
 
-    it('should enforce unique constraint on (moduleId, lessonKey)', () => {
+    it('should enforce unique constraint on (moduleId, lessonKey)', async () => {
         const lesson1: NewLesson = {
             id: 'test-lesson-1',
             moduleId: 'module1',
@@ -112,14 +66,22 @@ describe('Database Schema - Lessons Table', () => {
             requiredLessonId: null
         };
 
-        db.insert(lessons).values(lesson1).run();
+        await db.insert(lessons).values(lesson1).run();
 
-        expect(() => {
-            db.insert(lessons).values(lesson2).run();
-        }).toThrow(/UNIQUE constraint failed/);
+        // libsql wraps the driver error, so the "UNIQUE constraint failed" text
+        // lives on the cause rather than the top-level message.
+        let caught: unknown;
+        try {
+            await db.insert(lessons).values(lesson2).run();
+        } catch (e) {
+            caught = e;
+        }
+        expect(caught).toBeDefined();
+        const text = `${(caught as Error)?.message ?? ''} ${String((caught as { cause?: unknown })?.cause ?? '')}`;
+        expect(text).toMatch(/UNIQUE constraint failed/);
     });
 
-    it('should allow same lessonKey in different modules', () => {
+    it('should allow same lessonKey in different modules', async () => {
         const lesson1: NewLesson = {
             id: 'test-lesson-1',
             moduleId: 'module1',
@@ -148,14 +110,14 @@ describe('Database Schema - Lessons Table', () => {
             requiredLessonId: null
         };
 
-        db.insert(lessons).values(lesson1).run();
-        db.insert(lessons).values(lesson2).run();
+        await db.insert(lessons).values(lesson1).run();
+        await db.insert(lessons).values(lesson2).run();
 
-        const results = db.select().from(lessons).all();
+        const results = await db.select().from(lessons).all();
         expect(results).toHaveLength(2);
     });
 
-    it('should handle foreign key constraint on requiredLessonId', () => {
+    it('should handle foreign key constraint on requiredLessonId', async () => {
         const lesson1: NewLesson = {
             id: 'test-lesson-1',
             moduleId: 'module1',
@@ -184,27 +146,30 @@ describe('Database Schema - Lessons Table', () => {
             requiredLessonId: 'test-lesson-1' // References lesson1
         };
 
-        db.insert(lessons).values(lesson1).run();
-        db.insert(lessons).values(lesson2).run();
+        await db.insert(lessons).values(lesson1).run();
+        await db.insert(lessons).values(lesson2).run();
 
-        const result = db.select().from(lessons).where(eq(lessons.id, 'test-lesson-2')).get();
+        const result = await db.select().from(lessons).where(eq(lessons.id, 'test-lesson-2')).get();
         expect(result?.requiredLessonId).toBe('test-lesson-1');
     });
 
-    it('should default preferredDevice to null and round-trip each device value', () => {
-        db.insert(users).values({ id: 'u-null', username: 'anna' }).run();
-        const noPref = db.select().from(users).where(eq(users.id, 'u-null')).get();
+    it('should default preferredDevice to null and round-trip each device value', async () => {
+        await db.insert(users).values({ id: 'u-null', username: 'anna' }).run();
+        const noPref = await db.select().from(users).where(eq(users.id, 'u-null')).get();
         expect(noPref?.preferredDevice).toBeNull();
 
         for (const device of DEVICE_VALUES) {
             const id = `u-${device}`;
-            db.insert(users).values({ id, username: `user-${device}`, preferredDevice: device }).run();
-            const row = db.select().from(users).where(eq(users.id, id)).get();
+            await db
+                .insert(users)
+                .values({ id, username: `user-${device}`, preferredDevice: device })
+                .run();
+            const row = await db.select().from(users).where(eq(users.id, id)).get();
             expect(row?.preferredDevice).toBe(device);
         }
     });
 
-    it('should filter lessons by enabled status', () => {
+    it('should filter lessons by enabled status', async () => {
         const lesson1: NewLesson = {
             id: 'test-lesson-1',
             moduleId: 'module1',
@@ -233,9 +198,9 @@ describe('Database Schema - Lessons Table', () => {
             requiredLessonId: null
         };
 
-        db.insert(lessons).values([lesson1, lesson2]).run();
+        await db.insert(lessons).values([lesson1, lesson2]).run();
 
-        const enabledLessons = db
+        const enabledLessons = await db
             .select()
             .from(lessons)
             .where(and(eq(lessons.moduleId, 'module1'), eq(lessons.enabled, true)))
@@ -274,7 +239,9 @@ describe('Database Schema - Seed Data', () => {
             'legacy-module-4',
             'desktop-simulation',
             'browser',
-            'quiz'
+            'quiz',
+            'scam-spotter',
+            'reading'
         ]);
 
         allLessons.forEach((lesson) => {
@@ -303,15 +270,20 @@ describe('Database Schema - Seed Data', () => {
     });
 
     it('should have valid i18n keys', () => {
-        allLessons.forEach((lesson) => {
-            // Keys must be non-empty strings without spaces
-            expect(lesson.titleKey).toMatch(/^\S+$/);
-            expect(lesson.titleKey).toContain('title');
-            if (lesson.descriptionKey) {
-                expect(lesson.descriptionKey).toMatch(/^\S+$/);
-                expect(lesson.descriptionKey).toContain('desc');
-            }
-        });
+        // 'reading' lessons are seeded from the content manifest and display their
+        // title/description text directly (not through i18n message keys), so the
+        // key-format rules below only apply to interactive lessons.
+        allLessons
+            .filter((lesson) => lesson.lessonType !== 'reading')
+            .forEach((lesson) => {
+                // Keys must be non-empty strings without spaces
+                expect(lesson.titleKey).toMatch(/^\S+$/);
+                expect(lesson.titleKey).toContain('title');
+                if (lesson.descriptionKey) {
+                    expect(lesson.descriptionKey).toMatch(/^\S+$/);
+                    expect(lesson.descriptionKey).toContain('desc');
+                }
+            });
     });
 
     it('should have first lesson without prerequisite', () => {

@@ -1,66 +1,37 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { POST } from '../+server';
-import type { RequestEvent } from '@sveltejs/kit';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { lessons, users, userProgress } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { createTestDb, type TestDb } from '$lib/db/__tests__/testDb';
+
+// The handler uses the module-level `db` from $lib/db/client (not locals.db),
+// so we mock that module to point at a fresh in-memory db per test.
+let currentDb: TestDb;
+vi.mock('$lib/db/client', async () => {
+    const schema = await import('$lib/db/schema');
+    return {
+        get db() {
+            return currentDb;
+        },
+        ...schema
+    };
+});
+
+const { POST } = await import('../+server');
+type RequestEvent = import('@sveltejs/kit').RequestEvent;
 
 describe('POST /api/lessons/complete', () => {
-    let db: ReturnType<typeof drizzle>;
-    let sqlite: Database.Database;
+    let db: TestDb;
     let testUserId: string;
     let testLessonId: string;
 
-    beforeEach(() => {
-        // Create in-memory database for testing
-        sqlite = new Database(':memory:');
-        db = drizzle(sqlite);
-
-        // Create tables
-        sqlite.exec(`
-			CREATE TABLE users (
-				id TEXT PRIMARY KEY,
-				username TEXT UNIQUE NOT NULL,
-				display_name TEXT,
-				created_at INTEGER NOT NULL,
-				last_login INTEGER,
-				is_admin INTEGER DEFAULT 0
-			);
-
-			CREATE TABLE lessons (
-				id TEXT PRIMARY KEY,
-				module_id TEXT NOT NULL,
-				lesson_key TEXT NOT NULL,
-				title_key TEXT NOT NULL,
-				description_key TEXT,
-				difficulty TEXT NOT NULL CHECK(difficulty IN ('beginner', 'intermediate', 'advanced')),
-				order_index INTEGER NOT NULL,
-				lesson_type TEXT NOT NULL,
-				config TEXT,
-				enabled INTEGER NOT NULL DEFAULT 1,
-				required_lesson_id TEXT REFERENCES lessons(id) ON DELETE SET NULL,
-				created_at INTEGER NOT NULL,
-				UNIQUE(module_id, lesson_key)
-			);
-
-			CREATE TABLE user_progress (
-				id TEXT PRIMARY KEY,
-				user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-				lesson_id TEXT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-				completed INTEGER NOT NULL DEFAULT 0,
-				completed_at INTEGER,
-				score INTEGER,
-				stars INTEGER,
-				attempts INTEGER NOT NULL DEFAULT 0,
-				last_attempt_at INTEGER,
-				UNIQUE(user_id, lesson_id)
-			);
-		`);
+    beforeEach(async () => {
+        db = await createTestDb();
+        currentDb = db;
 
         // Insert test user
         testUserId = crypto.randomUUID();
-        db.insert(users)
+        await db
+            .insert(users)
             .values({
                 id: testUserId,
                 username: 'testuser',
@@ -70,7 +41,8 @@ describe('POST /api/lessons/complete', () => {
 
         // Insert test lesson
         testLessonId = 'module1-lesson1';
-        db.insert(lessons)
+        await db
+            .insert(lessons)
             .values({
                 id: testLessonId,
                 moduleId: 'module1',
@@ -114,7 +86,7 @@ describe('POST /api/lessons/complete', () => {
         expect(data.progress.completed).toBe(true);
 
         // Verify database
-        const progress = db
+        const progress = await db
             .select()
             .from(userProgress)
             .where(eq(userProgress.userId, testUserId))
@@ -172,7 +144,8 @@ describe('POST /api/lessons/complete', () => {
 
     it('should update existing progress record', async () => {
         // Insert initial progress
-        db.insert(userProgress)
+        await db
+            .insert(userProgress)
             .values({
                 id: crypto.randomUUID(),
                 userId: testUserId,
@@ -210,7 +183,7 @@ describe('POST /api/lessons/complete', () => {
         expect(data.progress.attempts).toBe(2); // Incremented
 
         // Verify only one record exists
-        const records = db.select().from(userProgress).all();
+        const records = await db.select().from(userProgress).all();
         expect(records).toHaveLength(1);
     });
 

@@ -1,39 +1,32 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { POST } from '../+server';
-import type { RequestEvent } from '@sveltejs/kit';
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { lessons, type NewLesson } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { createTestDb, type TestDb } from '$lib/db/__tests__/testDb';
+
+// This handler talks to the module-level `db` from $lib/db/client (not locals.db),
+// so we mock that module to point at a fresh in-memory db per test. The getter is
+// re-read on every access, so it always returns the current test db.
+let currentDb: TestDb;
+vi.mock('$lib/db/client', async () => {
+    const schema = await import('$lib/db/schema');
+    return {
+        get db() {
+            return currentDb;
+        },
+        ...schema
+    };
+});
+
+const { POST } = await import('../+server');
+type RequestEvent = import('@sveltejs/kit').RequestEvent;
 
 describe('POST /api/admin/lessons/toggle', () => {
-    let db: ReturnType<typeof drizzle>;
-    let sqlite: Database.Database;
+    let db: TestDb;
     let testLessonId: string;
 
-    beforeEach(() => {
-        // Create in-memory database for testing
-        sqlite = new Database(':memory:');
-        db = drizzle(sqlite);
-
-        // Create tables
-        sqlite.exec(`
-			CREATE TABLE lessons (
-				id TEXT PRIMARY KEY,
-				module_id TEXT NOT NULL,
-				lesson_key TEXT NOT NULL,
-				title_key TEXT NOT NULL,
-				description_key TEXT,
-				difficulty TEXT NOT NULL CHECK(difficulty IN ('beginner', 'intermediate', 'advanced')),
-				order_index INTEGER NOT NULL,
-				lesson_type TEXT NOT NULL,
-				config TEXT,
-				enabled INTEGER NOT NULL DEFAULT 1,
-				required_lesson_id TEXT REFERENCES lessons(id) ON DELETE SET NULL,
-				created_at INTEGER NOT NULL,
-				UNIQUE(module_id, lesson_key)
-			);
-		`);
+    beforeEach(async () => {
+        db = await createTestDb();
+        currentDb = db;
 
         // Insert test lesson
         testLessonId = 'module1-lesson1';
@@ -52,7 +45,7 @@ describe('POST /api/admin/lessons/toggle', () => {
             createdAt: new Date()
         };
 
-        db.insert(lessons).values(testLesson).run();
+        await db.insert(lessons).values(testLesson).run();
     });
 
     it('should toggle lesson enabled status to false', async () => {
@@ -80,13 +73,13 @@ describe('POST /api/admin/lessons/toggle', () => {
         expect(data.lesson.enabled).toBe(false);
 
         // Verify database
-        const lesson = db.select().from(lessons).where(eq(lessons.id, testLessonId)).get();
+        const lesson = await db.select().from(lessons).where(eq(lessons.id, testLessonId)).get();
         expect(lesson?.enabled).toBe(false);
     });
 
     it('should toggle lesson enabled status to true', async () => {
         // First disable the lesson
-        db.update(lessons).set({ enabled: false }).where(eq(lessons.id, testLessonId)).run();
+        await db.update(lessons).set({ enabled: false }).where(eq(lessons.id, testLessonId)).run();
 
         const mockRequest = {
             json: async () => ({
@@ -110,7 +103,7 @@ describe('POST /api/admin/lessons/toggle', () => {
         expect(data.lesson.enabled).toBe(true);
 
         // Verify database
-        const lesson = db.select().from(lessons).where(eq(lessons.id, testLessonId)).get();
+        const lesson = await db.select().from(lessons).where(eq(lessons.id, testLessonId)).get();
         expect(lesson?.enabled).toBe(true);
     });
 
