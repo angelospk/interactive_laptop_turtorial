@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { dev } from '$app/environment';
 
 /**
  * Resolves the HMAC secret used to sign session cookies.
@@ -21,7 +22,10 @@ export function getSessionSecret(): string {
 		return cached;
 	}
 
-	if (process.env.NODE_ENV === 'production') {
+	// Guard on SvelteKit's build-time `dev` flag rather than process.env.NODE_ENV,
+	// which can be unset on non-Node adapters (fail-open risk). Anything that is
+	// not an explicit dev build must supply a real secret.
+	if (!dev) {
 		throw new Error(
 			'SESSION_SECRET is required in production (min 16 chars). Refusing to sign sessions with the dev fallback.'
 		);

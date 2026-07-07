@@ -74,3 +74,46 @@ export function verifySessionCookie(cookie: string, secret: string): UserSession
 	void _exp;
 	return session;
 }
+
+/**
+ * Signed admin flag for the separate `admin_session` cookie (password-gated
+ * admin panel). Previously stored the literal string 'true', which any client
+ * could forge by sending `Cookie: admin_session=true`. Now it carries an
+ * HMAC-signed, expiring marker verified the same way as session cookies.
+ */
+const ADMIN_MARKER = 'admin';
+
+export function signAdminCookie(secret: string, maxAgeSeconds: number): string {
+	const exp = Math.floor(Date.now() / 1000) + maxAgeSeconds;
+	const payloadB64 = Buffer.from(JSON.stringify({ m: ADMIN_MARKER, exp }), 'utf8').toString(
+		'base64url'
+	);
+	return `${payloadB64}.${hmac(payloadB64, secret)}`;
+}
+
+export function verifyAdminCookie(cookie: string, secret: string): boolean {
+	if (!cookie || typeof cookie !== 'string') return false;
+
+	const parts = cookie.split('.');
+	if (parts.length !== 2) return false;
+
+	const [payloadB64, sig] = parts;
+	if (!B64URL.test(payloadB64) || !B64URL.test(sig)) return false;
+
+	const expected = hmac(payloadB64, secret);
+	const sigBuf = Buffer.from(sig, 'base64url');
+	const expBuf = Buffer.from(expected, 'base64url');
+	if (sigBuf.length !== expBuf.length || sigBuf.length === 0) return false;
+	if (!timingSafeEqual(sigBuf, expBuf)) return false;
+
+	try {
+		const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
+		return (
+			payload?.m === ADMIN_MARKER &&
+			typeof payload.exp === 'number' &&
+			payload.exp > Math.floor(Date.now() / 1000)
+		);
+	} catch {
+		return false;
+	}
+}

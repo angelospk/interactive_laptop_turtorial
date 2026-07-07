@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { signSessionCookie, verifySessionCookie } from './session';
+import {
+	signSessionCookie,
+	verifySessionCookie,
+	signAdminCookie,
+	verifyAdminCookie
+} from './session';
 import type { UserSession } from '$lib/types';
 
 const SECRET = 'test-secret-0123456789';
@@ -78,5 +83,28 @@ describe('signSessionCookie / verifySessionCookie', () => {
 		const parsed = verifySessionCookie(cookie, SECRET) as Record<string, unknown>;
 		expect(parsed).not.toHaveProperty('iat');
 		expect(parsed).not.toHaveProperty('exp');
+	});
+});
+
+describe('signAdminCookie / verifyAdminCookie', () => {
+	it('round-trips a signed admin flag', () => {
+		expect(verifyAdminCookie(signAdminCookie(SECRET, 3600), SECRET)).toBe(true);
+	});
+
+	it('rejects the legacy forgeable literal "true"', () => {
+		expect(verifyAdminCookie('true', SECRET)).toBe(false);
+	});
+
+	it('rejects a cookie signed with a different secret', () => {
+		expect(verifyAdminCookie(signAdminCookie(OTHER_SECRET, 3600), SECRET)).toBe(false);
+	});
+
+	it('rejects an expired admin cookie', () => {
+		expect(verifyAdminCookie(signAdminCookie(SECRET, -10), SECRET)).toBe(false);
+	});
+
+	it('rejects malformed / empty values', () => {
+		expect(verifyAdminCookie('', SECRET)).toBe(false);
+		expect(verifyAdminCookie('a.b.c', SECRET)).toBe(false);
 	});
 });
