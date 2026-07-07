@@ -40,34 +40,34 @@ describe('Progress Utils', () => {
     });
 
     describe('isLessonLocked', () => {
+        // Lesson locking is intentionally disabled — users navigate freely
+        // ("unlock all lessons", commit 50f052b). isLessonLocked always returns
+        // false regardless of order, progress, or explicit prerequisites. These
+        // tests pin that contract so a regression (re-enabling locking silently)
+        // is caught. If sequential locking is reintroduced, gate it behind config
+        // and update these expectations accordingly.
         const mockLessons: Lesson[] = [
             { id: 'l1', orderIndex: 0, requiredLessonId: null } as Lesson,
             { id: 'l2', orderIndex: 1, requiredLessonId: null } as Lesson,
             { id: 'l3', orderIndex: 2, requiredLessonId: 'l1' } as Lesson // Explicit requirement
         ];
 
-        it('should unlock first lesson by default', () => {
+        it('never locks the first lesson', () => {
             expect(isLessonLocked(0, mockLessons[0], mockLessons, {})).toBe(false);
         });
 
-        it('should lock second lesson if first is incomplete (sequential)', () => {
-            expect(isLessonLocked(1, mockLessons[1], mockLessons, {})).toBe(true);
+        it('does not lock a later lesson even when the previous one is incomplete', () => {
+            expect(isLessonLocked(1, mockLessons[1], mockLessons, {})).toBe(false);
         });
 
-        it('should unlock second lesson if first is complete (sequential)', () => {
+        it('does not lock a lesson with an unmet explicit prerequisite', () => {
+            // l3 requires l1, which is incomplete — still unlocked (locking disabled).
+            expect(isLessonLocked(2, mockLessons[2], mockLessons, {})).toBe(false);
+        });
+
+        it('stays unlocked once prerequisites are complete', () => {
             const progress = { l1: { completed: true } };
             expect(isLessonLocked(1, mockLessons[1], mockLessons, progress)).toBe(false);
-        });
-
-        it('should lock lesson with explicit requirement if requirement incomplete', () => {
-            // l3 requires l1
-            expect(isLessonLocked(2, mockLessons[2], mockLessons, {})).toBe(true);
-        });
-
-        it('should unlock lesson with explicit requirement if requirement complete', () => {
-            // l3 requires l1. Even if l2 is incomplete, l3 should unlock if l1 is done?
-            // The function checks requiredLessonId FIRST.
-            const progress = { l1: { completed: true } };
             expect(isLessonLocked(2, mockLessons[2], mockLessons, progress)).toBe(false);
         });
     });
