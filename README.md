@@ -4,7 +4,8 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 
 ## Features
 
-- 🔐 Simple username-based authentication with redirect-after-login (deep links survive the login step)
+- 🔐 Simple username-based authentication with **HMAC-signed session cookies** (tamper-proof; `SESSION_SECRET` required in production) and redirect-after-login (deep links survive the login step)
+- 📱 Device-aware onboarding — auto-*detects* the user's device (Windows/Mac/Android/iPhone) as a hint and asks them to confirm which device they want to learn (`preferredDevice`), the enabling layer for per-device content tracks (see `docs/ROADMAP.md`)
 - 🔗 Deep-linkable lessons — every lesson has its own URL (`/modules/<module>/<lessonKey>`), shareable and bookmarkable
 - 📚 Library ↔ lesson bridge — theory subsections can link straight to the matching interactive lesson
 - 🗂️ Themed module categories on the home page + labelled sub-sections inside long modules, for easy navigation
