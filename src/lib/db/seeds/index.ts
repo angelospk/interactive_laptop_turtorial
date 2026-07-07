@@ -16,6 +16,7 @@ import { module13Lessons } from './module13-lessons';
 import { wordLessons } from './module-word-lessons';
 import { eapsiReadingLessons } from './eapsi-reading-lessons';
 import { androidLessons } from './android-lessons';
+import { iphoneLessons } from './iphone-lessons';
 export { allModules } from './modules';
 
 /**
@@ -52,7 +53,8 @@ const _allLessons: NewLesson[] = [
     ...module12Lessons,
     ...module13Lessons,
     ...eapsiReadingLessons,
-    ...androidLessons
+    ...androidLessons,
+    ...iphoneLessons
 ];
 
 // Fail fast at import time if any lesson references an unknown goal.
@@ -79,5 +81,6 @@ export {
     module12Lessons,
     module13Lessons,
     eapsiReadingLessons,
-    androidLessons
+    androidLessons,
+    iphoneLessons
 };

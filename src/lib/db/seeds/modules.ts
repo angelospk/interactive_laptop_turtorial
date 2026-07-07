@@ -21,6 +21,7 @@ const _modules: Omit<NewModule, 'orderIndex' | 'createdAt'>[] = [
     { id: 'module12', titleKey: 'module12_title', descriptionKey: 'module12_description', iconName: 'Building2', enabled: true },
     { id: 'module13', titleKey: 'module13_title', descriptionKey: 'module13_description', iconName: 'Bot',       enabled: true },
     { id: 'android',  titleKey: 'android_title',  descriptionKey: 'android_description',  iconName: 'Smartphone', enabled: true },
+    { id: 'iphone',   titleKey: 'iphone_title',   descriptionKey: 'iphone_description',   iconName: 'TabletSmartphone', enabled: true },
 ];
 
 export const allModules: NewModule[] = _modules.map((mod, i) => ({
