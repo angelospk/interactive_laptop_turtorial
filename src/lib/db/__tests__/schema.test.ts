@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { lessons, users, userProgress, type NewLesson } from '../schema';
+import { lessons, users, userProgress, DEVICE_VALUES, type NewLesson } from '../schema';
 import { allLessons, module1Lessons } from '../seeds';
 import { eq, and } from 'drizzle-orm';
 
@@ -21,7 +21,9 @@ describe('Database Schema - Lessons Table', () => {
 				username TEXT UNIQUE NOT NULL,
 				display_name TEXT,
 				created_at INTEGER NOT NULL,
-				last_login INTEGER
+				last_login INTEGER,
+				is_admin INTEGER DEFAULT 0,
+				preferred_device TEXT
 			);
 
 			CREATE TABLE lessons (
@@ -187,6 +189,19 @@ describe('Database Schema - Lessons Table', () => {
 
         const result = db.select().from(lessons).where(eq(lessons.id, 'test-lesson-2')).get();
         expect(result?.requiredLessonId).toBe('test-lesson-1');
+    });
+
+    it('should default preferredDevice to null and round-trip each device value', () => {
+        db.insert(users).values({ id: 'u-null', username: 'anna' }).run();
+        const noPref = db.select().from(users).where(eq(users.id, 'u-null')).get();
+        expect(noPref?.preferredDevice).toBeNull();
+
+        for (const device of DEVICE_VALUES) {
+            const id = `u-${device}`;
+            db.insert(users).values({ id, username: `user-${device}`, preferredDevice: device }).run();
+            const row = db.select().from(users).where(eq(users.id, id)).get();
+            expect(row?.preferredDevice).toBe(device);
+        }
     });
 
     it('should filter lessons by enabled status', () => {

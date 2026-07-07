@@ -1,7 +1,8 @@
 import type { Handle } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import type { UserSession } from '$lib/types';
 import { sequence } from '@sveltejs/kit/hooks';
+import { verifySessionCookie } from '$lib/server/session';
+import { getSessionSecret } from '$lib/server/sessionSecret';
 
 // Authentication handle
 const handleAuth: Handle = async ({ event, resolve }) => {
@@ -9,14 +10,18 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	const adminCookie = event.cookies.get('admin_session');
 
 	if (sessionCookie) {
-		try {
-			const user: UserSession = JSON.parse(sessionCookie);
+		// Signed HMAC cookie — verify before trusting. Forged/tampered/legacy
+		// unsigned cookies fail verification and are cleared (treated as logged-out).
+		const user = verifySessionCookie(sessionCookie, getSessionSecret());
+		if (user) {
 			event.locals.user = user;
-			// Admin status can come from user record OR admin cookie
+			// Admin status can come from the (signed) user record OR admin cookie
 			event.locals.admin = user.isAdmin === true || adminCookie === 'true';
-		} catch (error) {
-			console.error('Error parsing session cookie:', error);
+		} else {
 			event.cookies.delete('session', { path: '/' });
+			if (adminCookie === 'true') {
+				event.locals.admin = true;
+			}
 		}
 	} else if (adminCookie === 'true') {
 		// Admin-only session (no user record)

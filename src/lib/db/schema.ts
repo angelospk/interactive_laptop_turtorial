@@ -14,6 +14,12 @@ export const modules = sqliteTable('modules', {
         .$defaultFn(() => new Date())
 });
 
+// Learning-device tracks the user opted into (device-aware content, ROADMAP Φάση 1).
+// null = not chosen yet (onboarding not completed). This is the device the user
+// wants to LEARN — it may differ from the device they are currently browsing on.
+export const DEVICE_VALUES = ['windows', 'mac', 'android', 'iphone'] as const;
+export type PreferredDevice = (typeof DEVICE_VALUES)[number];
+
 // Users table - simple username-based authentication
 export const users = sqliteTable('users', {
     id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -23,7 +29,9 @@ export const users = sqliteTable('users', {
         .notNull()
         .$defaultFn(() => new Date()),
     lastLogin: integer('last_login', { mode: 'timestamp' }),
-    isAdmin: integer('is_admin', { mode: 'boolean' }).default(false)
+    isAdmin: integer('is_admin', { mode: 'boolean' }).default(false),
+    // Preferred learning device (windows|mac|android|iphone); null until chosen.
+    preferredDevice: text('preferred_device', { enum: DEVICE_VALUES })
 });
 
 // Lessons table - dynamic lesson repository
