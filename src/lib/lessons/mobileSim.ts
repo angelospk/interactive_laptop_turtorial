@@ -14,7 +14,7 @@ export interface MobileSimApp {
 	/** Emoji rendered inside the icon tile. */
 	icon: string;
 	/** Which mini-app opens on tap. Default: an inert placeholder screen. */
-	kind?: 'phone' | 'messages' | 'viber' | 'settings' | 'camera' | 'browser' | 'placeholder';
+	kind?: 'phone' | 'messages' | 'viber' | 'settings' | 'camera' | 'browser' | 'store' | 'placeholder';
 	/** Tailwind-compatible background class for the icon tile. */
 	color?: string;
 }
@@ -58,6 +58,14 @@ export interface MobileSimConfig {
 	qrUrl?: string;
 	/** Expected official domain to verify against, e.g. 'gov.gr'. */
 	targetHost?: string;
+	/** Toggle target for night-mode / find-device goals (default true = turn ON). */
+	targetOn?: boolean;
+	/** Apps listed in the store (update-app lesson). */
+	storeItems?: { id: string; label: string; icon: string; hasUpdate?: boolean }[];
+	/** Which store item must be updated. */
+	targetUpdateId?: string;
+	/** Store name shown in the header (Play Store / App Store). */
+	storeName?: string;
 	successMessage?: string;
 	hint?: string;
 }
@@ -86,7 +94,10 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	// force-close targets an app by id, but from the recents layer — not by its
 	// on-home kind, so no targetKind.
 	'mobile-force-close': { requiresTargetAppId: true },
-	'mobile-scan-qr': { requiresTargetAppId: true, targetKind: 'camera' }
+	'mobile-scan-qr': { requiresTargetAppId: true, targetKind: 'camera' },
+	'mobile-night-mode': { requiresTargetAppId: true, targetKind: 'settings' },
+	'mobile-find-device': { requiresTargetAppId: true, targetKind: 'settings' },
+	'mobile-update-app': { requiresTargetAppId: true, targetKind: 'store' }
 	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
 
@@ -213,6 +224,17 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 			new URL(c.qrUrl);
 		} catch {
 			throw new Error(`mobile-scan-qr qrUrl is not a valid URL ("${c.qrUrl}")`);
+		}
+	}
+	if (c.goal === 'mobile-update-app') {
+		if (!c.storeItems?.length) throw new Error('mobile-update-app needs storeItems');
+		const storeIds = new Set(c.storeItems.map((s) => s.id));
+		if (!c.targetUpdateId || !storeIds.has(c.targetUpdateId)) {
+			throw new Error('mobile-update-app needs a targetUpdateId present in storeItems');
+		}
+		const target = c.storeItems.find((s) => s.id === c.targetUpdateId);
+		if (!target?.hasUpdate) {
+			throw new Error(`store item "${c.targetUpdateId}" must have hasUpdate:true to be updatable`);
 		}
 	}
 	if (c.goal === 'mobile-change-font-size' && c.targetSize) {

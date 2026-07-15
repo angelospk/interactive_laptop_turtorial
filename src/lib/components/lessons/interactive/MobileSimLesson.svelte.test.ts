@@ -228,6 +228,40 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 	});
 });
 
+describe('MobileSimLesson — store app update', () => {
+	const storeLesson = mkLesson({
+		goal: 'mobile-update-app',
+		prompt: 'Ενημέρωσε το Viber.',
+		apps: [{ id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store' }],
+		targetAppId: 'store',
+		storeName: 'Play Store',
+		targetUpdateId: 'viber',
+		storeItems: [
+			{ id: 'viber', label: 'Viber', icon: '💜', hasUpdate: true },
+			{ id: 'maps', label: 'Χάρτες', icon: '🗺️', hasUpdate: true }
+		],
+		successMessage: 'Μπράβο! Ενημέρωσες το Viber.'
+	});
+
+	it('completes when the target app is updated from the official store', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: storeLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Play Store' }).click();
+		await screen.getByRole('button', { name: 'Ενημέρωση Viber' }).click();
+		await expect.element(screen.getByText('Μπράβο! Ενημέρωσες το Viber.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete when the wrong app is updated', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: storeLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Play Store' }).click();
+		await screen.getByRole('button', { name: 'Ενημέρωση Χάρτες' }).click();
+		await expect.element(screen.getByText(/Ενημέρωσες άλλη εφαρμογή/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
 describe('MobileSimLesson — QR scan + link check', () => {
 	const qrLesson = (qrUrl: string) =>
 		({
@@ -348,6 +382,42 @@ describe('MobileSimLesson — settings flows', () => {
 		await screen.getByRole('button', { name: 'Μέγεθος γραμμάτων' }).click();
 		await screen.getByRole('button', { name: 'Μεγάλα' }).click();
 		await expect.element(screen.getByText('Μπράβο! Μεγάλωσες τα γράμματα.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('completes the night-mode goal by toggling it on', async () => {
+		const onComplete = vi.fn();
+		const lesson = mkLesson({
+			goal: 'mobile-night-mode',
+			prompt: 'Άνοιξε τη νυχτερινή λειτουργία.',
+			apps: settingsApps,
+			targetAppId: 'settings',
+			successMessage: 'Μπράβο! Άνοιξες τη νυχτερινή λειτουργία.'
+		});
+		const screen = render(MobileSimLesson, { lesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Ρυθμίσεις' }).click();
+		await screen.getByRole('button', { name: 'Νυχτερινή λειτουργία' }).click();
+		await screen.getByRole('switch', { name: 'Νυχτερινή λειτουργία' }).click();
+		await expect
+			.element(screen.getByText('Μπράβο! Άνοιξες τη νυχτερινή λειτουργία.'))
+			.toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('completes the find-device goal by toggling it on', async () => {
+		const onComplete = vi.fn();
+		const lesson = mkLesson({
+			goal: 'mobile-find-device',
+			prompt: 'Ενεργοποίησε την εύρεση συσκευής.',
+			apps: settingsApps,
+			targetAppId: 'settings',
+			successMessage: 'Μπράβο! Ενεργοποίησες την εύρεση.'
+		});
+		const screen = render(MobileSimLesson, { lesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Ρυθμίσεις' }).click();
+		await screen.getByRole('button', { name: 'Εύρεση συσκευής' }).click();
+		await screen.getByRole('switch', { name: 'Εύρεση συσκευής' }).click();
+		await expect.element(screen.getByText('Μπράβο! Ενεργοποίησες την εύρεση.')).toBeInTheDocument();
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
 	});
 

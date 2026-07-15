@@ -490,6 +490,40 @@ describe('mobile-connect-wifi', () => {
 	});
 });
 
+describe('mobile-night-mode / mobile-find-device (toggles)', () => {
+	it('completes only when toggled ON (default target)', () => {
+		expect(checkGoalMatch('mobile-night-mode', 'mobile-night-mode-set', { on: true }, {})).toBe(true);
+		expect(checkGoalMatch('mobile-find-device', 'mobile-find-device-set', { on: true }, {})).toBe(
+			true
+		);
+	});
+	it('does NOT complete when toggled OFF', () => {
+		expect(checkGoalMatch('mobile-night-mode', 'mobile-night-mode-set', { on: false }, {})).toBe(
+			false
+		);
+		expect(checkGoalMatch('mobile-find-device', 'mobile-find-device-set', { on: false }, {})).toBe(
+			false
+		);
+	});
+});
+
+describe('mobile-update-app', () => {
+	const config = { targetUpdateId: 'viber' };
+	it('matches updating the target app', () => {
+		expect(checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'viber' }, config)).toBe(
+			true
+		);
+	});
+	it('does not match updating a different app', () => {
+		expect(checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'maps' }, config)).toBe(
+			false
+		);
+	});
+	it('does not match desktop update-app events', () => {
+		expect(checkGoalMatch('mobile-update-app', 'update-app', {}, config)).toBe(false);
+	});
+});
+
 describe('mobile-scan-qr', () => {
 	const config = { targetHost: 'gov.gr' };
 	it('completes only when the opened link is the official domain over https', () => {

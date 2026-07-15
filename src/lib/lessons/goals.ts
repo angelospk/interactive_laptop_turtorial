@@ -93,6 +93,9 @@ export const GOALS = {
 	'mobile-screenshot': { requiresAppId: false },
 	'mobile-force-close': { requiresAppId: true },
 	'mobile-scan-qr': { requiresAppId: false },
+	'mobile-night-mode': { requiresAppId: false },
+	'mobile-find-device': { requiresAppId: false },
+	'mobile-update-app': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },

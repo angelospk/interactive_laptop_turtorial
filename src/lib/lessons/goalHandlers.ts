@@ -183,6 +183,18 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		return evaluateLink(data.url, domain).official;
 	},
 
+	// Toggle goals: only the requested state (default ON) completes — flipping it
+	// off again must not count (codex adversarial test).
+	'mobile-night-mode': (action, data, config) =>
+		action === 'mobile-night-mode-set' && data.on === (config.targetOn ?? true),
+
+	'mobile-find-device': (action, data, config) =>
+		action === 'mobile-find-device-set' && data.on === (config.targetOn ?? true),
+
+	'mobile-update-app': (action, data, config) =>
+		action === 'mobile-app-updated' &&
+		(!config.targetUpdateId || data.appId === config.targetUpdateId),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

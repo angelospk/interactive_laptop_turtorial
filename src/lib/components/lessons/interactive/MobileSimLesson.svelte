@@ -9,6 +9,7 @@
 	import MobileSettingsApp from '$lib/components/mobile/apps/MobileSettingsApp.svelte';
 	import RecentApps from '$lib/components/mobile/RecentApps.svelte';
 	import CameraApp from '$lib/components/mobile/apps/CameraApp.svelte';
+	import StoreApp from '$lib/components/mobile/apps/StoreApp.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
 
@@ -98,6 +99,8 @@
 		} else if (action === 'mobile-qr-link-opened') {
 			// The link was opened but its host is not the official domain.
 			miss('Προσοχή: αυτή η διεύθυνση δεν είναι το επίσημο gov.gr. Καλύτερα μην την ανοίξεις.');
+		} else if (action === 'mobile-app-updated') {
+			miss('Ενημέρωσες άλλη εφαρμογή. Ψάξε αυτή που ζητά το μάθημα.');
 		}
 	}
 
@@ -179,6 +182,12 @@
 				<MobileSettingsApp onEvent={dispatch} wifiNetworks={config.wifiNetworks ?? []} />
 			{:else if currentApp.kind === 'camera'}
 				<CameraApp onEvent={dispatch} qrUrl={config.qrUrl ?? ''} />
+			{:else if currentApp.kind === 'store'}
+				<StoreApp
+					onEvent={dispatch}
+					items={config.storeItems ?? []}
+					storeName={config.storeName ?? 'Κατάστημα εφαρμογών'}
+				/>
 			{:else}
 				<!-- Inert placeholder for apps that are scenery in this lesson -->
 				<div class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">

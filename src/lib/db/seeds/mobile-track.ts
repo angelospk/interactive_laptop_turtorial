@@ -29,6 +29,9 @@ function homeApps(variant: MobileVariant): MobileSimApp[] {
 			: []),
 		{ id: 'camera', label: 'Κάμερα', icon: '📷', kind: 'camera', color: 'bg-slate-100' },
 		{ id: 'photos', label: 'Φωτογραφίες', icon: '🖼️', kind: 'placeholder', color: 'bg-amber-100' },
+		variant === 'ios'
+			? { id: 'store', label: 'App Store', icon: '🛍️', kind: 'store', color: 'bg-sky-100' }
+			: { id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store', color: 'bg-green-100' },
 		{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', kind: 'settings', color: 'bg-slate-200' }
 	];
 }
@@ -199,6 +202,49 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				targetHost: 'gov.gr',
 				successMessage: 'Μπράβο! Έλεγξες τη διεύθυνση και άνοιξες τον επίσημο σύνδεσμο.',
 				hint: 'Άνοιξε την «Κάμερα», πάτησε «Σάρωση» και διάβασε τη διεύθυνση: πρέπει να λέει gov.gr.'
+			}
+		},
+		{
+			n: 12,
+			difficulty: 'advanced' as const,
+			lessonKey: 'night-mode',
+			config: {
+				goal: 'mobile-night-mode',
+				prompt: 'Άνοιξε τη «Νυχτερινή λειτουργία» από τις Ρυθμίσεις για να ξεκουράζονται τα μάτια σου το βράδυ.',
+				targetAppId: 'settings',
+				successMessage: 'Μπράβο! Άνοιξες τη νυχτερινή λειτουργία.',
+				hint: 'Ρυθμίσεις → Νυχτερινή λειτουργία → πάτησε τον διακόπτη ώστε να γίνει πράσινος.'
+			}
+		},
+		{
+			n: 13,
+			difficulty: 'advanced' as const,
+			lessonKey: 'find-device',
+			config: {
+				goal: 'mobile-find-device',
+				prompt: 'Ενεργοποίησε την «Εύρεση συσκευής» από τις Ρυθμίσεις, για να βρίσκεις το κινητό αν χαθεί.',
+				targetAppId: 'settings',
+				successMessage: 'Μπράβο! Τώρα μπορείς να εντοπίσεις το κινητό αν χαθεί.',
+				hint: 'Ρυθμίσεις → Εύρεση συσκευής → πάτησε τον διακόπτη ώστε να γίνει πράσινος.'
+			}
+		},
+		{
+			n: 14,
+			difficulty: 'advanced' as const,
+			lessonKey: 'update-app',
+			config: {
+				goal: 'mobile-update-app',
+				prompt: `Ενημέρωσε το «Viber» από το ${variant === 'ios' ? 'App Store' : 'Play Store'} (το επίσημο κατάστημα).`,
+				targetAppId: 'store',
+				storeName: variant === 'ios' ? 'App Store' : 'Play Store',
+				targetUpdateId: 'viber',
+				storeItems: [
+					{ id: 'viber', label: 'Viber', icon: '💜', hasUpdate: true },
+					{ id: 'maps', label: 'Χάρτες', icon: '🗺️', hasUpdate: true },
+					{ id: 'weather', label: 'Καιρός', icon: '⛅' }
+				],
+				successMessage: 'Μπράβο! Ενημέρωσες το Viber από το επίσημο κατάστημα.',
+				hint: 'Άνοιξε το κατάστημα, βρες το «Viber» και πάτησε «Ενημέρωση».'
 			}
 		}
 	];

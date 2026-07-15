@@ -250,6 +250,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 				'android-force-close',
 				'android-scan-qr'
 			]
+		},
+		{
+			id: 'settings-help',
+			title: 'Ρυθμίσεις & βοήθεια',
+			lessonIds: ['android-night-mode', 'android-find-device', 'android-update-app']
 		}
 	],
 	iphone: [
@@ -276,6 +281,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 				'iphone-force-close',
 				'iphone-scan-qr'
 			]
+		},
+		{
+			id: 'settings-help',
+			title: 'Ρυθμίσεις & βοήθεια',
+			lessonIds: ['iphone-night-mode', 'iphone-find-device', 'iphone-update-app']
 		}
 	]
 };
