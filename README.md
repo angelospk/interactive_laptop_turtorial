@@ -9,7 +9,7 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 - 🔗 Deep-linkable lessons — every lesson has its own URL (`/modules/<module>/<lessonKey>`), shareable and bookmarkable
 - 📚 Library ↔ lesson bridge — theory subsections can link straight to the matching interactive lesson
 - 🗂️ Device-aware module categories on the home page («Windows υπολογιστής», «Κινητό τηλέφωνο»…) + labelled Θεωρία/Εξάσκηση sub-sections inside long modules (see `docs/CURRICULUM_PLAN.md`)
-- 📞 Realistic phone simulator (`mobile-sim`) — Android/iOS home screen with dock & wallpaper, goal-driven mini-apps (Τηλέφωνο με πληκτρολόγιο+Επαφές, Μηνύματα/Viber, Ρυθμίσεις με μέγεθος γραμμάτων & Wi-Fi); Android/iPhone tracks με 7 μαθήματα το καθένα (dev playground: `/demo/mobile-sim`)
+- 📞 Realistic phone simulator (`mobile-sim`) — Android/iOS home screen with dock & wallpaper, goal-driven mini-apps: Τηλέφωνο (πληκτρολόγιο+Επαφές), Μηνύματα/Viber (βιντεοκλήση + αναγνώριση ύποπτου SMS), Ρυθμίσεις (γράμματα, Wi-Fi, νυχτερινή λειτουργία, εύρεση συσκευής), Κάμερα (σκανάρισμα QR + έλεγχος συνδέσμου gov.gr), Play/App Store (ενημέρωση εφαρμογής), Ψηφιακός βοηθός (chips διατύπωσης — τίμια «φωνή» χωρίς μικρόφωνο), περιηγητής με 2FA. Επιπλέον: screenshot με τα φυσικά κουμπιά (per-OS chord), κλείσιμο κολλημένης εφαρμογής από τις πρόσφατες. Android/iPhone tracks με 19 μαθήματα το καθένα σε 5 ενότητες (Βασικά → Καθημερινή χρήση → Ρυθμίσεις & βοήθεια → Πιο προχωρημένα & AI → Έξυπνα & ασφάλεια), με σημασιολογία «Ολοκληρώθηκε η βασική διαδρομή» ώστε τα νέα μαθήματα να μην υποβαθμίζουν όσους τελείωσαν (dev playground: `/demo/mobile-sim`)
 - 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)

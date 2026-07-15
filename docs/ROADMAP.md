@@ -64,7 +64,7 @@
 
 ### Φάση 2 — Per-device tracks περιεχομένου
 
-> **Πρόοδος 2026-07-15**: εκτελείται μέσω του [CURRICULUM_PLAN.md](CURRICULUM_PLAN.md) — mobile simulator v2 (`mobile-sim` lessonType, home screen + Τηλέφωνο/Μηνύματα/Viber/Ρυθμίσεις) και Android/iPhone tracks με 7 μαθήματα ο καθένας υλοποιήθηκαν. Εκκρεμούν: Camera/Gallery/Store/QR (wave 2), Mac track.
+> **Πρόοδος 2026-07-15**: εκτελείται μέσω του [CURRICULUM_PLAN.md](CURRICULUM_PLAN.md). Ολοκληρώθηκαν: mobile simulator v2 (`mobile-sim`), Android/iPhone tracks με **19 μαθήματα** το καθένα σε 5 ενότητες, και όλο το **wave 3**: βιντεοκλήση, screenshot με φυσικά κουμπιά (per-OS chord), κλείσιμο κολλημένης εφαρμογής (recent apps), Κάμερα+QR με έλεγχο συνδέσμου gov.gr, νυχτερινή λειτουργία, εύρεση συσκευής, ενημέρωση από Store, Ψηφιακός βοηθός (chips διατύπωσης), ύποπτο SMS + 2FA. Επίσης: σημασιολογία ολοκλήρωσης «βασικής διαδρομής» + id-based sections. Εκκρεμεί: **Mac track** (ibm/532).
 
 Σειρά προτεραιότητας με βάση το κοινό (ΚΑΠΗ):
 
