@@ -244,7 +244,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{
 			id: 'daily',
 			title: 'Καθημερινή χρήση',
-			lessonIds: ['android-videocall-viber', 'android-screenshot']
+			lessonIds: ['android-videocall-viber', 'android-screenshot', 'android-force-close']
 		}
 	],
 	iphone: [
@@ -265,7 +265,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{
 			id: 'daily',
 			title: 'Καθημερινή χρήση',
-			lessonIds: ['iphone-videocall-viber', 'iphone-screenshot']
+			lessonIds: ['iphone-videocall-viber', 'iphone-screenshot', 'iphone-force-close']
 		}
 	]
 };

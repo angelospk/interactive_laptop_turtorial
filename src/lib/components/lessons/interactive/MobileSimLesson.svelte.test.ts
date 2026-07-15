@@ -197,6 +197,37 @@ describe('MobileSimLesson — messaging flow', () => {
 	});
 });
 
+describe('MobileSimLesson — force close (recent apps)', () => {
+	const forceCloseLesson = mkLesson({
+		goal: 'mobile-force-close',
+		prompt: 'Κλείσε την εφαρμογή που κόλλησε.',
+		targetAppId: 'settings',
+		recentAppIds: ['phone', 'viber', 'settings'],
+		successMessage: 'Μπράβο! Έκλεισες την εφαρμογή που κόλλησε.'
+	});
+
+	it('opens recents and completes when the frozen app is dismissed', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: forceCloseLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Πρόσφατες εφαρμογές' }).click();
+		await expect.element(screen.getByTestId('recent-apps')).toBeInTheDocument();
+		await screen.getByRole('button', { name: 'Κλείσιμο Ρυθμίσεις' }).click();
+		await expect
+			.element(screen.getByText('Μπράβο! Έκλεισες την εφαρμογή που κόλλησε.'))
+			.toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete when a different app is closed', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: forceCloseLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Πρόσφατες εφαρμογές' }).click();
+		await screen.getByRole('button', { name: 'Κλείσιμο Viber' }).click();
+		await expect.element(screen.getByText(/Έκλεισες άλλη εφαρμογή/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
 describe('MobileSimLesson — screenshot chord', () => {
 	const screenshotLesson = (variant: 'android' | 'ios') =>
 		({

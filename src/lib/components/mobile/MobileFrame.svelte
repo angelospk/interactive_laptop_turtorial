@@ -17,6 +17,7 @@
 		variant = 'android',
 		time = '9:41',
 		onHome,
+		onRecents,
 		showSystemButtons = false,
 		onSystemChord,
 		class: className
@@ -31,6 +32,8 @@
 		 * (used by goal-driven simulations); otherwise it stays decorative.
 		 */
 		onHome?: () => void;
+		/** When provided, adds a «recent apps» button next to the home indicator. */
+		onRecents?: () => void;
 		/** Show the physical Power/Volume buttons on the bezel (screenshot lesson). */
 		showSystemButtons?: boolean;
 		/**
@@ -137,7 +140,18 @@
 	</div>
 
 	<!-- Home indicator (iOS bar) / gesture pill (Android) -->
-	<div class="flex shrink-0 items-center justify-center bg-white py-2">
+	<div class="relative flex shrink-0 items-center justify-center bg-white py-2">
+		{#if onRecents}
+			<button
+				type="button"
+				data-testid="mobile-recents-button"
+				onclick={onRecents}
+				aria-label="Πρόσφατες εφαρμογές"
+				class="absolute right-4 flex h-7 w-7 items-center justify-center rounded-md border-2 border-slate-500 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+			>
+				<span aria-hidden="true" class="h-3.5 w-3.5 rounded-sm border-2 border-slate-500"></span>
+			</button>
+		{/if}
 		{#if onHome}
 			<button
 				type="button"

@@ -173,6 +173,19 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 						? 'Στο iPhone: Πλαϊνό κουμπί (δεξιά) + Ένταση πάνω (αριστερά), ταυτόχρονα.'
 						: 'Στο Android: Κουμπί λειτουργίας (δεξιά) + Ένταση κάτω (αριστερά), ταυτόχρονα.'
 			}
+		},
+		{
+			n: 10,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'force-close',
+			config: {
+				goal: 'mobile-force-close',
+				prompt: 'Η «Κάμερα» κόλλησε. Άνοιξε τις πρόσφατες εφαρμογές και κλείσ’ την.',
+				targetAppId: 'camera',
+				recentAppIds: ['messages', 'camera', 'settings'],
+				successMessage: 'Μπράβο! Έκλεισες την εφαρμογή που κόλλησε.',
+				hint: 'Πάτησε το τετράγωνο κουμπί κάτω δεξιά· βρες την «Κάμερα» και πάτησε «Κλείσιμο».'
+			}
 		}
 	];
 

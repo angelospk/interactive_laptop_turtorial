@@ -52,6 +52,8 @@ export interface MobileSimConfig {
 	conversations?: MobileSimConversation[];
 	/** Wi-Fi networks listed in settings. */
 	wifiNetworks?: string[];
+	/** App ids shown as cards in the "recent apps" layer (force-close lesson). */
+	recentAppIds?: string[];
 	successMessage?: string;
 	hint?: string;
 }
@@ -76,7 +78,10 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-send-chat': { requiresTargetAppId: true, targetKind: 'viber' },
 	'mobile-change-font-size': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-connect-wifi': { requiresTargetAppId: true, targetKind: 'settings' },
-	'mobile-start-videocall': { requiresTargetAppId: true, targetKind: 'viber' }
+	'mobile-start-videocall': { requiresTargetAppId: true, targetKind: 'viber' },
+	// force-close targets an app by id, but from the recents layer — not by its
+	// on-home kind, so no targetKind.
+	'mobile-force-close': { requiresTargetAppId: true }
 	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
 
@@ -185,6 +190,15 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		if (!c.wifiNetworks?.length) throw new Error('mobile-connect-wifi needs wifiNetworks');
 		if (c.targetSsid && !c.wifiNetworks.includes(c.targetSsid)) {
 			throw new Error(`targetSsid "${c.targetSsid}" is not in wifiNetworks`);
+		}
+	}
+	if (c.goal === 'mobile-force-close') {
+		if (!c.recentAppIds?.length) throw new Error('mobile-force-close needs recentAppIds');
+		for (const id of c.recentAppIds) {
+			if (!ids.has(id)) throw new Error(`recentAppIds references unknown app "${id}"`);
+		}
+		if (c.targetAppId && !c.recentAppIds.includes(c.targetAppId)) {
+			throw new Error(`mobile-force-close targetAppId "${c.targetAppId}" must be in recentAppIds`);
 		}
 	}
 	if (c.goal === 'mobile-change-font-size' && c.targetSize) {

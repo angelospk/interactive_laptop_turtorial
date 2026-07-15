@@ -7,6 +7,7 @@
 	import PhoneApp from '$lib/components/mobile/apps/PhoneApp.svelte';
 	import MessagingApp from '$lib/components/mobile/apps/MessagingApp.svelte';
 	import MobileSettingsApp from '$lib/components/mobile/apps/MobileSettingsApp.svelte';
+	import RecentApps from '$lib/components/mobile/RecentApps.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
 
@@ -114,6 +115,21 @@
 			miss('Άλλος συνδυασμός κουμπιών. Δοκίμασε ξανά τα δύο σωστά κουμπιά μαζί.');
 		}
 	}
+
+	// Recent-apps layer (force-close lesson): the learner opens recents and
+	// dismisses the frozen app card. The event carries the appId (by design).
+	const isForceCloseLesson = config.goal === 'mobile-force-close';
+	let showRecents = $state(false);
+
+	function dismissRecent(appId: string) {
+		if (done) return;
+		dispatch('mobile-app-force-closed', { appId });
+		if (appId === config.targetAppId) {
+			showRecents = false; // frozen app closed → back to a responsive phone
+		} else {
+			miss('Έκλεισες άλλη εφαρμογή. Ψάξε αυτή που «κόλλησε».');
+		}
+	}
 </script>
 
 <LessonTemplate {lesson} {onBack}>
@@ -123,10 +139,20 @@
 		<MobileFrame
 			variant={config.variant === 'ios' ? 'ios' : 'android'}
 			onHome={goHome}
+			onRecents={isForceCloseLesson && !done ? () => (showRecents = true) : undefined}
 			showSystemButtons={isScreenshotLesson}
 			onSystemChord={handleSystemChord}
 			class="my-2"
 		>
+			{#if showRecents}
+				<RecentApps
+					apps={config.apps}
+					recentAppIds={config.recentAppIds ?? []}
+					frozenAppId={config.targetAppId ?? null}
+					onDismiss={dismissRecent}
+					onClose={() => (showRecents = false)}
+				/>
+			{/if}
 			{#if currentApp === null}
 				<MobileHomeScreen
 					variant={config.variant === 'ios' ? 'ios' : 'android'}

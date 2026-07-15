@@ -165,6 +165,11 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	// component only emits this event for the correct button combination).
 	'mobile-screenshot': (action) => action === 'mobile-screenshot-taken',
 
+	// Close a frozen app from the recents layer — appId is carried here by design.
+	'mobile-force-close': (action, data, config) =>
+		action === 'mobile-app-force-closed' &&
+		(!config.targetAppId || data.appId === config.targetAppId),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

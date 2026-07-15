@@ -490,6 +490,18 @@ describe('mobile-connect-wifi', () => {
 	});
 });
 
+describe('mobile-force-close', () => {
+	it('matches closing the target app from recents', () => {
+		const config = { targetAppId: 'camera' };
+		expect(
+			checkGoalMatch('mobile-force-close', 'mobile-app-force-closed', { appId: 'camera' }, config)
+		).toBe(true);
+		expect(
+			checkGoalMatch('mobile-force-close', 'mobile-app-force-closed', { appId: 'photos' }, config)
+		).toBe(false);
+	});
+});
+
 describe('mobile-screenshot', () => {
 	it('matches the screenshot-taken event (chord already validated by the component)', () => {
 		expect(checkGoalMatch('mobile-screenshot', 'mobile-screenshot-taken', {}, {})).toBe(true);
