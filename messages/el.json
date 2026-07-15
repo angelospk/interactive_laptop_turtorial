@@ -75,8 +75,8 @@
 	"module1_lesson6_desc": "Μάθετε να κυλάτε σελίδες με τον τροχό του ποντικιού",
 	"module1_lesson7_title": "Κλικ Ακριβείας",
 	"module1_lesson7_desc": "Κάντε κλικ σε μικρούς στόχους με μεγάλη ακρίβεια",
-	"module1_lesson8_title": "Γρήγορο Κλικ",
-	"module1_lesson8_desc": "Δοκιμάστε την ταχύτητά σας στο κλικ",
+	"module1_lesson8_title": "Παζλ με Σύρσιμο",
+	"module1_lesson8_desc": "Συμπληρώστε το παζλ σέρνοντας τα κομμάτια στη θέση τους",
 	"module1_lesson9_title": "Ακολουθήστε το Σχήμα",
 	"module1_lesson9_desc": "Ακολουθήστε ένα σχήμα με το ποντίκι χωρίς να βγείτε έξω",
 	"module1_lesson10_title": "Κλικ με Μοτίβο",
@@ -359,14 +359,12 @@
 	"fullscreen_exit": "Έξοδος πλήρους οθόνης",
 	"auto_advancing_in": "Επόμενο σε {seconds} δευτερόλεπτα...",
 	"cancel": "Ακύρωση",
-
 	"module5_lesson8_title": "8. Λήψη Αρχείου",
 	"module5_lesson8_desc": "Μάθε πώς να κατεβάζεις αρχεία από το διαδίκτυο",
 	"module5_lesson9_title": "9. Μεγέθυνση Σελίδας",
 	"module5_lesson9_desc": "Μεγάλωσε ή μίκρυνε το κείμενο μιας ιστοσελίδας",
 	"module5_lesson10_title": "10. Αναζήτηση στη Σελίδα",
 	"module5_lesson10_desc": "Βρες λέξεις μέσα σε μια ιστοσελίδα με Ctrl+F",
-
 	"module8_lesson8_title": "8. Ισχυρός Κωδικός",
 	"module8_lesson8_desc": "Μάθε τι κάνει έναν κωδικό ισχυρό και ασφαλή",
 	"module8_lesson9_title": "9. Διπλή Ταυτοποίηση (2FA)",
@@ -375,7 +373,6 @@
 	"module8_lesson10_desc": "Πώς να διαχειριστείς το ιστορικό και τα cookies του browser",
 	"module8_lesson11_title": "11. Κίνδυνοι Δημόσιου WiFi",
 	"module8_lesson11_desc": "Τι κινδύνους κρύβει το δημόσιο WiFi και πώς να προστατευθείς",
-
 	"module9_lesson5_title": "5. Ενημέρωση Εφαρμογής",
 	"module9_lesson5_desc": "Μάθε πώς να ενημερώνεις τις εφαρμογές σου",
 	"module9_lesson6_title": "6. Σύνδεση Bluetooth",
@@ -386,7 +383,6 @@
 	"module9_lesson8_desc": "Ενεργοποίησε μεγαλύτερο κείμενο και υψηλή αντίθεση",
 	"module9_lesson9_title": "9. Ρυθμίσεις Ήχου",
 	"module9_lesson9_desc": "Ρύθμισε την ένταση και τις ειδοποιήσεις του υπολογιστή",
-
 	"module11_title": "Βιντεοκλήση",
 	"module11_description": "Μάθε να κάνεις βιντεοκλήσεις με Viber και άλλες εφαρμογές",
 	"module11_lesson1_title": "1. Τι είναι η Βιντεοκλήση",
@@ -401,7 +397,6 @@
 	"module11_lesson5_desc": "Πώς να τελειώσεις σωστά μια βιντεοκλήση",
 	"module11_lesson6_title": "6. Συμβουλές & Καλές Πρακτικές",
 	"module11_lesson6_desc": "Φωτισμός, ήχος, ιδιωτικότητα — όλα όσα πρέπει να ξέρεις",
-
 	"quiz_what_is_videocall_question": "Τι χρειάζεσαι για να κάνεις βιντεοκλήση;",
 	"quiz_what_is_videocall_explanation": "Για βιντεοκλήση χρειάζεσαι: σύνδεση στο internet, κάμερα (ή laptop με ενσωματωμένη), και μια εφαρμογή όπως Viber, Skype ή Zoom. Η άλλη πλευρά πρέπει επίσης να έχει την ίδια εφαρμογή.",
 	"quiz_what_is_videocall_opt_a": "Μόνο τηλέφωνο",
@@ -412,7 +407,6 @@
 	"quiz_videocall_tips_opt_a": "Να μιλάς όσο πιο δυνατά μπορείς",
 	"quiz_videocall_tips_opt_b": "Να κάθεσαι μακριά από το παράθυρο",
 	"quiz_videocall_tips_opt_c": "Καλό φωτισμό, σταθερό internet και ήσυχο χώρο",
-
 	"module12_title": "Κρατικές Υπηρεσίες Online [BETA]",
 	"module12_description": "Εξερεύνησε το gov.gr — χρησιμοποίησε Google ή AI για να βρεις αυτό που ψάχνεις",
 	"module12_lesson1_title": "1. Πώς να βρεις υπηρεσία στο gov.gr",
@@ -422,7 +416,6 @@
 	"quiz_gov_intro_opt_a": "Να ψάξεις τυχαία στο gov.gr μέχρι να το βρεις",
 	"quiz_gov_intro_opt_b": "Να ρωτήσεις Google ή AI: 'ανανέωση ταυτότητας gov.gr'",
 	"quiz_gov_intro_opt_c": "Να πας στο ΚΕΠ χωρίς να ψάξεις online",
-
 	"android_title": "Κινητό Android [BETA]",
 	"android_description": "Μάθε να χρησιμοποιείς το κινητό σου Android — άνοιγμα εφαρμογών, κλήσεις, φωτογραφίες και ρυθμίσεις",
 	"android_lesson1_title": "1. Άνοιξε μια εφαρμογή",
@@ -443,7 +436,6 @@
 	"module13_lesson4_desc": "Μάθε πότε βολεύει ο AI και πότε το Google",
 	"module13_lesson5_title": "5. Τα Όρια του AI",
 	"module13_lesson5_desc": "Ο AI μπορεί να κάνει λάθη — μάθε πότε να το ελέγχεις",
-
 	"quiz_what_is_ai_question": "Τι κάνει διαφορετικό έναν AI βοηθό (π.χ. ChatGPT) από το Google;",
 	"quiz_what_is_ai_explanation": "Το Google σου δείχνει λίστα από ιστοσελίδες. Ο AI βοηθός διαβάζει πολλές πηγές και σου δίνει μια απάντηση προσαρμοσμένη στην ερώτησή σου — σαν να μιλάς με κάποιον που ξέρει πολλά. Μπορείς να κάνεις follow-up ερωτήσεις!",
 	"quiz_what_is_ai_opt_a": "Είναι πιο γρήγορο από το Google",
@@ -464,7 +456,6 @@
 	"quiz_ai_limitations_opt_a": "Τον πιστεύεις αμέσως — ο AI ξέρει τα πάντα",
 	"quiz_ai_limitations_opt_b": "Ελέγχεις το φύλλο οδηγιών ή ρωτάς φαρμακοποιό",
 	"quiz_ai_limitations_opt_c": "Σταματάς να χρησιμοποιείς τον AI",
-
 	"quiz_strong_password_question": "Ποιος είναι ο πιο ασφαλής κωδικός;",
 	"quiz_strong_password_explanation": "Ένας ισχυρός κωδικός έχει τουλάχιστον 8 χαρακτήρες και συνδυάζει κεφαλαία, μικρά, αριθμούς και σύμβολα (!@#). Αποφεύγουμε ημερομηνίες γέννησης, ονόματα και απλές λέξεις.",
 	"quiz_strong_password_opt_a": "1234",

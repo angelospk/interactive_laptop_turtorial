@@ -4,6 +4,7 @@ import {
 	buildLessonSections,
 	moduleCategories,
 	getModuleDevices,
+	getSimulationPlatform,
 	isModuleForDevice,
 	modulesSpecificToDevice
 } from './moduleOrganization';
@@ -31,17 +32,23 @@ describe('groupModulesByCategory', () => {
 		const all = mods(
 			'module1', 'module2', 'module3', 'module4', 'module5', 'module6',
 			'word', 'module7', 'module8', 'module9', 'module10', 'module11',
-			'module12', 'module13'
+			'module12', 'module13', 'android', 'iphone'
 		);
 		const flat = groupModulesByCategory(all).flatMap((g) => g.modules.map((m) => m.id));
 		expect(flat.sort()).toEqual(all.map((m) => m.id).sort());
-		// all 14 covered by real categories → no "other" bucket
+		// all 16 covered by real categories → no "other" bucket
 		expect(groupModulesByCategory(all).some((g) => g.category?.id === 'other')).toBe(false);
 	});
 
-	it('exposes 6 categories (incl. the mobile track)', () => {
-		expect(moduleCategories).toHaveLength(6);
+	it('exposes 7 categories (incl. windows + mobile device groups)', () => {
+		expect(moduleCategories).toHaveLength(7);
 		expect(moduleCategories.map((c) => c.id)).toContain('mobile');
+		expect(moduleCategories.map((c) => c.id)).toContain('windows');
+	});
+
+	it('groups the Windows-simulated environment modules under "windows"', () => {
+		const windows = moduleCategories.find((c) => c.id === 'windows')!;
+		expect(windows.moduleIds).toEqual(['module3', 'module4', 'module9']);
 	});
 });
 
@@ -50,7 +57,7 @@ const lessons = (n: number) =>
 
 describe('buildLessonSections', () => {
 	it('returns null for modules without configured sections', () => {
-		expect(buildLessonSections('module1', lessons(10))).toBeNull();
+		expect(buildLessonSections('module6', lessons(7))).toBeNull();
 	});
 
 	it('returns null for an empty lesson list', () => {
@@ -61,10 +68,26 @@ describe('buildLessonSections', () => {
 		const sections = buildLessonSections('module2', lessons(13))!;
 		expect(sections.map((s) => s.title)).toEqual([
 			'Βασική πληκτρολόγηση',
-			'Προχωρημένα & ταχύτητα'
+			'Συντομεύσεις Windows & ταχύτητα'
 		]);
 		expect(sections[0].items).toHaveLength(9);
 		expect(sections[1].items).toHaveLength(4);
+	});
+
+	it('splits module1 into theory / core practice / optional extra practice', () => {
+		const sections = buildLessonSections('module1', lessons(11))!;
+		expect(sections.map((s) => s.title)).toEqual([
+			'Θεωρία',
+			'Βασική εξάσκηση',
+			'Επιπλέον εξάσκηση (προαιρετική)'
+		]);
+		expect(sections.map((s) => s.items.length)).toEqual([1, 7, 3]);
+	});
+
+	it('labels the module8 theory wall separately from the two practice groups', () => {
+		const sections = buildLessonSections('module8', lessons(18))!;
+		expect(sections.map((s) => s.items.length)).toEqual([7, 5, 6]);
+		expect(sections[0].title).toBe('Θεωρία');
 	});
 
 	it('preserves original indices across sections', () => {
@@ -87,6 +110,21 @@ describe('device tags', () => {
 		expect(getModuleDevices('module1')).toEqual(['windows', 'mac']);
 		expect(getModuleDevices('module3')).toEqual(['windows']); // Windows-only
 		expect(getModuleDevices('module10')).toBeNull(); // phishing = universal
+	});
+
+	it('tags the Windows-UI exercise modules as windows-only (A1 fix)', () => {
+		// File Explorer / Windows Settings exercises do not transfer to Mac.
+		expect(getModuleDevices('module4')).toEqual(['windows']);
+		expect(getModuleDevices('module9')).toEqual(['windows']);
+	});
+
+	it('exposes the simulation platform separately from concept applicability', () => {
+		// word is useful concept-wise on windows+mac, but its exercises render
+		// a Windows-like environment (applicable ≠ simulated).
+		expect(getModuleDevices('word')).toEqual(['windows', 'mac']);
+		expect(getSimulationPlatform('word')).toBe('windows');
+		expect(getSimulationPlatform('android')).toBe('android');
+		expect(getSimulationPlatform('module12')).toBeNull(); // reading/quiz only
 	});
 
 	it('treats untagged (universal) modules as matching every device', () => {

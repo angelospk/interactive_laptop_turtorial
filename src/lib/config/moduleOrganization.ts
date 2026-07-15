@@ -18,7 +18,13 @@ export interface ModuleCategory {
 }
 
 export const moduleCategories: ModuleCategory[] = [
-	{ id: 'basics', title: 'Τα πρώτα βήματα', moduleIds: ['module1', 'module2', 'module3', 'module4'] },
+	{ id: 'basics', title: 'Τα πρώτα βήματα', moduleIds: ['module1', 'module2'] },
+	{
+		id: 'windows',
+		title: 'Windows υπολογιστής',
+		moduleIds: ['module3', 'module4', 'module9']
+	},
+	{ id: 'mobile', title: 'Κινητό τηλέφωνο', moduleIds: ['android', 'iphone'] },
 	{
 		id: 'internet',
 		title: 'Διαδίκτυο & Επικοινωνία',
@@ -29,9 +35,8 @@ export const moduleCategories: ModuleCategory[] = [
 	{
 		id: 'digital-life',
 		title: 'Ψηφιακή ζωή & υπηρεσίες',
-		moduleIds: ['module9', 'module12', 'module13']
-	},
-	{ id: 'mobile', title: 'Κινητό τηλέφωνο', moduleIds: ['android', 'iphone'] }
+		moduleIds: ['module12', 'module13']
+	}
 ];
 
 // ── Device tags (device-aware prioritisation, ROADMAP Φάση 1) ───────────────
@@ -41,23 +46,55 @@ export type ModuleDevice = 'windows' | 'mac' | 'android' | 'iphone';
 /**
  * Modules tied to a specific device family. A module NOT listed here is
  * "universal" — it applies to every device (e.g. internet safety, video calls,
- * gov services), so existing content needs zero migration. Desktop-input and
- * desktop-app modules are the ones that genuinely differ per device.
+ * gov services), so existing content needs zero migration.
+ *
+ * Semantics (CURRICULUM_PLAN §6): a tag means "the MATERIAL is useful on this
+ * device" (concept level). Which environment the exercises visually simulate
+ * is a separate axis — see `moduleSimulationPlatform` below. E.g. `word` is
+ * useful on windows+mac (writing a document transfers), while module4's
+ * File-Explorer exercises genuinely do not transfer to Mac/Finder.
  */
 export const moduleDevices: Record<string, ModuleDevice[]> = {
 	module1: ['windows', 'mac'], // Ποντίκι & Κλικ
-	module2: ['windows', 'mac'], // Πληκτρολόγιο
+	module2: ['windows', 'mac'], // Πληκτρολόγιο (Windows shortcuts: δικό τους section)
 	module3: ['windows'], // Περιβάλλον Windows 11 (Windows-only)
-	module4: ['windows', 'mac'], // Αρχεία & Φάκελοι
+	module4: ['windows'], // Αρχεία & Φάκελοι — ασκήσεις σε Windows File Explorer
+	module9: ['windows'], // Προχωρημένες Λειτουργίες — ασκήσεις σε Windows Settings
 	module7: ['windows', 'mac'], // Excel
 	word: ['windows', 'mac'], // Επεξεργασία Κειμένου
 	android: ['android'], // Android track (ROADMAP Φάση 2)
 	iphone: ['iphone'] // iPhone track (ROADMAP Φάση 2)
 };
 
+/**
+ * Which device environment a module's interactive exercises visually simulate
+ * (the "chrome" of the simulator). Absent = no simulated environment (pure
+ * reading/quiz modules). Kept separate from `moduleDevices` so a module can be
+ * concept-applicable on Mac while its exercises still render a Windows-like UI.
+ */
+export const moduleSimulationPlatform: Record<string, ModuleDevice> = {
+	module3: 'windows',
+	module4: 'windows',
+	module5: 'windows',
+	module6: 'windows',
+	module7: 'windows',
+	module9: 'windows',
+	module10: 'windows',
+	module11: 'windows',
+	module13: 'windows',
+	word: 'windows',
+	android: 'android',
+	iphone: 'iphone'
+};
+
 /** Device tags for a module, or `null` when it is universal (applies to all). */
 export function getModuleDevices(moduleId: string): ModuleDevice[] | null {
 	return moduleDevices[moduleId] ?? null;
+}
+
+/** Simulated environment of a module's exercises, or `null` if none. */
+export function getSimulationPlatform(moduleId: string): ModuleDevice | null {
+	return moduleSimulationPlatform[moduleId] ?? null;
 }
 
 /** A universal module matches any device; a tagged one only its listed devices. */
@@ -127,13 +164,35 @@ export interface LessonSection {
  * `buildLessonSections` tolerates drift defensively.
  */
 export const moduleSections: Record<string, LessonSection[]> = {
+	// 1 reading + 7 core skills + 3 arcade-style drills (χαμηλή διδακτική αξία —
+	// μένουν διαθέσιμα ως προαιρετική εξάσκηση, δεν σβήνονται: audit A3).
+	module1: [
+		{ title: 'Θεωρία', count: 1 },
+		{ title: 'Βασική εξάσκηση', count: 7 },
+		{ title: 'Επιπλέον εξάσκηση (προαιρετική)', count: 3 }
+	],
 	module2: [
 		{ title: 'Βασική πληκτρολόγηση', count: 9 },
-		{ title: 'Προχωρημένα & ταχύτητα', count: 4 }
+		{ title: 'Συντομεύσεις Windows & ταχύτητα', count: 4 }
+	],
+	// Τα ΕΑΨΙ readings μπαίνουν πρώτα (orderIndex −1000) — χωρίς section label
+	// ο μαθητής βλέπει «τοίχο θεωρίας» πριν από κάθε άσκηση (audit A5).
+	module5: [
+		{ title: 'Θεωρία', count: 4 },
+		{ title: 'Εξάσκηση', count: 10 }
 	],
 	module8: [
+		{ title: 'Θεωρία', count: 7 },
 		{ title: 'Ασφαλής περιήγηση', count: 5 },
 		{ title: 'Συναλλαγές & προστασία λογαριασμού', count: 6 }
+	],
+	module9: [
+		{ title: 'Θεωρία', count: 7 },
+		{ title: 'Εξάσκηση', count: 9 }
+	],
+	module11: [
+		{ title: 'Θεωρία', count: 5 },
+		{ title: 'Εξάσκηση', count: 6 }
 	]
 };
 

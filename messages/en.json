@@ -75,8 +75,8 @@
 	"module1_lesson6_desc": "Learn to scroll pages with the mouse wheel",
 	"module1_lesson7_title": "Precision Click",
 	"module1_lesson7_desc": "Click on small targets with high accuracy",
-	"module1_lesson8_title": "Speed Click",
-	"module1_lesson8_desc": "Test your clicking speed",
+	"module1_lesson8_title": "Drag-and-Drop Puzzle",
+	"module1_lesson8_desc": "Complete the puzzle by dragging the pieces into place",
 	"module1_lesson9_title": "Follow the Shape",
 	"module1_lesson9_desc": "Follow a shape with the mouse without going outside",
 	"module1_lesson10_title": "Pattern Click",
@@ -222,14 +222,12 @@
 	"module7_lesson9_desc": "Find the largest expense with =MAX()",
 	"module7_lesson10_title": "10. Minimum with MIN",
 	"module7_lesson10_desc": "Find the smallest expense with =MIN()",
-
 	"module5_lesson8_title": "8. Download a File",
 	"module5_lesson8_desc": "Learn how to download files from the internet",
 	"module5_lesson9_title": "9. Zoom In/Out",
 	"module5_lesson9_desc": "Make webpage text larger or smaller",
 	"module5_lesson10_title": "10. Find on Page",
 	"module5_lesson10_desc": "Search for words on a webpage using Ctrl+F",
-
 	"module8_lesson8_title": "8. Strong Password",
 	"module8_lesson8_desc": "Learn what makes a password strong and secure",
 	"module8_lesson9_title": "9. Two-Factor Authentication (2FA)",
@@ -238,7 +236,6 @@
 	"module8_lesson10_desc": "How to manage your browser history and cookies",
 	"module8_lesson11_title": "11. Public WiFi Risks",
 	"module8_lesson11_desc": "What dangers lurk on public WiFi and how to stay safe",
-
 	"module9_lesson5_title": "5. Update an App",
 	"module9_lesson5_desc": "Learn how to check for and install app updates",
 	"module9_lesson6_title": "6. Bluetooth Connection",
@@ -249,7 +246,6 @@
 	"module9_lesson8_desc": "Enable larger text and high contrast for easier use",
 	"module9_lesson9_title": "9. Sound Settings",
 	"module9_lesson9_desc": "Adjust volume and notification sounds",
-
 	"module11_title": "Video Calls",
 	"module11_description": "Learn to make video calls with Viber and other apps",
 	"module11_lesson1_title": "1. What is a Video Call",
@@ -264,7 +260,6 @@
 	"module11_lesson5_desc": "How to properly end a video call",
 	"module11_lesson6_title": "6. Tips & Best Practices",
 	"module11_lesson6_desc": "Lighting, sound, privacy — everything you need to know",
-
 	"quiz_what_is_videocall_question": "What do you need to make a video call?",
 	"quiz_what_is_videocall_explanation": "For a video call you need: an internet connection, a camera (or a laptop with a built-in one), and an app like Viber, Skype, or Zoom. The other person must also have the same app.",
 	"quiz_what_is_videocall_opt_a": "Just a phone",
@@ -275,7 +270,6 @@
 	"quiz_videocall_tips_opt_a": "Speak as loudly as possible",
 	"quiz_videocall_tips_opt_b": "Sit far from the window",
 	"quiz_videocall_tips_opt_c": "Good lighting, stable internet, and a quiet space",
-
 	"module12_title": "Online Government Services [BETA]",
 	"module12_description": "Explore gov.gr — use Google or AI to find what you're looking for",
 	"module12_lesson1_title": "1. How to Find a Service on gov.gr",
@@ -285,7 +279,6 @@
 	"quiz_gov_intro_opt_a": "Browse gov.gr randomly until you find it",
 	"quiz_gov_intro_opt_b": "Ask Google or AI: 'ID card renewal gov.gr'",
 	"quiz_gov_intro_opt_c": "Go to the citizen service center without searching online",
-
 	"android_title": "Android Phone [BETA]",
 	"android_description": "Learn to use your Android phone — opening apps, calls, photos and settings",
 	"android_lesson1_title": "1. Open an app",
@@ -306,7 +299,6 @@
 	"module13_lesson4_desc": "Learn when AI is useful and when to use Google",
 	"module13_lesson5_title": "5. AI Limitations",
 	"module13_lesson5_desc": "AI can make mistakes — learn when to double-check",
-
 	"quiz_what_is_ai_question": "What makes an AI assistant (e.g. ChatGPT) different from Google?",
 	"quiz_what_is_ai_explanation": "Google shows you a list of websites. An AI assistant reads many sources and gives you an answer tailored to your question — like talking to someone very knowledgeable. You can even ask follow-up questions!",
 	"quiz_what_is_ai_opt_a": "It's faster than Google",
@@ -327,7 +319,6 @@
 	"quiz_ai_limitations_opt_a": "Trust it immediately — AI knows everything",
 	"quiz_ai_limitations_opt_b": "Check the package leaflet or ask a pharmacist",
 	"quiz_ai_limitations_opt_c": "Stop using AI altogether",
-
 	"quiz_strong_password_question": "Which is the most secure password?",
 	"quiz_strong_password_explanation": "A strong password has at least 8 characters and combines uppercase, lowercase, numbers and symbols (!@#). Avoid birthdays, names and simple words.",
 	"quiz_strong_password_opt_a": "1234",
