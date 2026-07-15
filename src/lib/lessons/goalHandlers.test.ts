@@ -353,6 +353,99 @@ describe('mobile-dial-number', () => {
 	});
 });
 
+describe('mobile-call-contact', () => {
+	const config = { targetContactId: 'maria' };
+
+	it('matches when the target contact is called', () => {
+		expect(
+			checkGoalMatch('mobile-call-contact', 'mobile-contact-called', { contactId: 'maria' }, config)
+		).toBe(true);
+	});
+
+	it('does not match another contact or a keypad call', () => {
+		expect(
+			checkGoalMatch('mobile-call-contact', 'mobile-contact-called', { contactId: 'nikos' }, config)
+		).toBe(false);
+		expect(
+			checkGoalMatch('mobile-call-contact', 'mobile-call-placed', { number: '123' }, config)
+		).toBe(false);
+	});
+});
+
+describe('mobile-send-sms / mobile-send-chat (channel separation)', () => {
+	it('sms goal matches only the sms channel', () => {
+		expect(
+			checkGoalMatch('mobile-send-sms', 'mobile-message-sent', { channel: 'sms', text: 'γεια' }, {})
+		).toBe(true);
+		expect(
+			checkGoalMatch('mobile-send-sms', 'mobile-message-sent', { channel: 'viber', text: 'γεια' }, {})
+		).toBe(false);
+	});
+
+	it('chat goal matches only the viber channel', () => {
+		expect(
+			checkGoalMatch('mobile-send-chat', 'mobile-message-sent', { channel: 'viber', text: 'γεια' }, {})
+		).toBe(true);
+		expect(
+			checkGoalMatch('mobile-send-chat', 'mobile-message-sent', { channel: 'sms', text: 'γεια' }, {})
+		).toBe(false);
+	});
+
+	it('respects targetConversationId when configured', () => {
+		const config = { targetConversationId: 'kori' };
+		expect(
+			checkGoalMatch(
+				'mobile-send-sms',
+				'mobile-message-sent',
+				{ channel: 'sms', conversationId: 'kori', text: 'γεια' },
+				config
+			)
+		).toBe(true);
+		expect(
+			checkGoalMatch(
+				'mobile-send-sms',
+				'mobile-message-sent',
+				{ channel: 'sms', conversationId: 'gios', text: 'γεια' },
+				config
+			)
+		).toBe(false);
+	});
+});
+
+describe('mobile-change-font-size', () => {
+	it('matches any size change when no target is set', () => {
+		expect(
+			checkGoalMatch('mobile-change-font-size', 'mobile-font-size-set', { size: 'large' }, {})
+		).toBe(true);
+	});
+
+	it('matches only the configured target size', () => {
+		const config = { targetSize: 'large' };
+		expect(
+			checkGoalMatch('mobile-change-font-size', 'mobile-font-size-set', { size: 'large' }, config)
+		).toBe(true);
+		expect(
+			checkGoalMatch('mobile-change-font-size', 'mobile-font-size-set', { size: 'small' }, config)
+		).toBe(false);
+	});
+});
+
+describe('mobile-connect-wifi', () => {
+	it('matches connecting to the target network', () => {
+		const config = { targetSsid: 'SPITI-WIFI' };
+		expect(
+			checkGoalMatch('mobile-connect-wifi', 'mobile-wifi-connected', { ssid: 'SPITI-WIFI' }, config)
+		).toBe(true);
+		expect(
+			checkGoalMatch('mobile-connect-wifi', 'mobile-wifi-connected', { ssid: 'CAFE' }, config)
+		).toBe(false);
+	});
+
+	it('does not match desktop connect-wifi events', () => {
+		expect(checkGoalMatch('mobile-connect-wifi', 'connect-wifi', {}, {})).toBe(false);
+	});
+});
+
 // ── Unknown goal guard ─────────────────────────────────────────────────────────
 
 describe('unknown goal', () => {

@@ -5,6 +5,8 @@
 	import MobileFrame from '$lib/components/mobile/MobileFrame.svelte';
 	import MobileHomeScreen from '$lib/components/mobile/MobileHomeScreen.svelte';
 	import PhoneApp from '$lib/components/mobile/apps/PhoneApp.svelte';
+	import MessagingApp from '$lib/components/mobile/apps/MessagingApp.svelte';
+	import MobileSettingsApp from '$lib/components/mobile/apps/MobileSettingsApp.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 
@@ -74,8 +76,19 @@
 
 		if (action === 'mobile-app-opened' && data.appId !== config.targetAppId) {
 			miss(`Όχι αυτό. Ψάξε το «${targetApp?.label ?? ''}».`);
-		} else if (action === 'mobile-call-placed') {
-			miss('Κάλεσες λάθος αριθμό. Σβήσε τον και δοκίμασε ξανά.');
+		} else if (action === 'mobile-call-placed' || action === 'mobile-contact-called') {
+			// A call happened but didn't satisfy the goal (wrong number/contact).
+			if (action === 'mobile-call-placed' && !data.contactId) {
+				miss('Κάλεσες λάθος αριθμό. Σβήσε τον και δοκίμασε ξανά.');
+			} else if (action === 'mobile-contact-called') {
+				miss('Κάλεσες άλλη επαφή. Δοκίμασε ξανά.');
+			}
+		} else if (action === 'mobile-message-sent') {
+			miss('Το μήνυμα δεν πήγε εκεί που έπρεπε. Δοκίμασε άλλη συνομιλία.');
+		} else if (action === 'mobile-font-size-set') {
+			miss('Σχεδόν! Δοκίμασε άλλο μέγεθος.');
+		} else if (action === 'mobile-wifi-connected') {
+			miss('Συνδέθηκες σε άλλο δίκτυο. Δοκίμασε ξανά.');
 		}
 	}
 
@@ -99,7 +112,16 @@
 					disabled={done}
 				/>
 			{:else if currentApp.kind === 'phone'}
-				<PhoneApp onEvent={dispatch} />
+				<PhoneApp onEvent={dispatch} contacts={config.contacts ?? []} />
+			{:else if currentApp.kind === 'messages' || currentApp.kind === 'viber'}
+				<MessagingApp
+					onEvent={dispatch}
+					conversations={config.conversations ?? []}
+					channel={currentApp.kind === 'viber' ? 'viber' : 'sms'}
+					title={currentApp.label}
+				/>
+			{:else if currentApp.kind === 'settings'}
+				<MobileSettingsApp onEvent={dispatch} wifiNetworks={config.wifiNetworks ?? []} />
 			{:else}
 				<!-- Inert placeholder for apps that are scenery in this lesson -->
 				<div class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">

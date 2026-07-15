@@ -136,6 +136,26 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		return digits(data.number) === digits(config.targetNumber);
 	},
 
+	'mobile-call-contact': (action, data, config) =>
+		action === 'mobile-contact-called' &&
+		(!config.targetContactId || data.contactId === config.targetContactId),
+
+	'mobile-send-sms': (action, data, config) =>
+		action === 'mobile-message-sent' &&
+		data.channel === 'sms' &&
+		(!config.targetConversationId || data.conversationId === config.targetConversationId),
+
+	'mobile-send-chat': (action, data, config) =>
+		action === 'mobile-message-sent' &&
+		data.channel === 'viber' &&
+		(!config.targetConversationId || data.conversationId === config.targetConversationId),
+
+	'mobile-change-font-size': (action, data, config) =>
+		action === 'mobile-font-size-set' && (!config.targetSize || data.size === config.targetSize),
+
+	'mobile-connect-wifi': (action, data, config) =>
+		action === 'mobile-wifi-connected' && (!config.targetSsid || data.ssid === config.targetSsid),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

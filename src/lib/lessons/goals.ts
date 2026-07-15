@@ -84,6 +84,11 @@ export const GOALS = {
 	// desktop and mobile events can never satisfy each other)
 	'mobile-open-app': { requiresAppId: true },
 	'mobile-dial-number': { requiresAppId: false },
+	'mobile-call-contact': { requiresAppId: false },
+	'mobile-send-sms': { requiresAppId: false },
+	'mobile-send-chat': { requiresAppId: false },
+	'mobile-change-font-size': { requiresAppId: false },
+	'mobile-connect-wifi': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },
