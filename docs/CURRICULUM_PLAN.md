@@ -106,6 +106,8 @@
 
 ## 4γ. Wave 3 — μαθήματα από τον «Οδηγό Τσέπης» (digital tips PDF)
 
+> **✅ Υλοποιήθηκε (2026-07-15)** — bd issues κλειστά: `1mf,ebb,att,v40,abm,mbp,bdt`. Τα Android/iPhone tracks έφτασαν τα **19 μαθήματα** το καθένα σε **5 ενότητες**: Βασικά — πρώτα βήματα (base path) · Καθημερινή χρήση (βιντεοκλήση, screenshot, force-close, QR) · Ρυθμίσεις & βοήθεια (νυχτερινή, εύρεση συσκευής, ενημέρωση Store) · Πιο προχωρημένα & AI (Ψηφιακός βοηθός ×3) · Έξυπνα & ασφάλεια (ύποπτο SMS, 2FA). Νέα mini-apps: RecentApps, CameraApp, MobileBrowser, StoreApp, AssistantApp, Login2FA. Το QR ολοκληρώνεται μόνο με `mobile-qr-link-opened{host,confirmed}` + exact domain check (`mobileLink.evaluateLink`), όχι με σκέτο scan. **Δεν** υλοποιήθηκαν από τον πίνακα: Google Photos backup, «Δημόσιο WiFi & τράπεζα» quiz (μελλοντικά).
+
 Υποψήφια διαδραστικά μαθήματα (όχι reading) από τα tips, με εφικτότητα:
 
 | Μάθημα | Goal (νέο) | Mini-app | Δυσκολία | Κόστος |
