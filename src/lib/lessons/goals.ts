@@ -97,6 +97,8 @@ export const GOALS = {
 	'mobile-find-device': { requiresAppId: false },
 	'mobile-update-app': { requiresAppId: false },
 	'mobile-assistant-task': { requiresAppId: false },
+	'mobile-spot-scam-sms': { requiresAppId: false },
+	'mobile-enter-2fa': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },

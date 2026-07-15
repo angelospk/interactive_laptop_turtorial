@@ -3,24 +3,30 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Video from '@lucide/svelte/icons/video';
 	import PhoneOff from '@lucide/svelte/icons/phone-off';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { cn } from '$lib/utils';
 	import type { MobileSimConversation } from '$lib/lessons/mobileSim';
 
 	/**
 	 * Shared messaging mini-app: SMS ('sms' channel, green accents) and
-	 * Viber-like chat ('viber' channel, purple accents). Semantic event:
+	 * Viber-like chat ('viber' channel, purple accents). Semantic events:
 	 *   mobile-message-sent { channel, conversationId, text }
+	 *   mobile-sms-verdict  { conversationId, isScam }   (scam-spotting lesson)
 	 */
 	let {
 		onEvent,
 		conversations = [],
 		channel = 'sms',
-		title = 'Μηνύματα'
+		title = 'Μηνύματα',
+		verdictConversationId = null
 	}: {
 		onEvent: (action: string, data?: Record<string, unknown>) => void;
 		conversations?: MobileSimConversation[];
 		channel?: 'sms' | 'viber';
 		title?: string;
+		/** When the open conversation matches, show «Ασφαλές/Ύποπτο» buttons. */
+		verdictConversationId?: string | null;
 	} = $props();
 
 	const isViber = $derived(channel === 'viber');
@@ -45,6 +51,13 @@
 		sent[open.id] = [...(sent[open.id] ?? []), text];
 		draft = '';
 		onEvent('mobile-message-sent', { channel, conversationId: open.id, text });
+	}
+
+	const inVerdictMode = $derived(open != null && open.id === verdictConversationId);
+
+	function verdict(isScam: boolean) {
+		if (!open) return;
+		onEvent('mobile-sms-verdict', { conversationId: open.id, isScam });
 	}
 </script>
 
@@ -151,6 +164,27 @@
 			{/each}
 		</div>
 
+		{#if inVerdictMode}
+			<div class="shrink-0 space-y-2 border-t border-slate-200 bg-white px-3 py-3">
+				<p class="text-center text-sm text-slate-600">Είναι αυτό το μήνυμα ασφαλές ή ύποπτο;</p>
+				<div class="flex gap-2">
+					<button
+						type="button"
+						onclick={() => verdict(false)}
+						class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-base font-semibold text-white transition active:bg-emerald-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					>
+						<ShieldCheck class="h-5 w-5" aria-hidden="true" /> Ασφαλές
+					</button>
+					<button
+						type="button"
+						onclick={() => verdict(true)}
+						class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 text-base font-semibold text-white transition active:bg-red-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					>
+						<TriangleAlert class="h-5 w-5" aria-hidden="true" /> Ύποπτο
+					</button>
+				</div>
+			</div>
+		{:else}
 		<form
 			class="flex shrink-0 items-center gap-2 border-t border-slate-200 px-3 py-2"
 			onsubmit={(e) => {
@@ -176,6 +210,7 @@
 				<Send class="h-5 w-5" aria-hidden="true" />
 			</button>
 		</form>
+		{/if}
 		{/if}
 	{/if}
 </div>

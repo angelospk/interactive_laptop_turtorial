@@ -83,6 +83,14 @@ export interface MobileSimConfig {
 	assistantGreeting?: string;
 	/** Assistant confirmation shown after the correct phrase. */
 	assistantConfirm?: string;
+	/** Correct verdict for the suspicious-SMS lesson (true = it IS a scam). */
+	smsIsScam?: boolean;
+	/** Login URL shown in the 2FA browser lesson. */
+	loginUrl?: string;
+	/** The one-time code "sent by SMS" in the 2FA lesson. */
+	twofaCode?: string;
+	/** Service name in the 2FA login header. */
+	serviceName?: string;
 	successMessage?: string;
 	hint?: string;
 }
@@ -115,7 +123,9 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-night-mode': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-find-device': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-update-app': { requiresTargetAppId: true, targetKind: 'store' },
-	'mobile-assistant-task': { requiresTargetAppId: true, targetKind: 'assistant' }
+	'mobile-assistant-task': { requiresTargetAppId: true, targetKind: 'assistant' },
+	'mobile-spot-scam-sms': { requiresTargetAppId: true, targetKind: 'messages' },
+	'mobile-enter-2fa': { requiresTargetAppId: true, targetKind: 'browser' }
 	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
 
@@ -209,7 +219,12 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 			throw new Error(`targetContactId "${c.targetContactId}" is not in contacts`);
 		}
 	}
-	if (c.goal === 'mobile-send-sms' || c.goal === 'mobile-send-chat' || c.goal === 'mobile-start-videocall') {
+	if (
+		c.goal === 'mobile-send-sms' ||
+		c.goal === 'mobile-send-chat' ||
+		c.goal === 'mobile-start-videocall' ||
+		c.goal === 'mobile-spot-scam-sms'
+	) {
 		if (!c.conversations?.length) throw new Error(`${c.goal} needs a conversations list`);
 		for (const t of c.conversations) {
 			if (!t?.id || !t.name || !Array.isArray(t.messages)) {
@@ -254,6 +269,10 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		if (!target?.hasUpdate) {
 			throw new Error(`store item "${c.targetUpdateId}" must have hasUpdate:true to be updatable`);
 		}
+	}
+	if (c.goal === 'mobile-enter-2fa') {
+		if (!c.twofaCode) throw new Error('mobile-enter-2fa needs a twofaCode');
+		if (!c.loginUrl) throw new Error('mobile-enter-2fa needs a loginUrl');
 	}
 	if (c.goal === 'mobile-assistant-task') {
 		if (!c.intent) throw new Error('mobile-assistant-task needs an intent');

@@ -201,6 +201,17 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		data.correct === true &&
 		(!config.intent || data.intent === config.intent),
 
+	// Spot the scam SMS: the verdict must match the truth (default: it IS a scam),
+	// and be about the target conversation. Merely opening the message never counts.
+	'mobile-spot-scam-sms': (action, data, config) =>
+		action === 'mobile-sms-verdict' &&
+		data.isScam === (config.smsIsScam ?? true) &&
+		(!config.targetConversationId || data.conversationId === config.targetConversationId),
+
+	// 2FA: the submitted one-time code must match the code that "arrived by SMS".
+	'mobile-enter-2fa': (action, data, config) =>
+		action === 'mobile-2fa-submitted' && data.code === config.twofaCode,
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

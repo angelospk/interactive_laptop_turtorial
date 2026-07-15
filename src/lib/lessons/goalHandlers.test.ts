@@ -524,6 +524,47 @@ describe('mobile-update-app', () => {
 	});
 });
 
+describe('mobile-spot-scam-sms', () => {
+	const config = { targetConversationId: 'unknown', smsIsScam: true };
+	it('completes when the scam SMS is flagged as suspicious', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-spot-scam-sms',
+				'mobile-sms-verdict',
+				{ conversationId: 'unknown', isScam: true },
+				config
+			)
+		).toBe(true);
+	});
+	it('does not complete when a scam is judged safe', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-spot-scam-sms',
+				'mobile-sms-verdict',
+				{ conversationId: 'unknown', isScam: false },
+				config
+			)
+		).toBe(false);
+	});
+	it('does not complete merely by opening the message', () => {
+		expect(checkGoalMatch('mobile-spot-scam-sms', 'mobile-message-sent', {}, config)).toBe(false);
+	});
+});
+
+describe('mobile-enter-2fa', () => {
+	const config = { twofaCode: '482913' };
+	it('completes when the correct one-time code is submitted', () => {
+		expect(checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '482913' }, config)).toBe(
+			true
+		);
+	});
+	it('does not complete on a wrong code', () => {
+		expect(checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '000000' }, config)).toBe(
+			false
+		);
+	});
+});
+
 describe('mobile-assistant-task', () => {
 	const config = { intent: 'alarm' };
 	it('completes when the correct phrase for the intent is chosen', () => {

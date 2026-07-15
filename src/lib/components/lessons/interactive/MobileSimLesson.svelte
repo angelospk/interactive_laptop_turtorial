@@ -11,6 +11,7 @@
 	import CameraApp from '$lib/components/mobile/apps/CameraApp.svelte';
 	import StoreApp from '$lib/components/mobile/apps/StoreApp.svelte';
 	import AssistantApp from '$lib/components/mobile/apps/AssistantApp.svelte';
+	import Login2FA from '$lib/components/mobile/apps/Login2FA.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
 
@@ -104,6 +105,10 @@
 			miss('Ενημέρωσες άλλη εφαρμογή. Ψάξε αυτή που ζητά το μάθημα.');
 		} else if (action === 'mobile-assistant-command') {
 			miss('Ο βοηθός δεν το κατάλαβε καλά. Διάλεξε πιο ξεκάθαρη διατύπωση.');
+		} else if (action === 'mobile-sms-verdict') {
+			miss('Κοίτα ξανά: άγνωστος αποστολέας και σύνδεσμος που πιέζει — είναι ύποπτο.');
+		} else if (action === 'mobile-2fa-submitted') {
+			miss('Λάθος κωδικός. Δες ξανά το SMS και γράψε τα ίδια ψηφία.');
 		}
 	}
 
@@ -180,6 +185,9 @@
 					conversations={config.conversations ?? []}
 					channel={currentApp.kind === 'viber' ? 'viber' : 'sms'}
 					title={currentApp.label}
+					verdictConversationId={config.goal === 'mobile-spot-scam-sms'
+						? (config.targetConversationId ?? null)
+						: null}
 				/>
 			{:else if currentApp.kind === 'settings'}
 				<MobileSettingsApp onEvent={dispatch} wifiNetworks={config.wifiNetworks ?? []} />
@@ -198,6 +206,13 @@
 					phrases={config.phrases ?? []}
 					greeting={config.assistantGreeting ?? undefined}
 					confirm={config.assistantConfirm ?? undefined}
+				/>
+			{:else if currentApp.kind === 'browser'}
+				<Login2FA
+					onEvent={dispatch}
+					url={config.loginUrl ?? ''}
+					code={config.twofaCode ?? ''}
+					serviceName={config.serviceName ?? undefined}
 				/>
 			{:else}
 				<!-- Inert placeholder for apps that are scenery in this lesson -->

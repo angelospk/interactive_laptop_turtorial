@@ -260,6 +260,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'advanced-ai',
 			title: 'Πιο προχωρημένα & AI',
 			lessonIds: ['android-assistant-alarm', 'android-assistant-reminder', 'android-assistant-ask']
+		},
+		{
+			id: 'smart-safety',
+			title: 'Έξυπνα & ασφάλεια',
+			lessonIds: ['android-scam-sms', 'android-two-factor']
 		}
 	],
 	iphone: [
@@ -296,6 +301,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'advanced-ai',
 			title: 'Πιο προχωρημένα & AI',
 			lessonIds: ['iphone-assistant-alarm', 'iphone-assistant-reminder', 'iphone-assistant-ask']
+		},
+		{
+			id: 'smart-safety',
+			title: 'Έξυπνα & ασφάλεια',
+			lessonIds: ['iphone-scam-sms', 'iphone-two-factor']
 		}
 	]
 };

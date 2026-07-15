@@ -33,6 +33,9 @@ function homeApps(variant: MobileVariant): MobileSimApp[] {
 			? { id: 'store', label: 'App Store', icon: '🛍️', kind: 'store', color: 'bg-sky-100' }
 			: { id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store', color: 'bg-green-100' },
 		{ id: 'assistant', label: 'Ψηφιακός βοηθός', icon: '✨', kind: 'assistant', color: 'bg-indigo-100' },
+		variant === 'ios'
+			? { id: 'browser', label: 'Safari', icon: '🧭', kind: 'browser', color: 'bg-blue-100' }
+			: { id: 'browser', label: 'Chrome', icon: '🌐', kind: 'browser', color: 'bg-blue-100' },
 		{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', kind: 'settings', color: 'bg-slate-200' }
 	];
 }
@@ -305,6 +308,47 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				],
 				successMessage: 'Μπράβο! Έκανες μια καθαρή, συγκεκριμένη ερώτηση.',
 				hint: 'Μια καλή ερώτηση λέει ΤΙ ψάχνεις και ΠΟΥ/ΠΟΤΕ: «ανοιχτά φαρμακεία κοντά μου τώρα».'
+			}
+		},
+		{
+			n: 18,
+			difficulty: 'advanced' as const,
+			lessonKey: 'scam-sms',
+			config: {
+				goal: 'mobile-spot-scam-sms',
+				prompt: 'Άνοιξε τα Μηνύματα, διάβασε το SMS από άγνωστο αριθμό και κρίνε: ασφαλές ή ύποπτο;',
+				targetAppId: 'messages',
+				targetConversationId: 'unknown',
+				smsIsScam: true,
+				conversations: [
+					{
+						id: 'unknown',
+						name: 'Άγνωστος αριθμός',
+						messages: [
+							{
+								from: 'them' as const,
+								text: 'ΕΛΤΑ: Το δέμα σας εκκρεμεί. Πληρώστε 1,99€ τελωνείου εδώ: http://elta-parcel.info/pay'
+							}
+						]
+					}
+				],
+				successMessage: 'Μπράβο! Το αναγνώρισες ως ύποπτο — μην πατήσεις τον σύνδεσμο.',
+				hint: 'Άγνωστος αριθμός, βιασύνη για πληρωμή και περίεργη διεύθυνση = σημάδια απάτης.'
+			}
+		},
+		{
+			n: 19,
+			difficulty: 'advanced' as const,
+			lessonKey: 'two-factor',
+			config: {
+				goal: 'mobile-enter-2fa',
+				prompt: 'Συνδέσου με ασφάλεια: διάβασε τον κωδικό μιας χρήσης από το SMS και γράψ’ τον στη σελίδα.',
+				targetAppId: 'browser',
+				loginUrl: 'https://www.mybank.gr/login',
+				twofaCode: '482913',
+				serviceName: 'MyBank',
+				successMessage: 'Μπράβο! Χρησιμοποίησες σωστά τον κωδικό μιας χρήσης.',
+				hint: 'Πάτησε «Άνοιξε το SMS», δες τα 6 ψηφία και γράψ’ τα. Μην τα πεις ποτέ σε άλλον.'
 			}
 		}
 	];

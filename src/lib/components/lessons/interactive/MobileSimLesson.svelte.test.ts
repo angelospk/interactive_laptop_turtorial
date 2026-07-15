@@ -228,6 +228,75 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 	});
 });
 
+describe('MobileSimLesson — suspicious SMS verdict', () => {
+	const scamLesson = mkLesson({
+		goal: 'mobile-spot-scam-sms',
+		prompt: 'Ασφαλές ή ύποπτο;',
+		apps: [{ id: 'messages', label: 'Μηνύματα', icon: '💬', kind: 'messages' }],
+		targetAppId: 'messages',
+		targetConversationId: 'unknown',
+		smsIsScam: true,
+		conversations: [
+			{ id: 'unknown', name: 'Άγνωστος αριθμός', messages: [{ from: 'them', text: 'Πληρώστε εδώ: http://x.info' }] }
+		],
+		successMessage: 'Μπράβο! Το αναγνώρισες ως ύποπτο.'
+	});
+
+	it('completes when the scam is flagged as suspicious', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: scamLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Μηνύματα' }).click();
+		await screen.getByRole('button', { name: 'Συνομιλία με Άγνωστος αριθμός' }).click();
+		await screen.getByRole('button', { name: 'Ύποπτο' }).click();
+		await expect.element(screen.getByText('Μπράβο! Το αναγνώρισες ως ύποπτο.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('gives feedback and does not complete when judged safe', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: scamLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Μηνύματα' }).click();
+		await screen.getByRole('button', { name: 'Συνομιλία με Άγνωστος αριθμός' }).click();
+		await screen.getByRole('button', { name: 'Ασφαλές' }).click();
+		await expect.element(screen.getByText(/Κοίτα ξανά/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
+describe('MobileSimLesson — 2FA login', () => {
+	const twofaLesson = mkLesson({
+		goal: 'mobile-enter-2fa',
+		prompt: 'Γράψε τον κωδικό.',
+		apps: [{ id: 'browser', label: 'Chrome', icon: '🌐', kind: 'browser' }],
+		targetAppId: 'browser',
+		loginUrl: 'https://www.mybank.gr/login',
+		twofaCode: '482913',
+		serviceName: 'MyBank',
+		successMessage: 'Μπράβο! Συνδέθηκες με ασφάλεια.'
+	});
+
+	it('completes when the SMS code is read and entered correctly', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: twofaLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Chrome' }).click();
+		await screen.getByRole('button', { name: 'Άνοιξε το SMS' }).click();
+		await screen.getByRole('textbox', { name: 'Κωδικός μιας χρήσης' }).fill('482913');
+		await screen.getByRole('button', { name: 'Επιβεβαίωση' }).click();
+		await expect.element(screen.getByText('Μπράβο! Συνδέθηκες με ασφάλεια.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete on a wrong code', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: twofaLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Chrome' }).click();
+		await screen.getByRole('textbox', { name: 'Κωδικός μιας χρήσης' }).fill('000000');
+		await screen.getByRole('button', { name: 'Επιβεβαίωση' }).click();
+		await expect.element(screen.getByText(/γράψε τα ίδια ψηφία/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
 describe('MobileSimLesson — digital assistant (phrase chips)', () => {
 	const assistantLesson = mkLesson({
 		goal: 'mobile-assistant-task',
