@@ -216,12 +216,14 @@
 				/>
 			{:else}
 				<!-- Inert placeholder for apps that are scenery in this lesson -->
-				<div class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">
+				<div
+					class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center"
+				>
 					<span class="text-5xl" aria-hidden="true">{currentApp.icon}</span>
 					<p class="text-lg font-semibold text-slate-800">{currentApp.label}</p>
 					<p class="text-sm text-muted-foreground">
-						Αυτή η εφαρμογή δεν χρειάζεται σε αυτό το μάθημα. Πάτησε τη γραμμή κάτω για να
-						γυρίσεις στην αρχική οθόνη.
+						Αυτή η εφαρμογή δεν χρειάζεται σε αυτό το μάθημα. Πάτησε τη γραμμή κάτω για να γυρίσεις
+						στην αρχική οθόνη.
 					</p>
 				</div>
 			{/if}

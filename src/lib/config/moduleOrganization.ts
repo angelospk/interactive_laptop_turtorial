@@ -134,9 +134,7 @@ export function groupModulesByCategory<M extends { id: string }>(
 	const groups: GroupedModules<M>[] = [];
 
 	for (const category of moduleCategories) {
-		const found = category.moduleIds
-			.map((id) => byId.get(id))
-			.filter((m): m is M => Boolean(m));
+		const found = category.moduleIds.map((id) => byId.get(id)).filter((m): m is M => Boolean(m));
 		found.forEach((m) => used.add(m.id));
 		if (found.length) groups.push({ category, modules: found });
 	}
@@ -327,10 +325,7 @@ export interface BuiltSection {
  * μαθήματα» bucket (guards against a live-DB lesson missing from compiled
  * config — codex plan review).
  */
-export function buildLessonSections(
-	moduleId: string,
-	lessons: Lesson[]
-): BuiltSection[] | null {
+export function buildLessonSections(moduleId: string, lessons: Lesson[]): BuiltSection[] | null {
 	const spec = moduleSections[moduleId];
 	if (!spec || lessons.length === 0) return null;
 

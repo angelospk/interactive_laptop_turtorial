@@ -22,17 +22,37 @@ function homeApps(variant: MobileVariant): MobileSimApp[] {
 		{ id: 'phone', label: 'Τηλέφωνο', icon: '📞', kind: 'phone', color: 'bg-green-100' },
 		{ id: 'messages', label: 'Μηνύματα', icon: '💬', kind: 'messages', color: 'bg-blue-100' },
 		variant === 'ios'
-			? { id: 'facetime', label: 'FaceTime', icon: '📹', kind: 'placeholder', color: 'bg-emerald-100' }
+			? {
+					id: 'facetime',
+					label: 'FaceTime',
+					icon: '📹',
+					kind: 'placeholder',
+					color: 'bg-emerald-100'
+				}
 			: { id: 'viber', label: 'Viber', icon: '💜', kind: 'viber', color: 'bg-purple-100' },
 		...(variant === 'ios'
-			? [{ id: 'viber', label: 'Viber', icon: '💜', kind: 'viber', color: 'bg-purple-100' } as MobileSimApp]
+			? [
+					{
+						id: 'viber',
+						label: 'Viber',
+						icon: '💜',
+						kind: 'viber',
+						color: 'bg-purple-100'
+					} as MobileSimApp
+				]
 			: []),
 		{ id: 'camera', label: 'Κάμερα', icon: '📷', kind: 'camera', color: 'bg-slate-100' },
 		{ id: 'photos', label: 'Φωτογραφίες', icon: '🖼️', kind: 'placeholder', color: 'bg-amber-100' },
 		variant === 'ios'
 			? { id: 'store', label: 'App Store', icon: '🛍️', kind: 'store', color: 'bg-sky-100' }
 			: { id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store', color: 'bg-green-100' },
-		{ id: 'assistant', label: 'Ψηφιακός βοηθός', icon: '✨', kind: 'assistant', color: 'bg-indigo-100' },
+		{
+			id: 'assistant',
+			label: 'Ψηφιακός βοηθός',
+			icon: '✨',
+			kind: 'assistant',
+			color: 'bg-indigo-100'
+		},
 		variant === 'ios'
 			? { id: 'browser', label: 'Safari', icon: '🧭', kind: 'browser', color: 'bg-blue-100' }
 			: { id: 'browser', label: 'Chrome', icon: '🌐', kind: 'browser', color: 'bg-blue-100' },
@@ -200,7 +220,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'scan-qr',
 			config: {
 				goal: 'mobile-scan-qr',
-				prompt: 'Σκάναρε τον κωδικό QR με την Κάμερα και άνοιξε τον σύνδεσμο — αφού βεβαιωθείς ότι είναι το επίσημο gov.gr.',
+				prompt:
+					'Σκάναρε τον κωδικό QR με την Κάμερα και άνοιξε τον σύνδεσμο — αφού βεβαιωθείς ότι είναι το επίσημο gov.gr.',
 				targetAppId: 'camera',
 				qrUrl: 'https://www.gov.gr/ipiresies/polites-kai-kathimerinotita',
 				targetHost: 'gov.gr',
@@ -214,7 +235,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'night-mode',
 			config: {
 				goal: 'mobile-night-mode',
-				prompt: 'Άνοιξε τη «Νυχτερινή λειτουργία» από τις Ρυθμίσεις για να ξεκουράζονται τα μάτια σου το βράδυ.',
+				prompt:
+					'Άνοιξε τη «Νυχτερινή λειτουργία» από τις Ρυθμίσεις για να ξεκουράζονται τα μάτια σου το βράδυ.',
 				targetAppId: 'settings',
 				successMessage: 'Μπράβο! Άνοιξες τη νυχτερινή λειτουργία.',
 				hint: 'Ρυθμίσεις → Νυχτερινή λειτουργία → πάτησε τον διακόπτη ώστε να γίνει πράσινος.'
@@ -226,7 +248,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'find-device',
 			config: {
 				goal: 'mobile-find-device',
-				prompt: 'Ενεργοποίησε την «Εύρεση συσκευής» από τις Ρυθμίσεις, για να βρίσκεις το κινητό αν χαθεί.',
+				prompt:
+					'Ενεργοποίησε την «Εύρεση συσκευής» από τις Ρυθμίσεις, για να βρίσκεις το κινητό αν χαθεί.',
 				targetAppId: 'settings',
 				successMessage: 'Μπράβο! Τώρα μπορείς να εντοπίσεις το κινητό αν χαθεί.',
 				hint: 'Ρυθμίσεις → Εύρεση συσκευής → πάτησε τον διακόπτη ώστε να γίνει πράσινος.'
@@ -257,7 +280,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'assistant-alarm',
 			config: {
 				goal: 'mobile-assistant-task',
-				prompt: 'Άνοιξε τον «Ψηφιακό βοηθό» και ζήτα του να βάλει ξυπνητήρι — διάλεξε την πιο ξεκάθαρη διατύπωση.',
+				prompt:
+					'Άνοιξε τον «Ψηφιακό βοηθό» και ζήτα του να βάλει ξυπνητήρι — διάλεξε την πιο ξεκάθαρη διατύπωση.',
 				targetAppId: 'assistant',
 				intent: 'alarm',
 				assistantGreeting: 'Γεια σου! Τι θέλεις να κάνω; Διάλεξε πώς θα το έλεγες:',
@@ -277,10 +301,12 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'assistant-reminder',
 			config: {
 				goal: 'mobile-assistant-task',
-				prompt: 'Ζήτα από τον «Ψηφιακό βοηθό» να σου θυμίσει να πάρεις το χάπι σου — διάλεξε τη σωστή διατύπωση.',
+				prompt:
+					'Ζήτα από τον «Ψηφιακό βοηθό» να σου θυμίσει να πάρεις το χάπι σου — διάλεξε τη σωστή διατύπωση.',
 				targetAppId: 'assistant',
 				intent: 'reminder',
-				assistantConfirm: 'Θα σου θυμίσω να πάρεις το χάπι σου στις 9 το βράδυ. (εκπαιδευτική προσομοίωση)',
+				assistantConfirm:
+					'Θα σου θυμίσω να πάρεις το χάπι σου στις 9 το βράδυ. (εκπαιδευτική προσομοίωση)',
 				phrases: [
 					{ id: 'clear', text: 'Θύμισέ μου να πάρω το χάπι μου στις 9 το βράδυ', correct: true },
 					{ id: 'vague', text: 'Χάπι' },
@@ -296,11 +322,13 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'assistant-ask',
 			config: {
 				goal: 'mobile-assistant-task',
-				prompt: 'Ρώτα σωστά τον «Ψηφιακό βοηθό» ποια φαρμακεία είναι ανοιχτά — διάλεξε την πιο ξεκάθαρη ερώτηση.',
+				prompt:
+					'Ρώτα σωστά τον «Ψηφιακό βοηθό» ποια φαρμακεία είναι ανοιχτά — διάλεξε την πιο ξεκάθαρη ερώτηση.',
 				targetAppId: 'assistant',
 				intent: 'ask',
 				assistantGreeting: 'Ρώτησέ με κάτι. Διάλεξε πώς θα το έλεγες:',
-				assistantConfirm: 'Να τα φαρμακεία που είναι ανοιχτά κοντά σου τώρα… (εκπαιδευτική προσομοίωση)',
+				assistantConfirm:
+					'Να τα φαρμακεία που είναι ανοιχτά κοντά σου τώρα… (εκπαιδευτική προσομοίωση)',
 				phrases: [
 					{ id: 'clear', text: 'Ποια φαρμακεία είναι ανοιχτά κοντά μου τώρα;', correct: true },
 					{ id: 'vague', text: 'Φαρμακείο' },
@@ -316,7 +344,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'scam-sms',
 			config: {
 				goal: 'mobile-spot-scam-sms',
-				prompt: 'Άνοιξε τα Μηνύματα, διάβασε το SMS από άγνωστο αριθμό και κρίνε: ασφαλές ή ύποπτο;',
+				prompt:
+					'Άνοιξε τα Μηνύματα, διάβασε το SMS από άγνωστο αριθμό και κρίνε: ασφαλές ή ύποπτο;',
 				targetAppId: 'messages',
 				targetConversationId: 'unknown',
 				smsIsScam: true,
@@ -342,7 +371,8 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey: 'two-factor',
 			config: {
 				goal: 'mobile-enter-2fa',
-				prompt: 'Συνδέσου με ασφάλεια: διάβασε τον κωδικό μιας χρήσης από το SMS και γράψ’ τον στη σελίδα.',
+				prompt:
+					'Συνδέσου με ασφάλεια: διάβασε τον κωδικό μιας χρήσης από το SMS και γράψ’ τον στη σελίδα.',
 				targetAppId: 'browser',
 				loginUrl: 'https://www.mybank.gr/login',
 				twofaCode: '482913',

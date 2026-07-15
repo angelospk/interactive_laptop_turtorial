@@ -41,7 +41,9 @@
 <div data-testid="camera-app" class="flex h-full flex-col bg-slate-900">
 	{#if stage === 'viewfinder'}
 		<div class="flex flex-1 flex-col items-center justify-center gap-6 p-6 text-white">
-			<div class="relative flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-white/40">
+			<div
+				class="relative flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-white/40"
+			>
 				<QrCode class="h-28 w-28 text-white" aria-hidden="true" />
 				<span class="absolute inset-x-6 top-1/2 h-0.5 bg-emerald-400/80"></span>
 			</div>

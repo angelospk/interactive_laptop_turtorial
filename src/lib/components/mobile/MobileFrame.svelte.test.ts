@@ -44,7 +44,11 @@ describe('MobileFrame', () => {
 
 		it('emits the canonical sorted chord when two buttons are pressed together', async () => {
 			const onSystemChord = vi.fn();
-			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			const screen = render(MobileFrame, {
+				children: content,
+				showSystemButtons: true,
+				onSystemChord
+			});
 			await screen.getByTestId('bezel-power').click();
 			await screen.getByTestId('bezel-volume-down').click();
 			expect(onSystemChord).toHaveBeenCalledWith('power+volume-down');
@@ -52,7 +56,11 @@ describe('MobileFrame', () => {
 
 		it('is order-independent (volume first, then power → same chord)', async () => {
 			const onSystemChord = vi.fn();
-			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			const screen = render(MobileFrame, {
+				children: content,
+				showSystemButtons: true,
+				onSystemChord
+			});
 			await screen.getByTestId('bezel-volume-up').click();
 			await screen.getByTestId('bezel-power').click();
 			expect(onSystemChord).toHaveBeenCalledWith('power+volume-up');
@@ -60,14 +68,22 @@ describe('MobileFrame', () => {
 
 		it('does not fire on a single button press', async () => {
 			const onSystemChord = vi.fn();
-			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			const screen = render(MobileFrame, {
+				children: content,
+				showSystemButtons: true,
+				onSystemChord
+			});
 			await screen.getByTestId('bezel-power').click();
 			expect(onSystemChord).not.toHaveBeenCalled();
 		});
 
 		it('does not fire when the same button is pressed twice', async () => {
 			const onSystemChord = vi.fn();
-			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			const screen = render(MobileFrame, {
+				children: content,
+				showSystemButtons: true,
+				onSystemChord
+			});
 			await screen.getByTestId('bezel-power').click();
 			await screen.getByTestId('bezel-power').click();
 			expect(onSystemChord).not.toHaveBeenCalled();

@@ -61,7 +61,7 @@
 						type="button"
 						onclick={() => update(app.id)}
 						aria-label={`Ενημέρωση ${app.label}`}
-						class="min-h-[40px] rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white transition active:bg-emerald-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						class="min-h-[40px] rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-emerald-700"
 					>
 						Ενημέρωση
 					</button>

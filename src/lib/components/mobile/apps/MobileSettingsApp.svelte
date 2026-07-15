@@ -90,9 +90,11 @@
 				<button
 					type="button"
 					onclick={() => (page = 'font')}
-					class="flex w-full min-h-[56px] items-center gap-3 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					class="flex min-h-[56px] w-full items-center gap-3 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 				>
-					<span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+					<span
+						class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-700"
+					>
 						<Type class="h-5 w-5" aria-hidden="true" />
 					</span>
 					<span class="flex-1 text-base font-medium text-slate-900">Μέγεθος γραμμάτων</span>
@@ -103,7 +105,7 @@
 				<button
 					type="button"
 					onclick={() => (page = 'wifi')}
-					class="flex w-full min-h-[56px] items-center gap-3 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					class="flex min-h-[56px] w-full items-center gap-3 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 				>
 					<span
 						class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700"
@@ -119,9 +121,11 @@
 				<button
 					type="button"
 					onclick={() => (page = 'night')}
-					class="flex w-full min-h-[56px] items-center gap-3 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					class="flex min-h-[56px] w-full items-center gap-3 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 				>
-					<span class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
+					<span
+						class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700"
+					>
 						<Moon class="h-5 w-5" aria-hidden="true" />
 					</span>
 					<span class="flex-1 text-base font-medium text-slate-900">Νυχτερινή λειτουργία</span>
@@ -133,9 +137,11 @@
 				<button
 					type="button"
 					onclick={() => (page = 'find')}
-					class="flex w-full min-h-[56px] items-center gap-3 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					class="flex min-h-[56px] w-full items-center gap-3 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 				>
-					<span class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-100 text-rose-700">
+					<span
+						class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-100 text-rose-700"
+					>
 						<MapPin class="h-5 w-5" aria-hidden="true" />
 					</span>
 					<span class="flex-1 text-base font-medium text-slate-900">Εύρεση συσκευής</span>
@@ -146,7 +152,12 @@
 		</ul>
 	{:else if page === 'font'}
 		<div class="mt-2 space-y-2 bg-white p-4">
-			<p class={cn('rounded-lg bg-slate-100 p-3 text-slate-700', SIZES.find((s) => s.id === fontSize)?.sample)}>
+			<p
+				class={cn(
+					'rounded-lg bg-slate-100 p-3 text-slate-700',
+					SIZES.find((s) => s.id === fontSize)?.sample
+				)}
+			>
 				Έτσι θα φαίνονται τα γράμματα.
 			</p>
 			{#each SIZES as size (size.id)}
@@ -155,7 +166,7 @@
 					onclick={() => setSize(size.id)}
 					aria-pressed={fontSize === size.id}
 					class={cn(
-						'flex w-full min-h-[52px] items-center justify-between rounded-xl border px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
+						'flex min-h-[52px] w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
 						fontSize === size.id
 							? 'border-blue-600 bg-blue-50 text-blue-800'
 							: 'border-slate-200 bg-white text-slate-900'
@@ -176,7 +187,7 @@
 						type="button"
 						onclick={() => connect(ssid)}
 						aria-label={`Σύνδεση στο δίκτυο ${ssid}`}
-						class="flex w-full min-h-[52px] items-center gap-3 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						class="flex min-h-[52px] w-full items-center gap-3 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 					>
 						<Wifi class="h-5 w-5 text-slate-500" aria-hidden="true" />
 						<span class="flex-1 text-base font-medium text-slate-900">{ssid}</span>

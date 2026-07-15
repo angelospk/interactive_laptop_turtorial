@@ -124,7 +124,7 @@
 			<!-- iOS notch -->
 			<span
 				aria-hidden="true"
-				class="absolute left-1/2 top-0 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-slate-900"
+				class="absolute top-0 left-1/2 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-slate-900"
 			></span>
 		{/if}
 		<span class="flex items-center gap-1.5">

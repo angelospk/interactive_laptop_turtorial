@@ -49,7 +49,7 @@
 				'flex h-14 w-14 items-center justify-center text-3xl leading-none shadow-md',
 				isIos ? 'rounded-2xl' : 'rounded-full',
 				app.color ?? 'bg-white/90',
-				isTarget && 'ring-4 ring-emerald-400 animate-pulse'
+				isTarget && 'animate-pulse ring-4 ring-emerald-400'
 			)}
 		>
 			{app.icon}
@@ -89,10 +89,7 @@
 	{#if dockApps.length}
 		<div
 			data-testid="mobile-dock"
-			class={cn(
-				'mt-3 grid gap-2 rounded-3xl p-2',
-				'bg-white/20 backdrop-blur-sm'
-			)}
+			class={cn('mt-3 grid gap-2 rounded-3xl p-2', 'bg-white/20 backdrop-blur-sm')}
 			style:grid-template-columns={`repeat(${Math.min(dockApps.length, 4)}, minmax(0, 1fr))`}
 		>
 			{#each dockApps as app (app.id)}

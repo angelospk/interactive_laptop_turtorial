@@ -80,7 +80,7 @@
 						type="button"
 						onclick={() => callContact(contact)}
 						aria-label={`Κλήση ${contact.name}`}
-						class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white shadow transition active:bg-green-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white shadow transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-green-700"
 					>
 						<Phone class="h-5 w-5" aria-hidden="true" />
 					</button>
@@ -103,7 +103,7 @@
 					type="button"
 					onclick={() => press(key)}
 					aria-label={/\d/.test(key) ? `Ψηφίο ${key}` : `Σύμβολο ${key}`}
-					class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl font-medium text-slate-900 transition active:bg-slate-300 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl font-medium text-slate-900 transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-300"
 				>
 					{key}
 				</button>
@@ -117,7 +117,7 @@
 				type="button"
 				onclick={call}
 				aria-label="Κλήση"
-				class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition active:bg-green-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-green-700"
 			>
 				<Phone class="h-7 w-7" aria-hidden="true" />
 			</button>
@@ -125,7 +125,7 @@
 				type="button"
 				onclick={erase}
 				aria-label="Διαγραφή ψηφίου"
-				class="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-slate-500 transition active:bg-slate-100 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				class="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-slate-500 transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-100"
 			>
 				<Delete class="h-6 w-6" aria-hidden="true" />
 			</button>

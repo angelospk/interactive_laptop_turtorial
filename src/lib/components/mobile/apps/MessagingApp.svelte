@@ -78,7 +78,7 @@
 						type="button"
 						onclick={() => (openId = convo.id)}
 						aria-label={`Συνομιλία με ${convo.name}`}
-						class="flex w-full min-h-[56px] flex-col items-start gap-0.5 px-4 py-3 text-left transition active:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						class="flex min-h-[56px] w-full flex-col items-start gap-0.5 px-4 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-50"
 					>
 						<span class="text-base font-semibold text-slate-900">{convo.name}</span>
 						<span class="line-clamp-1 text-sm text-slate-500">
@@ -138,79 +138,78 @@
 				</button>
 			</div>
 		{:else}
-
-		<div class="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-3">
-			{#each open.messages as msg, i (i)}
-				<p
-					class={cn(
-						'max-w-[80%] rounded-2xl px-3 py-2 text-sm',
-						msg.from === 'me'
-							? cn('self-end text-white', isViber ? 'bg-purple-600' : 'bg-green-600')
-							: 'self-start bg-slate-100 text-slate-900'
-					)}
-				>
-					{msg.text}
-				</p>
-			{/each}
-			{#each sent[open.id] ?? [] as text, i (i)}
-				<p
-					class={cn(
-						'max-w-[80%] self-end rounded-2xl px-3 py-2 text-sm text-white',
-						isViber ? 'bg-purple-600' : 'bg-green-600'
-					)}
-				>
-					{text}
-				</p>
-			{/each}
-		</div>
-
-		{#if inVerdictMode}
-			<div class="shrink-0 space-y-2 border-t border-slate-200 bg-white px-3 py-3">
-				<p class="text-center text-sm text-slate-600">Είναι αυτό το μήνυμα ασφαλές ή ύποπτο;</p>
-				<div class="flex gap-2">
-					<button
-						type="button"
-						onclick={() => verdict(false)}
-						class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-base font-semibold text-white transition active:bg-emerald-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+			<div class="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-3">
+				{#each open.messages as msg, i (i)}
+					<p
+						class={cn(
+							'max-w-[80%] rounded-2xl px-3 py-2 text-sm',
+							msg.from === 'me'
+								? cn('self-end text-white', isViber ? 'bg-purple-600' : 'bg-green-600')
+								: 'self-start bg-slate-100 text-slate-900'
+						)}
 					>
-						<ShieldCheck class="h-5 w-5" aria-hidden="true" /> Ασφαλές
-					</button>
-					<button
-						type="button"
-						onclick={() => verdict(true)}
-						class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 text-base font-semibold text-white transition active:bg-red-700 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						{msg.text}
+					</p>
+				{/each}
+				{#each sent[open.id] ?? [] as text, i (i)}
+					<p
+						class={cn(
+							'max-w-[80%] self-end rounded-2xl px-3 py-2 text-sm text-white',
+							isViber ? 'bg-purple-600' : 'bg-green-600'
+						)}
 					>
-						<TriangleAlert class="h-5 w-5" aria-hidden="true" /> Ύποπτο
-					</button>
-				</div>
+						{text}
+					</p>
+				{/each}
 			</div>
-		{:else}
-		<form
-			class="flex shrink-0 items-center gap-2 border-t border-slate-200 px-3 py-2"
-			onsubmit={(e) => {
-				e.preventDefault();
-				send();
-			}}
-		>
-			<input
-				type="text"
-				bind:value={draft}
-				aria-label="Γράψε μήνυμα"
-				placeholder="Γράψε μήνυμα…"
-				class="min-h-[44px] flex-1 rounded-full border border-slate-300 px-4 text-base text-slate-900 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
-			/>
-			<button
-				type="submit"
-				aria-label="Αποστολή"
-				class={cn(
-					'flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white shadow transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
-					isViber ? 'bg-purple-600 active:bg-purple-700' : 'bg-green-600 active:bg-green-700'
-				)}
-			>
-				<Send class="h-5 w-5" aria-hidden="true" />
-			</button>
-		</form>
-		{/if}
+
+			{#if inVerdictMode}
+				<div class="shrink-0 space-y-2 border-t border-slate-200 bg-white px-3 py-3">
+					<p class="text-center text-sm text-slate-600">Είναι αυτό το μήνυμα ασφαλές ή ύποπτο;</p>
+					<div class="flex gap-2">
+						<button
+							type="button"
+							onclick={() => verdict(false)}
+							class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-base font-semibold text-white transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-emerald-700"
+						>
+							<ShieldCheck class="h-5 w-5" aria-hidden="true" /> Ασφαλές
+						</button>
+						<button
+							type="button"
+							onclick={() => verdict(true)}
+							class="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 text-base font-semibold text-white transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-red-700"
+						>
+							<TriangleAlert class="h-5 w-5" aria-hidden="true" /> Ύποπτο
+						</button>
+					</div>
+				</div>
+			{:else}
+				<form
+					class="flex shrink-0 items-center gap-2 border-t border-slate-200 px-3 py-2"
+					onsubmit={(e) => {
+						e.preventDefault();
+						send();
+					}}
+				>
+					<input
+						type="text"
+						bind:value={draft}
+						aria-label="Γράψε μήνυμα"
+						placeholder="Γράψε μήνυμα…"
+						class="min-h-[44px] flex-1 rounded-full border border-slate-300 px-4 text-base text-slate-900 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+					/>
+					<button
+						type="submit"
+						aria-label="Αποστολή"
+						class={cn(
+							'flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white shadow transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
+							isViber ? 'bg-purple-600 active:bg-purple-700' : 'bg-green-600 active:bg-green-700'
+						)}
+					>
+						<Send class="h-5 w-5" aria-hidden="true" />
+					</button>
+				</form>
+			{/if}
 		{/if}
 	{/if}
 </div>

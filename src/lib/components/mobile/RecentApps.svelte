@@ -117,7 +117,7 @@
 						type="button"
 						onclick={() => dismiss(app.id)}
 						aria-label={`Κλείσιμο ${app.label}`}
-						class="mt-3 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-slate-100 text-base font-medium text-slate-700 transition active:bg-slate-200 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+						class="mt-3 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-slate-100 text-base font-medium text-slate-700 transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none active:bg-slate-200"
 					>
 						<X class="h-5 w-5" aria-hidden="true" /> Κλείσιμο
 					</button>

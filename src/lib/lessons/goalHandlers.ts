@@ -1,7 +1,11 @@
 import type { GoalId } from './goals';
 import { evaluateLink } from '$lib/utils/mobileLink';
 
-type GoalHandler = (action: string, data: Record<string, unknown>, config: Record<string, unknown>) => boolean;
+type GoalHandler = (
+	action: string,
+	data: Record<string, unknown>,
+	config: Record<string, unknown>
+) => boolean;
 
 /**
  * One handler per GoalId.
@@ -15,8 +19,7 @@ type GoalHandler = (action: string, data: Record<string, unknown>, config: Recor
  */
 const goalHandlers: Record<GoalId, GoalHandler> = {
 	// ── Window management ──────────────────────────────────────────────────
-	'open-app': (action, data, config) =>
-		action === 'open-app' && data.appId === config.targetAppId,
+	'open-app': (action, data, config) => action === 'open-app' && data.appId === config.targetAppId,
 
 	'minimize-app': (action, data, config) =>
 		action === 'minimize-app' && data.appId === config.targetAppId,
