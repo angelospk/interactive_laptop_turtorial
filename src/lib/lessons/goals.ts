@@ -96,6 +96,7 @@ export const GOALS = {
 	'mobile-night-mode': { requiresAppId: false },
 	'mobile-find-device': { requiresAppId: false },
 	'mobile-update-app': { requiresAppId: false },
+	'mobile-assistant-task': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },

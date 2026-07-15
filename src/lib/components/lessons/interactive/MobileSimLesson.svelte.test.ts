@@ -228,6 +228,40 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 	});
 });
 
+describe('MobileSimLesson — digital assistant (phrase chips)', () => {
+	const assistantLesson = mkLesson({
+		goal: 'mobile-assistant-task',
+		prompt: 'Ζήτα να μπει ξυπνητήρι.',
+		apps: [{ id: 'assistant', label: 'Ψηφιακός βοηθός', icon: '✨', kind: 'assistant' }],
+		targetAppId: 'assistant',
+		intent: 'alarm',
+		assistantConfirm: 'Έβαλα ξυπνητήρι.',
+		phrases: [
+			{ id: 'clear', text: 'Βάλε ξυπνητήρι για τις 7 το πρωί', correct: true },
+			{ id: 'vague', text: 'Ξυπνητήρι' }
+		],
+		successMessage: 'Μπράβο! Έδωσες ξεκάθαρη εντολή.'
+	});
+
+	it('completes when the well-formed phrase is chosen', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: assistantLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Ψηφιακός βοηθός' }).click();
+		await screen.getByRole('button', { name: '«Βάλε ξυπνητήρι για τις 7 το πρωί»' }).click();
+		await expect.element(screen.getByText('Μπράβο! Έδωσες ξεκάθαρη εντολή.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete on a vague phrase and nudges to rephrase', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: assistantLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Ψηφιακός βοηθός' }).click();
+		await screen.getByRole('button', { name: '«Ξυπνητήρι»' }).click();
+		await expect.element(screen.getByText(/δεν το κατάλαβε/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
 describe('MobileSimLesson — store app update', () => {
 	const storeLesson = mkLesson({
 		goal: 'mobile-update-app',

@@ -255,6 +255,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'settings-help',
 			title: 'Ρυθμίσεις & βοήθεια',
 			lessonIds: ['android-night-mode', 'android-find-device', 'android-update-app']
+		},
+		{
+			id: 'advanced-ai',
+			title: 'Πιο προχωρημένα & AI',
+			lessonIds: ['android-assistant-alarm', 'android-assistant-reminder', 'android-assistant-ask']
 		}
 	],
 	iphone: [
@@ -286,6 +291,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'settings-help',
 			title: 'Ρυθμίσεις & βοήθεια',
 			lessonIds: ['iphone-night-mode', 'iphone-find-device', 'iphone-update-app']
+		},
+		{
+			id: 'advanced-ai',
+			title: 'Πιο προχωρημένα & AI',
+			lessonIds: ['iphone-assistant-alarm', 'iphone-assistant-reminder', 'iphone-assistant-ask']
 		}
 	]
 };

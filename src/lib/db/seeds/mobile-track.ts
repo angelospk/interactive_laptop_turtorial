@@ -32,6 +32,7 @@ function homeApps(variant: MobileVariant): MobileSimApp[] {
 		variant === 'ios'
 			? { id: 'store', label: 'App Store', icon: '🛍️', kind: 'store', color: 'bg-sky-100' }
 			: { id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store', color: 'bg-green-100' },
+		{ id: 'assistant', label: 'Ψηφιακός βοηθός', icon: '✨', kind: 'assistant', color: 'bg-indigo-100' },
 		{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', kind: 'settings', color: 'bg-slate-200' }
 	];
 }
@@ -245,6 +246,65 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				],
 				successMessage: 'Μπράβο! Ενημέρωσες το Viber από το επίσημο κατάστημα.',
 				hint: 'Άνοιξε το κατάστημα, βρες το «Viber» και πάτησε «Ενημέρωση».'
+			}
+		},
+		{
+			n: 15,
+			difficulty: 'advanced' as const,
+			lessonKey: 'assistant-alarm',
+			config: {
+				goal: 'mobile-assistant-task',
+				prompt: 'Άνοιξε τον «Ψηφιακό βοηθό» και ζήτα του να βάλει ξυπνητήρι — διάλεξε την πιο ξεκάθαρη διατύπωση.',
+				targetAppId: 'assistant',
+				intent: 'alarm',
+				assistantGreeting: 'Γεια σου! Τι θέλεις να κάνω; Διάλεξε πώς θα το έλεγες:',
+				assistantConfirm: 'Έβαλα ξυπνητήρι για τις 7 το πρωί. (εκπαιδευτική προσομοίωση)',
+				phrases: [
+					{ id: 'clear', text: 'Βάλε ξυπνητήρι για τις 7 το πρωί', correct: true },
+					{ id: 'vague', text: 'Ξυπνητήρι' },
+					{ id: 'off', text: 'Πρέπει να ξυπνήσω νωρίς αύριο' }
+				],
+				successMessage: 'Μπράβο! Έδωσες μια ξεκάθαρη εντολή στον βοηθό.',
+				hint: 'Ο βοηθός καταλαβαίνει καλύτερα όταν λες ΤΙ και ΠΟΤΕ: «Βάλε ξυπνητήρι για τις 7».'
+			}
+		},
+		{
+			n: 16,
+			difficulty: 'advanced' as const,
+			lessonKey: 'assistant-reminder',
+			config: {
+				goal: 'mobile-assistant-task',
+				prompt: 'Ζήτα από τον «Ψηφιακό βοηθό» να σου θυμίσει να πάρεις το χάπι σου — διάλεξε τη σωστή διατύπωση.',
+				targetAppId: 'assistant',
+				intent: 'reminder',
+				assistantConfirm: 'Θα σου θυμίσω να πάρεις το χάπι σου στις 9 το βράδυ. (εκπαιδευτική προσομοίωση)',
+				phrases: [
+					{ id: 'clear', text: 'Θύμισέ μου να πάρω το χάπι μου στις 9 το βράδυ', correct: true },
+					{ id: 'vague', text: 'Χάπι' },
+					{ id: 'off', text: 'Ξεχνάω συνέχεια τα φάρμακά μου' }
+				],
+				successMessage: 'Μπράβο! Ζήτησες με σαφήνεια υπενθύμιση.',
+				hint: 'Πες ΤΙ να θυμηθείς και ΠΟΤΕ: «Θύμισέ μου να πάρω το χάπι στις 9».'
+			}
+		},
+		{
+			n: 17,
+			difficulty: 'advanced' as const,
+			lessonKey: 'assistant-ask',
+			config: {
+				goal: 'mobile-assistant-task',
+				prompt: 'Ρώτα σωστά τον «Ψηφιακό βοηθό» ποια φαρμακεία είναι ανοιχτά — διάλεξε την πιο ξεκάθαρη ερώτηση.',
+				targetAppId: 'assistant',
+				intent: 'ask',
+				assistantGreeting: 'Ρώτησέ με κάτι. Διάλεξε πώς θα το έλεγες:',
+				assistantConfirm: 'Να τα φαρμακεία που είναι ανοιχτά κοντά σου τώρα… (εκπαιδευτική προσομοίωση)',
+				phrases: [
+					{ id: 'clear', text: 'Ποια φαρμακεία είναι ανοιχτά κοντά μου τώρα;', correct: true },
+					{ id: 'vague', text: 'Φαρμακείο' },
+					{ id: 'off', text: 'Δεν νιώθω καλά' }
+				],
+				successMessage: 'Μπράβο! Έκανες μια καθαρή, συγκεκριμένη ερώτηση.',
+				hint: 'Μια καλή ερώτηση λέει ΤΙ ψάχνεις και ΠΟΥ/ΠΟΤΕ: «ανοιχτά φαρμακεία κοντά μου τώρα».'
 			}
 		}
 	];

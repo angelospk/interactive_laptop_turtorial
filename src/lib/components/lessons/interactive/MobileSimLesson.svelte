@@ -10,6 +10,7 @@
 	import RecentApps from '$lib/components/mobile/RecentApps.svelte';
 	import CameraApp from '$lib/components/mobile/apps/CameraApp.svelte';
 	import StoreApp from '$lib/components/mobile/apps/StoreApp.svelte';
+	import AssistantApp from '$lib/components/mobile/apps/AssistantApp.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
 
@@ -101,6 +102,8 @@
 			miss('Προσοχή: αυτή η διεύθυνση δεν είναι το επίσημο gov.gr. Καλύτερα μην την ανοίξεις.');
 		} else if (action === 'mobile-app-updated') {
 			miss('Ενημέρωσες άλλη εφαρμογή. Ψάξε αυτή που ζητά το μάθημα.');
+		} else if (action === 'mobile-assistant-command') {
+			miss('Ο βοηθός δεν το κατάλαβε καλά. Διάλεξε πιο ξεκάθαρη διατύπωση.');
 		}
 	}
 
@@ -187,6 +190,14 @@
 					onEvent={dispatch}
 					items={config.storeItems ?? []}
 					storeName={config.storeName ?? 'Κατάστημα εφαρμογών'}
+				/>
+			{:else if currentApp.kind === 'assistant'}
+				<AssistantApp
+					onEvent={dispatch}
+					intent={config.intent ?? ''}
+					phrases={config.phrases ?? []}
+					greeting={config.assistantGreeting ?? undefined}
+					confirm={config.assistantConfirm ?? undefined}
 				/>
 			{:else}
 				<!-- Inert placeholder for apps that are scenery in this lesson -->

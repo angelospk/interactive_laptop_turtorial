@@ -524,6 +524,40 @@ describe('mobile-update-app', () => {
 	});
 });
 
+describe('mobile-assistant-task', () => {
+	const config = { intent: 'alarm' };
+	it('completes when the correct phrase for the intent is chosen', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-assistant-task',
+				'mobile-assistant-command',
+				{ intent: 'alarm', phrase: 'Βάλε ξυπνητήρι στις 7', correct: true },
+				config
+			)
+		).toBe(true);
+	});
+	it('does not complete on an unclear (incorrect) phrase', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-assistant-task',
+				'mobile-assistant-command',
+				{ intent: 'alarm', phrase: 'Ξυπνητήρι', correct: false },
+				config
+			)
+		).toBe(false);
+	});
+	it('does not complete when the intent differs', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-assistant-task',
+				'mobile-assistant-command',
+				{ intent: 'reminder', phrase: 'x', correct: true },
+				config
+			)
+		).toBe(false);
+	});
+});
+
 describe('mobile-scan-qr', () => {
 	const config = { targetHost: 'gov.gr' };
 	it('completes only when the opened link is the official domain over https', () => {

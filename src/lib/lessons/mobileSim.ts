@@ -14,7 +14,16 @@ export interface MobileSimApp {
 	/** Emoji rendered inside the icon tile. */
 	icon: string;
 	/** Which mini-app opens on tap. Default: an inert placeholder screen. */
-	kind?: 'phone' | 'messages' | 'viber' | 'settings' | 'camera' | 'browser' | 'store' | 'placeholder';
+	kind?:
+		| 'phone'
+		| 'messages'
+		| 'viber'
+		| 'settings'
+		| 'camera'
+		| 'browser'
+		| 'store'
+		| 'assistant'
+		| 'placeholder';
 	/** Tailwind-compatible background class for the icon tile. */
 	color?: string;
 }
@@ -66,6 +75,14 @@ export interface MobileSimConfig {
 	targetUpdateId?: string;
 	/** Store name shown in the header (Play Store / App Store). */
 	storeName?: string;
+	/** Digital-assistant intent, e.g. 'alarm' | 'reminder' (assistant lesson). */
+	intent?: string;
+	/** Candidate phrase chips — exactly one is `correct`. */
+	phrases?: { id: string; text: string; correct?: boolean }[];
+	/** Assistant greeting bubble. */
+	assistantGreeting?: string;
+	/** Assistant confirmation shown after the correct phrase. */
+	assistantConfirm?: string;
 	successMessage?: string;
 	hint?: string;
 }
@@ -97,7 +114,8 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-scan-qr': { requiresTargetAppId: true, targetKind: 'camera' },
 	'mobile-night-mode': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-find-device': { requiresTargetAppId: true, targetKind: 'settings' },
-	'mobile-update-app': { requiresTargetAppId: true, targetKind: 'store' }
+	'mobile-update-app': { requiresTargetAppId: true, targetKind: 'store' },
+	'mobile-assistant-task': { requiresTargetAppId: true, targetKind: 'assistant' }
 	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
 
@@ -235,6 +253,22 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		const target = c.storeItems.find((s) => s.id === c.targetUpdateId);
 		if (!target?.hasUpdate) {
 			throw new Error(`store item "${c.targetUpdateId}" must have hasUpdate:true to be updatable`);
+		}
+	}
+	if (c.goal === 'mobile-assistant-task') {
+		if (!c.intent) throw new Error('mobile-assistant-task needs an intent');
+		if (!c.phrases?.length) throw new Error('mobile-assistant-task needs phrases');
+		const correct = c.phrases.filter((p) => p.correct);
+		if (correct.length !== 1) {
+			throw new Error(
+				`mobile-assistant-task needs exactly one correct phrase (got ${correct.length})`
+			);
+		}
+		const phraseIds = new Set<string>();
+		for (const p of c.phrases) {
+			if (!p.id || !p.text) throw new Error('phrases entries need id/text');
+			if (phraseIds.has(p.id)) throw new Error(`duplicate phrase id "${p.id}"`);
+			phraseIds.add(p.id);
 		}
 	}
 	if (c.goal === 'mobile-change-font-size' && c.targetSize) {
