@@ -356,16 +356,27 @@ describe('mobile-dial-number', () => {
 describe('mobile-call-contact', () => {
 	const config = { targetContactId: 'maria' };
 
-	it('matches when the target contact is called', () => {
+	it('matches when the target contact is called (single canonical call event)', () => {
 		expect(
-			checkGoalMatch('mobile-call-contact', 'mobile-contact-called', { contactId: 'maria' }, config)
+			checkGoalMatch(
+				'mobile-call-contact',
+				'mobile-call-placed',
+				{ number: '697', contactId: 'maria' },
+				config
+			)
 		).toBe(true);
 	});
 
-	it('does not match another contact or a keypad call', () => {
+	it('does not match another contact or a keypad-only call', () => {
 		expect(
-			checkGoalMatch('mobile-call-contact', 'mobile-contact-called', { contactId: 'nikos' }, config)
+			checkGoalMatch(
+				'mobile-call-contact',
+				'mobile-call-placed',
+				{ number: '697', contactId: 'nikos' },
+				config
+			)
 		).toBe(false);
+		// Keypad call carries no contactId → not a contacts-tab call.
 		expect(
 			checkGoalMatch('mobile-call-contact', 'mobile-call-placed', { number: '123' }, config)
 		).toBe(false);

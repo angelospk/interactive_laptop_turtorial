@@ -13,6 +13,10 @@
 	const componentPromise = $derived(lessonTypeRegistry[lesson.lessonType]?.(lesson));
 </script>
 
+<!-- Keyed by lesson.id: SvelteKit preserves this component across same-route
+     param navigation, so without the key a lesson component would keep the
+     previous lesson's local state (done/feedback/config snapshot) — codex review. -->
+{#key lesson.id}
 {#if componentPromise}
 	{#await componentPromise}
 		<div class="flex h-full items-center justify-center">
@@ -38,6 +42,7 @@
 		<button onclick={onBack}>Go Back</button>
 	</div>
 {/if}
+{/key}
 
 <style>
 	.error-container {

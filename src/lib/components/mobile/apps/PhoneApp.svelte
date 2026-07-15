@@ -7,9 +7,10 @@
 	/**
 	 * Dialer + contacts mini-app for the mobile simulation. Purely
 	 * presentational state; lesson logic listens to the semantic events:
-	 *   mobile-digit-typed    { number }              — after every keypad tap
-	 *   mobile-call-placed    { number, contactId? }  — a call actually starts
-	 *   mobile-contact-called { contactId }           — call started from contacts
+	 *   mobile-digit-typed { number }              — after every keypad tap
+	 *   mobile-call-placed { number, contactId? }  — the ONE canonical call
+	 *     event (contactId set when the call started from the contacts tab),
+	 *     so a single gesture never emits competing events (codex review).
 	 */
 	let {
 		onEvent,
@@ -39,7 +40,6 @@
 	}
 
 	function callContact(contact: MobileSimContact) {
-		onEvent('mobile-contact-called', { contactId: contact.id });
 		onEvent('mobile-call-placed', { number: contact.number, contactId: contact.id });
 	}
 </script>

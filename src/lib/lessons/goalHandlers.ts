@@ -137,7 +137,8 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	},
 
 	'mobile-call-contact': (action, data, config) =>
-		action === 'mobile-contact-called' &&
+		action === 'mobile-call-placed' &&
+		data.contactId != null &&
 		(!config.targetContactId || data.contactId === config.targetContactId),
 
 	'mobile-send-sms': (action, data, config) =>

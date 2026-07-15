@@ -41,9 +41,9 @@
 	let completeTimer: ReturnType<typeof setTimeout> | undefined;
 	onDestroy(() => clearTimeout(completeTimer));
 
-	// Elderly-friendly scoring (codex): full marks first try, gentle penalties.
-	function scoreFor(wrong: number, hinted: boolean): number {
-		if (hinted) return 60;
+	// Elderly-friendly scoring: full marks first try, gentle penalty otherwise.
+	// The hint is shown automatically after 2 misses, so it never costs score.
+	function scoreFor(wrong: number): number {
 		return wrong === 0 ? 100 : 80;
 	}
 
@@ -55,7 +55,7 @@
 			feedback = config.successMessage ?? 'Μπράβο! Το βρήκες.';
 			// Small pause so the success message is seen before advancing.
 			clearTimeout(completeTimer);
-			completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps, showHint)), 900);
+			completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps)), 900);
 			return;
 		}
 

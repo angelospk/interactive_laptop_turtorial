@@ -101,6 +101,26 @@ describe('module organization config', () => {
 		}
 	});
 
+	it('keeps «Θεωρία» section boundaries aligned with actual reading lessons', () => {
+		// Positional counts are fragile by design — this pins them to reality:
+		// where a module declares a leading «Θεωρία» section of N lessons, the
+		// first N seeded lessons (by orderIndex) must actually be readings.
+		for (const [moduleId, sections] of Object.entries(moduleSections)) {
+			if (sections[0]?.title !== 'Θεωρία') continue;
+			const ordered = allLessons
+				.filter((l) => l.moduleId === moduleId)
+				.sort((a, b) => a.orderIndex - b.orderIndex);
+			const theory = ordered.slice(0, sections[0].count);
+			for (const l of theory) {
+				expect(l.lessonType, `module ${moduleId}: ${l.id} in «Θεωρία»`).toBe('reading');
+			}
+			expect(
+				ordered[sections[0].count]?.lessonType,
+				`module ${moduleId}: first lesson after «Θεωρία»`
+			).not.toBe('reading');
+		}
+	});
+
 	it('only tags devices/simulation for modules that exist', () => {
 		for (const id of Object.keys(moduleDevices)) {
 			expect(moduleIds, `moduleDevices → ${id}`).toContain(id);

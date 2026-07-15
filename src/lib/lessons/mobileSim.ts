@@ -116,19 +116,49 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 			throw new Error(`goal "${c.goal}" needs a targetAppId present in apps`);
 		}
 	}
+	// Functional kinds must be unique: semantic events don't carry an appId, so
+	// two apps of the same kind would make goal completion ambiguous.
+	const kindCounts = new Map<string, number>();
+	for (const app of c.apps) {
+		if (app.kind && app.kind !== 'placeholder') {
+			kindCounts.set(app.kind, (kindCounts.get(app.kind) ?? 0) + 1);
+		}
+	}
+	for (const [kind, count] of kindCounts) {
+		if (count > 1) throw new Error(`multiple apps with kind "${kind}" — events would be ambiguous`);
+	}
+
 	const neededKind = GOAL_APP_KIND[c.goal];
-	if (neededKind && !c.apps.some((a) => a.kind === neededKind)) {
-		throw new Error(`goal "${c.goal}" needs an app with kind "${neededKind}"`);
+	if (neededKind) {
+		// The TARGET app itself must be the one carrying the needed kind —
+		// otherwise the hint highlights one app while the goal completes in
+		// another (codex review).
+		const target = c.apps.find((a) => a.id === c.targetAppId);
+		if (target?.kind !== neededKind) {
+			throw new Error(
+				`goal "${c.goal}" needs targetAppId to be an app with kind "${neededKind}" (got "${target?.kind}")`
+			);
+		}
 	}
 	// Goal-specific reachability: the target entity must exist in the config data.
 	if (c.goal === 'mobile-call-contact') {
 		if (!c.contacts?.length) throw new Error('mobile-call-contact needs a contacts list');
+		for (const p of c.contacts) {
+			if (!p?.id || !p.name || !p.number) {
+				throw new Error(`contacts entries need id/name/number (got ${JSON.stringify(p)})`);
+			}
+		}
 		if (c.targetContactId && !c.contacts.some((p) => p.id === c.targetContactId)) {
 			throw new Error(`targetContactId "${c.targetContactId}" is not in contacts`);
 		}
 	}
 	if (c.goal === 'mobile-send-sms' || c.goal === 'mobile-send-chat' || c.goal === 'mobile-start-videocall') {
 		if (!c.conversations?.length) throw new Error(`${c.goal} needs a conversations list`);
+		for (const t of c.conversations) {
+			if (!t?.id || !t.name || !Array.isArray(t.messages)) {
+				throw new Error(`conversations entries need id/name/messages[] (got ${JSON.stringify(t)})`);
+			}
+		}
 		if (c.targetConversationId && !c.conversations.some((t) => t.id === c.targetConversationId)) {
 			throw new Error(`targetConversationId "${c.targetConversationId}" is not in conversations`);
 		}

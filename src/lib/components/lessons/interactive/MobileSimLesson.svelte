@@ -41,9 +41,11 @@
 	let completeTimer: ReturnType<typeof setTimeout> | undefined;
 	onDestroy(() => clearTimeout(completeTimer));
 
-	// Elderly-friendly scoring: full marks first try, gentle penalties.
-	function scoreFor(wrong: number, hinted: boolean): number {
-		if (hinted) return 60;
+	// Elderly-friendly scoring: full marks first try, gentle penalty otherwise.
+	// The hint appears AUTOMATICALLY after 2 misses — it is guidance we chose to
+	// give, not something the learner "paid" for, so it never lowers the score
+	// further (codex review: auto-help must not be a severe penalty).
+	function scoreFor(wrong: number): number {
 		return wrong === 0 ? 100 : 80;
 	}
 
@@ -51,7 +53,7 @@
 		done = true;
 		feedback = config.successMessage ?? 'Μπράβο! Τα κατάφερες.';
 		clearTimeout(completeTimer);
-		completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps, showHint)), 900);
+		completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps)), 900);
 	}
 
 	function miss(message: string) {
@@ -76,13 +78,13 @@
 
 		if (action === 'mobile-app-opened' && data.appId !== config.targetAppId) {
 			miss(`Όχι αυτό. Ψάξε το «${targetApp?.label ?? ''}».`);
-		} else if (action === 'mobile-call-placed' || action === 'mobile-contact-called') {
+		} else if (action === 'mobile-call-placed') {
 			// A call happened but didn't satisfy the goal (wrong number/contact).
-			if (action === 'mobile-call-placed' && !data.contactId) {
-				miss('Κάλεσες λάθος αριθμό. Σβήσε τον και δοκίμασε ξανά.');
-			} else if (action === 'mobile-contact-called') {
-				miss('Κάλεσες άλλη επαφή. Δοκίμασε ξανά.');
-			}
+			miss(
+				data.contactId
+					? 'Κάλεσες άλλη επαφή. Δοκίμασε ξανά.'
+					: 'Κάλεσες λάθος αριθμό. Σβήσε τον και δοκίμασε ξανά.'
+			);
 		} else if (action === 'mobile-videocall-started') {
 			miss('Ξεκίνησες βιντεοκλήση με άλλη επαφή. Κλείσε την και δοκίμασε ξανά.');
 		} else if (action === 'mobile-message-sent') {
