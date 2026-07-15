@@ -228,6 +228,53 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 	});
 });
 
+describe('MobileSimLesson — QR scan + link check', () => {
+	const qrLesson = (qrUrl: string) =>
+		({
+			id: 'android-scan-qr',
+			moduleId: 'android',
+			lessonType: 'mobile-sim',
+			config: {
+				goal: 'mobile-scan-qr',
+				variant: 'android',
+				prompt: 'Σκάναρε τον κωδικό QR.',
+				apps: [{ id: 'camera', label: 'Κάμερα', icon: '📷', kind: 'camera' }],
+				targetAppId: 'camera',
+				qrUrl,
+				targetHost: 'gov.gr',
+				successMessage: 'Μπράβο! Άνοιξες τον επίσημο σύνδεσμο.'
+			}
+		}) as never;
+
+	it('completes when the official gov.gr link is scanned and opened', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			lesson: qrLesson('https://www.gov.gr/ipiresies'),
+			onComplete,
+			onBack: vi.fn()
+		});
+		await screen.getByRole('button', { name: 'Άνοιγμα Κάμερα' }).click();
+		await screen.getByRole('button', { name: 'Σάρωση κωδικού' }).click();
+		await screen.getByRole('button', { name: 'Άνοιγμα συνδέσμου' }).click();
+		await expect.element(screen.getByText('Μπράβο! Άνοιξες τον επίσημο σύνδεσμο.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('warns and does not complete for a lookalike domain', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			lesson: qrLesson('https://gov.gr.evil.com/login'),
+			onComplete,
+			onBack: vi.fn()
+		});
+		await screen.getByRole('button', { name: 'Άνοιγμα Κάμερα' }).click();
+		await screen.getByRole('button', { name: 'Σάρωση κωδικού' }).click();
+		await screen.getByRole('button', { name: 'Άνοιγμα συνδέσμου' }).click();
+		await expect.element(screen.getByText(/δεν είναι το επίσημο gov.gr/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
 describe('MobileSimLesson — screenshot chord', () => {
 	const screenshotLesson = (variant: 'android' | 'ios') =>
 		({

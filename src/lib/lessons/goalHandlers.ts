@@ -1,4 +1,5 @@
 import type { GoalId } from './goals';
+import { evaluateLink } from '$lib/utils/mobileLink';
 
 type GoalHandler = (action: string, data: Record<string, unknown>, config: Record<string, unknown>) => boolean;
 
@@ -169,6 +170,18 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-force-close': (action, data, config) =>
 		action === 'mobile-app-force-closed' &&
 		(!config.targetAppId || data.appId === config.targetAppId),
+
+	// QR scan is only satisfied by OPENING a link whose host is the official
+	// domain over https — scanning alone (mobile-qr-scanned) never completes, so
+	// the domain-check UI is not dead (codex plan review). The host is re-derived
+	// from the url the learner opened, not trusted from the event payload.
+	'mobile-scan-qr': (action, data, config) => {
+		if (action !== 'mobile-qr-link-opened' || !data.confirmed) return false;
+		const domain = config.targetHost;
+		if (typeof domain !== 'string' || typeof data.url !== 'string') return false;
+		// Evaluate the full url the learner opened (keeps scheme — http is unsafe).
+		return evaluateLink(data.url, domain).official;
+	},
 
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {

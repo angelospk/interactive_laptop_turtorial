@@ -490,6 +490,33 @@ describe('mobile-connect-wifi', () => {
 	});
 });
 
+describe('mobile-scan-qr', () => {
+	const config = { targetHost: 'gov.gr' };
+	it('completes only when the opened link is the official domain over https', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-scan-qr',
+				'mobile-qr-link-opened',
+				{ url: 'https://www.gov.gr/x', host: 'www.gov.gr', confirmed: true },
+				config
+			)
+		).toBe(true);
+	});
+	it('does not complete on scan alone (no link opened)', () => {
+		expect(checkGoalMatch('mobile-scan-qr', 'mobile-qr-scanned', {}, config)).toBe(false);
+	});
+	it('rejects a lookalike host even if opened', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-scan-qr',
+				'mobile-qr-link-opened',
+				{ url: 'https://gov.gr.evil.com/x', host: 'gov.gr.evil.com', confirmed: true },
+				config
+			)
+		).toBe(false);
+	});
+});
+
 describe('mobile-force-close', () => {
 	it('matches closing the target app from recents', () => {
 		const config = { targetAppId: 'camera' };

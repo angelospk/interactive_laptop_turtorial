@@ -14,7 +14,7 @@ export interface MobileSimApp {
 	/** Emoji rendered inside the icon tile. */
 	icon: string;
 	/** Which mini-app opens on tap. Default: an inert placeholder screen. */
-	kind?: 'phone' | 'messages' | 'viber' | 'settings' | 'placeholder';
+	kind?: 'phone' | 'messages' | 'viber' | 'settings' | 'camera' | 'browser' | 'placeholder';
 	/** Tailwind-compatible background class for the icon tile. */
 	color?: string;
 }
@@ -54,6 +54,10 @@ export interface MobileSimConfig {
 	wifiNetworks?: string[];
 	/** App ids shown as cards in the "recent apps" layer (force-close lesson). */
 	recentAppIds?: string[];
+	/** URL encoded in the mock QR code (scan-qr lesson). */
+	qrUrl?: string;
+	/** Expected official domain to verify against, e.g. 'gov.gr'. */
+	targetHost?: string;
 	successMessage?: string;
 	hint?: string;
 }
@@ -81,7 +85,8 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-start-videocall': { requiresTargetAppId: true, targetKind: 'viber' },
 	// force-close targets an app by id, but from the recents layer — not by its
 	// on-home kind, so no targetKind.
-	'mobile-force-close': { requiresTargetAppId: true }
+	'mobile-force-close': { requiresTargetAppId: true },
+	'mobile-scan-qr': { requiresTargetAppId: true, targetKind: 'camera' }
 	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
 
@@ -199,6 +204,15 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		}
 		if (c.targetAppId && !c.recentAppIds.includes(c.targetAppId)) {
 			throw new Error(`mobile-force-close targetAppId "${c.targetAppId}" must be in recentAppIds`);
+		}
+	}
+	if (c.goal === 'mobile-scan-qr') {
+		if (!c.qrUrl || !c.targetHost) throw new Error('mobile-scan-qr needs qrUrl and targetHost');
+		try {
+			// eslint-disable-next-line no-new
+			new URL(c.qrUrl);
+		} catch {
+			throw new Error(`mobile-scan-qr qrUrl is not a valid URL ("${c.qrUrl}")`);
 		}
 	}
 	if (c.goal === 'mobile-change-font-size' && c.targetSize) {

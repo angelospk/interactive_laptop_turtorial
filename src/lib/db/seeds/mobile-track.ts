@@ -27,7 +27,7 @@ function homeApps(variant: MobileVariant): MobileSimApp[] {
 		...(variant === 'ios'
 			? [{ id: 'viber', label: 'Viber', icon: '💜', kind: 'viber', color: 'bg-purple-100' } as MobileSimApp]
 			: []),
-		{ id: 'camera', label: 'Κάμερα', icon: '📷', kind: 'placeholder', color: 'bg-slate-100' },
+		{ id: 'camera', label: 'Κάμερα', icon: '📷', kind: 'camera', color: 'bg-slate-100' },
 		{ id: 'photos', label: 'Φωτογραφίες', icon: '🖼️', kind: 'placeholder', color: 'bg-amber-100' },
 		{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', kind: 'settings', color: 'bg-slate-200' }
 	];
@@ -185,6 +185,20 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				recentAppIds: ['messages', 'camera', 'settings'],
 				successMessage: 'Μπράβο! Έκλεισες την εφαρμογή που κόλλησε.',
 				hint: 'Πάτησε το τετράγωνο κουμπί κάτω δεξιά· βρες την «Κάμερα» και πάτησε «Κλείσιμο».'
+			}
+		},
+		{
+			n: 11,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'scan-qr',
+			config: {
+				goal: 'mobile-scan-qr',
+				prompt: 'Σκάναρε τον κωδικό QR με την Κάμερα και άνοιξε τον σύνδεσμο — αφού βεβαιωθείς ότι είναι το επίσημο gov.gr.',
+				targetAppId: 'camera',
+				qrUrl: 'https://www.gov.gr/ipiresies/polites-kai-kathimerinotita',
+				targetHost: 'gov.gr',
+				successMessage: 'Μπράβο! Έλεγξες τη διεύθυνση και άνοιξες τον επίσημο σύνδεσμο.',
+				hint: 'Άνοιξε την «Κάμερα», πάτησε «Σάρωση» και διάβασε τη διεύθυνση: πρέπει να λέει gov.gr.'
 			}
 		}
 	];

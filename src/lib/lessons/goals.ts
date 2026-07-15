@@ -92,6 +92,7 @@ export const GOALS = {
 	'mobile-start-videocall': { requiresAppId: false },
 	'mobile-screenshot': { requiresAppId: false },
 	'mobile-force-close': { requiresAppId: true },
+	'mobile-scan-qr': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },
