@@ -2,7 +2,7 @@
 	import QrCode from '@lucide/svelte/icons/qr-code';
 	import ScanLine from '@lucide/svelte/icons/scan-line';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
-	import { parseHost } from '$lib/utils/mobileLink';
+	import { parseHost, evaluateLink } from '$lib/utils/mobileLink';
 	import MobileBrowser from './MobileBrowser.svelte';
 
 	/**
@@ -17,15 +17,21 @@
 	let {
 		onEvent,
 		qrUrl,
+		targetHost = '',
 		pageTitle = 'gov.gr — Ενιαία Ψηφιακή Πύλη'
 	}: {
 		onEvent: (action: string, data?: Record<string, unknown>) => void;
 		qrUrl: string;
+		/** Expected official domain — used only to keep the opened-page copy honest. */
+		targetHost?: string;
 		pageTitle?: string;
 	} = $props();
 
 	let stage: 'viewfinder' | 'preview' | 'opened' = $state('viewfinder');
 	const host = $derived(parseHost(qrUrl) ?? '—');
+	// Never claim an opened link is "safe/official" unless it truly is (codex/
+	// CodeRabbit): for a lookalike host the opened page stays neutral + cautionary.
+	const official = $derived(targetHost ? evaluateLink(qrUrl, targetHost).official : false);
 
 	function scan() {
 		stage = 'preview';
@@ -89,13 +95,23 @@
 		</div>
 	{:else}
 		<MobileBrowser url={qrUrl}>
-			<div class="space-y-3 p-5">
-				<p class="text-lg font-bold text-slate-900">{pageTitle}</p>
-				<p class="text-sm text-slate-600">
-					Άνοιξες με ασφάλεια τον επίσημο σύνδεσμο. Εδώ θα έβρισκες τις ψηφιακές υπηρεσίες του
-					Δημοσίου.
-				</p>
-			</div>
+			{#if official}
+				<div class="space-y-3 p-5">
+					<p class="text-lg font-bold text-slate-900">{pageTitle}</p>
+					<p class="text-sm text-slate-600">
+						Άνοιξες τον επίσημο σύνδεσμο ({host}). Εδώ θα έβρισκες τις ψηφιακές υπηρεσίες του
+						Δημοσίου.
+					</p>
+				</div>
+			{:else}
+				<div class="space-y-3 p-5">
+					<p class="text-lg font-bold text-slate-900">{host}</p>
+					<p class="text-sm text-red-600">
+						Προσοχή: η διεύθυνση δεν φαίνεται να είναι το επίσημο gov.gr. Μην δίνεις προσωπικά
+						στοιχεία εδώ.
+					</p>
+				</div>
+			{/if}
 		</MobileBrowser>
 	{/if}
 </div>

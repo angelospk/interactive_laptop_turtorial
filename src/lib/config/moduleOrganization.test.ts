@@ -32,9 +32,22 @@ describe('groupModulesByCategory', () => {
 
 	it('drops no modules and never duplicates', () => {
 		const all = mods(
-			'module1', 'module2', 'module3', 'module4', 'module5', 'module6',
-			'word', 'module7', 'module8', 'module9', 'module10', 'module11',
-			'module12', 'module13', 'android', 'iphone'
+			'module1',
+			'module2',
+			'module3',
+			'module4',
+			'module5',
+			'module6',
+			'word',
+			'module7',
+			'module8',
+			'module9',
+			'module10',
+			'module11',
+			'module12',
+			'module13',
+			'android',
+			'iphone'
 		);
 		const flat = groupModulesByCategory(all).flatMap((g) => g.modules.map((m) => m.id));
 		expect(flat.sort()).toEqual(all.map((m) => m.id).sort());
@@ -195,16 +208,16 @@ describe('base path completion (CURRICULUM_PLAN §4β δ)', () => {
 		expect(c.baseComplete).toBe(false);
 	});
 
-	it('ignores base ids not present in the module (defensive)', () => {
-		// If a base id is somehow absent from the live lesson list, it must not
-		// block or fake completion.
+	it('requires every configured base lesson to be done (no fake completion)', () => {
+		// hasBase follows the CONFIG; completing only one of the seven base lessons
+		// is NOT «βασική διαδρομή ολοκληρωμένη».
 		const c = getModuleCompletion(
 			'android',
 			{ android: ['android-open-viber'] },
 			done('android-open-viber')
 		);
 		expect(c.hasBase).toBe(true);
-		expect(c.baseComplete).toBe(true); // only the present base lesson is required
+		expect(c.baseComplete).toBe(false);
 	});
 });
 

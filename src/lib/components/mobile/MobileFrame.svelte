@@ -95,6 +95,8 @@
 		<!-- Physical bezel buttons (screenshot lesson). Recognisable placement,
 		     not photorealistic: volume on the left edge, power on the right. -->
 		{#snippet bezelButton(id: string, extra: string)}
+			<!-- Wide transparent hit area (≥24px, senior-friendly) with a narrow
+			     visual bar inside, so the bezel still looks slim. -->
 			<button
 				type="button"
 				data-testid={`bezel-${id}`}
@@ -103,11 +105,18 @@
 				aria-label={BUTTON_LABEL[id]}
 				aria-pressed={armed === id}
 				class={cn(
-					'absolute z-20 w-2.5 rounded-full bg-slate-700 shadow-md transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
-					armed === id && 'bg-emerald-400 ring-2 ring-emerald-300',
+					'absolute z-20 flex w-7 items-center justify-center rounded-md focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
 					extra
 				)}
-			></button>
+			>
+				<span
+					aria-hidden="true"
+					class={cn(
+						'h-full w-2.5 rounded-full bg-slate-700 shadow-md transition',
+						armed === id && 'bg-emerald-400 ring-2 ring-emerald-300'
+					)}
+				></span>
+			</button>
 		{/snippet}
 		{@render bezelButton('volume-up', 'left-0 top-[26%] h-12')}
 		{@render bezelButton('volume-down', 'left-0 top-[40%] h-12')}

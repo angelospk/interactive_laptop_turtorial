@@ -19,8 +19,15 @@
 		children?: Snippet;
 	} = $props();
 
-	const host = $derived(parseHost(url) ?? '—');
-	const https = $derived(url.trim().toLowerCase().startsWith('https://'));
+	const parsedHost = $derived(parseHost(url));
+	const host = $derived(parsedHost ?? '—');
+	// Secure only when a real host parsed AND the scheme is https — so a malformed
+	// or fallback value like `https://—` is never shown with a lock (CodeRabbit).
+	const https = $derived(
+		parsedHost !== null &&
+			parsedHost.includes('.') &&
+			url.trim().toLowerCase().startsWith('https://')
+	);
 </script>
 
 <div data-testid="mobile-browser" class="flex h-full flex-col bg-white">

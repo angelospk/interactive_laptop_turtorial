@@ -422,14 +422,16 @@ export function getModuleCompletion(
 	const completed = lessonIds.filter(isDone).length;
 	const overallPercent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
-	const baseIdsAll = getBasePathLessonIds(moduleId);
-	// Only base lessons that actually exist in this module count (defensive).
-	const baseIds = baseIdsAll?.filter((id) => lessonIds.includes(id)) ?? [];
-	const hasBase = baseIds.length > 0;
-	const baseComplete = hasBase && baseIds.every(isDone);
+	// `hasBase` reflects the CONFIG (is a base path declared), independent of the
+	// live lesson list. Every configured base lesson must be completed for
+	// `baseComplete` — a base lesson missing from the learner's progress simply
+	// isn't done, so it can't fake completion (CodeRabbit).
+	const configuredBaseIds = getBasePathLessonIds(moduleId) ?? [];
+	const hasBase = configuredBaseIds.length > 0;
+	const baseComplete = hasBase && configuredBaseIds.every(isDone);
 
-	const baseSet = new Set(baseIds);
-	const extensionIds = lessonIds.filter((id) => !baseSet.has(id));
+	const baseSet = new Set(configuredBaseIds);
+	const extensionIds = hasBase ? lessonIds.filter((id) => !baseSet.has(id)) : [];
 
 	return {
 		overallPercent,

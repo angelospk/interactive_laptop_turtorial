@@ -211,7 +211,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				targetAppId: 'camera',
 				recentAppIds: ['messages', 'camera', 'settings'],
 				successMessage: 'Μπράβο! Έκλεισες την εφαρμογή που κόλλησε.',
-				hint: 'Πάτησε το τετράγωνο κουμπί κάτω δεξιά· βρες την «Κάμερα» και πάτησε «Κλείσιμο».'
+				hint: 'Πάτησε το κουμπί «Πρόσφατες εφαρμογές» (κάτω δεξιά)· βρες την «Κάμερα» και πάτησε «Κλείσιμο» ή σύρε την προς τα πάνω.'
 			}
 		},
 		{

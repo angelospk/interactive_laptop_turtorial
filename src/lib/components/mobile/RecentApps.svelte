@@ -56,6 +56,11 @@
 		if (dragId === null) return;
 		dragDy = e.clientY - startY;
 	}
+	function pointerCancel() {
+		// Gesture interrupted (e.g. system scroll takeover): reset, never dismiss.
+		dragId = null;
+		dragDy = 0;
+	}
 	function pointerUp(appId: string) {
 		if (dragId === appId && dragDy < -SWIPE_THRESHOLD) dismiss(appId);
 		dragId = null;
@@ -95,6 +100,7 @@
 					onpointerdown={(e) => pointerDown(app.id, e)}
 					onpointermove={pointerMove}
 					onpointerup={() => pointerUp(app.id)}
+					onpointercancel={pointerCancel}
 				>
 					<div class="flex items-center gap-3">
 						<span

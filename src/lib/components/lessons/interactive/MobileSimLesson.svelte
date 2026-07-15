@@ -81,7 +81,10 @@
 			return;
 		}
 
-		if (action === 'mobile-app-opened' && data.appId !== config.targetAppId) {
+		if (action === 'mobile-app-opened' && config.targetAppId && data.appId !== config.targetAppId) {
+			// Only a lesson that expects a specific app treats a different tap as a
+			// miss. System-control lessons (screenshot) have no targetAppId, so
+			// exploring apps must not penalise the learner.
 			miss(`Όχι αυτό. Ψάξε το «${targetApp?.label ?? ''}».`);
 		} else if (action === 'mobile-call-placed') {
 			// A call happened but didn't satisfy the goal (wrong number/contact).
@@ -192,7 +195,11 @@
 			{:else if currentApp.kind === 'settings'}
 				<MobileSettingsApp onEvent={dispatch} wifiNetworks={config.wifiNetworks ?? []} />
 			{:else if currentApp.kind === 'camera'}
-				<CameraApp onEvent={dispatch} qrUrl={config.qrUrl ?? ''} />
+				<CameraApp
+					onEvent={dispatch}
+					qrUrl={config.qrUrl ?? ''}
+					targetHost={config.targetHost ?? ''}
+				/>
 			{:else if currentApp.kind === 'store'}
 				<StoreApp
 					onEvent={dispatch}
