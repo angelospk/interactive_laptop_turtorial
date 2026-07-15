@@ -151,17 +151,46 @@ export function groupModulesByCategory<M extends { id: string }>(
 
 // ── Lesson sub-sections (module page, for long lesson lists) ────────────────
 
-export interface LessonSection {
+/**
+ * Positional section: the first N lessons (by order) belong here. Fragile by
+ * design — used for the stable reading-heavy modules whose «Θεωρία» boundary is
+ * pinned to orderIndex and never grows.
+ */
+export interface PositionalSection {
 	title: string;
 	/** Number of lessons (in order) that belong to this section. */
 	count: number;
 }
 
 /**
+ * Id-based section: lists its lessons by immutable lesson **id** (CURRICULUM_PLAN
+ * §4β decision στ). Counts are derived, so growing a track never desyncs a hand
+ * -written number. `completionRole: 'base'` marks the module's core path — the
+ * lessons a learner must finish to have «Ολοκληρώθηκε η βασική διαδρομή», even
+ * after later waves add more lessons (decision δ, migration-free).
+ */
+export interface IdSection {
+	id: string;
+	title: string;
+	/** Immutable lesson ids, in display order. */
+	lessonIds: string[];
+	completionRole?: 'base';
+}
+
+export type LessonSection = PositionalSection | IdSection;
+
+/** Type guard: an id-based section (has an explicit lessonIds list). */
+export function isIdSection(s: LessonSection): s is IdSection {
+	return 'lessonIds' in s;
+}
+
+/**
  * Split points for modules whose lesson list is long enough to benefit from
- * labelled sub-sections. Counts are positional (first N, next N…) so they don't
- * depend on fragile lessonKeys. Sum should equal the module's lesson count, but
- * `buildLessonSections` tolerates drift defensively.
+ * labelled sub-sections. Two shapes coexist:
+ *  - positional (`count`) for the stable reading modules, and
+ *  - id-based (`lessonIds`) for tracks that grow across waves (mobile), where a
+ *    `completionRole: 'base'` section defines the core path.
+ * `buildLessonSections` tolerates drift defensively either way.
  */
 export const moduleSections: Record<string, LessonSection[]> = {
 	// 1 reading + 7 core skills + 3 arcade-style drills (χαμηλή διδακτική αξία —
@@ -194,14 +223,42 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{ title: 'Θεωρία', count: 5 },
 		{ title: 'Εξάσκηση', count: 6 }
 	],
-	// Mobile tracks: απλό επίπεδο πρώτα, μετά «καθημερινή χρήση» (PLAN §4β).
+	// Mobile tracks: id-based sections (grow across waves). «Βασικά» is the base
+	// path — its 7 lesson ids are the immutable original track (7/7 = «βασική
+	// διαδρομή ολοκληρωμένη»). Later waves append lessons to the other sections.
 	android: [
-		{ title: 'Βασικά — πρώτα βήματα', count: 7 },
-		{ title: 'Καθημερινή χρήση', count: 1 }
+		{
+			id: 'basics',
+			title: 'Βασικά — πρώτα βήματα',
+			completionRole: 'base',
+			lessonIds: [
+				'android-open-viber',
+				'android-call-number',
+				'android-call-contact',
+				'android-send-sms',
+				'android-send-viber',
+				'android-font-size',
+				'android-connect-wifi'
+			]
+		},
+		{ id: 'daily', title: 'Καθημερινή χρήση', lessonIds: ['android-videocall-viber'] }
 	],
 	iphone: [
-		{ title: 'Βασικά — πρώτα βήματα', count: 7 },
-		{ title: 'Καθημερινή χρήση', count: 1 }
+		{
+			id: 'basics',
+			title: 'Βασικά — πρώτα βήματα',
+			completionRole: 'base',
+			lessonIds: [
+				'iphone-open-facetime',
+				'iphone-call-number',
+				'iphone-call-contact',
+				'iphone-send-sms',
+				'iphone-send-viber',
+				'iphone-font-size',
+				'iphone-connect-wifi'
+			]
+		},
+		{ id: 'daily', title: 'Καθημερινή χρήση', lessonIds: ['iphone-videocall-viber'] }
 	]
 };
 
@@ -214,8 +271,13 @@ export interface BuiltSection {
 /**
  * Turn a flat lesson list into labelled sections for the given module.
  * Returns `null` when the module has no configured sections (caller renders a
- * plain grid). Any lessons beyond the configured counts are appended to the
- * last section so none are ever hidden.
+ * plain grid).
+ *
+ * Positional specs slice by count; id-based specs map by lesson id. Either way
+ * no lesson is ever hidden: positional overflow lands in the last section, and
+ * id-based lessons absent from every section fall into a trailing «Επιπλέον
+ * μαθήματα» bucket (guards against a live-DB lesson missing from compiled
+ * config — codex plan review).
  */
 export function buildLessonSections(
 	moduleId: string,
@@ -224,6 +286,15 @@ export function buildLessonSections(
 	const spec = moduleSections[moduleId];
 	if (!spec || lessons.length === 0) return null;
 
+	const idBased = spec.every(isIdSection);
+	const sections: BuiltSection[] = idBased
+		? buildIdSections(spec as IdSection[], lessons)
+		: buildPositionalSections(spec as PositionalSection[], lessons);
+
+	return sections.length ? sections : null;
+}
+
+function buildPositionalSections(spec: PositionalSection[], lessons: Lesson[]): BuiltSection[] {
 	const sections: BuiltSection[] = [];
 	let cursor = 0;
 	spec.forEach((section, i) => {
@@ -233,6 +304,96 @@ export function buildLessonSections(
 		if (items.length) sections.push({ title: section.title, items });
 		cursor = end;
 	});
+	return sections;
+}
 
-	return sections.length ? sections : null;
+function buildIdSections(spec: IdSection[], lessons: Lesson[]): BuiltSection[] {
+	const indexById = new Map(lessons.map((l, i) => [l.id, i]));
+	const placed = new Set<string>();
+	const sections: BuiltSection[] = [];
+
+	for (const section of spec) {
+		const items = section.lessonIds
+			.map((id) => {
+				const index = indexById.get(id);
+				if (index === undefined) return null;
+				placed.add(id);
+				return { lesson: lessons[index], index };
+			})
+			.filter((x): x is { lesson: Lesson; index: number } => x !== null);
+		if (items.length) sections.push({ title: section.title, items });
+	}
+
+	// Any seeded/live lesson not named by a section still shows up (never hidden).
+	const leftovers = lessons
+		.map((lesson, index) => ({ lesson, index }))
+		.filter(({ lesson }) => !placed.has(lesson.id));
+	if (leftovers.length) sections.push({ title: 'Επιπλέον μαθήματα', items: leftovers });
+
+	return sections;
+}
+
+// ── Module completion semantics (base path vs extensions, CURRICULUM_PLAN §4β δ)
+
+/**
+ * Immutable lesson ids that form a module's core «base path» (the section marked
+ * `completionRole: 'base'`), or `null` when the module has no base section.
+ * These are the lessons whose completion means «Ολοκληρώθηκε η βασική διαδρομή»
+ * — stable even as later waves append more lessons.
+ */
+export function getBasePathLessonIds(moduleId: string): string[] | null {
+	const spec = moduleSections[moduleId];
+	if (!spec) return null;
+	const base = spec.filter(isIdSection).filter((s) => s.completionRole === 'base');
+	if (base.length === 0) return null;
+	return base.flatMap((s) => s.lessonIds);
+}
+
+export interface ModuleCompletion {
+	overallPercent: number;
+	allComplete: boolean;
+	/** Whether this module has a defined base path at all. */
+	hasBase: boolean;
+	/** Base path fully done (false when there is no base path). */
+	baseComplete: boolean;
+	/** Lessons beyond the base path (0 when there is no base path). */
+	extensionTotal: number;
+	extensionCompleted: number;
+}
+
+/**
+ * Full completion summary for a module. The overall percent is the honest
+ * completed/all ratio (unchanged), but `baseComplete` lets the UI show «βασική
+ * διαδρομή ολοκληρωμένη» so adding lessons never demotes a finished learner to
+ * «7/12, ημιτελές» (codex plan review, decision δ). Migration-free: reads only
+ * the existing progress map, keyed by immutable lesson id.
+ */
+export function getModuleCompletion(
+	moduleId: string,
+	moduleLessonIds: Record<string, string[]>,
+	userProgress: Record<string, { completed?: boolean } | undefined>
+): ModuleCompletion {
+	const lessonIds = moduleLessonIds?.[moduleId] ?? [];
+	const isDone = (id: string) => Boolean(userProgress?.[id]?.completed);
+	const total = lessonIds.length;
+	const completed = lessonIds.filter(isDone).length;
+	const overallPercent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+	const baseIdsAll = getBasePathLessonIds(moduleId);
+	// Only base lessons that actually exist in this module count (defensive).
+	const baseIds = baseIdsAll?.filter((id) => lessonIds.includes(id)) ?? [];
+	const hasBase = baseIds.length > 0;
+	const baseComplete = hasBase && baseIds.every(isDone);
+
+	const baseSet = new Set(baseIds);
+	const extensionIds = lessonIds.filter((id) => !baseSet.has(id));
+
+	return {
+		overallPercent,
+		allComplete: total > 0 && completed === total,
+		hasBase,
+		baseComplete,
+		extensionTotal: extensionIds.length,
+		extensionCompleted: extensionIds.filter(isDone).length
+	};
 }

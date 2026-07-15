@@ -14,6 +14,7 @@
 		groupModulesByCategory,
 		getModuleDevices,
 		modulesSpecificToDevice,
+		getModuleCompletion,
 		type ModuleDevice
 	} from '$lib/config/moduleOrganization';
 	import DeviceOnboarding from '$lib/components/DeviceOnboarding.svelte';
@@ -21,13 +22,11 @@
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
 
-	import { getModuleProgress } from '$lib/utils/progress';
-
 	// Get progress from server
 	let { data } = $props();
 
-	function getProgress(moduleId: string) {
-		return getModuleProgress(moduleId, data.moduleLessonIds, data.progress);
+	function getCompletion(moduleId: string) {
+		return getModuleCompletion(moduleId, data.moduleLessonIds, data.progress);
 	}
 
 	// Group the flat module list into themed categories for easier navigation.
@@ -96,8 +95,10 @@
 
 		<!-- Module grid, grouped into themed categories -->
 		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string | null }, num: number)}
-			{@const moduleProgress = getProgress(module.id)}
-			{@const done = moduleProgress >= 100}
+			{@const completion = getCompletion(module.id)}
+			{@const moduleProgress = completion.overallPercent}
+			{@const done = completion.allComplete}
+			{@const baseDone = completion.baseComplete && !completion.allComplete}
 			{@const deviceTags = getModuleDevices(module.id)}
 			<a
 				href={`/modules/${module.id}`}
@@ -108,19 +109,32 @@
 				<div class="bezel-core flex h-full flex-col gap-5 p-6 sm:p-7">
 					<div class="flex items-start justify-between gap-4">
 						<div
-							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-bold {done
+							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-bold {done ||
+							baseDone
 								? 'bg-emerald-500/15 text-emerald-600'
 								: 'bg-brand/10 text-brand'}"
 						>
-							{#if done}
+							{#if done || baseDone}
 								<Check class="h-6 w-6" strokeWidth={2.5} />
 							{:else}
 								{num}
 							{/if}
 						</div>
-						<span class="text-sm font-semibold tabular-nums text-muted-foreground">
-							{moduleProgress}%
-						</span>
+						<!-- Base-path completion never demotes to a bare «X%» (codex plan review) -->
+						{#if baseDone}
+							<span class="text-right text-xs font-semibold text-emerald-600">
+								<span class="block">Βασική διαδρομή ✓</span>
+								{#if completion.extensionCompleted < completion.extensionTotal}
+									<span class="block font-medium text-muted-foreground">
+										+{completion.extensionCompleted}/{completion.extensionTotal} επιπλέον
+									</span>
+								{/if}
+							</span>
+						{:else}
+							<span class="text-sm font-semibold tabular-nums text-muted-foreground">
+								{moduleProgress}%
+							</span>
+						{/if}
 					</div>
 
 					<div class="flex-1">
@@ -150,7 +164,8 @@
 					<!-- Progress rail -->
 					<div class="h-2 w-full overflow-hidden rounded-full bg-secondary">
 						<div
-							class="h-full rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] {done
+							class="h-full rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] {done ||
+							baseDone
 								? 'bg-emerald-500'
 								: 'bg-brand'}"
 							style="width: {Math.max(moduleProgress, 2)}%"
