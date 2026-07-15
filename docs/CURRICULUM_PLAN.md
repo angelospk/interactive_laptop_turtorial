@@ -90,6 +90,37 @@
 
 Ίδια δομή με iOS variant (FaceTime αντί για απλή βιντεοκλήση, App Store αντί Play Store, iOS Ρυθμίσεις). Κοινά components, `variant: 'ios'` — μόνο τα seeds/κείμενα διαφέρουν.
 
+## 4β. Επίπεδα μέσα στα mobile tracks (απλό → σύνθετο)
+
+Απαίτηση: **απλό επίπεδο για απλούς χρήστες** και σταδιακά πιο σύνθετα/ενδιαφέροντα (ρυθμίσεις, AI βοηθός). Υλοποίηση χωρίς migration, με τους υπάρχοντες μηχανισμούς (`difficulty` + `moduleSections` positional counts):
+
+| Section (module page) | Δυσκολία | Μαθήματα |
+|---|---|---|
+| **Βασικά — πρώτα βήματα** | beginner | 1 άνοιγμα εφαρμογής, 2 κλήση αριθμού, 3 κλήση επαφής, 4 SMS, 5 Viber, 6 γράμματα, 7 Wi-Fi |
+| **Καθημερινή χρήση** | intermediate | βιντεοκλήση Viber, screenshot με τα «κουμπιά» της συσκευής, κλείσιμο κολλημένης εφαρμογής, νυχτερινή λειτουργία, σκανάρισμα QR, φωτογραφία+κοινοποίηση |
+| **Πιο προχωρημένα & AI** | advanced | AI βοηθός (ξυπνητήρι/υπενθύμιση χαπιών/μήνυμα με φωνή), «ρώτα το AI σωστά», Εύρεση συσκευής, Google Photos backup, ενημερώσεις εφαρμογών, Private DNS/λιγότερες διαφημίσεις |
+
+## 4γ. Wave 3 — μαθήματα από τον «Οδηγό Τσέπης» (digital tips PDF)
+
+Υποψήφια διαδραστικά μαθήματα (όχι reading) από τα tips, με εφικτότητα:
+
+| Μάθημα | Goal (νέο) | Mini-app | Δυσκολία | Κόστος |
+|---|---|---|---|---|
+| Screenshot: Power+Vol− μαζί | `mobile-screenshot` ← `mobile-screenshot-taken` | Κουμπιά πάνω στο MobileFrame bezel | Μέτριο | Φθηνό |
+| Κλείσε κολλημένη εφαρμογή | `mobile-force-close` ← `mobile-app-force-closed{appId}` | RecentApps view (κάρτες + σύρσιμο/Χ) | Μέτριο | Φθηνό |
+| Βιντεοκλήση στο Viber | `mobile-start-videocall` ← `mobile-videocall-started{conversationId}` | κουμπί 📹 στο MessagingApp header | Μέτριο | Φθηνό |
+| Νυχτερινή λειτουργία | `mobile-night-mode` ← `mobile-night-mode-set{on}` | MobileSettingsApp νέα σελίδα | Μέτριο | Φθηνό |
+| Σκανάρισμα QR | `mobile-scan-qr` ← `mobile-qr-scanned` | CameraApp mock (viewfinder με QR) | Μέτριο | Μέτριο |
+| AI βοηθός: ξυπνητήρι | `mobile-assistant-task{intent:'alarm'}` ← `mobile-assistant-command` | AssistantApp: μεγάλο μικρόφωνο + **chips επιλογής φράσης** (τίμια προσομοίωση φωνής χωρίς μικρόφωνο) | Προχωρ. | Μέτριο |
+| AI βοηθός: υπενθύμιση χαπιών | ίδιο goal, `intent:'reminder'` | AssistantApp | Προχωρ. | Φθηνό μετά το πρώτο |
+| Ρώτα το AI σωστά | επιλογή καλύτερης διατύπωσης (quiz μέσα σε chat UI) | AssistantApp/quiz | Προχωρ. | Φθηνό |
+| Εύρεση συσκευής ON | `mobile-find-device` ← toggle event | MobileSettingsApp (βαθύτερο path + αναζήτηση ρύθμισης) | Προχωρ. | Φθηνό |
+| Google Photos backup | `mobile-backup-on` | GalleryApp settings | Προχωρ. | Μέτριο |
+| Ενημέρωση εφαρμογής | `mobile-update-app` | StoreApp lite | Προχωρ. | Μέτριο |
+| Δημόσιο WiFi & τράπεζα (σενάριο) | quiz/scam-spotter variant | — | Προχωρ. | Φθηνό |
+
+Αρχές για τα «φωνητικά»: χωρίς πραγματικό μικρόφωνο — ο μαθητής **διαλέγει τι θα έλεγε** (chips με 2-3 φράσεις, μία σωστά διατυπωμένη)· έτσι διδάσκεται η διατύπωση, που είναι και το πραγματικό ζητούμενο των curricula για AI.
+
 ## 5. Mac: simulator + track (νέο module `mac`)
 
 ### Simulator
