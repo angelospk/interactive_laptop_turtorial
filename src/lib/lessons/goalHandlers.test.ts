@@ -490,6 +490,16 @@ describe('mobile-connect-wifi', () => {
 	});
 });
 
+describe('mobile-screenshot', () => {
+	it('matches the screenshot-taken event (chord already validated by the component)', () => {
+		expect(checkGoalMatch('mobile-screenshot', 'mobile-screenshot-taken', {}, {})).toBe(true);
+	});
+
+	it('does not match other mobile events', () => {
+		expect(checkGoalMatch('mobile-screenshot', 'mobile-app-opened', { appId: 'x' }, {})).toBe(false);
+	});
+});
+
 // ── Unknown goal guard ─────────────────────────────────────────────────────────
 
 describe('unknown goal', () => {

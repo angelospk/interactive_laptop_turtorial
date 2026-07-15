@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { Snippet } from 'svelte';
+	import { onDestroy, type Snippet } from 'svelte';
 	import Wifi from '@lucide/svelte/icons/wifi';
 	import SignalHigh from '@lucide/svelte/icons/signal-high';
 	import BatteryFull from '@lucide/svelte/icons/battery-full';
@@ -17,6 +17,8 @@
 		variant = 'android',
 		time = '9:41',
 		onHome,
+		showSystemButtons = false,
+		onSystemChord,
 		class: className
 	}: {
 		children?: Snippet;
@@ -29,10 +31,48 @@
 		 * (used by goal-driven simulations); otherwise it stays decorative.
 		 */
 		onHome?: () => void;
+		/** Show the physical Power/Volume buttons on the bezel (screenshot lesson). */
+		showSystemButtons?: boolean;
+		/**
+		 * Emitted when two hardware buttons are pressed "together" (canonical
+		 * sorted `a+b` id, e.g. `power+volume-down`). MobileFrame stays
+		 * presentational: it knows nothing about goals — the lesson decides what a
+		 * chord means for the current platform.
+		 */
+		onSystemChord?: (chord: string) => void;
 		class?: string;
 	} = $props();
 
 	const isIos = $derived(variant === 'ios');
+
+	// Senior-friendly chord: pressing one button "arms" it for a short window;
+	// pressing a *different* button while armed counts as pressing both together.
+	// This teaches the combination without demanding true simultaneous multitouch
+	// on tiny bezel controls, and works with a keyboard (they are real buttons).
+	const CHORD_WINDOW_MS = 1500;
+	let armed: string | null = $state(null);
+	let armTimer: ReturnType<typeof setTimeout> | undefined;
+	onDestroy(() => clearTimeout(armTimer));
+
+	function pressButton(id: string) {
+		if (armed && armed !== id) {
+			const chord = [armed, id].sort().join('+');
+			clearTimeout(armTimer);
+			armed = null;
+			onSystemChord?.(chord);
+			return;
+		}
+		// (Re-)arm this button and start the window.
+		armed = id;
+		clearTimeout(armTimer);
+		armTimer = setTimeout(() => (armed = null), CHORD_WINDOW_MS);
+	}
+
+	const BUTTON_LABEL = $derived<Record<string, string>>({
+		power: isIos ? 'Πλαϊνό κουμπί' : 'Κουμπί λειτουργίας',
+		'volume-up': 'Ένταση πάνω',
+		'volume-down': 'Ένταση κάτω'
+	});
 </script>
 
 <div
@@ -48,6 +88,29 @@
 	role="group"
 	aria-label={isIos ? 'Προσομοίωση οθόνης iPhone' : 'Προσομοίωση οθόνης Android'}
 >
+	{#if showSystemButtons}
+		<!-- Physical bezel buttons (screenshot lesson). Recognisable placement,
+		     not photorealistic: volume on the left edge, power on the right. -->
+		{#snippet bezelButton(id: string, extra: string)}
+			<button
+				type="button"
+				data-testid={`bezel-${id}`}
+				data-armed={armed === id}
+				onclick={() => pressButton(id)}
+				aria-label={BUTTON_LABEL[id]}
+				aria-pressed={armed === id}
+				class={cn(
+					'absolute z-20 w-2.5 rounded-full bg-slate-700 shadow-md transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none',
+					armed === id && 'bg-emerald-400 ring-2 ring-emerald-300',
+					extra
+				)}
+			></button>
+		{/snippet}
+		{@render bezelButton('volume-up', 'left-0 top-[26%] h-12')}
+		{@render bezelButton('volume-down', 'left-0 top-[40%] h-12')}
+		{@render bezelButton('power', 'right-0 top-[30%] h-16')}
+	{/if}
+
 	<!-- Status bar -->
 	<div
 		data-testid="mobile-statusbar"

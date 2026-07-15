@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { createRawSnippet } from 'svelte';
 import MobileFrame from './MobileFrame.svelte';
@@ -34,5 +34,43 @@ describe('MobileFrame', () => {
 	it('shows the provided status-bar time', async () => {
 		const screen = render(MobileFrame, { children: content, time: '12:34' });
 		await expect.element(screen.getByText('12:34')).toBeInTheDocument();
+	});
+
+	describe('system buttons (screenshot chord)', () => {
+		it('hides the bezel buttons unless explicitly enabled', async () => {
+			const screen = render(MobileFrame, { children: content });
+			await expect.element(screen.getByTestId('bezel-power')).not.toBeInTheDocument();
+		});
+
+		it('emits the canonical sorted chord when two buttons are pressed together', async () => {
+			const onSystemChord = vi.fn();
+			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			await screen.getByTestId('bezel-power').click();
+			await screen.getByTestId('bezel-volume-down').click();
+			expect(onSystemChord).toHaveBeenCalledWith('power+volume-down');
+		});
+
+		it('is order-independent (volume first, then power → same chord)', async () => {
+			const onSystemChord = vi.fn();
+			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			await screen.getByTestId('bezel-volume-up').click();
+			await screen.getByTestId('bezel-power').click();
+			expect(onSystemChord).toHaveBeenCalledWith('power+volume-up');
+		});
+
+		it('does not fire on a single button press', async () => {
+			const onSystemChord = vi.fn();
+			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			await screen.getByTestId('bezel-power').click();
+			expect(onSystemChord).not.toHaveBeenCalled();
+		});
+
+		it('does not fire when the same button is pressed twice', async () => {
+			const onSystemChord = vi.fn();
+			const screen = render(MobileFrame, { children: content, showSystemButtons: true, onSystemChord });
+			await screen.getByTestId('bezel-power').click();
+			await screen.getByTestId('bezel-power').click();
+			expect(onSystemChord).not.toHaveBeenCalled();
+		});
 	});
 });

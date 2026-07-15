@@ -50,8 +50,8 @@ export const iphoneLessons: NewLesson[] = [
 // Fail fast at import time if a target app is missing from its own list.
 for (const lesson of iphoneLessons) {
 	const config = lesson.config as { apps?: MobileApp[]; targetAppId?: string };
-	const ok = config.apps?.some((a) => a.id === config.targetAppId);
-	if (!ok) {
+	// System-control goals (e.g. screenshot) have no targetAppId — skip them.
+	if (config.targetAppId && !config.apps?.some((a) => a.id === config.targetAppId)) {
 		throw new Error(
 			`Seed error in "${lesson.id}": targetAppId "${config.targetAppId}" is not in apps.`
 		);

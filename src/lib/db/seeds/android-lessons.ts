@@ -58,8 +58,9 @@ export const androidLessons: NewLesson[] = [
  */
 for (const lesson of androidLessons) {
 	const config = lesson.config as { apps?: MobileApp[]; targetAppId?: string };
-	const ok = config.apps?.some((a) => a.id === config.targetAppId);
-	if (!ok) {
+	// Only tap/target lessons carry a targetAppId; system-control goals (e.g.
+	// screenshot) legitimately have none — parseMobileSimConfig handles those.
+	if (config.targetAppId && !config.apps?.some((a) => a.id === config.targetAppId)) {
 		throw new Error(
 			`Seed error in "${lesson.id}": targetAppId "${config.targetAppId}" is not in apps.`
 		);

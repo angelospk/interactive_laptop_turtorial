@@ -56,28 +56,45 @@ export interface MobileSimConfig {
 	hint?: string;
 }
 
-/** Goals that require a target app to exist on the home screen. */
-const GOALS_NEEDING_TARGET_APP = new Set<string>([
-	'mobile-open-app',
-	'mobile-dial-number',
-	'mobile-call-contact',
-	'mobile-send-sms',
-	'mobile-send-chat',
-	'mobile-change-font-size',
-	'mobile-connect-wifi',
-	'mobile-start-videocall'
-]);
+/**
+ * Per-goal reachability requirements (codex plan review: one map instead of two
+ * parallel structures, so cross-app flows scale). A goal not listed here has no
+ * structural app requirement (e.g. a pure system-control goal like screenshot).
+ */
+interface GoalRequirement {
+	/** `targetAppId` must be present in `apps`. */
+	requiresTargetAppId?: boolean;
+	/** The target app itself must carry this functional kind. */
+	targetKind?: MobileSimApp['kind'];
+}
 
-/** Which app kind each goal is completed in (reachability check). */
-const GOAL_APP_KIND: Record<string, MobileSimApp['kind']> = {
-	'mobile-dial-number': 'phone',
-	'mobile-call-contact': 'phone',
-	'mobile-send-sms': 'messages',
-	'mobile-send-chat': 'viber',
-	'mobile-change-font-size': 'settings',
-	'mobile-connect-wifi': 'settings',
-	'mobile-start-videocall': 'viber'
+const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
+	'mobile-open-app': { requiresTargetAppId: true },
+	'mobile-dial-number': { requiresTargetAppId: true, targetKind: 'phone' },
+	'mobile-call-contact': { requiresTargetAppId: true, targetKind: 'phone' },
+	'mobile-send-sms': { requiresTargetAppId: true, targetKind: 'messages' },
+	'mobile-send-chat': { requiresTargetAppId: true, targetKind: 'viber' },
+	'mobile-change-font-size': { requiresTargetAppId: true, targetKind: 'settings' },
+	'mobile-connect-wifi': { requiresTargetAppId: true, targetKind: 'settings' },
+	'mobile-start-videocall': { requiresTargetAppId: true, targetKind: 'viber' }
+	// 'mobile-screenshot' — system-control goal, no app on the home screen.
 };
+
+/**
+ * Truthful per-platform hardware capabilities (codex plan review: the source of
+ * truth lives centrally, NOT copied into every lesson config). Chord ids are the
+ * canonical sorted `button+button` form emitted by MobileFrame.
+ *
+ * Screenshot: Android is Power + Volume-Down, modern iPhone (notch/Face ID) is
+ * Side + Volume-Up. https://support.google.com/android/answer/9075928 ·
+ * https://support.apple.com/guide/iphone/iphc872c0115
+ */
+export const mobilePlatformCapabilities = {
+	android: { screenshotChord: 'power+volume-down' },
+	ios: { screenshotChord: 'power+volume-up' }
+} as const;
+
+export type MobileVariantKey = keyof typeof mobilePlatformCapabilities;
 
 /**
  * Validates a raw lesson config and returns it typed, or throws with a
@@ -111,7 +128,8 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 	for (const dockId of c.dockAppIds ?? []) {
 		if (!ids.has(dockId)) throw new Error(`dockAppIds references unknown app "${dockId}"`);
 	}
-	if (GOALS_NEEDING_TARGET_APP.has(c.goal)) {
+	const req = GOAL_REQUIREMENTS[c.goal];
+	if (req?.requiresTargetAppId) {
 		if (!c.targetAppId || !ids.has(c.targetAppId)) {
 			throw new Error(`goal "${c.goal}" needs a targetAppId present in apps`);
 		}
@@ -128,7 +146,7 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		if (count > 1) throw new Error(`multiple apps with kind "${kind}" — events would be ambiguous`);
 	}
 
-	const neededKind = GOAL_APP_KIND[c.goal];
+	const neededKind = req?.targetKind;
 	if (neededKind) {
 		// The TARGET app itself must be the one carrying the needed kind —
 		// otherwise the hint highlights one app while the goal completes in

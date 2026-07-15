@@ -197,6 +197,61 @@ describe('MobileSimLesson — messaging flow', () => {
 	});
 });
 
+describe('MobileSimLesson — screenshot chord', () => {
+	const screenshotLesson = (variant: 'android' | 'ios') =>
+		({
+			id: `${variant}-screenshot`,
+			moduleId: variant === 'ios' ? 'iphone' : 'android',
+			lessonType: 'mobile-sim',
+			config: {
+				goal: 'mobile-screenshot',
+				variant,
+				prompt: 'Τράβηξε στιγμιότυπο οθόνης.',
+				apps: baseApps,
+				successMessage: 'Μπράβο! Τράβηξες στιγμιότυπο.'
+			}
+		}) as never;
+
+	it('completes on the correct Android chord (power + volume-down)', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			lesson: screenshotLesson('android'),
+			onComplete,
+			onBack: vi.fn()
+		});
+		await screen.getByTestId('bezel-power').click();
+		await screen.getByTestId('bezel-volume-down').click();
+		await expect.element(screen.getByText('Μπράβο! Τράβηξες στιγμιότυπο.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('rejects the iOS chord on an Android lesson (wrong combination)', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			lesson: screenshotLesson('android'),
+			onComplete,
+			onBack: vi.fn()
+		});
+		await screen.getByTestId('bezel-power').click();
+		await screen.getByTestId('bezel-volume-up').click();
+		await expect.element(screen.getByText(/Άλλος συνδυασμός/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it('completes on the correct iOS chord (side + volume-up)', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			lesson: screenshotLesson('ios'),
+			onComplete,
+			onBack: vi.fn()
+		});
+		await screen.getByTestId('bezel-power').click();
+		await screen.getByTestId('bezel-volume-up').click();
+		await expect.element(screen.getByText('Μπράβο! Τράβηξες στιγμιότυπο.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+});
+
 describe('MobileSimLesson — settings flows', () => {
 	const settingsApps = [{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', kind: 'settings' }];
 

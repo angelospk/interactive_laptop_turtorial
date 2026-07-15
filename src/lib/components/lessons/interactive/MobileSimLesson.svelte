@@ -8,7 +8,7 @@
 	import MessagingApp from '$lib/components/mobile/apps/MessagingApp.svelte';
 	import MobileSettingsApp from '$lib/components/mobile/apps/MobileSettingsApp.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
-	import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
+	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
 
 	/**
 	 * Goal-driven phone simulation (mobile counterpart of DesktopLesson,
@@ -99,13 +99,34 @@
 	function goHome() {
 		currentAppId = null;
 	}
+
+	// Screenshot lesson: show the physical bezel buttons and turn the correct
+	// platform chord into the semantic event. The truthful combination lives in
+	// the capability profile, not in the lesson config (codex plan review).
+	const isScreenshotLesson = config.goal === 'mobile-screenshot';
+	const screenshotChord = mobilePlatformCapabilities[config.variant].screenshotChord;
+
+	function handleSystemChord(chord: string) {
+		if (done) return;
+		if (chord === screenshotChord) {
+			dispatch('mobile-screenshot-taken', { chord });
+		} else {
+			miss('Άλλος συνδυασμός κουμπιών. Δοκίμασε ξανά τα δύο σωστά κουμπιά μαζί.');
+		}
+	}
 </script>
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="flex flex-col items-center gap-4 py-4">
 		<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
-		<MobileFrame variant={config.variant === 'ios' ? 'ios' : 'android'} onHome={goHome} class="my-2">
+		<MobileFrame
+			variant={config.variant === 'ios' ? 'ios' : 'android'}
+			onHome={goHome}
+			showSystemButtons={isScreenshotLesson}
+			onSystemChord={handleSystemChord}
+			class="my-2"
+		>
 			{#if currentApp === null}
 				<MobileHomeScreen
 					variant={config.variant === 'ios' ? 'ios' : 'android'}

@@ -161,6 +161,10 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		action === 'mobile-videocall-started' &&
 		(!config.targetConversationId || data.conversationId === config.targetConversationId),
 
+	// System control: the screenshot chord already matched the platform (the
+	// component only emits this event for the correct button combination).
+	'mobile-screenshot': (action) => action === 'mobile-screenshot-taken',
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;
