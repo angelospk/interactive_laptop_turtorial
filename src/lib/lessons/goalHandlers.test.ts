@@ -303,6 +303,56 @@ describe('save-document', () => {
 	});
 });
 
+// ── Mobile simulation (mobile-sim lessonType, CURRICULUM_PLAN B2) ──────────────
+
+describe('mobile-open-app', () => {
+	const config = { targetAppId: 'phone' };
+
+	it('matches when the target app is opened', () => {
+		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'phone' }, config)).toBe(true);
+	});
+
+	it('does not match a different app', () => {
+		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'viber' }, config)).toBe(false);
+	});
+
+	it('does not match desktop open-app events (namespaces stay separate)', () => {
+		expect(checkGoalMatch('mobile-open-app', 'open-app', { appId: 'phone' }, config)).toBe(false);
+	});
+});
+
+describe('mobile-dial-number', () => {
+	const config = { targetNumber: '2101234567' };
+
+	it('matches when the exact number is called', () => {
+		expect(
+			checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '2101234567' }, config)
+		).toBe(true);
+	});
+
+	it('ignores spacing/formatting differences in the dialled number', () => {
+		expect(
+			checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '210 123 4567' }, config)
+		).toBe(true);
+	});
+
+	it('does not match a wrong number', () => {
+		expect(
+			checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '2109999999' }, config)
+		).toBe(false);
+	});
+
+	it('matches any number when no target is configured', () => {
+		expect(checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '69' }, {})).toBe(true);
+	});
+
+	it('does not match merely typing digits (call must be placed)', () => {
+		expect(
+			checkGoalMatch('mobile-dial-number', 'mobile-digit-typed', { number: '2101234567' }, config)
+		).toBe(false);
+	});
+});
+
 // ── Unknown goal guard ─────────────────────────────────────────────────────────
 
 describe('unknown goal', () => {

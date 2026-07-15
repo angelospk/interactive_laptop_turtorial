@@ -16,6 +16,7 @@
 		children,
 		variant = 'android',
 		time = '9:41',
+		onHome,
 		class: className
 	}: {
 		children?: Snippet;
@@ -23,6 +24,11 @@
 		variant?: 'android' | 'ios';
 		/** Status-bar clock text. */
 		time?: string;
+		/**
+		 * When provided, the home indicator becomes a real "go home" button
+		 * (used by goal-driven simulations); otherwise it stays decorative.
+		 */
+		onHome?: () => void;
 		class?: string;
 	} = $props();
 
@@ -69,9 +75,23 @@
 
 	<!-- Home indicator (iOS bar) / gesture pill (Android) -->
 	<div class="flex shrink-0 items-center justify-center bg-white py-2">
-		<span
-			data-testid="mobile-home-indicator"
-			class={cn('rounded-full bg-slate-900/80', isIos ? 'h-1 w-32' : 'h-1 w-24')}
-		></span>
+		{#if onHome}
+			<button
+				type="button"
+				onclick={onHome}
+				aria-label="Αρχική οθόνη"
+				class="flex min-h-[28px] items-center justify-center px-6 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+			>
+				<span
+					data-testid="mobile-home-indicator"
+					class={cn('rounded-full bg-slate-900/80', isIos ? 'h-1 w-32' : 'h-1 w-24')}
+				></span>
+			</button>
+		{:else}
+			<span
+				data-testid="mobile-home-indicator"
+				class={cn('rounded-full bg-slate-900/80', isIos ? 'h-1 w-32' : 'h-1 w-24')}
+			></span>
+		{/if}
 	</div>
 </div>

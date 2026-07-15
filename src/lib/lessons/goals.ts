@@ -80,6 +80,11 @@ export const GOALS = {
 	'mute-call': { requiresAppId: false },
 	'end-call': { requiresAppId: false },
 
+	// Mobile simulation (mobile-sim lessonType — namespaced with `mobile-` so
+	// desktop and mobile events can never satisfy each other)
+	'mobile-open-app': { requiresAppId: true },
+	'mobile-dial-number': { requiresAppId: false },
+
 	// Word Processor
 	'update-text': { requiresAppId: false },
 	'format-text-bold': { requiresAppId: false },

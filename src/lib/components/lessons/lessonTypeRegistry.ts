@@ -37,6 +37,9 @@ export const lessonTypeRegistry: Record<
 	// Mobile (Android/iPhone) tap-to-open-app simulation — ROADMAP Φάση 2
 	'mobile-tap': () => import('./interactive/MobileTapLesson.svelte'),
 
+	// Goal-driven phone simulation (home screen + mini-apps) — CURRICULUM_PLAN B2
+	'mobile-sim': () => import('./interactive/MobileSimLesson.svelte'),
+
 	// New Quiz Type
 	quiz: () => import('./interactive/QuizLesson.svelte'),
 	reading: () => import('./interactive/ReadingLesson.svelte'),

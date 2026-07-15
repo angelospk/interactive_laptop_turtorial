@@ -8,6 +8,7 @@ import {
 	moduleSimulationPlatform
 } from '$lib/config/moduleOrganization';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
+import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import el from '../../../../messages/el.json';
 
 /**
@@ -59,6 +60,16 @@ describe('renderer registry', () => {
 		const types = new Set(allLessons.map((l) => l.lessonType));
 		for (const t of types) {
 			expect(Object.keys(lessonTypeRegistry), `lessonType "${t}"`).toContain(t);
+		}
+	});
+});
+
+describe('mobile-sim playability', () => {
+	it('every seeded mobile-sim lesson has a valid, reachable config', () => {
+		const sims = allLessons.filter((l) => l.lessonType === 'mobile-sim');
+		expect(sims.length).toBeGreaterThan(0);
+		for (const l of sims) {
+			expect(() => parseMobileSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
 		}
 	});
 });

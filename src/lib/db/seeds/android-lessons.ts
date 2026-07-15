@@ -24,6 +24,18 @@ const homeApps: MobileApp[] = [
 	{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️' }
 ];
 
+// Home screen for goal-driven mobile-sim lessons (MobileHomeScreen v2):
+// same apps, plus kind/color metadata and the dock row.
+const simApps = [
+	{ id: 'phone', label: 'Τηλέφωνο', icon: '📞', kind: 'phone', color: 'bg-green-100' },
+	{ id: 'messages', label: 'Μηνύματα', icon: '💬', color: 'bg-blue-100' },
+	{ id: 'viber', label: 'Viber', icon: '💜', color: 'bg-purple-100' },
+	{ id: 'camera', label: 'Κάμερα', icon: '📷', color: 'bg-slate-100' },
+	{ id: 'photos', label: 'Φωτογραφίες', icon: '🖼️', color: 'bg-amber-100' },
+	{ id: 'settings', label: 'Ρυθμίσεις', icon: '⚙️', color: 'bg-slate-200' }
+];
+const simDock = ['phone', 'messages', 'camera'];
+
 export const androidLessons: NewLesson[] = [
 	{
 		id: 'android-open-viber',
@@ -44,6 +56,32 @@ export const androidLessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: null
+	},
+
+	// Lesson 2 — first goal-driven mobile-sim lesson (CURRICULUM_PLAN B2):
+	// open the Phone app and dial a number on the keypad.
+	{
+		id: 'android-call-number',
+		moduleId: 'android',
+		lessonKey: 'call-number',
+		titleKey: 'android_lesson2_title',
+		descriptionKey: 'android_lesson2_desc',
+		difficulty: 'beginner',
+		orderIndex: 2,
+		lessonType: 'mobile-sim',
+		config: {
+			goal: 'mobile-dial-number',
+			variant: 'android',
+			prompt: 'Άνοιξε το Τηλέφωνο και κάλεσε το 210 1234567.',
+			apps: simApps,
+			dockAppIds: simDock,
+			targetAppId: 'phone',
+			targetNumber: '2101234567',
+			successMessage: 'Μπράβο! Έκανες την πρώτη σου κλήση.',
+			hint: 'Πάτησε πρώτα το πράσινο εικονίδιο «Τηλέφωνο» και μετά τα ψηφία ένα-ένα.'
+		},
+		enabled: true,
+		requiredLessonId: 'android-open-viber'
 	}
 ];
 

@@ -1,0 +1,131 @@
+<script lang="ts">
+	import type { Lesson } from '$lib/db/schema';
+	import { onDestroy } from 'svelte';
+	import LessonTemplate from '../LessonTemplate.svelte';
+	import MobileFrame from '$lib/components/mobile/MobileFrame.svelte';
+	import MobileHomeScreen from '$lib/components/mobile/MobileHomeScreen.svelte';
+	import PhoneApp from '$lib/components/mobile/apps/PhoneApp.svelte';
+	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
+	import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
+
+	/**
+	 * Goal-driven phone simulation (mobile counterpart of DesktopLesson,
+	 * CURRICULUM_PLAN B2). The home screen and mini-apps emit semantic events
+	 * (`mobile-app-opened`, `mobile-call-placed`, …); lesson scoring listens to
+	 * those events only — never to component internals.
+	 */
+	interface Props {
+		lesson: Lesson;
+		onComplete: (score: number) => void;
+		onBack: () => void;
+	}
+
+	let { lesson, onComplete, onBack }: Props = $props();
+
+	const config = parseMobileSimConfig(lesson.config);
+	const goalConfig = config as unknown as Record<string, unknown>;
+	const targetApp = config.apps.find((a) => a.id === config.targetAppId);
+
+	let currentAppId: string | null = $state(null);
+	const currentApp = $derived(config.apps.find((a) => a.id === currentAppId) ?? null);
+
+	let wrongTaps = $state(0);
+	let showHint = $state(false);
+	let done = $state(false);
+	let feedback = $state(''); // announced via aria-live
+
+	// The success delay must not fire after the lesson is left/unmounted
+	// (same guard as MobileTapLesson).
+	let completeTimer: ReturnType<typeof setTimeout> | undefined;
+	onDestroy(() => clearTimeout(completeTimer));
+
+	// Elderly-friendly scoring: full marks first try, gentle penalties.
+	function scoreFor(wrong: number, hinted: boolean): number {
+		if (hinted) return 60;
+		return wrong === 0 ? 100 : 80;
+	}
+
+	function succeed() {
+		done = true;
+		feedback = config.successMessage ?? 'Μπράβο! Τα κατάφερες.';
+		clearTimeout(completeTimer);
+		completeTimer = setTimeout(() => onComplete(scoreFor(wrongTaps, showHint)), 900);
+	}
+
+	function miss(message: string) {
+		wrongTaps += 1;
+		feedback = message;
+		// After a couple of misses, highlight the right path (guide, never punish).
+		if (wrongTaps >= 2) showHint = true;
+	}
+
+	/** Single entry point for every semantic event the simulation emits. */
+	function dispatch(action: string, data: Record<string, unknown> = {}) {
+		if (done) return;
+
+		if (action === 'mobile-app-opened') {
+			currentAppId = data.appId as string;
+		}
+
+		if (checkGoalMatch(config.goal, action, data, goalConfig)) {
+			succeed();
+			return;
+		}
+
+		if (action === 'mobile-app-opened' && data.appId !== config.targetAppId) {
+			miss(`Όχι αυτό. Ψάξε το «${targetApp?.label ?? ''}».`);
+		} else if (action === 'mobile-call-placed') {
+			miss('Κάλεσες λάθος αριθμό. Σβήσε τον και δοκίμασε ξανά.');
+		}
+	}
+
+	function goHome() {
+		currentAppId = null;
+	}
+</script>
+
+<LessonTemplate {lesson} {onBack}>
+	<div class="flex flex-col items-center gap-4 py-4">
+		<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
+
+		<MobileFrame variant={config.variant === 'ios' ? 'ios' : 'android'} onHome={goHome} class="my-2">
+			{#if currentApp === null}
+				<MobileHomeScreen
+					variant={config.variant === 'ios' ? 'ios' : 'android'}
+					apps={config.apps}
+					dockAppIds={config.dockAppIds ?? []}
+					onOpenApp={(appId) => dispatch('mobile-app-opened', { appId })}
+					highlightAppId={showHint && !done ? (config.targetAppId ?? null) : null}
+					disabled={done}
+				/>
+			{:else if currentApp.kind === 'phone'}
+				<PhoneApp onEvent={dispatch} />
+			{:else}
+				<!-- Inert placeholder for apps that are scenery in this lesson -->
+				<div class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">
+					<span class="text-5xl" aria-hidden="true">{currentApp.icon}</span>
+					<p class="text-lg font-semibold text-slate-800">{currentApp.label}</p>
+					<p class="text-sm text-muted-foreground">
+						Αυτή η εφαρμογή δεν χρειάζεται σε αυτό το μάθημα. Πάτησε τη γραμμή κάτω για να
+						γυρίσεις στην αρχική οθόνη.
+					</p>
+				</div>
+			{/if}
+		</MobileFrame>
+
+		<!-- Calm, non-blocking feedback (aria-live so it is announced) -->
+		<p
+			class="min-h-[1.75rem] text-center text-base font-medium"
+			class:text-emerald-600={done}
+			class:text-amber-700={!done && feedback}
+			role="status"
+			aria-live="polite"
+		>
+			{feedback}
+		</p>
+
+		{#if showHint && !done && config.hint}
+			<p class="text-center text-sm text-muted-foreground">{config.hint}</p>
+		{/if}
+	</div>
+</LessonTemplate>

@@ -124,6 +124,18 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mute-call': (action) => action === 'mute-call',
 	'end-call': (action) => action === 'end-call',
 
+	// ── Mobile simulation ──────────────────────────────────────────────────
+	'mobile-open-app': (action, data, config) =>
+		action === 'mobile-app-opened' && data.appId === config.targetAppId,
+
+	'mobile-dial-number': (action, data, config) => {
+		if (action !== 'mobile-call-placed') return false;
+		if (!config.targetNumber) return true;
+		// Compare digits only, so «210 123 4567» matches «2101234567».
+		const digits = (v: unknown) => String(v ?? '').replace(/\D/g, '');
+		return digits(data.number) === digits(config.targetNumber);
+	},
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;
