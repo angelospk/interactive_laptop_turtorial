@@ -64,6 +64,8 @@
 
 ### Φάση 2 — Per-device tracks περιεχομένου
 
+> **Πρόοδος 2026-07-15**: εκτελείται μέσω του [CURRICULUM_PLAN.md](CURRICULUM_PLAN.md) — mobile simulator v2 (`mobile-sim` lessonType, home screen + Τηλέφωνο/Μηνύματα/Viber/Ρυθμίσεις) και Android/iPhone tracks με 7 μαθήματα ο καθένας υλοποιήθηκαν. Εκκρεμούν: Camera/Gallery/Store/QR (wave 2), Mac track.
+
 Σειρά προτεραιότητας με βάση το κοινό (ΚΑΠΗ):
 
 1. **Android track** — αναβάθμιση του esm001/c2 από «κεφάλαιο» σε πλήρες module: αρχική οθόνη/χειρονομίες, κλήσεις/επαφές, φωτογραφίες, Viber/WhatsApp, Play Store, ρυθμίσεις (μέγεθος γραμμάτων, ένταση, WiFi), μπαταρία/αποθηκευτικός χώρος, ασφάλεια.

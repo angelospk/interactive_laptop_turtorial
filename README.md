@@ -8,7 +8,8 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 - 📱 Device-aware onboarding — auto-*detects* the user's device (Windows/Mac/Android/iPhone) as a hint and asks them to confirm which device they want to learn (`preferredDevice`), the enabling layer for per-device content tracks (see `docs/ROADMAP.md`)
 - 🔗 Deep-linkable lessons — every lesson has its own URL (`/modules/<module>/<lessonKey>`), shareable and bookmarkable
 - 📚 Library ↔ lesson bridge — theory subsections can link straight to the matching interactive lesson
-- 🗂️ Themed module categories on the home page + labelled sub-sections inside long modules, for easy navigation
+- 🗂️ Device-aware module categories on the home page («Windows υπολογιστής», «Κινητό τηλέφωνο»…) + labelled Θεωρία/Εξάσκηση sub-sections inside long modules (see `docs/CURRICULUM_PLAN.md`)
+- 📞 Realistic phone simulator (`mobile-sim`) — Android/iOS home screen with dock & wallpaper, goal-driven mini-apps (Τηλέφωνο με πληκτρολόγιο+Επαφές, Μηνύματα/Viber, Ρυθμίσεις με μέγεθος γραμμάτων & Wi-Fi); Android/iPhone tracks με 7 μαθήματα το καθένα (dev playground: `/demo/mobile-sim`)
 - 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)
