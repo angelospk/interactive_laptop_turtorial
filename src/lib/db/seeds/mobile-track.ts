@@ -141,10 +141,25 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				successMessage: 'Μπράβο! Συνδέθηκες στο Wi-Fi του σπιτιού.',
 				hint: 'Ρυθμίσεις → Wi-Fi → πάτησε το όνομα του δικτύου σου.'
 			}
+		},
+		// «Καθημερινή χρήση» — πρώτο intermediate μάθημα (wave 3, digital tips).
+		{
+			n: 8,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'videocall-viber',
+			config: {
+				goal: 'mobile-start-videocall',
+				prompt: 'Κάνε βιντεοκλήση στην «Ελένη (κόρη)» μέσα από το Viber.',
+				targetAppId: 'viber',
+				targetConversationId: 'eleni',
+				conversations: CONVERSATIONS,
+				successMessage: 'Μπράβο! Η βιντεοκλήση ξεκίνησε — βλέπεις και ακούς την Ελένη.',
+				hint: 'Άνοιξε τη συνομιλία με την Ελένη και πάτησε το εικονίδιο της κάμερας πάνω δεξιά.'
+			}
 		}
 	];
 
-	return defs.map(({ n, lessonKey, config }, i) => {
+	return defs.map(({ n, lessonKey, config, difficulty }, i) => {
 		const full = parseMobileSimConfig({
 			...config,
 			variant,
@@ -157,7 +172,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			lessonKey,
 			titleKey: `${mod}_lesson${n}_title`,
 			descriptionKey: `${mod}_lesson${n}_desc`,
-			difficulty: 'beginner' as const,
+			difficulty: difficulty ?? ('beginner' as const),
 			orderIndex: n,
 			lessonType: 'mobile-sim',
 			config: full,

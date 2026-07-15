@@ -64,7 +64,8 @@ const GOALS_NEEDING_TARGET_APP = new Set<string>([
 	'mobile-send-sms',
 	'mobile-send-chat',
 	'mobile-change-font-size',
-	'mobile-connect-wifi'
+	'mobile-connect-wifi',
+	'mobile-start-videocall'
 ]);
 
 /** Which app kind each goal is completed in (reachability check). */
@@ -74,7 +75,8 @@ const GOAL_APP_KIND: Record<string, MobileSimApp['kind']> = {
 	'mobile-send-sms': 'messages',
 	'mobile-send-chat': 'viber',
 	'mobile-change-font-size': 'settings',
-	'mobile-connect-wifi': 'settings'
+	'mobile-connect-wifi': 'settings',
+	'mobile-start-videocall': 'viber'
 };
 
 /**
@@ -125,7 +127,7 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 			throw new Error(`targetContactId "${c.targetContactId}" is not in contacts`);
 		}
 	}
-	if (c.goal === 'mobile-send-sms' || c.goal === 'mobile-send-chat') {
+	if (c.goal === 'mobile-send-sms' || c.goal === 'mobile-send-chat' || c.goal === 'mobile-start-videocall') {
 		if (!c.conversations?.length) throw new Error(`${c.goal} needs a conversations list`);
 		if (c.targetConversationId && !c.conversations.some((t) => t.id === c.targetConversationId)) {
 			throw new Error(`targetConversationId "${c.targetConversationId}" is not in conversations`);

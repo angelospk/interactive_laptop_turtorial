@@ -156,6 +156,10 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-connect-wifi': (action, data, config) =>
 		action === 'mobile-wifi-connected' && (!config.targetSsid || data.ssid === config.targetSsid),
 
+	'mobile-start-videocall': (action, data, config) =>
+		action === 'mobile-videocall-started' &&
+		(!config.targetConversationId || data.conversationId === config.targetConversationId),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

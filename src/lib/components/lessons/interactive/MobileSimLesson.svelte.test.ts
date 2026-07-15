@@ -160,6 +160,25 @@ describe('MobileSimLesson — messaging flow', () => {
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
 	});
 
+	it('completes a video-call goal from the Viber conversation header', async () => {
+		const onComplete = vi.fn();
+		const lesson = mkLesson({
+			goal: 'mobile-start-videocall',
+			prompt: 'Κάνε βιντεοκλήση στην Ελένη.',
+			apps: messagingApps,
+			targetAppId: 'viber',
+			targetConversationId: 'kori',
+			conversations,
+			successMessage: 'Μπράβο! Η βιντεοκλήση ξεκίνησε.'
+		});
+		const screen = render(MobileSimLesson, { lesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Viber' }).click();
+		await screen.getByRole('button', { name: 'Συνομιλία με Ελένη (κόρη)' }).click();
+		await screen.getByRole('button', { name: 'Βιντεοκλήση με Ελένη (κόρη)' }).click();
+		await expect.element(screen.getByText('Μπράβο! Η βιντεοκλήση ξεκίνησε.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
 	it('a viber goal is not satisfied from the SMS app', async () => {
 		const onComplete = vi.fn();
 		const lesson = mkLesson({

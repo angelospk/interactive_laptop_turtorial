@@ -412,6 +412,39 @@ describe('mobile-send-sms / mobile-send-chat (channel separation)', () => {
 	});
 });
 
+describe('mobile-start-videocall', () => {
+	it('matches a video call started in the target conversation', () => {
+		const config = { targetConversationId: 'eleni' };
+		expect(
+			checkGoalMatch(
+				'mobile-start-videocall',
+				'mobile-videocall-started',
+				{ conversationId: 'eleni' },
+				config
+			)
+		).toBe(true);
+		expect(
+			checkGoalMatch(
+				'mobile-start-videocall',
+				'mobile-videocall-started',
+				{ conversationId: 'giorgos' },
+				config
+			)
+		).toBe(false);
+	});
+
+	it('is not satisfied by merely sending a message', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-start-videocall',
+				'mobile-message-sent',
+				{ channel: 'viber', conversationId: 'eleni' },
+				{}
+			)
+		).toBe(false);
+	});
+});
+
 describe('mobile-change-font-size', () => {
 	it('matches any size change when no target is set', () => {
 		expect(

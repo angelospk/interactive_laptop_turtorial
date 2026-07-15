@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Send from '@lucide/svelte/icons/send';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import Video from '@lucide/svelte/icons/video';
+	import PhoneOff from '@lucide/svelte/icons/phone-off';
 	import { cn } from '$lib/utils';
 	import type { MobileSimConversation } from '$lib/lessons/mobileSim';
 
@@ -27,8 +29,15 @@
 	let draft = $state('');
 	// Sent messages per conversation (appended after the seeded thread).
 	let sent: Record<string, string[]> = $state({});
+	let inVideoCall = $state(false);
 
 	const open = $derived(conversations.find((c) => c.id === openId) ?? null);
+
+	function startVideoCall() {
+		if (!open) return;
+		inVideoCall = true;
+		onEvent('mobile-videocall-started', { conversationId: open.id });
+	}
 
 	function send() {
 		const text = draft.trim();
@@ -82,8 +91,40 @@
 				<ChevronLeft class="h-5 w-5" aria-hidden="true" />
 			</button>
 			<span class="flex-1 text-center">{open.name}</span>
-			<span class="w-9"></span>
+			{#if isViber}
+				<button
+					type="button"
+					onclick={startVideoCall}
+					aria-label={`Βιντεοκλήση με ${open.name}`}
+					class="flex h-9 w-9 items-center justify-center rounded-full focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				>
+					<Video class="h-5 w-5" aria-hidden="true" />
+				</button>
+			{:else}
+				<span class="w-9"></span>
+			{/if}
 		</header>
+
+		{#if inVideoCall}
+			<!-- Mock βιντεοκλήση: αρκετά για να διδάξει το κουμπί & τον τερματισμό -->
+			<div class="flex flex-1 flex-col items-center justify-center gap-4 bg-slate-900 text-white">
+				<span class="flex h-24 w-24 items-center justify-center rounded-full bg-slate-700 text-4xl">
+					👵
+				</span>
+				<p class="text-lg font-semibold">{open.name}</p>
+				<p class="text-sm text-slate-300" role="status" aria-live="polite">
+					Η βιντεοκλήση ξεκίνησε…
+				</p>
+				<button
+					type="button"
+					onclick={() => (inVideoCall = false)}
+					aria-label="Τερματισμός βιντεοκλήσης"
+					class="mt-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				>
+					<PhoneOff class="h-6 w-6" aria-hidden="true" />
+				</button>
+			</div>
+		{:else}
 
 		<div class="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-3">
 			{#each open.messages as msg, i (i)}
@@ -135,5 +176,6 @@
 				<Send class="h-5 w-5" aria-hidden="true" />
 			</button>
 		</form>
+		{/if}
 	{/if}
 </div>

@@ -193,6 +193,15 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	module11: [
 		{ title: 'Θεωρία', count: 5 },
 		{ title: 'Εξάσκηση', count: 6 }
+	],
+	// Mobile tracks: απλό επίπεδο πρώτα, μετά «καθημερινή χρήση» (PLAN §4β).
+	android: [
+		{ title: 'Βασικά — πρώτα βήματα', count: 7 },
+		{ title: 'Καθημερινή χρήση', count: 1 }
+	],
+	iphone: [
+		{ title: 'Βασικά — πρώτα βήματα', count: 7 },
+		{ title: 'Καθημερινή χρήση', count: 1 }
 	]
 };
 

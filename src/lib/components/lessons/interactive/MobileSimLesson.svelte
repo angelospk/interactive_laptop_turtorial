@@ -83,6 +83,8 @@
 			} else if (action === 'mobile-contact-called') {
 				miss('Κάλεσες άλλη επαφή. Δοκίμασε ξανά.');
 			}
+		} else if (action === 'mobile-videocall-started') {
+			miss('Ξεκίνησες βιντεοκλήση με άλλη επαφή. Κλείσε την και δοκίμασε ξανά.');
 		} else if (action === 'mobile-message-sent') {
 			miss('Το μήνυμα δεν πήγε εκεί που έπρεπε. Δοκίμασε άλλη συνομιλία.');
 		} else if (action === 'mobile-font-size-set') {

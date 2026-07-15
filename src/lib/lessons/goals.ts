@@ -89,6 +89,7 @@ export const GOALS = {
 	'mobile-send-chat': { requiresAppId: false },
 	'mobile-change-font-size': { requiresAppId: false },
 	'mobile-connect-wifi': { requiresAppId: false },
+	'mobile-start-videocall': { requiresAppId: false },
 
 	// Word Processor
 	'update-text': { requiresAppId: false },
