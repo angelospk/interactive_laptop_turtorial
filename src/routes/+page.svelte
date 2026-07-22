@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState } from '$lib/gameStore.svelte';
+	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
@@ -251,7 +251,7 @@
 		<div class="mt-12 text-center">
 			<Button
 				variant="ghost"
-				onclick={() => gameState.reset()}
+				onclick={() => appState.resetProgress()}
 				class="text-sm text-muted-foreground hover:text-foreground"
 			>
 				{messages.progress_reset()}
