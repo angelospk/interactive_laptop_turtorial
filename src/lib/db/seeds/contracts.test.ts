@@ -14,6 +14,8 @@ import type { Lesson } from '$lib/db/schema';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
 import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import { parseMacSimConfig } from '$lib/lessons/macSim';
+import { parseGovSimConfig } from '$lib/lessons/govSim';
+import { parseHealthSimConfig } from '$lib/lessons/healthSim';
 import el from '../../../../messages/el.json';
 import en from '../../../../messages/en.json';
 
@@ -88,6 +90,26 @@ describe('mac-simulation playability', () => {
 		expect(sims.length).toBeGreaterThan(0);
 		for (const l of sims) {
 			expect(() => parseMacSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
+		}
+	});
+});
+
+describe('gov-simulation playability', () => {
+	it('every seeded gov-simulation lesson has a valid, reachable config', () => {
+		const sims = allLessons.filter((l) => l.lessonType === 'gov-simulation');
+		expect(sims.length).toBeGreaterThan(0);
+		for (const l of sims) {
+			expect(() => parseGovSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
+		}
+	});
+});
+
+describe('health-simulation playability', () => {
+	it('every seeded health-simulation lesson has a valid, reachable config', () => {
+		const sims = allLessons.filter((l) => l.lessonType === 'health-simulation');
+		expect(sims.length).toBeGreaterThan(0);
+		for (const l of sims) {
+			expect(() => parseHealthSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
 		}
 	});
 });

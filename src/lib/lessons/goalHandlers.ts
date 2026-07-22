@@ -249,6 +249,25 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		data.setting === (config.targetSetting ?? 'text') &&
 		(!config.targetSize || data.size === config.targetSize),
 
+	// ── gov.gr track ───────────────────────────────────────────────────────
+	'gov-login': (action, data) => action === 'gov-login' && data.success === true,
+
+	'gov-find-service': (action, data, config) =>
+		action === 'gov-service-selected' &&
+		(!config.targetServiceId || data.serviceId === config.targetServiceId),
+
+	'gov-authorize': (action) => action === 'gov-authorize',
+
+	// ── Health services track ──────────────────────────────────────────────
+	'health-read-eprescription-code': (action, data) =>
+		action === 'health-code-revealed' && data.confirmed === true,
+
+	'health-view-prescriptions': (action) => action === 'health-prescriptions-viewed',
+
+	'health-book-appointment': (action, data, config) =>
+		action === 'health-appointment-booked' &&
+		(!config.targetSlotId || data.slotId === config.targetSlotId),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

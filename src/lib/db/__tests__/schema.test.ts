@@ -244,7 +244,9 @@ describe('Database Schema - Seed Data', () => {
 			'reading',
 			'mobile-tap',
 			'mobile-sim',
-			'mac-simulation'
+			'mac-simulation',
+			'gov-simulation',
+			'health-simulation'
 		]);
 
 		allLessons.forEach((lesson) => {

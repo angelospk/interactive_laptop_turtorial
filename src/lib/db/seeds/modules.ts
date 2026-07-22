@@ -124,6 +124,27 @@ const _modules: Omit<NewModule, 'orderIndex' | 'createdAt'>[] = [
 		descriptionKey: 'mac_description',
 		iconName: 'Laptop',
 		enabled: true
+	},
+	{
+		id: 'gov',
+		titleKey: 'gov_title',
+		descriptionKey: 'gov_description',
+		iconName: 'Building2',
+		enabled: true
+	},
+	{
+		id: 'health',
+		titleKey: 'health_title',
+		descriptionKey: 'health_description',
+		iconName: 'HeartPulse',
+		enabled: true
+	},
+	{
+		id: 'bank',
+		titleKey: 'bank_title',
+		descriptionKey: 'bank_description',
+		iconName: 'Landmark',
+		enabled: true
 	}
 ];
 

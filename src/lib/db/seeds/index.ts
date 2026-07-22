@@ -18,6 +18,10 @@ import { eapsiReadingLessons } from './eapsi-reading-lessons';
 import { androidLessons } from './android-lessons';
 import { iphoneLessons } from './iphone-lessons';
 import { macLessons } from './mac-lessons';
+import { govLessons } from './gov-lessons';
+import { healthLessons } from './health-lessons';
+import { bankLessons } from './bank-lessons';
+import { scamPerDeviceLessons } from './scam-perdevice-lessons';
 export { allModules } from './modules';
 
 /**
@@ -56,7 +60,11 @@ const _allLessons: NewLesson[] = [
 	...eapsiReadingLessons,
 	...androidLessons,
 	...iphoneLessons,
-	...macLessons
+	...macLessons,
+	...govLessons,
+	...healthLessons,
+	...bankLessons,
+	...scamPerDeviceLessons
 ];
 
 // Fail fast at import time if any lesson references an unknown goal.
@@ -85,5 +93,9 @@ export {
 	eapsiReadingLessons,
 	androidLessons,
 	iphoneLessons,
-	macLessons
+	macLessons,
+	govLessons,
+	healthLessons,
+	bankLessons,
+	scamPerDeviceLessons
 };

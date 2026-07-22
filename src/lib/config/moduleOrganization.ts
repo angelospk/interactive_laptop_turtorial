@@ -32,11 +32,11 @@ export const moduleCategories: ModuleCategory[] = [
 		moduleIds: ['module5', 'module6', 'module11']
 	},
 	{ id: 'apps', title: 'Εφαρμογές & Παραγωγικότητα', moduleIds: ['word', 'module7'] },
-	{ id: 'security', title: 'Ασφάλεια & Προστασία', moduleIds: ['module8', 'module10'] },
+	{ id: 'security', title: 'Ασφάλεια & Προστασία', moduleIds: ['module8', 'module10', 'bank'] },
 	{
 		id: 'digital-life',
 		title: 'Ψηφιακή ζωή & υπηρεσίες',
-		moduleIds: ['module12', 'module13']
+		moduleIds: ['module12', 'module13', 'gov', 'health']
 	}
 ];
 
@@ -327,6 +327,48 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'settings-shortcuts',
 			title: 'Ρυθμίσεις & συντομεύσεις',
 			lessonIds: ['mac-text-size', 'mac-copy-paste']
+		}
+	],
+	// gov.gr track (Φάση 3). Base = σύνδεση + εύρεση + λήψη βεβαίωσης.
+	gov: [
+		{
+			id: 'get-certificate',
+			title: 'Βρες τη βεβαίωσή σου',
+			completionRole: 'base',
+			lessonIds: ['gov-login', 'gov-find-family-cert', 'gov-download-cert']
+		},
+		{
+			id: 'more',
+			title: 'Περισσότερα',
+			lessonIds: ['gov-find-birth-cert', 'gov-authorize']
+		}
+	],
+	// Health services track (Φάση 3).
+	health: [
+		{
+			id: 'eprescription',
+			title: 'Άυλη συνταγογράφηση',
+			completionRole: 'base',
+			lessonIds: ['health-lesson1', 'health-lesson2', 'health-lesson3']
+		},
+		{
+			id: 'myhealth-appointments',
+			title: 'MyHealth & ραντεβού',
+			lessonIds: ['health-lesson4', 'health-lesson5', 'health-lesson6']
+		}
+	],
+	// e-banking track (Φάση 3).
+	bank: [
+		{
+			id: 'core',
+			title: 'Ασφαλής τραπεζική',
+			completionRole: 'base',
+			lessonIds: ['bank-padlock-quiz', 'bank-open-secure', 'bank-secure-login', 'bank-transfer']
+		},
+		{
+			id: 'protection',
+			title: 'Προστασία από απάτες',
+			lessonIds: ['bank-fake-sms-quiz']
 		}
 	]
 };
