@@ -32,6 +32,30 @@ describe('TutorialAssistant persistence', () => {
 		await expect.element(screen.getByText('Κάνε αυτό το βήμα.')).not.toBeInTheDocument();
 	});
 
+	it('re-reads persisted state when lessonId changes without unmounting', async () => {
+		// Lesson A already seen → assistant starts minimized.
+		localStorage.setItem(key('lesson-a'), 'true');
+		const screen = render(TutorialAssistant, {
+			lessonId: 'lesson-a',
+			instructions: 'Πρώτο μάθημα.'
+		});
+		await expect
+			.element(screen.getByRole('button', { name: 'Άνοιγμα Βοηθού' }))
+			.toBeInTheDocument();
+
+		// Same component instance, new lesson: B is unseen → must expand.
+		await screen.rerender({ lessonId: 'lesson-b', instructions: 'Δεύτερο μάθημα.' });
+		await expect.element(screen.getByText('Δεύτερο μάθημα.')).toBeInTheDocument();
+		expect(localStorage.getItem(key('lesson-b'))).toBe('true');
+
+		// Back to A: still minimized (its persisted state is unchanged).
+		await screen.rerender({ lessonId: 'lesson-a', instructions: 'Πρώτο μάθημα.' });
+		await expect
+			.element(screen.getByRole('button', { name: 'Άνοιγμα Βοηθού' }))
+			.toBeInTheDocument();
+		await expect.element(screen.getByText('Πρώτο μάθημα.')).not.toBeInTheDocument();
+	});
+
 	it('scopes persistence per lesson: a new lesson still opens expanded', async () => {
 		localStorage.setItem(key('lesson-a'), 'true');
 		const screen = render(TutorialAssistant, {

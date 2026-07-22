@@ -211,11 +211,11 @@
 								<div class="flex items-center gap-2">
 									<div class="h-2 flex-1 rounded-full bg-slate-200">
 										<div
-											class="h-2 rounded-full {progressPercent >= 75
+											class="h-2 rounded-full {Number(progressPercent) >= 75
 												? 'bg-green-600'
-												: progressPercent >= 50
+												: Number(progressPercent) >= 50
 													? 'bg-blue-600'
-													: progressPercent >= 25
+													: Number(progressPercent) >= 25
 														? 'bg-orange-600'
 														: 'bg-red-600'} transition-all"
 											style="width: {progressPercent}%"

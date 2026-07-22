@@ -3,7 +3,6 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Minimize2, HelpCircle } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
-	import { onMount } from 'svelte';
 
 	let {
 		instructions = 'Ακολουθήστε τις οδηγίες για να ολοκληρώσετε το μάθημα.',
@@ -26,8 +25,11 @@
 
 	let isMinimized = $state(false);
 
-	// Check localStorage on mount to determine initial state
-	onMount(() => {
+	// Re-read persisted state whenever the storage key changes (e.g. navigating
+	// between lessons without unmounting). The effect's only reactive dependency
+	// is `storageKey` — it never reads `isMinimized`, so setting state or writing
+	// localStorage here cannot re-trigger it.
+	$effect(() => {
 		if (typeof localStorage !== 'undefined') {
 			const hasBeenSeen = localStorage.getItem(storageKey) === 'true';
 			// Seen before → start minimized. First visit → stay expanded and mark seen.

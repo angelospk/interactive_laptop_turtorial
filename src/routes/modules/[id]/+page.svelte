@@ -14,7 +14,7 @@
 	let progress = $derived((data.progress || {}) as Record<string, any>);
 
 	// For long modules, split the lessons into labelled sub-sections (null = plain grid).
-	let sections = $derived(buildLessonSections($page.params.id, moduleLessons));
+	let sections = $derived(buildLessonSections($page.params.id!, moduleLessons));
 
 	// Notice surfaced after a guarded redirect from a lesson URL (locked / missing).
 	let notice = $derived($page.url.searchParams.get('notice'));
@@ -42,11 +42,7 @@
 
 	<div class="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-10">
 		<div class="mb-8" data-reveal use:reveal>
-			<Button
-				variant="outline"
-				href="/"
-				class="h-11 gap-2 rounded-full px-5 text-base shadow-soft"
-			>
+			<Button variant="outline" href="/" class="shadow-soft h-11 gap-2 rounded-full px-5 text-base">
 				<ArrowLeft class="h-5 w-5" strokeWidth={1.75} />
 				{m.back_to_modules ? m.back_to_modules() : 'Πίσω στις Ενότητες'}
 			</Button>
@@ -66,14 +62,11 @@
 		</div>
 
 		{#if notice === 'locked' || notice === 'missing'}
-			<div
-				class="bezel-shell mb-8 shadow-soft"
-				data-reveal
-				use:reveal
-				role="status"
-			>
+			<div class="bezel-shell shadow-soft mb-8" data-reveal use:reveal role="status">
 				<div class="bezel-core flex items-center gap-3 px-5 py-4">
-					<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
+					<span
+						class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/15"
+					>
 						<Info class="h-5 w-5 text-amber-600" strokeWidth={1.75} />
 					</span>
 					<p class="text-base text-foreground">
@@ -111,7 +104,7 @@
 									{section.title}
 								</h2>
 								<span class="h-px flex-1 bg-border"></span>
-								<span class="text-xs font-medium tabular-nums text-muted-foreground">
+								<span class="text-xs font-medium text-muted-foreground tabular-nums">
 									{section.items.length}
 								</span>
 							</div>
@@ -131,7 +124,7 @@
 				</div>
 			{/if}
 		{:else}
-			<div class="bezel-shell mx-auto max-w-md shadow-soft" data-reveal use:reveal>
+			<div class="bezel-shell shadow-soft mx-auto max-w-md" data-reveal use:reveal>
 				<div class="bezel-core px-6 py-12 text-center">
 					<p class="text-base text-muted-foreground">{m.no_lessons_in_module()}</p>
 					<Button class="mt-6 rounded-full" href="/">{m.nav_home()}</Button>
