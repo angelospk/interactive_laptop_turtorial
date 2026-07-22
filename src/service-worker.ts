@@ -113,7 +113,9 @@ async function cacheFirst(request: Request): Promise<Response> {
 async function navigationHandler(request: Request): Promise<Response> {
 	try {
 		const response = await fetch(request);
-		if (response.ok) {
+		// Cache only successful, same-origin (basic), non-redirected documents — never
+		// error pages, auth redirects or opaque responses, which would poison offline.
+		if (response.ok && response.type === 'basic' && !response.redirected) {
 			const cache = await caches.open(RUNTIME_CACHE);
 			cache.put(request, response.clone());
 		}

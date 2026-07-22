@@ -177,7 +177,7 @@ export function matchHealthGoal(
 		case 'health-book-appointment':
 			return (
 				action === 'health-appointment-booked' &&
-				(!config.targetSlotId || data.slotId === config.targetSlotId)
+				(config.targetSlotId === undefined || data.slotId === config.targetSlotId)
 			);
 
 		default:

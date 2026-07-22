@@ -113,8 +113,10 @@ export function parseGovSimConfig(raw: unknown): GovSimConfig {
 		}
 		const ids = new Set<string>();
 		for (const s of c.services) {
-			if (typeof s?.id !== 'string' || typeof s.label !== 'string') {
-				throw new Error(`service entries need string id/label (got ${JSON.stringify(s)})`);
+			if (typeof s?.id !== 'string' || typeof s.label !== 'string' || !s.label.trim()) {
+				throw new Error(
+					`service entries need string id/non-empty label (got ${JSON.stringify(s)})`
+				);
 			}
 			if (ids.has(s.id)) throw new Error(`duplicate service id "${s.id}"`);
 			ids.add(s.id);

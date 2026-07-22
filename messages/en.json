@@ -444,7 +444,7 @@
 	"wrong_answer": "Wrong answer",
 	"submit_answer": "Submit",
 	"step_browser_type_gov": "Type 'gov' in the address bar and press Enter.",
-	"step_browser_check_lock": "Look at the green padlock next to the address. It means the site is secure.",
+	"step_browser_check_lock": "Look at the padlock next to the address — it means the connection is encrypted. But ALSO check the address is the correct one; the padlock alone does not prove the site is genuine.",
 	"step_browser_visit_news": "Go to the 'news' website to read the news.",
 	"step_browser_accept_cookies": "A window about Cookies will appear. Click 'Accept All'.",
 	"step_browser_visit_bank": "Go to the 'bank' website.",

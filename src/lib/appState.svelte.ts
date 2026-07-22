@@ -47,7 +47,7 @@ class AppState {
 	 * Persist a lesson result to the server, then refresh loaded data so the UI
 	 * reflects the new progress. (Formerly `gameState.updateProgress`.)
 	 */
-	async updateProgress(lessonId: string, score: number) {
+	async updateProgress(lessonId: string, score: number): Promise<boolean> {
 		try {
 			const response = await fetch('/api/lessons/complete', {
 				method: 'POST',
@@ -56,11 +56,13 @@ class AppState {
 			});
 			if (!response.ok) {
 				console.error('Failed to save progress');
-			} else {
-				await invalidateAll();
+				return false;
 			}
+			await invalidateAll();
+			return true;
 		} catch (error) {
 			console.error('Error saving progress:', error);
+			return false;
 		}
 	}
 
@@ -69,16 +71,18 @@ class AppState {
 	 * (Formerly `gameState.reset`.) Named `resetProgress` to stay distinct from
 	 * `reset()` below, which only clears in-memory client state.
 	 */
-	async resetProgress() {
+	async resetProgress(): Promise<boolean> {
 		try {
 			const response = await fetch('/api/lessons/reset', { method: 'POST' });
-			if (response.ok) {
-				await invalidateAll();
-			} else {
+			if (!response.ok) {
 				console.error('Failed to reset progress');
+				return false;
 			}
+			await invalidateAll();
+			return true;
 		} catch (error) {
 			console.error('Error resetting progress:', error);
+			return false;
 		}
 	}
 

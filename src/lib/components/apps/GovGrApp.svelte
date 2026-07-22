@@ -32,8 +32,17 @@
 
 	function submitLogin() {
 		if (done) return;
-		const ok = username.trim().length > 0 && password.trim().length > 0;
-		loginError = ok ? '' : 'Συμπληρώστε και το Όνομα χρήστη και τον Κωδικό.';
+		const expectedUser = (config.demoUsername ?? 'kaph').trim();
+		const expectedPass = config.demoPassword ?? '123456';
+		const filled = username.trim().length > 0 && password.trim().length > 0;
+		// Success requires the credentials shown in the example — teaches the learner
+		// to actually type the TaxisNet codes, not that any input logs you in.
+		const ok = filled && username.trim() === expectedUser && password === expectedPass;
+		loginError = ok
+			? ''
+			: filled
+				? 'Τα στοιχεία δεν είναι σωστά. Πληκτρολογήστε αυτά που φαίνονται στο παράδειγμα.'
+				: 'Συμπληρώστε και το Όνομα χρήστη και τον Κωδικό.';
 		onEvent('gov-login', { success: ok });
 	}
 
