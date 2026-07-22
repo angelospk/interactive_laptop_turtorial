@@ -429,7 +429,7 @@
 	"quiz_https_opt_a": "It has nice colors and pictures",
 	"quiz_https_opt_b": "It has a closed padlock (🔒) next to the address",
 	"quiz_https_opt_c": "A friend sent it to me on Facebook",
-	"quiz_https_explanation": "The padlock (HTTPS) means the connection is encrypted and your data is safe.",
+	"quiz_https_explanation": "The padlock (HTTPS) means the connection is encrypted — no one can eavesdrop on your details in transit. BUT be careful: the padlock does NOT guarantee the page is the real, correct one — scammers can have a padlock too. ALWAYS also check that the address is the correct, official site (e.g. your bank's official page).",
 	"quiz_cookies_question": "What are 'Cookies' on the internet?",
 	"quiz_cookies_opt_a": "Small files that store settings and preferences",
 	"quiz_cookies_opt_b": "Viruses that damage your computer",
