@@ -40,6 +40,9 @@ export const lessonTypeRegistry: Record<
 	// Goal-driven phone simulation (home screen + mini-apps) — CURRICULUM_PLAN B2
 	'mobile-sim': () => import('./interactive/MobileSimLesson.svelte'),
 
+	// Goal-driven Mac simulation (Dock + menu bar + traffic lights) — CURRICULUM_PLAN §5
+	'mac-simulation': () => import('./interactive/MacSimLesson.svelte'),
+
 	// New Quiz Type
 	quiz: () => import('./interactive/QuizLesson.svelte'),
 	reading: () => import('./interactive/ReadingLesson.svelte'),

@@ -25,6 +25,7 @@ export const moduleCategories: ModuleCategory[] = [
 		moduleIds: ['module3', 'module4', 'module9']
 	},
 	{ id: 'mobile', title: 'Κινητό τηλέφωνο', moduleIds: ['android', 'iphone'] },
+	{ id: 'mac', title: 'Mac υπολογιστής', moduleIds: ['mac'] },
 	{
 		id: 'internet',
 		title: 'Διαδίκτυο & Επικοινωνία',
@@ -63,7 +64,8 @@ export const moduleDevices: Record<string, ModuleDevice[]> = {
 	module7: ['windows', 'mac'], // Excel
 	word: ['windows', 'mac'], // Επεξεργασία Κειμένου
 	android: ['android'], // Android track (ROADMAP Φάση 2)
-	iphone: ['iphone'] // iPhone track (ROADMAP Φάση 2)
+	iphone: ['iphone'], // iPhone track (ROADMAP Φάση 2)
+	mac: ['mac'] // Mac track (CURRICULUM_PLAN §5): Dock/Finder/Spotlight, close≠quit
 };
 
 /**
@@ -84,7 +86,8 @@ export const moduleSimulationPlatform: Record<string, ModuleDevice> = {
 	module13: 'windows',
 	word: 'windows',
 	android: 'android',
-	iphone: 'iphone'
+	iphone: 'iphone',
+	mac: 'mac'
 };
 
 /** Device tags for a module, or `null` when it is universal (applies to all). */
@@ -304,6 +307,26 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'smart-safety',
 			title: 'Έξυπνα & ασφάλεια',
 			lessonIds: ['iphone-scam-sms', 'iphone-two-factor']
+		}
+	],
+	// Mac track (CURRICULUM_PLAN §5). «Τα βασικά του Mac» is the base path — its
+	// four lessons (γνωριμία + άνοιγμα + κλείσιμο ≠ τερματισμός) are the core.
+	mac: [
+		{
+			id: 'basics',
+			title: 'Τα βασικά του Mac',
+			completionRole: 'base',
+			lessonIds: ['mac-intro', 'mac-open-dock', 'mac-close-window', 'mac-quit']
+		},
+		{
+			id: 'finder-spotlight',
+			title: 'Finder & Spotlight',
+			lessonIds: ['mac-finder', 'mac-spotlight']
+		},
+		{
+			id: 'settings-shortcuts',
+			title: 'Ρυθμίσεις & συντομεύσεις',
+			lessonIds: ['mac-text-size', 'mac-copy-paste']
 		}
 	]
 };

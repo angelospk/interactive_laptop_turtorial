@@ -21,15 +21,21 @@ describe('GOALS registry', () => {
 
 describe('open-app', () => {
 	it('matches when appId equals targetAppId', () => {
-		expect(checkGoalMatch('open-app', 'open-app', { appId: 'explorer' }, { targetAppId: 'explorer' })).toBe(true);
+		expect(
+			checkGoalMatch('open-app', 'open-app', { appId: 'explorer' }, { targetAppId: 'explorer' })
+		).toBe(true);
 	});
 
 	it('does not match wrong appId', () => {
-		expect(checkGoalMatch('open-app', 'open-app', { appId: 'browser' }, { targetAppId: 'explorer' })).toBe(false);
+		expect(
+			checkGoalMatch('open-app', 'open-app', { appId: 'browser' }, { targetAppId: 'explorer' })
+		).toBe(false);
 	});
 
 	it('does not match wrong action', () => {
-		expect(checkGoalMatch('open-app', 'close-app', { appId: 'explorer' }, { targetAppId: 'explorer' })).toBe(false);
+		expect(
+			checkGoalMatch('open-app', 'close-app', { appId: 'explorer' }, { targetAppId: 'explorer' })
+		).toBe(false);
 	});
 });
 
@@ -37,16 +43,24 @@ describe('minimize-app / restore-app / maximize-app / close-app', () => {
 	const appConfig = { targetAppId: 'explorer' };
 
 	it('minimize-app', () => {
-		expect(checkGoalMatch('minimize-app', 'minimize-app', { appId: 'explorer' }, appConfig)).toBe(true);
-		expect(checkGoalMatch('minimize-app', 'minimize-app', { appId: 'browser' }, appConfig)).toBe(false);
+		expect(checkGoalMatch('minimize-app', 'minimize-app', { appId: 'explorer' }, appConfig)).toBe(
+			true
+		);
+		expect(checkGoalMatch('minimize-app', 'minimize-app', { appId: 'browser' }, appConfig)).toBe(
+			false
+		);
 	});
 
 	it('restore-app', () => {
-		expect(checkGoalMatch('restore-app', 'restore-app', { appId: 'explorer' }, appConfig)).toBe(true);
+		expect(checkGoalMatch('restore-app', 'restore-app', { appId: 'explorer' }, appConfig)).toBe(
+			true
+		);
 	});
 
 	it('maximize-app', () => {
-		expect(checkGoalMatch('maximize-app', 'maximize-app', { appId: 'explorer' }, appConfig)).toBe(true);
+		expect(checkGoalMatch('maximize-app', 'maximize-app', { appId: 'explorer' }, appConfig)).toBe(
+			true
+		);
 	});
 
 	it('close-app', () => {
@@ -101,15 +115,31 @@ describe('file explorer goals', () => {
 
 describe('navigate-site', () => {
 	it('matches when url contains targetUrl', () => {
-		expect(checkGoalMatch('navigate-site', 'navigate', { url: 'https://gov.gr/page' }, { targetUrl: 'gov.gr' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'navigate-site',
+				'navigate',
+				{ url: 'https://gov.gr/page' },
+				{ targetUrl: 'gov.gr' }
+			)
+		).toBe(true);
 	});
 
 	it('does not match when url does not contain targetUrl', () => {
-		expect(checkGoalMatch('navigate-site', 'navigate', { url: 'https://news.gr' }, { targetUrl: 'gov.gr' })).toBe(false);
+		expect(
+			checkGoalMatch(
+				'navigate-site',
+				'navigate',
+				{ url: 'https://news.gr' },
+				{ targetUrl: 'gov.gr' }
+			)
+		).toBe(false);
 	});
 
 	it('does not match wrong action', () => {
-		expect(checkGoalMatch('navigate-site', 'search', { url: 'https://gov.gr' }, { targetUrl: 'gov.gr' })).toBe(false);
+		expect(
+			checkGoalMatch('navigate-site', 'search', { url: 'https://gov.gr' }, { targetUrl: 'gov.gr' })
+		).toBe(false);
 	});
 });
 
@@ -119,8 +149,12 @@ describe('navigate (no required targetUrl)', () => {
 	});
 
 	it('matches url containing targetUrl when configured', () => {
-		expect(checkGoalMatch('navigate', 'navigate', { url: 'https://news.gr' }, { targetUrl: 'news.gr' })).toBe(true);
-		expect(checkGoalMatch('navigate', 'navigate', { url: 'https://other.gr' }, { targetUrl: 'news.gr' })).toBe(false);
+		expect(
+			checkGoalMatch('navigate', 'navigate', { url: 'https://news.gr' }, { targetUrl: 'news.gr' })
+		).toBe(true);
+		expect(
+			checkGoalMatch('navigate', 'navigate', { url: 'https://other.gr' }, { targetUrl: 'news.gr' })
+		).toBe(false);
 	});
 });
 
@@ -136,7 +170,14 @@ describe('switch-tab', () => {
 
 describe('bookmark', () => {
 	it('matches when url contains targetSite', () => {
-		expect(checkGoalMatch('bookmark', 'bookmark', { url: 'https://gov.gr/page' }, { targetSite: 'gov.gr' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'bookmark',
+				'bookmark',
+				{ url: 'https://gov.gr/page' },
+				{ targetSite: 'gov.gr' }
+			)
+		).toBe(true);
 	});
 
 	it('matches any url when no target configured', () => {
@@ -144,7 +185,9 @@ describe('bookmark', () => {
 	});
 
 	it('does not match url without targetSite', () => {
-		expect(checkGoalMatch('bookmark', 'bookmark', { url: 'https://news.gr' }, { targetSite: 'gov.gr' })).toBe(false);
+		expect(
+			checkGoalMatch('bookmark', 'bookmark', { url: 'https://news.gr' }, { targetSite: 'gov.gr' })
+		).toBe(false);
 	});
 });
 
@@ -166,23 +209,53 @@ describe('email goals', () => {
 
 describe('update-cell', () => {
 	it('matches when no cell/value constraint', () => {
-		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'A1', value: 'hello' }, {})).toBe(true);
+		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'A1', value: 'hello' }, {})).toBe(
+			true
+		);
 	});
 
 	it('matches exact cell and value', () => {
-		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'B2', value: '42' }, { targetCell: 'B2', targetValue: '42' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'update-cell',
+				'update-cell',
+				{ cellId: 'B2', value: '42' },
+				{ targetCell: 'B2', targetValue: '42' }
+			)
+		).toBe(true);
 	});
 
 	it('fails wrong cell', () => {
-		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'A1', value: '42' }, { targetCell: 'B2', targetValue: '42' })).toBe(false);
+		expect(
+			checkGoalMatch(
+				'update-cell',
+				'update-cell',
+				{ cellId: 'A1', value: '42' },
+				{ targetCell: 'B2', targetValue: '42' }
+			)
+		).toBe(false);
 	});
 
 	it('fails wrong value', () => {
-		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'B2', value: '99' }, { targetCell: 'B2', targetValue: '42' })).toBe(false);
+		expect(
+			checkGoalMatch(
+				'update-cell',
+				'update-cell',
+				{ cellId: 'B2', value: '99' },
+				{ targetCell: 'B2', targetValue: '42' }
+			)
+		).toBe(false);
 	});
 
 	it('trims whitespace when comparing values', () => {
-		expect(checkGoalMatch('update-cell', 'update-cell', { cellId: 'B2', value: ' 42 ' }, { targetCell: 'B2', targetValue: '42' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'update-cell',
+				'update-cell',
+				{ cellId: 'B2', value: ' 42 ' },
+				{ targetCell: 'B2', targetValue: '42' }
+			)
+		).toBe(true);
 	});
 });
 
@@ -197,31 +270,53 @@ describe('enter-formula', () => {
 
 describe('identify-phishing', () => {
 	it('matches report-phishing with correct=true', () => {
-		expect(checkGoalMatch('identify-phishing', 'report-phishing', { correct: true }, {})).toBe(true);
+		expect(checkGoalMatch('identify-phishing', 'report-phishing', { correct: true }, {})).toBe(
+			true
+		);
 	});
 
 	it('does not match when correct=false', () => {
-		expect(checkGoalMatch('identify-phishing', 'report-phishing', { correct: false }, {})).toBe(false);
+		expect(checkGoalMatch('identify-phishing', 'report-phishing', { correct: false }, {})).toBe(
+			false
+		);
 	});
 });
 
 describe('handle-cookies', () => {
 	it('matches when choice equals targetChoice', () => {
-		expect(checkGoalMatch('handle-cookies', 'cookie-choice', { choice: 'reject' }, { targetChoice: 'reject' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'handle-cookies',
+				'cookie-choice',
+				{ choice: 'reject' },
+				{ targetChoice: 'reject' }
+			)
+		).toBe(true);
 	});
 
 	it('does not match wrong choice', () => {
-		expect(checkGoalMatch('handle-cookies', 'cookie-choice', { choice: 'accept' }, { targetChoice: 'reject' })).toBe(false);
+		expect(
+			checkGoalMatch(
+				'handle-cookies',
+				'cookie-choice',
+				{ choice: 'accept' },
+				{ targetChoice: 'reject' }
+			)
+		).toBe(false);
 	});
 });
 
 describe('secure-login', () => {
 	it('matches bank-login when success=true and strength=strong', () => {
-		expect(checkGoalMatch('secure-login', 'bank-login', { success: true, strength: 'strong' }, {})).toBe(true);
+		expect(
+			checkGoalMatch('secure-login', 'bank-login', { success: true, strength: 'strong' }, {})
+		).toBe(true);
 	});
 
 	it('does not match weak password', () => {
-		expect(checkGoalMatch('secure-login', 'bank-login', { success: true, strength: 'weak' }, {})).toBe(false);
+		expect(
+			checkGoalMatch('secure-login', 'bank-login', { success: true, strength: 'weak' }, {})
+		).toBe(false);
 	});
 });
 
@@ -233,11 +328,20 @@ describe('update-text', () => {
 	});
 
 	it('matches when text includes targetText', () => {
-		expect(checkGoalMatch('update-text', 'update-text', { text: 'ΑΙΤΗΣΗ\nΚείμενο' }, { targetText: 'ΑΙΤΗΣΗ' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'update-text',
+				'update-text',
+				{ text: 'ΑΙΤΗΣΗ\nΚείμενο' },
+				{ targetText: 'ΑΙΤΗΣΗ' }
+			)
+		).toBe(true);
 	});
 
 	it('does not match when text missing targetText', () => {
-		expect(checkGoalMatch('update-text', 'update-text', { text: 'Κείμενο' }, { targetText: 'ΑΙΤΗΣΗ' })).toBe(false);
+		expect(
+			checkGoalMatch('update-text', 'update-text', { text: 'Κείμενο' }, { targetText: 'ΑΙΤΗΣΗ' })
+		).toBe(false);
 	});
 
 	it('does not match wrong action', () => {
@@ -269,25 +373,45 @@ describe('format-text-underline', () => {
 
 describe('format-text-align', () => {
 	it('matches when align equals targetAlign', () => {
-		expect(checkGoalMatch('format-text-align', 'format-align', { align: 'center' }, { targetAlign: 'center' })).toBe(true);
+		expect(
+			checkGoalMatch(
+				'format-text-align',
+				'format-align',
+				{ align: 'center' },
+				{ targetAlign: 'center' }
+			)
+		).toBe(true);
 	});
 
 	it('does not match wrong align', () => {
-		expect(checkGoalMatch('format-text-align', 'format-align', { align: 'left' }, { targetAlign: 'center' })).toBe(false);
+		expect(
+			checkGoalMatch(
+				'format-text-align',
+				'format-align',
+				{ align: 'left' },
+				{ targetAlign: 'center' }
+			)
+		).toBe(false);
 	});
 });
 
 describe('format-font-size', () => {
 	it('matches when size equals targetSize', () => {
-		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: '18' }, { targetSize: '18' })).toBe(true);
+		expect(
+			checkGoalMatch('format-font-size', 'format-font-size', { size: '18' }, { targetSize: '18' })
+		).toBe(true);
 	});
 
 	it('matches when size is number and targetSize is string', () => {
-		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: 18 }, { targetSize: '18' })).toBe(true);
+		expect(
+			checkGoalMatch('format-font-size', 'format-font-size', { size: 18 }, { targetSize: '18' })
+		).toBe(true);
 	});
 
 	it('does not match wrong size', () => {
-		expect(checkGoalMatch('format-font-size', 'format-font-size', { size: '12' }, { targetSize: '18' })).toBe(false);
+		expect(
+			checkGoalMatch('format-font-size', 'format-font-size', { size: '12' }, { targetSize: '18' })
+		).toBe(false);
 	});
 });
 
@@ -309,11 +433,15 @@ describe('mobile-open-app', () => {
 	const config = { targetAppId: 'phone' };
 
 	it('matches when the target app is opened', () => {
-		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'phone' }, config)).toBe(true);
+		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'phone' }, config)).toBe(
+			true
+		);
 	});
 
 	it('does not match a different app', () => {
-		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'viber' }, config)).toBe(false);
+		expect(checkGoalMatch('mobile-open-app', 'mobile-app-opened', { appId: 'viber' }, config)).toBe(
+			false
+		);
 	});
 
 	it('does not match desktop open-app events (namespaces stay separate)', () => {
@@ -343,7 +471,9 @@ describe('mobile-dial-number', () => {
 	});
 
 	it('matches any number when no target is configured', () => {
-		expect(checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '69' }, {})).toBe(true);
+		expect(checkGoalMatch('mobile-dial-number', 'mobile-call-placed', { number: '69' }, {})).toBe(
+			true
+		);
 	});
 
 	it('does not match merely typing digits (call must be placed)', () => {
@@ -389,16 +519,31 @@ describe('mobile-send-sms / mobile-send-chat (channel separation)', () => {
 			checkGoalMatch('mobile-send-sms', 'mobile-message-sent', { channel: 'sms', text: 'γεια' }, {})
 		).toBe(true);
 		expect(
-			checkGoalMatch('mobile-send-sms', 'mobile-message-sent', { channel: 'viber', text: 'γεια' }, {})
+			checkGoalMatch(
+				'mobile-send-sms',
+				'mobile-message-sent',
+				{ channel: 'viber', text: 'γεια' },
+				{}
+			)
 		).toBe(false);
 	});
 
 	it('chat goal matches only the viber channel', () => {
 		expect(
-			checkGoalMatch('mobile-send-chat', 'mobile-message-sent', { channel: 'viber', text: 'γεια' }, {})
+			checkGoalMatch(
+				'mobile-send-chat',
+				'mobile-message-sent',
+				{ channel: 'viber', text: 'γεια' },
+				{}
+			)
 		).toBe(true);
 		expect(
-			checkGoalMatch('mobile-send-chat', 'mobile-message-sent', { channel: 'sms', text: 'γεια' }, {})
+			checkGoalMatch(
+				'mobile-send-chat',
+				'mobile-message-sent',
+				{ channel: 'sms', text: 'γεια' },
+				{}
+			)
 		).toBe(false);
 	});
 
@@ -492,7 +637,9 @@ describe('mobile-connect-wifi', () => {
 
 describe('mobile-night-mode / mobile-find-device (toggles)', () => {
 	it('completes only when toggled ON (default target)', () => {
-		expect(checkGoalMatch('mobile-night-mode', 'mobile-night-mode-set', { on: true }, {})).toBe(true);
+		expect(checkGoalMatch('mobile-night-mode', 'mobile-night-mode-set', { on: true }, {})).toBe(
+			true
+		);
 		expect(checkGoalMatch('mobile-find-device', 'mobile-find-device-set', { on: true }, {})).toBe(
 			true
 		);
@@ -510,14 +657,14 @@ describe('mobile-night-mode / mobile-find-device (toggles)', () => {
 describe('mobile-update-app', () => {
 	const config = { targetUpdateId: 'viber' };
 	it('matches updating the target app', () => {
-		expect(checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'viber' }, config)).toBe(
-			true
-		);
+		expect(
+			checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'viber' }, config)
+		).toBe(true);
 	});
 	it('does not match updating a different app', () => {
-		expect(checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'maps' }, config)).toBe(
-			false
-		);
+		expect(
+			checkGoalMatch('mobile-update-app', 'mobile-app-updated', { appId: 'maps' }, config)
+		).toBe(false);
 	});
 	it('does not match desktop update-app events', () => {
 		expect(checkGoalMatch('mobile-update-app', 'update-app', {}, config)).toBe(false);
@@ -554,14 +701,14 @@ describe('mobile-spot-scam-sms', () => {
 describe('mobile-enter-2fa', () => {
 	const config = { twofaCode: '482913' };
 	it('completes when the correct one-time code is submitted', () => {
-		expect(checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '482913' }, config)).toBe(
-			true
-		);
+		expect(
+			checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '482913' }, config)
+		).toBe(true);
 	});
 	it('does not complete on a wrong code', () => {
-		expect(checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '000000' }, config)).toBe(
-			false
-		);
+		expect(
+			checkGoalMatch('mobile-enter-2fa', 'mobile-2fa-submitted', { code: '000000' }, config)
+		).toBe(false);
 	});
 });
 
@@ -644,7 +791,175 @@ describe('mobile-screenshot', () => {
 	});
 
 	it('does not match other mobile events', () => {
-		expect(checkGoalMatch('mobile-screenshot', 'mobile-app-opened', { appId: 'x' }, {})).toBe(false);
+		expect(checkGoalMatch('mobile-screenshot', 'mobile-app-opened', { appId: 'x' }, {})).toBe(
+			false
+		);
+	});
+});
+
+// ── Mac simulation ─────────────────────────────────────────────────────────────
+
+describe('mac-open-from-dock', () => {
+	const config = { targetAppId: 'finder' };
+	it('matches opening the target app from the Dock', () => {
+		expect(
+			checkGoalMatch(
+				'mac-open-from-dock',
+				'mac-app-opened',
+				{ appId: 'finder', source: 'dock' },
+				config
+			)
+		).toBe(true);
+	});
+	it('does not match a Spotlight launch of the same app', () => {
+		expect(
+			checkGoalMatch(
+				'mac-open-from-dock',
+				'mac-app-opened',
+				{ appId: 'finder', source: 'spotlight' },
+				config
+			)
+		).toBe(false);
+	});
+	it('does not match the wrong app', () => {
+		expect(
+			checkGoalMatch(
+				'mac-open-from-dock',
+				'mac-app-opened',
+				{ appId: 'settings', source: 'dock' },
+				config
+			)
+		).toBe(false);
+	});
+});
+
+describe('mac-close-window vs mac-quit-app (close ≠ quit)', () => {
+	const config = { targetAppId: 'notes' };
+	it('close-window matches the window-closed event', () => {
+		expect(
+			checkGoalMatch('mac-close-window', 'mac-window-closed', { appId: 'notes' }, config)
+		).toBe(true);
+	});
+	it('close-window is NOT satisfied by a quit', () => {
+		expect(checkGoalMatch('mac-close-window', 'mac-app-quit', { appId: 'notes' }, config)).toBe(
+			false
+		);
+	});
+	it('close-window is NOT satisfied by minimise/zoom controls', () => {
+		expect(
+			checkGoalMatch(
+				'mac-close-window',
+				'mac-window-control-used',
+				{ appId: 'notes', control: 'minimize' },
+				config
+			)
+		).toBe(false);
+	});
+	it('quit-app matches the quit event', () => {
+		expect(checkGoalMatch('mac-quit-app', 'mac-app-quit', { appId: 'notes' }, config)).toBe(true);
+	});
+	it('quit-app is NOT satisfied by merely closing the window', () => {
+		expect(checkGoalMatch('mac-quit-app', 'mac-window-closed', { appId: 'notes' }, config)).toBe(
+			false
+		);
+	});
+	it('quit-app does not match the wrong app', () => {
+		expect(checkGoalMatch('mac-quit-app', 'mac-app-quit', { appId: 'finder' }, config)).toBe(false);
+	});
+});
+
+describe('mac-finder-open-folder', () => {
+	it('matches the target folder', () => {
+		expect(
+			checkGoalMatch(
+				'mac-finder-open-folder',
+				'mac-folder-opened',
+				{ folderId: 'documents' },
+				{ targetFolderId: 'documents' }
+			)
+		).toBe(true);
+	});
+	it('does not match a different folder', () => {
+		expect(
+			checkGoalMatch(
+				'mac-finder-open-folder',
+				'mac-folder-opened',
+				{ folderId: 'downloads' },
+				{ targetFolderId: 'documents' }
+			)
+		).toBe(false);
+	});
+	it('matches any folder when no target is set', () => {
+		expect(
+			checkGoalMatch('mac-finder-open-folder', 'mac-folder-opened', { folderId: 'downloads' }, {})
+		).toBe(true);
+	});
+});
+
+describe('mac-spotlight-search', () => {
+	const config = { targetAppId: 'settings' };
+	it('matches launching the target app via Spotlight', () => {
+		expect(
+			checkGoalMatch(
+				'mac-spotlight-search',
+				'mac-app-opened',
+				{ appId: 'settings', source: 'spotlight' },
+				config
+			)
+		).toBe(true);
+	});
+	it('does not match opening the same app from the Dock', () => {
+		expect(
+			checkGoalMatch(
+				'mac-spotlight-search',
+				'mac-app-opened',
+				{ appId: 'settings', source: 'dock' },
+				config
+			)
+		).toBe(false);
+	});
+});
+
+describe('mac-increase-size', () => {
+	it('matches the target text size', () => {
+		expect(
+			checkGoalMatch(
+				'mac-increase-size',
+				'mac-size-changed',
+				{ setting: 'text', size: 'large' },
+				{ targetSize: 'large' }
+			)
+		).toBe(true);
+	});
+	it('defaults the setting to text', () => {
+		expect(
+			checkGoalMatch(
+				'mac-increase-size',
+				'mac-size-changed',
+				{ setting: 'text', size: 'large' },
+				{ targetSize: 'large', targetSetting: 'text' }
+			)
+		).toBe(true);
+	});
+	it('does not match a different setting (pointer)', () => {
+		expect(
+			checkGoalMatch(
+				'mac-increase-size',
+				'mac-size-changed',
+				{ setting: 'pointer', size: 'large' },
+				{ targetSize: 'large' }
+			)
+		).toBe(false);
+	});
+	it('does not match a smaller size', () => {
+		expect(
+			checkGoalMatch(
+				'mac-increase-size',
+				'mac-size-changed',
+				{ setting: 'text', size: 'medium' },
+				{ targetSize: 'large' }
+			)
+		).toBe(false);
 	});
 });
 

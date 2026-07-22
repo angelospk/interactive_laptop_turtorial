@@ -17,6 +17,7 @@ import { wordLessons } from './module-word-lessons';
 import { eapsiReadingLessons } from './eapsi-reading-lessons';
 import { androidLessons } from './android-lessons';
 import { iphoneLessons } from './iphone-lessons';
+import { macLessons } from './mac-lessons';
 export { allModules } from './modules';
 
 /**
@@ -31,30 +32,31 @@ function validateLessons(lessons: NewLesson[]): void {
 		if (typeof goal === 'string' && !isValidGoalId(goal)) {
 			throw new Error(
 				`Seed error in lesson "${lesson.id}": unknown goal "${goal}". ` +
-				`Valid goals: ${Object.keys(GOALS).join(', ')}`
+					`Valid goals: ${Object.keys(GOALS).join(', ')}`
 			);
 		}
 	}
 }
 
 const _allLessons: NewLesson[] = [
-    ...module1Lessons,
-    ...module2Lessons,
-    ...module3Lessons,
-    ...module4Lessons,
-    ...module5Lessons,
-    ...module6Lessons,
-    ...wordLessons,
-    ...module7Lessons,
-    ...module8Lessons,
-    ...module9Lessons,
-    ...module10Lessons,
-    ...module11Lessons,
-    ...module12Lessons,
-    ...module13Lessons,
-    ...eapsiReadingLessons,
-    ...androidLessons,
-    ...iphoneLessons
+	...module1Lessons,
+	...module2Lessons,
+	...module3Lessons,
+	...module4Lessons,
+	...module5Lessons,
+	...module6Lessons,
+	...wordLessons,
+	...module7Lessons,
+	...module8Lessons,
+	...module9Lessons,
+	...module10Lessons,
+	...module11Lessons,
+	...module12Lessons,
+	...module13Lessons,
+	...eapsiReadingLessons,
+	...androidLessons,
+	...iphoneLessons,
+	...macLessons
 ];
 
 // Fail fast at import time if any lesson references an unknown goal.
@@ -66,21 +68,22 @@ validateLessons(_allLessons);
 export const allLessons: NewLesson[] = _allLessons;
 
 export {
-    module1Lessons,
-    module2Lessons,
-    module3Lessons,
-    module4Lessons,
-    module5Lessons,
-    module6Lessons,
-    wordLessons,
-    module7Lessons,
-    module8Lessons,
-    module9Lessons,
-    module10Lessons,
-    module11Lessons,
-    module12Lessons,
-    module13Lessons,
-    eapsiReadingLessons,
-    androidLessons,
-    iphoneLessons
+	module1Lessons,
+	module2Lessons,
+	module3Lessons,
+	module4Lessons,
+	module5Lessons,
+	module6Lessons,
+	wordLessons,
+	module7Lessons,
+	module8Lessons,
+	module9Lessons,
+	module10Lessons,
+	module11Lessons,
+	module12Lessons,
+	module13Lessons,
+	eapsiReadingLessons,
+	androidLessons,
+	iphoneLessons,
+	macLessons
 };

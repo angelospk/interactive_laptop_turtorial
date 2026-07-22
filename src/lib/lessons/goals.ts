@@ -100,6 +100,16 @@ export const GOALS = {
 	'mobile-spot-scam-sms': { requiresAppId: false },
 	'mobile-enter-2fa': { requiresAppId: false },
 
+	// Mac simulation (mac-simulation lessonType — namespaced `mac-` so desktop,
+	// mobile and mac events can never satisfy each other). The pivotal Mac concept
+	// is close (red traffic light) ≠ quit (⌘Q / menu «Quit»).
+	'mac-open-from-dock': { requiresAppId: true },
+	'mac-close-window': { requiresAppId: true },
+	'mac-quit-app': { requiresAppId: true },
+	'mac-finder-open-folder': { requiresAppId: false },
+	'mac-spotlight-search': { requiresAppId: true },
+	'mac-increase-size': { requiresAppId: false },
+
 	// Word Processor
 	'update-text': { requiresAppId: false },
 	'format-text-bold': { requiresAppId: false },

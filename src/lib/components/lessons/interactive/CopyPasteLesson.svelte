@@ -21,7 +21,13 @@
 		sampleText?: string;
 		sourceText?: string;
 		targetField?: string;
+		/** Modifier key shown in the instructions — 'Ctrl' (default) or 'Cmd (⌘)' on Mac. */
+		modifierLabel?: string;
 	};
+
+	// Windows/Linux use Ctrl, macOS uses Cmd (⌘). The instructions must be truthful
+	// per platform (Mac track, CURRICULUM_PLAN §5).
+	const mod = config.modifierLabel ?? 'Ctrl';
 
 	let sourceValue = $state(config.sampleText || config.sourceText || 'Κείμενο για αντιγραφή');
 	let targetValue = $state('');
@@ -66,12 +72,13 @@
 			</h3>
 			<p class="text-slate-600">
 				{#if isCopy}
-					Επέλεξε το κείμενο στο πρώτο πεδίο, πάτα <span class="font-bold">Ctrl+C</span> για
-					αντιγραφή και μετά πάτα στο δεύτερο πεδίο και πάτα <span class="font-bold">Ctrl+V</span> για
+					Επέλεξε το κείμενο στο πρώτο πεδίο, πάτα <span class="font-bold">{mod}+C</span> για
+					αντιγραφή και μετά πάτα στο δεύτερο πεδίο και πάτα <span class="font-bold">{mod}+V</span> για
 					επικόλληση.
 				{:else}
-					Επέλεξε το κείμενο στο πρώτο πεδίο, πάτα <span class="font-bold">Ctrl+X</span> για αποκοπή
-					και μετά πάτα στο δεύτερο πεδίο και πάτα <span class="font-bold">Ctrl+V</span> για επικόλληση.
+					Επέλεξε το κείμενο στο πρώτο πεδίο, πάτα <span class="font-bold">{mod}+X</span> για
+					αποκοπή και μετά πάτα στο δεύτερο πεδίο και πάτα <span class="font-bold">{mod}+V</span> για
+					επικόλληση.
 				{/if}
 			</p>
 		</div>

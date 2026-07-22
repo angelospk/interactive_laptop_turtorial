@@ -13,6 +13,7 @@ import {
 import type { Lesson } from '$lib/db/schema';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
 import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
+import { parseMacSimConfig } from '$lib/lessons/macSim';
 import el from '../../../../messages/el.json';
 import en from '../../../../messages/en.json';
 
@@ -77,6 +78,16 @@ describe('mobile-sim playability', () => {
 		expect(sims.length).toBeGreaterThan(0);
 		for (const l of sims) {
 			expect(() => parseMobileSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
+		}
+	});
+});
+
+describe('mac-simulation playability', () => {
+	it('every seeded mac-simulation lesson has a valid, reachable config', () => {
+		const sims = allLessons.filter((l) => l.lessonType === 'mac-simulation');
+		expect(sims.length).toBeGreaterThan(0);
+		for (const l of sims) {
+			expect(() => parseMacSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
 		}
 	});
 });
