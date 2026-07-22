@@ -14,6 +14,9 @@ import type { Lesson } from '$lib/db/schema';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
 import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import el from '../../../../messages/el.json';
+import en from '../../../../messages/en.json';
+
+const locales = { el, en } as const;
 
 /**
  * Data-evolution contracts (codex plan review, docs/CURRICULUM_PLAN.md §6):
@@ -212,12 +215,14 @@ describe('module organization config', () => {
 	});
 });
 
-describe('i18n contract (el)', () => {
+// Every seeded key must resolve in EVERY shipped locale — not just Greek. A key
+// present in el but absent in en (issue dyc) shows raw identifiers in the EN UI.
+describe.each(Object.entries(locales))('i18n contract (%s)', (localeName, messages) => {
 	it('resolves every module titleKey/descriptionKey', () => {
 		for (const m of allModules) {
 			for (const k of [m.titleKey, m.descriptionKey].filter((x): x is string => Boolean(x))) {
 				if (looksLikeI18nKey(k)) {
-					expect(el, `module ${m.id} key ${k}`).toHaveProperty(k);
+					expect(messages, `[${localeName}] module ${m.id} key ${k}`).toHaveProperty(k);
 				}
 			}
 		}
@@ -227,9 +232,28 @@ describe('i18n contract (el)', () => {
 		for (const l of allLessons) {
 			for (const k of [l.titleKey, l.descriptionKey].filter((x): x is string => Boolean(x))) {
 				if (looksLikeI18nKey(k)) {
-					expect(el, `lesson ${l.id} key ${k}`).toHaveProperty(k);
+					expect(messages, `[${localeName}] lesson ${l.id} key ${k}`).toHaveProperty(k);
 				}
 			}
 		}
+	});
+});
+
+// Locales must stay in lockstep: no key may exist in one shipped locale but not
+// another (both directions), so neither UI ever falls back to a raw key.
+describe('i18n locale parity (el ↔ en)', () => {
+	const keysOf = (m: Record<string, unknown>) =>
+		new Set(Object.keys(m).filter((k) => k !== '$schema'));
+	const elKeys = keysOf(el);
+	const enKeys = keysOf(en);
+
+	it('has no key present in el but missing from en', () => {
+		const missing = [...elKeys].filter((k) => !enKeys.has(k));
+		expect(missing, `missing from en: ${missing.join(', ')}`).toEqual([]);
+	});
+
+	it('has no key present in en but missing from el', () => {
+		const missing = [...enKeys].filter((k) => !elKeys.has(k));
+		expect(missing, `missing from el: ${missing.join(', ')}`).toEqual([]);
 	});
 });
