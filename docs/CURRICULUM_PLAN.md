@@ -1,19 +1,19 @@
 # Σχέδιο: Αναδιοργάνωση μαθημάτων ανά συσκευή + ρεαλιστικοί simulators
 
-*2026-07-15. Εκτελεί τη Φάση 2 του [ROADMAP.md](ROADMAP.md). Βασίζεται σε πλήρες audit των 156 μαθημάτων + έρευνα Grok (live search) σε GCFGlobal, DigitalLearn, Senior Planet, Εθνική Ακαδημία Ψηφιακών Ικανοτήτων.*
+_2026-07-15. Εκτελεί τη Φάση 2 του [ROADMAP.md](ROADMAP.md). Βασίζεται σε πλήρες audit των 156 μαθημάτων + έρευνα Grok (live search) σε GCFGlobal, DigitalLearn, Senior Planet, Εθνική Ακαδημία Ψηφιακών Ικανοτήτων._
 
 ## 1. Audit υπάρχοντος περιεχομένου
 
 16 modules, 156 lessons. Κατανομή ανά «πραγματική» συσκευή:
 
-| Ομάδα | Modules | Κατάσταση |
-|---|---|---|
-| Είσοδος (ποντίκι/πληκτρολόγιο) | module1, module2 | Universal desktop, ΑΛΛΑ οι συντομεύσεις (Ctrl+C, Alt+Shift, F-keys) είναι Windows-flavored |
-| Windows-only | module3 (Win11 UI), module9 (Ρυθμίσεις/Settings sim), module4 (File Explorer sim) | Σωστά δεμένα με το Windows desktop simulation |
-| Παραγωγικότητα | word, module7 (Excel) | Generic office UI — δουλεύει και ως «Mac» εννοιολογικά, αλλά το chrome είναι Windows |
-| Universal έννοιες | module5, module6, module8, module10, module11, module12, module13 | Σωστά universal· τα sims τρέχουν σε desktop frame |
-| Mobile tracks | android (1 μάθημα), iphone (1 μάθημα) | Ουσιαστικά κενά — το κρισιμότερο κενό για το κοινό (ΚΑΠΗ) |
-| Mac | — | Μηδέν περιεχόμενο, παρότι τα moduleDevices tags υπόσχονται mac σε 5 modules |
+| Ομάδα                          | Modules                                                                           | Κατάσταση                                                                                  |
+| ------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Είσοδος (ποντίκι/πληκτρολόγιο) | module1, module2                                                                  | Universal desktop, ΑΛΛΑ οι συντομεύσεις (Ctrl+C, Alt+Shift, F-keys) είναι Windows-flavored |
+| Windows-only                   | module3 (Win11 UI), module9 (Ρυθμίσεις/Settings sim), module4 (File Explorer sim) | Σωστά δεμένα με το Windows desktop simulation                                              |
+| Παραγωγικότητα                 | word, module7 (Excel)                                                             | Generic office UI — δουλεύει και ως «Mac» εννοιολογικά, αλλά το chrome είναι Windows       |
+| Universal έννοιες              | module5, module6, module8, module10, module11, module12, module13                 | Σωστά universal· τα sims τρέχουν σε desktop frame                                          |
+| Mobile tracks                  | android (1 μάθημα), iphone (1 μάθημα)                                             | Ουσιαστικά κενά — το κρισιμότερο κενό για το κοινό (ΚΑΠΗ)                                  |
+| Mac                            | —                                                                                 | Μηδέν περιεχόμενο, παρότι τα moduleDevices tags υπόσχονται mac σε 5 modules                |
 
 ### Ευρήματα (τι διορθώνουμε)
 
@@ -30,6 +30,7 @@
 **Κοινή σειρά διδασκαλίας (desktop)**: hardware/εκκίνηση → πλοήγηση OS → αρχεία/φάκελοι → internet+email → ασφάλεια → παραγωγικότητα → προσαρμογή/επίλυση προβλημάτων. ✅ Η υπάρχουσα σειρά modules μας ταιριάζει ήδη — δεν αλλάζουμε αρίθμηση, μόνο κατηγοριοποίηση.
 
 **Κοινή σειρά διδασκαλίας (smartphone, seniors)** — προτεραιότητες σε ΟΛΑ τα προγράμματα:
+
 1. Γνωριμία με τη συσκευή: αφή/χειρονομίες, αρχική οθόνη, φόρτιση, Wi-Fi
 2. Επικοινωνία: κλήσεις, επαφές, SMS, βιντεοκλήσεις, WhatsApp/Viber (στην Ελλάδα: Viber πρώτα)
 3. Κάμερα & φωτογραφίες: λήψη, προβολή, κοινοποίηση στην οικογένεια
@@ -44,16 +45,16 @@
 
 `moduleCategories` (αρχική σελίδα):
 
-| Κατηγορία | Modules |
-|---|---|
-| Τα πρώτα βήματα (κάθε υπολογιστής) | module1, module2 |
-| Windows υπολογιστής | module3, module4, module9 |
-| Mac υπολογιστής | mac *(νέο)* |
-| Κινητό & Tablet | android, iphone |
-| Διαδίκτυο & Επικοινωνία | module5, module6, module11 |
-| Εφαρμογές γραφείου | word, module7 |
-| Ασφάλεια & Προστασία | module8, module10 |
-| Ψηφιακή ζωή & υπηρεσίες | module12, module13 |
+| Κατηγορία                          | Modules                    |
+| ---------------------------------- | -------------------------- |
+| Τα πρώτα βήματα (κάθε υπολογιστής) | module1, module2           |
+| Windows υπολογιστής                | module3, module4, module9  |
+| Mac υπολογιστής                    | mac _(νέο)_                |
+| Κινητό & Tablet                    | android, iphone            |
+| Διαδίκτυο & Επικοινωνία            | module5, module6, module11 |
+| Εφαρμογές γραφείου                 | word, module7              |
+| Ασφάλεια & Προστασία               | module8, module10          |
+| Ψηφιακή ζωή & υπηρεσίες            | module12, module13         |
 
 `moduleDevices` διορθώσεις: module4 → `['windows']`· mac → `['mac']`· τα module2 κρατούν `['windows','mac']` αλλά οι Windows-specific συντομεύσεις παίρνουν υποενότητα «Συντομεύσεις Windows» (και το Mac track αποκτά δικό του μάθημα Cmd-συντομεύσεων).
 
@@ -73,7 +74,7 @@
 ### Android track (στόχος: 12 μαθήματα + 1 reading)
 
 1. [reading] Γνωριμία με το Android: οθόνη, χειρονομίες, κουμπιά
-2. [mobile-tap] Βρες και άνοιξε εφαρμογή *(υπάρχον, αναβαθμισμένο σε home screen v2)*
+2. [mobile-tap] Βρες και άνοιξε εφαρμογή _(υπάρχον, αναβαθμισμένο σε home screen v2)_
 3. [mobile-sim] Κάλεσε αριθμό από το πληκτρολόγιο
 4. [mobile-sim] Βρες επαφή και κάλεσέ την
 5. [mobile-sim] Στείλε SMS
@@ -84,7 +85,7 @@
 10. [mobile-sim] Συνδέσου σε Wi-Fi
 11. [mobile-sim] Εγκατάσταση εφαρμογής από το Play Store
 12. [mobile-sim] Σκανάρισμα QR code
-13. [scam-spotter] Απάτη ή όχι; SMS στο κινητό *(mobile-framed παραλλαγή του υπάρχοντος)*
+13. [scam-spotter] Απάτη ή όχι; SMS στο κινητό _(mobile-framed παραλλαγή του υπάρχοντος)_
 
 ### iPhone track
 
@@ -94,11 +95,11 @@
 
 Απαίτηση: **απλό επίπεδο για απλούς χρήστες** και σταδιακά πιο σύνθετα/ενδιαφέροντα (ρυθμίσεις, AI βοηθός). Υλοποίηση χωρίς migration, με τους υπάρχοντες μηχανισμούς (`difficulty` + `moduleSections` positional counts):
 
-| Section (module page) | Δυσκολία | Μαθήματα |
-|---|---|---|
-| **Βασικά — πρώτα βήματα** | beginner | 1 άνοιγμα εφαρμογής, 2 κλήση αριθμού, 3 κλήση επαφής, 4 SMS, 5 Viber, 6 γράμματα, 7 Wi-Fi |
-| **Καθημερινή χρήση** | intermediate | βιντεοκλήση Viber, screenshot με τα «κουμπιά» της συσκευής, κλείσιμο κολλημένης εφαρμογής, νυχτερινή λειτουργία, σκανάρισμα QR, φωτογραφία+κοινοποίηση |
-| **Πιο προχωρημένα & AI** | advanced | AI βοηθός (ξυπνητήρι/υπενθύμιση χαπιών/μήνυμα με φωνή), «ρώτα το AI σωστά», Εύρεση συσκευής, Google Photos backup, ενημερώσεις εφαρμογών, Private DNS/λιγότερες διαφημίσεις |
+| Section (module page)     | Δυσκολία     | Μαθήματα                                                                                                                                                                    |
+| ------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Βασικά — πρώτα βήματα** | beginner     | 1 άνοιγμα εφαρμογής, 2 κλήση αριθμού, 3 κλήση επαφής, 4 SMS, 5 Viber, 6 γράμματα, 7 Wi-Fi                                                                                   |
+| **Καθημερινή χρήση**      | intermediate | βιντεοκλήση Viber, screenshot με τα «κουμπιά» της συσκευής, κλείσιμο κολλημένης εφαρμογής, νυχτερινή λειτουργία, σκανάρισμα QR, φωτογραφία+κοινοποίηση                      |
+| **Πιο προχωρημένα & AI**  | advanced     | AI βοηθός (ξυπνητήρι/υπενθύμιση χαπιών/μήνυμα με φωνή), «ρώτα το AI σωστά», Εύρεση συσκευής, Google Photos backup, ενημερώσεις εφαρμογών, Private DNS/λιγότερες διαφημίσεις |
 
 ### Αποφάσεις από Codex ideation review (2026-07-15)
 
@@ -110,26 +111,28 @@
 
 Υποψήφια διαδραστικά μαθήματα (όχι reading) από τα tips, με εφικτότητα:
 
-| Μάθημα | Goal (νέο) | Mini-app | Δυσκολία | Κόστος |
-|---|---|---|---|---|
-| Screenshot: Power+Vol− μαζί | `mobile-screenshot` ← `mobile-screenshot-taken` | Κουμπιά πάνω στο MobileFrame bezel | Μέτριο | Φθηνό |
-| Κλείσε κολλημένη εφαρμογή | `mobile-force-close` ← `mobile-app-force-closed{appId}` | RecentApps view (κάρτες + σύρσιμο/Χ) | Μέτριο | Φθηνό |
-| Βιντεοκλήση στο Viber | `mobile-start-videocall` ← `mobile-videocall-started{conversationId}` | κουμπί 📹 στο MessagingApp header | Μέτριο | Φθηνό |
-| Νυχτερινή λειτουργία | `mobile-night-mode` ← `mobile-night-mode-set{on}` | MobileSettingsApp νέα σελίδα | Μέτριο | Φθηνό |
-| Σκανάρισμα QR | `mobile-scan-qr` ← `mobile-qr-scanned` | CameraApp mock (viewfinder με QR) | Μέτριο | Μέτριο |
-| AI βοηθός: ξυπνητήρι | `mobile-assistant-task{intent:'alarm'}` ← `mobile-assistant-command` | AssistantApp: μεγάλο μικρόφωνο + **chips επιλογής φράσης** (τίμια προσομοίωση φωνής χωρίς μικρόφωνο) | Προχωρ. | Μέτριο |
-| AI βοηθός: υπενθύμιση χαπιών | ίδιο goal, `intent:'reminder'` | AssistantApp | Προχωρ. | Φθηνό μετά το πρώτο |
-| Ρώτα το AI σωστά | επιλογή καλύτερης διατύπωσης (quiz μέσα σε chat UI) | AssistantApp/quiz | Προχωρ. | Φθηνό |
-| Εύρεση συσκευής ON | `mobile-find-device` ← toggle event | MobileSettingsApp (βαθύτερο path + αναζήτηση ρύθμισης) | Προχωρ. | Φθηνό |
-| Google Photos backup | `mobile-backup-on` | GalleryApp settings | Προχωρ. | Μέτριο |
-| Ενημέρωση εφαρμογής | `mobile-update-app` | StoreApp lite | Προχωρ. | Μέτριο |
-| Δημόσιο WiFi & τράπεζα (σενάριο) | quiz/scam-spotter variant | — | Προχωρ. | Φθηνό |
+| Μάθημα                           | Goal (νέο)                                                            | Mini-app                                                                                             | Δυσκολία | Κόστος              |
+| -------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------- | ------------------- |
+| Screenshot: Power+Vol− μαζί      | `mobile-screenshot` ← `mobile-screenshot-taken`                       | Κουμπιά πάνω στο MobileFrame bezel                                                                   | Μέτριο   | Φθηνό               |
+| Κλείσε κολλημένη εφαρμογή        | `mobile-force-close` ← `mobile-app-force-closed{appId}`               | RecentApps view (κάρτες + σύρσιμο/Χ)                                                                 | Μέτριο   | Φθηνό               |
+| Βιντεοκλήση στο Viber            | `mobile-start-videocall` ← `mobile-videocall-started{conversationId}` | κουμπί 📹 στο MessagingApp header                                                                    | Μέτριο   | Φθηνό               |
+| Νυχτερινή λειτουργία             | `mobile-night-mode` ← `mobile-night-mode-set{on}`                     | MobileSettingsApp νέα σελίδα                                                                         | Μέτριο   | Φθηνό               |
+| Σκανάρισμα QR                    | `mobile-scan-qr` ← `mobile-qr-scanned`                                | CameraApp mock (viewfinder με QR)                                                                    | Μέτριο   | Μέτριο              |
+| AI βοηθός: ξυπνητήρι             | `mobile-assistant-task{intent:'alarm'}` ← `mobile-assistant-command`  | AssistantApp: μεγάλο μικρόφωνο + **chips επιλογής φράσης** (τίμια προσομοίωση φωνής χωρίς μικρόφωνο) | Προχωρ.  | Μέτριο              |
+| AI βοηθός: υπενθύμιση χαπιών     | ίδιο goal, `intent:'reminder'`                                        | AssistantApp                                                                                         | Προχωρ.  | Φθηνό μετά το πρώτο |
+| Ρώτα το AI σωστά                 | επιλογή καλύτερης διατύπωσης (quiz μέσα σε chat UI)                   | AssistantApp/quiz                                                                                    | Προχωρ.  | Φθηνό               |
+| Εύρεση συσκευής ON               | `mobile-find-device` ← toggle event                                   | MobileSettingsApp (βαθύτερο path + αναζήτηση ρύθμισης)                                               | Προχωρ.  | Φθηνό               |
+| Google Photos backup             | `mobile-backup-on`                                                    | GalleryApp settings                                                                                  | Προχωρ.  | Μέτριο              |
+| Ενημέρωση εφαρμογής              | `mobile-update-app`                                                   | StoreApp lite                                                                                        | Προχωρ.  | Μέτριο              |
+| Δημόσιο WiFi & τράπεζα (σενάριο) | quiz/scam-spotter variant                                             | —                                                                                                    | Προχωρ.  | Φθηνό               |
 
 Αρχές για τα «φωνητικά»: χωρίς πραγματικό μικρόφωνο — ο μαθητής **διαλέγει τι θα έλεγε** (chips με 2-3 φράσεις, μία σωστά διατυπωμένη)· έτσι διδάσκεται η διατύπωση, που είναι και το πραγματικό ζητούμενο των curricula για AI.
 
 **Γνωστό εκκρεμές (codex diff review)**: το module2 είναι tagged windows+mac αλλά η ενότητα «Συντομεύσεις Windows & ταχύτητα» είναι Windows-only. Λύνεται στο Mac track (B7): Cmd-παραλλαγές μαθημάτων + per-lesson device tags αν χρειαστεί. Μέχρι τότε το section label το δηλώνει ρητά.
 
 ## 5. Mac: simulator + track (νέο module `mac`)
+
+> **✅ Υλοποιήθηκε (2026-07-22, B6+B7)**: `mac-simulation` lessonType + `MacSimLesson` (state `running`/`windowState`/`activeAppId`, κλείσιμο≠τερματισμός), components `MacDesktop`/`MacWindow`/`MacDock`/`MacMenuBar`/`MacSpotlight` + `FinderMacApp`/`MacSettingsApp`, 6 `mac-*` goals, module `mac` με 8 μαθήματα σε 3 ενότητες (base = τα 4 πρώτα), κατηγορία «Mac υπολογιστής», i18n el+en. 🤝 codex plan review ενσωματώθηκε (activeAppId, menu-Quit ως αξιόπιστο path, Finder non-quittable, spotlight activation). CodeRabbit clean.
 
 ### Simulator
 
@@ -153,21 +156,22 @@
 🤝 **codex plan review (2026-07-15)**: υιοθετήθηκαν — vertical slices αντί για layer-phases (κάθε μάθημα seed-άρεται μόνο όταν η ροή του είναι εκτελέσιμη), ρητή πολιτική progress, διαχωρισμός applicable-vs-simulated semantics, semantic events για goals, data-contract tests, mobile πριν από Mac.
 
 **Πολιτική δεδομένων (δεσμευτική):**
+
 - Τα module/lesson IDs είναι **αμετάβλητα για πάντα**. Καμία μετονομασία ID, καμία διαγραφή row.
 - Αλλαγές μόνο additive (νέα lessons) ή cosmetic (τίτλοι/περιγραφές/config UI). Ολοκληρωμένα μαθήματα μένουν ολοκληρωμένα· νέα μαθήματα σε module δεν «ξε-ολοκληρώνουν» κανέναν.
 - Το `moduleDevices` σημαίνει **«σε ποια συσκευή είναι χρήσιμη η ύλη»** (concept-level). Το πού «τρέχει» η προσομοίωση είναι χωριστό metadata (`moduleSimulationPlatform`) — π.χ. word/module7: ύλη windows+mac, προσομοίωση windows-like.
 - Upserts: πάντα per-row select→update/insert σε σταθερό ID (υπάρχον pattern), modules πριν από lessons, ποτέ αγγίζοντας user_progress. Deprecation = `enabled:false`, ποτέ delete.
 
-| Φάση | Παραδοτέο | Ρίσκο |
-|---|---|---|
+| Φάση   | Παραδοτέο                                                                                                                                                            | Ρίσκο  |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | **B1** | Reorg config-only: κατηγορίες ανά συσκευή, semantics σχόλια+`moduleSimulationPlatform`, υποενότητες, fix τίτλου lesson8 (μόνο i18n — ίδιο ID/skill) + contract tests | Χαμηλό |
-| **B2** | Mobile walking skeleton: MobileHomeScreen v2 + `mobile-sim` type + goal/event protocol + ΕΝΑ πλήρες μάθημα Android+iOS end-to-end (renderer, i18n, tests) | Μεσαίο |
-| **B3** | Mobile app primitives: PhoneApp, MessagesApp, ChatApp, MobileSettingsApp (+ tests ανά goal) | Μεσαίο |
-| **B4** | Tracks ως vertical slices: κάθε Android/iPhone μάθημα seed-άρεται μαζί με το app/goal του | Χαμηλό |
-| **B5** | Mobile wave 2: Camera/Gallery/Store/QR + αντίστοιχα μαθήματα + βιντεοκλήση + mobile scam-spotter variant | Μεσαίο |
-| **B6** | Mac walking skeleton: MacDesktop/MacWindow με χωριστό `windowOpen`/`appRunning` state (close≠quit), `mac-simulation` + ένα μάθημα | Μεσαίο |
-| **B7** | Mac track πλήρες + module `mac` + κατηγορία «Mac υπολογιστής» + truthful mac tags | Χαμηλό |
-| **B8** | Turso upsert (modules→lessons), e2e verify, README/ROADMAP sync | Χαμηλό |
+| **B2** | Mobile walking skeleton: MobileHomeScreen v2 + `mobile-sim` type + goal/event protocol + ΕΝΑ πλήρες μάθημα Android+iOS end-to-end (renderer, i18n, tests)            | Μεσαίο |
+| **B3** | Mobile app primitives: PhoneApp, MessagesApp, ChatApp, MobileSettingsApp (+ tests ανά goal)                                                                          | Μεσαίο |
+| **B4** | Tracks ως vertical slices: κάθε Android/iPhone μάθημα seed-άρεται μαζί με το app/goal του                                                                            | Χαμηλό |
+| **B5** | Mobile wave 2: Camera/Gallery/Store/QR + αντίστοιχα μαθήματα + βιντεοκλήση + mobile scam-spotter variant                                                             | Μεσαίο |
+| **B6** | Mac walking skeleton: MacDesktop/MacWindow με χωριστό `windowOpen`/`appRunning` state (close≠quit), `mac-simulation` + ένα μάθημα                                    | Μεσαίο |
+| **B7** | Mac track πλήρες + module `mac` + κατηγορία «Mac υπολογιστής» + truthful mac tags                                                                                    | Χαμηλό |
+| **B8** | Turso upsert (modules→lessons), e2e verify, README/ROADMAP sync                                                                                                      | Χαμηλό |
 
 Κάθε φάση: red-green (tests πρώτα), μετά υλοποίηση, μετά πλήρες suite. Goals καταναλώνουν **semantic events** (π.χ. `{type:'mobile-app-opened', appId}`), ποτέ DOM internals· lesson scoring χωριστό από app state.
 
