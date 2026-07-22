@@ -25,7 +25,12 @@
 			? apps.filter((a: MacSimApp) => a.label.toLowerCase().includes(query.trim().toLowerCase()))
 			: apps
 	);
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') onClose();
+	}
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <div
 	class="absolute inset-0 z-30 flex justify-center bg-black/30 pt-16 backdrop-blur-sm"

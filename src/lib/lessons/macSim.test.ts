@@ -132,5 +132,29 @@ describe('parseMacSimConfig — goal reachability', () => {
 				base({ goal: 'mac-increase-size', targetAppId: 'settings', targetSize: 'large' })
 			)
 		).not.toThrow();
+		// The app-kind constraint holds independently of a valid size.
+		expect(() =>
+			parseMacSimConfig(
+				base({ goal: 'mac-increase-size', targetAppId: 'finder', targetSize: 'large' })
+			)
+		).toThrow(/kind "settings"/);
+	});
+
+	it('rejects an invalid app kind and an invalid targetSetting', () => {
+		expect(() =>
+			parseMacSimConfig(
+				base({ apps: [...APPS, { id: 'x', label: 'X', icon: '❓', kind: 'ghost' as never }] })
+			)
+		).toThrow(/invalid kind/);
+		expect(() =>
+			parseMacSimConfig(
+				base({
+					goal: 'mac-increase-size',
+					targetAppId: 'settings',
+					targetSize: 'large',
+					targetSetting: 'color' as never
+				})
+			)
+		).toThrow(/targetSetting must be/);
 	});
 });

@@ -84,6 +84,8 @@ const MAC_GOAL_REQUIREMENTS: Partial<Record<string, MacGoalRequirement>> = {
 };
 
 const SUPPORTED_SIZES = ['small', 'medium', 'large'];
+const ALLOWED_KINDS: MacSimAppKind[] = ['finder', 'settings', 'browser', 'notes', 'placeholder'];
+const ALLOWED_SETTINGS = ['text', 'pointer'];
 
 /**
  * Validates a raw lesson config and returns it typed, or throws naming the exact
@@ -106,8 +108,17 @@ export function parseMacSimConfig(raw: unknown): MacSimConfig {
 
 	const ids = new Set<string>();
 	for (const app of c.apps) {
-		if (!app?.id || !app.label || !app.icon) {
-			throw new Error(`mac-simulation app entries need id/label/icon (got ${JSON.stringify(app)})`);
+		if (
+			typeof app?.id !== 'string' ||
+			typeof app.label !== 'string' ||
+			typeof app.icon !== 'string'
+		) {
+			throw new Error(
+				`mac-simulation app entries need string id/label/icon (got ${JSON.stringify(app)})`
+			);
+		}
+		if (app.kind !== undefined && !ALLOWED_KINDS.includes(app.kind)) {
+			throw new Error(`mac-simulation app "${app.id}" has invalid kind "${app.kind}"`);
 		}
 		if (ids.has(app.id)) throw new Error(`duplicate mac-simulation app id "${app.id}"`);
 		ids.add(app.id);
@@ -118,6 +129,9 @@ export function parseMacSimConfig(raw: unknown): MacSimConfig {
 	}
 	for (const dockId of c.dockAppIds) {
 		if (!ids.has(dockId)) throw new Error(`dockAppIds references unknown app "${dockId}"`);
+	}
+	if (c.initialRunningAppIds !== undefined && !Array.isArray(c.initialRunningAppIds)) {
+		throw new Error('initialRunningAppIds must be an array');
 	}
 	for (const runId of c.initialRunningAppIds ?? []) {
 		if (!ids.has(runId)) throw new Error(`initialRunningAppIds references unknown app "${runId}"`);
@@ -158,17 +172,25 @@ export function parseMacSimConfig(raw: unknown): MacSimConfig {
 	}
 
 	if (c.goal === 'mac-finder-open-folder') {
-		if (!c.folders?.length) throw new Error('mac-finder-open-folder needs a folders list');
+		if (!Array.isArray(c.folders) || c.folders.length === 0) {
+			throw new Error('mac-finder-open-folder needs a folders list');
+		}
 		const folderIds = new Set<string>();
 		for (const f of c.folders) {
-			if (!f?.id || !f.name)
-				throw new Error(`folders entries need id/name (got ${JSON.stringify(f)})`);
+			if (typeof f?.id !== 'string' || typeof f.name !== 'string')
+				throw new Error(`folders entries need string id/name (got ${JSON.stringify(f)})`);
 			if (folderIds.has(f.id)) throw new Error(`duplicate folder id "${f.id}"`);
 			folderIds.add(f.id);
 		}
 		if (c.targetFolderId && !folderIds.has(c.targetFolderId)) {
 			throw new Error(`targetFolderId "${c.targetFolderId}" is not in folders`);
 		}
+	}
+
+	if (c.targetSetting !== undefined && !ALLOWED_SETTINGS.includes(c.targetSetting)) {
+		throw new Error(
+			`targetSetting must be ${ALLOWED_SETTINGS.join('|')} (got "${c.targetSetting}")`
+		);
 	}
 
 	if (c.goal === 'mac-increase-size') {
