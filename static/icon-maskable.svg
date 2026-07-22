@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Ψηφιακά Βήματα (maskable)</title>
+  <!-- full-bleed background so mask crops never expose transparency -->
+  <rect width="512" height="512" fill="#2563eb" />
+  <!-- content kept inside the central ~66% safe zone -->
+  <g fill="#ffffff">
+    <rect x="176" y="188" width="160" height="104" rx="12" fill="none" stroke="#ffffff" stroke-width="14" />
+    <rect x="192" y="204" width="128" height="72" rx="4" fill="#dbeafe" />
+    <path d="M160 300 h192 a18 18 0 0 1 18 18 v4 H142 v-4 a18 18 0 0 1 18 -18 z" />
+  </g>
+  <text x="256" y="272" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="64" font-weight="800"
+        text-anchor="middle" fill="#2563eb">Ψ</text>
+</svg>

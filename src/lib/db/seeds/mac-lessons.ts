@@ -180,5 +180,23 @@ export const macLessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: `${MODULE_ID}-text-size`
-	}
+	},
+	// 9 — pointer (cursor) size, same goal as 7 but targetSetting:'pointer'.
+	simLesson(
+		{
+			n: 9,
+			lessonKey: 'pointer-size',
+			difficulty: 'intermediate',
+			config: {
+				goal: 'mac-increase-size',
+				prompt: 'Μεγάλωσε τον δείκτη (το βελάκι) του ποντικιού από τις Ρυθμίσεις.',
+				targetAppId: 'settings',
+				targetSetting: 'pointer',
+				targetSize: 'large',
+				successMessage: 'Μπράβο! Τώρα ο δείκτης του ποντικιού φαίνεται μεγαλύτερος.',
+				hint: 'Άνοιξε τις «Ρυθμίσεις» από το Dock και στο «Μέγεθος δείκτη (ποντικιού)» διάλεξε «Μεγάλος».'
+			}
+		},
+		`${MODULE_ID}-copy-paste`
+	)
 ];

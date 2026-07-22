@@ -4,7 +4,7 @@
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { BookOpen, ArrowRight, Check } from '@lucide/svelte';
+	import { BookOpen, ArrowRight, Check, HeartHandshake } from '@lucide/svelte';
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import Laptop from '@lucide/svelte/icons/laptop';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
@@ -71,6 +71,16 @@
 					<BookOpen class="h-5 w-5 text-brand" strokeWidth={1.75} />
 					Βιβλιοθήκη
 				</Button>
+				{#if data.user}
+					<Button
+						variant="ghost"
+						href="/synergos"
+						class="h-11 gap-2 rounded-full px-5 text-base text-muted-foreground hover:text-foreground"
+					>
+						<HeartHandshake class="h-5 w-5" strokeWidth={1.75} />
+						Για τον βοηθό μου
+					</Button>
+				{/if}
 			</div>
 			<LanguageToggle />
 		</header>

@@ -326,7 +326,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{
 			id: 'settings-shortcuts',
 			title: 'Ρυθμίσεις & συντομεύσεις',
-			lessonIds: ['mac-text-size', 'mac-copy-paste']
+			lessonIds: ['mac-text-size', 'mac-copy-paste', 'mac-pointer-size']
 		}
 	],
 	// gov.gr track (Φάση 3). Base = σύνδεση + εύρεση + λήψη βεβαίωσης.
