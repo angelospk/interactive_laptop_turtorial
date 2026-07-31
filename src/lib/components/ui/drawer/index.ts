@@ -1,4 +1,3 @@
-import { Drawer as DrawerPrimitive } from "vaul-svelte";
 
 import Root from "./drawer.svelte";
 import Content from "./drawer-content.svelte";
@@ -10,8 +9,7 @@ import Title from "./drawer-title.svelte";
 import NestedRoot from "./drawer-nested.svelte";
 import Close from "./drawer-close.svelte";
 import Trigger from "./drawer-trigger.svelte";
-
-const Portal: typeof DrawerPrimitive.Portal = DrawerPrimitive.Portal;
+import Portal from "./drawer-portal.svelte";
 
 export {
 	Root,
