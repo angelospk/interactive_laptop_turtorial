@@ -5,11 +5,12 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 ## Features
 
 - 🔐 Simple username-based authentication with **HMAC-signed session cookies** (tamper-proof; `SESSION_SECRET` required in production) and redirect-after-login (deep links survive the login step)
-- 📱 Device-aware onboarding — auto-*detects* the user's device (Windows/Mac/Android/iPhone) as a hint and asks them to confirm which device they want to learn (`preferredDevice`), the enabling layer for per-device content tracks (see `docs/ROADMAP.md`)
+- 📱 Device-aware onboarding — auto-_detects_ the user's device (Windows/Mac/Android/iPhone) as a hint and asks them to confirm which device they want to learn (`preferredDevice`), the enabling layer for per-device content tracks (see `docs/ROADMAP.md`)
 - 🔗 Deep-linkable lessons — every lesson has its own URL (`/modules/<module>/<lessonKey>`), shareable and bookmarkable
 - 📚 Library ↔ lesson bridge — theory subsections can link straight to the matching interactive lesson
 - 🗂️ Device-aware module categories on the home page («Windows υπολογιστής», «Κινητό τηλέφωνο»…) + labelled Θεωρία/Εξάσκηση sub-sections inside long modules (see `docs/CURRICULUM_PLAN.md`)
 - 📞 Realistic phone simulator (`mobile-sim`) — Android/iOS home screen with dock & wallpaper, goal-driven mini-apps: Τηλέφωνο (πληκτρολόγιο+Επαφές), Μηνύματα/Viber (βιντεοκλήση + αναγνώριση ύποπτου SMS), Ρυθμίσεις (γράμματα, Wi-Fi, νυχτερινή λειτουργία, εύρεση συσκευής), Κάμερα (σκανάρισμα QR + έλεγχος συνδέσμου gov.gr), Play/App Store (ενημέρωση εφαρμογής), Ψηφιακός βοηθός (chips διατύπωσης — τίμια «φωνή» χωρίς μικρόφωνο), περιηγητής με 2FA. Επιπλέον: screenshot με τα φυσικά κουμπιά (per-OS chord), κλείσιμο κολλημένης εφαρμογής από τις πρόσφατες. Android/iPhone tracks με 19 μαθήματα το καθένα σε 5 ενότητες (Βασικά → Καθημερινή χρήση → Ρυθμίσεις & βοήθεια → Πιο προχωρημένα & AI → Έξυπνα & ασφάλεια), με σημασιολογία «Ολοκληρώθηκε η βασική διαδρομή» ώστε τα νέα μαθήματα να μην υποβαθμίζουν όσους τελείωσαν (dev playground: `/demo/mobile-sim`)
+- 💻 Mac simulator (`mac-simulation`) — Mac desktop με Dock (ένδειξη «τρέχει»), γραμμή μενού και «φανάρια» παραθύρου. Το κεντρικό δίδαγμα: **κλείσιμο παραθύρου (κόκκινο) ≠ τερματισμός εφαρμογής** (⌘Q / μενού «Τερματισμός»). Mac track με 8 μαθήματα σε 3 ενότητες (Τα βασικά του Mac → Finder & Spotlight → Ρυθμίσεις & συντομεύσεις): γνωριμία, άνοιγμα από Dock, τα τρία κουμπιά, κλείσιμο≠έξοδος, Finder, Spotlight, μέγεθος κειμένου, αντιγραφή/επικόλληση με Cmd. Κατηγορία «Mac υπολογιστής», βασική διαδρομή = τα 4 πρώτα μαθήματα
 - 🛡️ Admin Panel for content management
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)
@@ -48,6 +49,7 @@ Navigate to `http://localhost:5173/admin/login`
 Password: `admin123` (configurable in `.env`)
 
 Features:
+
 - Enable/Disable lessons
 - Seed database with default lessons
 - View statistics
@@ -162,6 +164,7 @@ messages/
 5. Repeat
 
 Tests:
+
 ```bash
 bun run test          # All tests
 bun run test:unit     # Vitest unit tests

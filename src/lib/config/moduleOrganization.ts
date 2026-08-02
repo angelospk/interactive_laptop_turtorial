@@ -25,17 +25,18 @@ export const moduleCategories: ModuleCategory[] = [
 		moduleIds: ['module3', 'module4', 'module9']
 	},
 	{ id: 'mobile', title: 'Κινητό τηλέφωνο', moduleIds: ['android', 'iphone'] },
+	{ id: 'mac', title: 'Mac υπολογιστής', moduleIds: ['mac'] },
 	{
 		id: 'internet',
 		title: 'Διαδίκτυο & Επικοινωνία',
 		moduleIds: ['module5', 'module6', 'module11']
 	},
 	{ id: 'apps', title: 'Εφαρμογές & Παραγωγικότητα', moduleIds: ['word', 'module7'] },
-	{ id: 'security', title: 'Ασφάλεια & Προστασία', moduleIds: ['module8', 'module10'] },
+	{ id: 'security', title: 'Ασφάλεια & Προστασία', moduleIds: ['module8', 'module10', 'bank'] },
 	{
 		id: 'digital-life',
 		title: 'Ψηφιακή ζωή & υπηρεσίες',
-		moduleIds: ['module12', 'module13']
+		moduleIds: ['module12', 'module13', 'gov', 'health']
 	}
 ];
 
@@ -63,7 +64,8 @@ export const moduleDevices: Record<string, ModuleDevice[]> = {
 	module7: ['windows', 'mac'], // Excel
 	word: ['windows', 'mac'], // Επεξεργασία Κειμένου
 	android: ['android'], // Android track (ROADMAP Φάση 2)
-	iphone: ['iphone'] // iPhone track (ROADMAP Φάση 2)
+	iphone: ['iphone'], // iPhone track (ROADMAP Φάση 2)
+	mac: ['mac'] // Mac track (CURRICULUM_PLAN §5): Dock/Finder/Spotlight, close≠quit
 };
 
 /**
@@ -84,7 +86,8 @@ export const moduleSimulationPlatform: Record<string, ModuleDevice> = {
 	module13: 'windows',
 	word: 'windows',
 	android: 'android',
-	iphone: 'iphone'
+	iphone: 'iphone',
+	mac: 'mac'
 };
 
 /** Device tags for a module, or `null` when it is universal (applies to all). */
@@ -304,6 +307,68 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'smart-safety',
 			title: 'Έξυπνα & ασφάλεια',
 			lessonIds: ['iphone-scam-sms', 'iphone-two-factor']
+		}
+	],
+	// Mac track (CURRICULUM_PLAN §5). «Τα βασικά του Mac» is the base path — its
+	// four lessons (γνωριμία + άνοιγμα + κλείσιμο ≠ τερματισμός) are the core.
+	mac: [
+		{
+			id: 'basics',
+			title: 'Τα βασικά του Mac',
+			completionRole: 'base',
+			lessonIds: ['mac-intro', 'mac-open-dock', 'mac-close-window', 'mac-quit']
+		},
+		{
+			id: 'finder-spotlight',
+			title: 'Finder & Spotlight',
+			lessonIds: ['mac-finder', 'mac-spotlight']
+		},
+		{
+			id: 'settings-shortcuts',
+			title: 'Ρυθμίσεις & συντομεύσεις',
+			lessonIds: ['mac-text-size', 'mac-copy-paste', 'mac-pointer-size']
+		}
+	],
+	// gov.gr track (Φάση 3). Base = σύνδεση + εύρεση + λήψη βεβαίωσης.
+	gov: [
+		{
+			id: 'get-certificate',
+			title: 'Βρες τη βεβαίωσή σου',
+			completionRole: 'base',
+			lessonIds: ['gov-login', 'gov-find-family-cert', 'gov-download-cert']
+		},
+		{
+			id: 'more',
+			title: 'Περισσότερα',
+			lessonIds: ['gov-find-birth-cert', 'gov-authorize']
+		}
+	],
+	// Health services track (Φάση 3).
+	health: [
+		{
+			id: 'eprescription',
+			title: 'Άυλη συνταγογράφηση',
+			completionRole: 'base',
+			lessonIds: ['health-lesson1', 'health-lesson2', 'health-lesson3']
+		},
+		{
+			id: 'myhealth-appointments',
+			title: 'MyHealth & ραντεβού',
+			lessonIds: ['health-lesson4', 'health-lesson5', 'health-lesson6']
+		}
+	],
+	// e-banking track (Φάση 3).
+	bank: [
+		{
+			id: 'core',
+			title: 'Ασφαλής τραπεζική',
+			completionRole: 'base',
+			lessonIds: ['bank-padlock-quiz', 'bank-open-secure', 'bank-secure-login', 'bank-transfer']
+		},
+		{
+			id: 'protection',
+			title: 'Προστασία από απάτες',
+			lessonIds: ['bank-fake-sms-quiz']
 		}
 	]
 };

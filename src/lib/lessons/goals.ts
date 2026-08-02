@@ -100,6 +100,28 @@ export const GOALS = {
 	'mobile-spot-scam-sms': { requiresAppId: false },
 	'mobile-enter-2fa': { requiresAppId: false },
 
+	// Mac simulation (mac-simulation lessonType — namespaced `mac-` so desktop,
+	// mobile and mac events can never satisfy each other). The pivotal Mac concept
+	// is close (red traffic light) ≠ quit (⌘Q / menu «Quit»).
+	'mac-open-from-dock': { requiresAppId: true },
+	'mac-close-window': { requiresAppId: true },
+	'mac-quit-app': { requiresAppId: true },
+	'mac-finder-open-folder': { requiresAppId: false },
+	'mac-spotlight-search': { requiresAppId: true },
+	'mac-increase-size': { requiresAppId: false },
+
+	// gov.gr track (gov-simulation lessonType) — TaxisNet login, βεβαιώσεις,
+	// εξουσιοδοτήσεις. `gov-download` reuses the generic `download-file` goal.
+	'gov-login': { requiresAppId: false },
+	'gov-find-service': { requiresAppId: false },
+	'gov-authorize': { requiresAppId: false },
+
+	// Health services track (health-simulation lessonType) — άυλη συνταγογράφηση,
+	// MyHealth, ραντεβού.
+	'health-read-eprescription-code': { requiresAppId: false },
+	'health-view-prescriptions': { requiresAppId: false },
+	'health-book-appointment': { requiresAppId: false },
+
 	// Word Processor
 	'update-text': { requiresAppId: false },
 	'format-text-bold': { requiresAppId: false },

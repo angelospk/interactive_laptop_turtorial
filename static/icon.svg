@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Ψηφιακά Βήματα</title>
+  <rect width="512" height="512" rx="96" fill="#2563eb" />
+  <g fill="#ffffff">
+    <!-- laptop base -->
+    <rect x="128" y="150" width="256" height="168" rx="16" fill="none" stroke="#ffffff" stroke-width="18" />
+    <rect x="152" y="174" width="208" height="120" rx="6" fill="#dbeafe" />
+    <path d="M96 336 h320 a24 24 0 0 1 24 24 v6 H72 v-6 a24 24 0 0 1 24 -24 z" />
+  </g>
+  <text x="256" y="270" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="96" font-weight="800"
+        text-anchor="middle" fill="#2563eb">Ψ</text>
+</svg>

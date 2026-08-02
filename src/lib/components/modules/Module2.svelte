@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState } from '$lib/gameStore.svelte';
+	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
 	import {
@@ -109,7 +109,7 @@
 		if (isValid) {
 			currentChallenge.completed = true;
 			toast.success(`Άσκηση ${currentChallenge.id}: Επιτυχία!`);
-			gameState.updateProgress('module2', currentChallenge.progressValue);
+			appState.updateProgress('module2', currentChallenge.progressValue);
 
 			if (currentChallengeIndex < challenges.length - 1) {
 				currentChallengeIndex++;

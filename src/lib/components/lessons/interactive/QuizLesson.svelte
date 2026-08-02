@@ -19,7 +19,7 @@
 	const questions = config.questions || [config]; // Fallback for single question config
 
 	let currentQuestionIndex = $state(0);
-	let selectedOption = $state<string | null>(null);
+	let selectedOption = $state<string | undefined>(undefined);
 	let submitted = $state(false);
 	let isCorrect = $state(false);
 	let score = $state(0);
@@ -50,7 +50,7 @@
 	function handleNext() {
 		if (currentQuestionIndex < questions.length - 1) {
 			currentQuestionIndex++;
-			selectedOption = null;
+			selectedOption = undefined;
 			submitted = false;
 			isCorrect = false;
 		} else {
@@ -68,7 +68,7 @@
 
 	function handleRetry() {
 		submitted = false;
-		selectedOption = null;
+		selectedOption = undefined;
 		isCorrect = false;
 	}
 </script>

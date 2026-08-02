@@ -712,12 +712,12 @@
                 {
                   "module": "module10",
                   "lesson": "scam-spotter-email",
-                  "label": "Απάτη ή Όχι; — Email"
+                  "label": "Απάτη ή Όχι; (Email)"
                 },
                 {
                   "module": "module10",
                   "lesson": "scam-spotter-sms",
-                  "label": "Απάτη ή Όχι; — SMS"
+                  "label": "Απάτη ή Όχι; (SMS)"
                 }
               ]
             },

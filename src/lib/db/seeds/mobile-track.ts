@@ -180,7 +180,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				targetAppId: 'viber',
 				targetConversationId: 'eleni',
 				conversations: CONVERSATIONS,
-				successMessage: 'Μπράβο! Η βιντεοκλήση ξεκίνησε — βλέπεις και ακούς την Ελένη.',
+				successMessage: 'Μπράβο! Η βιντεοκλήση ξεκίνησε, βλέπεις και ακούς την Ελένη.',
 				hint: 'Άνοιξε τη συνομιλία με την Ελένη και πάτησε το εικονίδιο της κάμερας πάνω δεξιά.'
 			}
 		},
@@ -221,7 +221,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			config: {
 				goal: 'mobile-scan-qr',
 				prompt:
-					'Σκάναρε τον κωδικό QR με την Κάμερα και άνοιξε τον σύνδεσμο — αφού βεβαιωθείς ότι είναι το επίσημο gov.gr.',
+					'Σκάναρε τον κωδικό QR με την Κάμερα και άνοιξε τον σύνδεσμο, αφού βεβαιωθείς ότι είναι το επίσημο gov.gr.',
 				targetAppId: 'camera',
 				qrUrl: 'https://www.gov.gr/ipiresies/polites-kai-kathimerinotita',
 				targetHost: 'gov.gr',
@@ -281,7 +281,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			config: {
 				goal: 'mobile-assistant-task',
 				prompt:
-					'Άνοιξε τον «Ψηφιακό βοηθό» και ζήτα του να βάλει ξυπνητήρι — διάλεξε την πιο ξεκάθαρη διατύπωση.',
+					'Άνοιξε τον «Ψηφιακό βοηθό» και ζήτα του να βάλει ξυπνητήρι. Διάλεξε την πιο ξεκάθαρη διατύπωση.',
 				targetAppId: 'assistant',
 				intent: 'alarm',
 				assistantGreeting: 'Γεια σου! Τι θέλεις να κάνω; Διάλεξε πώς θα το έλεγες:',
@@ -302,7 +302,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			config: {
 				goal: 'mobile-assistant-task',
 				prompt:
-					'Ζήτα από τον «Ψηφιακό βοηθό» να σου θυμίσει να πάρεις το χάπι σου — διάλεξε τη σωστή διατύπωση.',
+					'Ζήτα από τον «Ψηφιακό βοηθό» να σου θυμίσει να πάρεις το χάπι σου. Διάλεξε τη σωστή διατύπωση.',
 				targetAppId: 'assistant',
 				intent: 'reminder',
 				assistantConfirm:
@@ -323,7 +323,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 			config: {
 				goal: 'mobile-assistant-task',
 				prompt:
-					'Ρώτα σωστά τον «Ψηφιακό βοηθό» ποια φαρμακεία είναι ανοιχτά — διάλεξε την πιο ξεκάθαρη ερώτηση.',
+					'Ρώτα σωστά τον «Ψηφιακό βοηθό» ποια φαρμακεία είναι ανοιχτά. Διάλεξε την πιο ξεκάθαρη ερώτηση.',
 				targetAppId: 'assistant',
 				intent: 'ask',
 				assistantGreeting: 'Ρώτησέ με κάτι. Διάλεξε πώς θα το έλεγες:',
@@ -361,7 +361,7 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 						]
 					}
 				],
-				successMessage: 'Μπράβο! Το αναγνώρισες ως ύποπτο — μην πατήσεις τον σύνδεσμο.',
+				successMessage: 'Μπράβο! Το αναγνώρισες ως ύποπτο. Μην πατήσεις τον σύνδεσμο.',
 				hint: 'Άγνωστος αριθμός, βιασύνη για πληρωμή και περίεργη διεύθυνση = σημάδια απάτης.'
 			}
 		},

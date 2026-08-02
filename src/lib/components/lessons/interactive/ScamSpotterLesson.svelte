@@ -13,9 +13,12 @@
 		Lightbulb
 	} from 'lucide-svelte';
 	import type { Lesson } from '$lib/db/schema';
+	import DeviceSms from './scam/DeviceSms.svelte';
 
+	// Only `config` is read here, so accept any lesson-shaped object that carries it
+	// (full DB Lesson from the registry, or the trimmed ScamExercise from /apates).
 	let { lesson, onComplete, onBack } = $props<{
-		lesson: Lesson;
+		lesson: Pick<Lesson, 'config'>;
 		onComplete: (score: number) => void;
 		onBack: () => void;
 	}>();
@@ -23,6 +26,8 @@
 	interface ScamCard {
 		id: string;
 		channel: 'email' | 'sms' | 'viber' | 'phone';
+		/** SMS-only: render the bubble with Android or iOS chrome (per-device lesson). */
+		deviceVariant?: 'android' | 'ios';
 		from: string;
 		fromAddress?: string;
 		subject?: string;
@@ -131,10 +136,10 @@
 							{#if card.subject}
 								<p class="text-lg font-semibold text-slate-900">{card.subject}</p>
 							{/if}
-							<p class="whitespace-pre-line leading-relaxed text-slate-700">{card.body}</p>
+							<p class="leading-relaxed whitespace-pre-line text-slate-700">{card.body}</p>
 							{#if card.link}
 								<p
-									class="flex items-center gap-2 break-all rounded-md bg-slate-100 p-2 font-mono text-sm text-blue-700"
+									class="flex items-center gap-2 rounded-md bg-slate-100 p-2 font-mono text-sm break-all text-blue-700"
 								>
 									<LinkIcon class="h-4 w-4 shrink-0" aria-hidden="true" />
 									<span><span class="sr-only">Σύνδεσμος: </span>{card.link}</span>
@@ -151,10 +156,12 @@
 							<span class="ml-auto text-xs font-medium text-purple-500">Viber</span>
 						</div>
 						<div class="bg-purple-50/40 p-4">
-							<div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-white p-3 shadow-sm ring-1 ring-purple-100">
-								<p class="whitespace-pre-line leading-relaxed text-slate-800">{card.body}</p>
+							<div
+								class="max-w-[85%] rounded-2xl rounded-tl-sm bg-white p-3 shadow-sm ring-1 ring-purple-100"
+							>
+								<p class="leading-relaxed whitespace-pre-line text-slate-800">{card.body}</p>
 								{#if card.link}
-									<p class="mt-1 break-all font-mono text-sm text-blue-700">
+									<p class="mt-1 font-mono text-sm break-all text-blue-700">
 										<span class="sr-only">Σύνδεσμος: </span>{card.link}
 									</p>
 								{/if}
@@ -162,7 +169,9 @@
 						</div>
 					{:else if card.channel === 'phone'}
 						<!-- Incoming phone call -->
-						<div class="flex items-center gap-3 border-b border-slate-200 bg-slate-800 p-4 text-white">
+						<div
+							class="flex items-center gap-3 border-b border-slate-200 bg-slate-800 p-4 text-white"
+						>
 							<div
 								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/90"
 								aria-hidden="true"
@@ -179,13 +188,20 @@
 						</div>
 						<div class="space-y-2 p-4">
 							<p class="text-sm font-medium text-slate-500">Ο/Η καλών λέει:</p>
-							<p class="whitespace-pre-line leading-relaxed text-slate-700 italic">«{card.body}»</p>
+							<p class="leading-relaxed whitespace-pre-line text-slate-700 italic">«{card.body}»</p>
 							{#if card.link}
-								<p class="break-all font-mono text-sm text-blue-700">
+								<p class="font-mono text-sm break-all text-blue-700">
 									<span class="sr-only">Αναφέρει: </span>{card.link}
 								</p>
 							{/if}
 						</div>
+					{:else if card.channel === 'sms' && card.deviceVariant}
+						<DeviceSms
+							deviceVariant={card.deviceVariant}
+							from={card.from}
+							body={card.body}
+							link={card.link}
+						/>
 					{:else}
 						<!-- SMS bubble -->
 						<div class="flex items-center gap-2 border-b border-slate-200 bg-slate-50 p-3">
@@ -196,9 +212,9 @@
 						</div>
 						<div class="p-4">
 							<div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-100 p-3">
-								<p class="whitespace-pre-line leading-relaxed text-slate-800">{card.body}</p>
+								<p class="leading-relaxed whitespace-pre-line text-slate-800">{card.body}</p>
 								{#if card.link}
-									<p class="mt-1 break-all font-mono text-sm text-blue-700">
+									<p class="mt-1 font-mono text-sm break-all text-blue-700">
 										<span class="sr-only">Σύνδεσμος: </span>{card.link}
 									</p>
 								{/if}
@@ -257,9 +273,7 @@
 							</ul>
 							<p class="mt-3 leading-relaxed text-slate-600">{card.explanation}</p>
 							{#if card.takeaway}
-								<p
-									class="mt-3 flex gap-2 rounded-md bg-amber-50 p-3 text-amber-900"
-								>
+								<p class="mt-3 flex gap-2 rounded-md bg-amber-50 p-3 text-amber-900">
 									<Lightbulb class="h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
 									<span class="font-medium">{card.takeaway}</span>
 								</p>

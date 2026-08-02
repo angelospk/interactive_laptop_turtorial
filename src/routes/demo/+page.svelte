@@ -3,3 +3,4 @@
 </script>
 
 <a href={resolve('/demo/paraglide')}>paraglide</a>
+<a href={resolve('/demo/mac-sim')}>mac-sim</a>

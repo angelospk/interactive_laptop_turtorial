@@ -55,10 +55,11 @@ describe('groupModulesByCategory', () => {
 		expect(groupModulesByCategory(all).some((g) => g.category?.id === 'other')).toBe(false);
 	});
 
-	it('exposes 7 categories (incl. windows + mobile device groups)', () => {
-		expect(moduleCategories).toHaveLength(7);
+	it('exposes 8 categories (incl. windows + mobile + mac device groups)', () => {
+		expect(moduleCategories).toHaveLength(8);
 		expect(moduleCategories.map((c) => c.id)).toContain('mobile');
 		expect(moduleCategories.map((c) => c.id)).toContain('windows');
+		expect(moduleCategories.map((c) => c.id)).toContain('mac');
 	});
 
 	it('groups the Windows-simulated environment modules under "windows"', () => {

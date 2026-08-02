@@ -1,4 +1,3 @@
-import { Select as SelectPrimitive } from "bits-ui";
 
 import Group from "./select-group.svelte";
 import Label from "./select-label.svelte";
@@ -9,8 +8,7 @@ import Separator from "./select-separator.svelte";
 import ScrollDownButton from "./select-scroll-down-button.svelte";
 import ScrollUpButton from "./select-scroll-up-button.svelte";
 import GroupHeading from "./select-group-heading.svelte";
-
-const Root = SelectPrimitive.Root;
+import Root from "./select-root.svelte";
 
 export {
 	Root,

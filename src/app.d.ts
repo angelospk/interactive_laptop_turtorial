@@ -6,6 +6,7 @@ declare global {
 		interface Locals {
 			user?: import('$lib/types').UserSession;
 			admin?: boolean;
+			db: typeof import('$lib/db/client').db;
 		}
 		// interface PageData {}
 		// interface PageState {}
@@ -13,4 +14,4 @@ declare global {
 	}
 }
 
-export { };
+export {};

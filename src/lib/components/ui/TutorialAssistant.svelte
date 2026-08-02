@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { X, Minimize2, Maximize2, HelpCircle } from 'lucide-svelte';
+	import { Minimize2, HelpCircle } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
-	import { onMount } from 'svelte';
 
 	let {
 		instructions = 'Ακολουθήστε τις οδηγίες για να ολοκληρώσετε το μάθημα.',
@@ -17,27 +16,32 @@
 		lessonId?: string;
 	}>();
 
-	// Global storage key - same for all lessons
-	const storageKey = 'tutorial-assistant-minimized';
+	// Per-lesson storage key: the assistant opens expanded on the first visit to a
+	// lesson, then starts minimized on subsequent visits. Falls back to a global
+	// key when no lessonId is supplied.
+	const storageKey = $derived(
+		lessonId ? `tutorial-assistant-${lessonId}-seen` : 'tutorial-assistant-minimized'
+	);
 
 	let isMinimized = $state(false);
-	let hasInitialized = $state(false);
 
-	// Check localStorage on mount to determine initial state
-	onMount(() => {
+	// Re-read persisted state whenever the storage key changes (e.g. navigating
+	// between lessons without unmounting). The effect's only reactive dependency
+	// is `storageKey` — it never reads `isMinimized`, so setting state or writing
+	// localStorage here cannot re-trigger it.
+	$effect(() => {
 		if (typeof localStorage !== 'undefined') {
-			const wasMinimized = localStorage.getItem(storageKey) === 'true';
-			isMinimized = wasMinimized;
+			const hasBeenSeen = localStorage.getItem(storageKey) === 'true';
+			// Seen before → start minimized. First visit → stay expanded and mark seen.
+			isMinimized = hasBeenSeen;
+			if (!hasBeenSeen) {
+				localStorage.setItem(storageKey, 'true');
+			}
 		}
-		hasInitialized = true;
 	});
 
 	function toggleMinimize() {
 		isMinimized = !isMinimized;
-		// Save state globally
-		if (typeof localStorage !== 'undefined') {
-			localStorage.setItem(storageKey, isMinimized.toString());
-		}
 	}
 </script>
 
@@ -72,7 +76,7 @@
 					<CardContent class="p-4 pt-0">
 						{#if Array.isArray(instructions)}
 							<ul class="list-inside list-decimal space-y-2 text-sm leading-relaxed text-slate-700">
-								{#each instructions as step}
+								{#each instructions as step, i (i)}
 									<li>{step}</li>
 								{/each}
 							</ul>

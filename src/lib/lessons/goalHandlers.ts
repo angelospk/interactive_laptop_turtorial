@@ -215,6 +215,59 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-enter-2fa': (action, data, config) =>
 		action === 'mobile-2fa-submitted' && data.code === config.twofaCode,
 
+	// ── Mac simulation ─────────────────────────────────────────────────────
+	// Open the target app FROM THE DOCK (not Spotlight/menu): the source
+	// disambiguates, so a Spotlight launch never satisfies a Dock lesson.
+	'mac-open-from-dock': (action, data, config) =>
+		action === 'mac-app-opened' && data.source === 'dock' && data.appId === config.targetAppId,
+
+	// Close the window with the red traffic light. The app KEEPS running (dot in
+	// the Dock) — this is the whole point of the "3 buttons" lesson. Minimise/zoom
+	// emit `mac-window-control-used`, so they read as a miss here, never a pass.
+	'mac-close-window': (action, data, config) =>
+		action === 'mac-window-closed' && data.appId === config.targetAppId,
+
+	// Quit the app entirely (⌘Q or menu «Quit») — only then does the Dock dot go
+	// away. Closing the window first (above) must NOT satisfy this.
+	'mac-quit-app': (action, data, config) =>
+		action === 'mac-app-quit' && data.appId === config.targetAppId,
+
+	// Finder: open the target folder (or any folder when no target is set).
+	'mac-finder-open-folder': (action, data, config) =>
+		action === 'mac-folder-opened' &&
+		(!config.targetFolderId || data.folderId === config.targetFolderId),
+
+	// Spotlight: the learner must ACTIVATE the searched result, not just type.
+	// Reuses `mac-app-opened` with source 'spotlight' so the app really opens.
+	'mac-spotlight-search': (action, data, config) =>
+		action === 'mac-app-opened' && data.source === 'spotlight' && data.appId === config.targetAppId,
+
+	// Accessibility: increase a specific setting (default: text) to the target
+	// size. The setting id is explicit so text vs pointer sizing never collide.
+	'mac-increase-size': (action, data, config) =>
+		action === 'mac-size-changed' &&
+		data.setting === (config.targetSetting ?? 'text') &&
+		(!config.targetSize || data.size === config.targetSize),
+
+	// ── gov.gr track ───────────────────────────────────────────────────────
+	'gov-login': (action, data) => action === 'gov-login' && data.success === true,
+
+	'gov-find-service': (action, data, config) =>
+		action === 'gov-service-selected' &&
+		(!config.targetServiceId || data.serviceId === config.targetServiceId),
+
+	'gov-authorize': (action) => action === 'gov-authorize',
+
+	// ── Health services track ──────────────────────────────────────────────
+	'health-read-eprescription-code': (action, data) =>
+		action === 'health-code-revealed' && data.confirmed === true,
+
+	'health-view-prescriptions': (action) => action === 'health-prescriptions-viewed',
+
+	'health-book-appointment': (action, data, config) =>
+		action === 'health-appointment-booked' &&
+		(!config.targetSlotId || data.slotId === config.targetSlotId),
+
 	// ── Word Processor ─────────────────────────────────────────────────────
 	'update-text': (action, data, config) => {
 		if (action !== 'update-text') return false;

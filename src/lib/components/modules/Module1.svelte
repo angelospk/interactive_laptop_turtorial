@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState } from '$lib/gameStore.svelte';
+	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
@@ -28,7 +28,7 @@
 	function checkSniperCompletion() {
 		if (bubbles.every((b) => b.hovered)) {
 			toast.success('Άσκηση 1: Τέλειος σκοπευτής!');
-			gameState.updateProgress('module1', 15);
+			appState.updateProgress('module1', 15);
 		}
 	}
 
@@ -38,7 +38,7 @@
 		clickTargets[index] = false;
 		if (clickTargets.every((t) => !t)) {
 			toast.success('Άσκηση 2: Εξαφάνισες τα κουμπιά!');
-			gameState.updateProgress('module1', 30);
+			appState.updateProgress('module1', 30);
 		}
 	}
 
@@ -48,7 +48,7 @@
 		if (!folderOpen) {
 			folderOpen = true;
 			toast.success('Άσκηση 3: Ο φάκελος άνοιξε!');
-			gameState.updateProgress('module1', 45);
+			appState.updateProgress('module1', 45);
 		}
 	}
 
@@ -80,7 +80,7 @@
 				piece.dropped = true;
 				if (puzzlePieces.every((p) => p.dropped)) {
 					toast.success('Άσκηση 4: Το παζλ ολοκληρώθηκε!');
-					gameState.updateProgress('module1', 65);
+					appState.updateProgress('module1', 65);
 				}
 			}
 		} else {
@@ -91,7 +91,7 @@
 	// --- 5. Right Click Exercise ---
 	function handleRightClick() {
 		toast.success('Άσκηση 5: Βρήκες το κρυμμένο μενού!');
-		gameState.updateProgress('module1', 80);
+		appState.updateProgress('module1', 80);
 	}
 
 	// --- 6. Scroll Exercise ---
@@ -99,10 +99,8 @@
 		const target = e.currentTarget as HTMLElement;
 		// Check if scrolled to the bottom
 		if (target.scrollHeight - target.scrollTop === target.clientHeight) {
-			if (gameState.subscribe((s) => s.progress.module1 < 100)) {
-				toast.success('Άσκηση 6: Έφτασες στο τέλος!');
-				gameState.updateProgress('module1', 100);
-			}
+			toast.success('Άσκηση 6: Έφτασες στο τέλος!');
+			appState.updateProgress('module1', 100);
 		}
 	}
 </script>

@@ -18,7 +18,7 @@
 		onEvent,
 		qrUrl,
 		targetHost = '',
-		pageTitle = 'gov.gr — Ενιαία Ψηφιακή Πύλη'
+		pageTitle = 'gov.gr: Ενιαία Ψηφιακή Πύλη'
 	}: {
 		onEvent: (action: string, data?: Record<string, unknown>) => void;
 		qrUrl: string;
@@ -90,7 +90,7 @@
 				onclick={() => (stage = 'viewfinder')}
 				class="min-h-[44px] text-base font-medium text-slate-600 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
 			>
-				Άκυρο — δεν το εμπιστεύομαι
+				Άκυρο, δεν το εμπιστεύομαι
 			</button>
 		</div>
 	{:else}
