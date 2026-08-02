@@ -33,7 +33,7 @@
 <div
 	class="absolute inset-x-0 bottom-2 flex justify-center"
 	role="toolbar"
-	aria-label="Dock — γραμμή εφαρμογών"
+	aria-label="Dock, γραμμή εφαρμογών"
 >
 	<div
 		class="flex items-end gap-2 rounded-2xl border border-white/40 bg-white/30 px-3 py-2 shadow-lg backdrop-blur-md"

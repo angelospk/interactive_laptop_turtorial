@@ -149,7 +149,7 @@
 					{disabled}
 				>
 					<Check class="h-6 w-6" />
-					Το είδα — συνέχεια
+					Το είδα, συνέχεια
 				</button>
 			</div>
 		{/if}

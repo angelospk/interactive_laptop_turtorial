@@ -51,7 +51,7 @@
 		</div>
 	{:else}
 		<div class="space-y-4 p-5">
-			<p class="text-lg font-bold text-slate-900">{serviceName} — Σύνδεση</p>
+			<p class="text-lg font-bold text-slate-900">{serviceName}: Σύνδεση</p>
 
 			{#if done}
 				<div class="flex flex-col items-center gap-3 py-6 text-center">
