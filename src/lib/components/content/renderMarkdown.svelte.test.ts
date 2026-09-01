@@ -23,6 +23,35 @@ describe('renderMarkdown', () => {
 		expect(html).toContain('player.vimeo.com/video/123');
 		expect(html).toContain('<iframe');
 	});
+	// Regression (bd-k50): `target` is in ADD_ATTR, so a target=_blank link is
+	// reverse-tabnabbing-capable unless we force rel on the way out.
+	it('forces rel="noopener noreferrer" on any link that keeps a target', () => {
+		const { html } = renderMarkdown('<a href="https://x.gr" target="_blank">κλικ</a>');
+		expect(html).toContain('target="_blank"');
+		expect(html).toMatch(/rel="[^"]*noopener[^"]*"/);
+		expect(html).toMatch(/rel="[^"]*noreferrer[^"]*"/);
+	});
+
+	it('does not add rel to links without a target', () => {
+		const { html } = renderMarkdown('[link](https://x.gr)');
+		expect(html).not.toContain('rel=');
+	});
+
+	it('preserves an author-supplied rel while still forcing noopener', () => {
+		const { html } = renderMarkdown(
+			'<a href="https://x.gr" target="_blank" rel="nofollow">κλικ</a>'
+		);
+		expect(html).toContain('nofollow');
+		expect(html).toMatch(/rel="[^"]*noopener[^"]*"/);
+	});
+
+	it('strips an iframe that smuggles content through srcdoc', () => {
+		const { html } = renderMarkdown(
+			'<iframe src="https://player.vimeo.com/video/1" srcdoc="<script>alert(1)</script>"></iframe>'
+		);
+		expect(html).not.toContain('srcdoc');
+	});
+
 	it('strips non-Vimeo iframe', () => {
 		const { html } = renderMarkdown('<iframe src="https://evil.example/x"></iframe>');
 		expect(html).not.toContain('<iframe');

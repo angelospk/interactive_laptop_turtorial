@@ -14,10 +14,22 @@ function ensureHook(): void {
 		if (data.tagName === 'iframe') {
 			const el = node as Element;
 			const src = el.getAttribute('src') || '';
-			if (!src.startsWith('https://player.vimeo.com/')) {
+			if (!src.startsWith('https://player.vimeo.com/') || el.hasAttribute('srcdoc')) {
 				el.parentNode?.removeChild(el);
 			}
 		}
+	});
+	// `target` is allowed through ADD_ATTR, so every element that keeps one must
+	// also carry rel="noopener noreferrer" or the opened page can reach back via
+	// window.opener (reverse tabnabbing). Content is fetched at runtime from
+	// PUBLIC_CONTENT_BASE_URL, so this is not purely hypothetical.
+	DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+		const el = node as Element;
+		if (typeof el.hasAttribute !== 'function' || !el.hasAttribute('target')) return;
+		const rel = new Set((el.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+		rel.add('noopener');
+		rel.add('noreferrer');
+		el.setAttribute('rel', [...rel].join(' '));
 	});
 	hookAdded = true;
 }
@@ -54,6 +66,11 @@ function extractToc(html: string): RenderedContent {
 
 /** Parse markdown to sanitized HTML + a TOC. Safe for {@html}. Browser-only. */
 export function renderMarkdown(src: string): RenderedContent {
+	// Without a DOM, DOMPurify.sanitize() is a pass-through — it would return the
+	// raw HTML unchanged and the caller would {@html} it. Fail loudly instead.
+	if (!DOMPurify.isSupported) {
+		throw new Error('renderMarkdown requires a DOM: DOMPurify cannot sanitize here.');
+	}
 	ensureHook();
 	const raw = marked.parse(src, { gfm: true, breaks: false, async: false }) as string;
 	const { html: withIds, toc } = extractToc(raw);
