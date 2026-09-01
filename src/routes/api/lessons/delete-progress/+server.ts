@@ -22,7 +22,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Parse request body
         const { lessonId } = await request.json();
 
-        if (!lessonId) {
+        // Strict: a bare truthiness check forwards numbers/objects/arrays into
+        // eq(userProgress.lessonId, …) and lets the driver decide (bd-pfx).
+        if (typeof lessonId !== 'string' || lessonId.trim() === '') {
             throw error(400, 'Lesson ID is required');
         }
 
