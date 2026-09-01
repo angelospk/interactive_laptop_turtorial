@@ -3,49 +3,46 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/db/client';
 import { userProgress } from '$lib/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { requireUser } from '$lib/server/guards';
 
 /**
  * POST /api/lessons/delete-progress
- * 
+ *
  * Deletes lesson progress for the authenticated user.
  * Used when user clicks "Try Again" to reset their progress.
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-    // Authentication check
-    if (!locals.user) {
-        throw error(401, 'Unauthorized');
-    }
+	// Authentication check
+	const user = requireUser(locals);
 
-    const { user } = locals;
+	try {
+		// Parse request body
+		const { lessonId } = await request.json();
 
-    try {
-        // Parse request body
-        const { lessonId } = await request.json();
+		// Strict: a bare truthiness check forwards numbers/objects/arrays into
+		// eq(userProgress.lessonId, …) and lets the driver decide (bd-pfx).
+		if (typeof lessonId !== 'string' || lessonId.trim() === '') {
+			throw error(400, 'Lesson ID is required');
+		}
 
-        // Strict: a bare truthiness check forwards numbers/objects/arrays into
-        // eq(userProgress.lessonId, …) and lets the driver decide (bd-pfx).
-        if (typeof lessonId !== 'string' || lessonId.trim() === '') {
-            throw error(400, 'Lesson ID is required');
-        }
+		// Delete the progress record
+		await db
+			.delete(userProgress)
+			.where(and(eq(userProgress.userId, user.id), eq(userProgress.lessonId, lessonId)))
+			.run();
 
-        // Delete the progress record
-        await db
-            .delete(userProgress)
-            .where(and(eq(userProgress.userId, user.id), eq(userProgress.lessonId, lessonId)))
-            .run();
+		return json({
+			success: true,
+			message: 'Progress deleted successfully'
+		});
+	} catch (err) {
+		// Re-throw SvelteKit errors
+		if (err && typeof err === 'object' && 'status' in err) {
+			throw err;
+		}
 
-        return json({
-            success: true,
-            message: 'Progress deleted successfully'
-        });
-    } catch (err) {
-        // Re-throw SvelteKit errors
-        if (err && typeof err === 'object' && 'status' in err) {
-            throw err;
-        }
-
-        // Log unexpected errors
-        console.error('Error deleting lesson progress:', err);
-        throw error(500, 'Failed to delete lesson progress');
-    }
+		// Log unexpected errors
+		console.error('Error deleting lesson progress:', err);
+		throw error(500, 'Failed to delete lesson progress');
+	}
 };

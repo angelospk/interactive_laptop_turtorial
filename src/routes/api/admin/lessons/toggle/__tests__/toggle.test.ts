@@ -106,7 +106,7 @@ describe('POST /api/admin/lessons/toggle', () => {
 		expect(lesson?.enabled).toBe(true);
 	});
 
-	it('should return 401 if not admin', async () => {
+	it('should return 403 if not admin', async () => {
 		const mockRequest = {
 			json: async () => ({
 				lessonId: testLessonId,
@@ -123,7 +123,7 @@ describe('POST /api/admin/lessons/toggle', () => {
 		} as unknown as Parameters<typeof POST>[0];
 
 		await expect(POST(mockEvent)).rejects.toMatchObject({
-			status: 401
+			status: 403
 		});
 	});
 

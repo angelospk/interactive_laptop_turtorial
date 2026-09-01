@@ -59,7 +59,9 @@ describe('POST /api/admin/seed', () => {
 		expect(lessonsInDb).toHaveLength(allLessons.length);
 	});
 
-	it('should return 401 if not admin', async () => {
+	// Normalised by bd-7gk: /api/admin/* answered 401 while /admin pages answered
+	// 403 for the identical condition. Both are 403 now (see server/guards.ts).
+	it('should return 403 if not admin', async () => {
 		const mockEvent = {
 			locals: {
 				admin: false,
@@ -68,7 +70,7 @@ describe('POST /api/admin/seed', () => {
 		} as unknown as Parameters<typeof POST>[0];
 
 		await expect(POST(mockEvent)).rejects.toMatchObject({
-			status: 401
+			status: 403
 		});
 	});
 

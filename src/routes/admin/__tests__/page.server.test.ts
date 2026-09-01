@@ -22,6 +22,11 @@ vi.mock('$lib/db/client', () => ({
 vi.mock('@sveltejs/kit', () => ({
 	error: (status: number, message: string) => {
 		throw new Error(`${status}: ${message}`);
+	},
+	// The load now guards via requireAdminPage(), which redirects rather than
+	// erroring — a non-admin should land on the login form, not a dead end.
+	redirect: (status: number, location: string) => {
+		throw Object.assign(new Error(`${status}: ${location}`), { status, location });
 	}
 }));
 
@@ -30,9 +35,12 @@ describe('Admin Page Load', () => {
 		vi.clearAllMocks();
 	});
 
-	it('should throw 403 if not admin', async () => {
+	it('should redirect to the admin login if not admin', async () => {
 		const locals = { admin: false } as any;
-		await expect(load({ locals } as any)).rejects.toThrow('Unauthorized');
+		await expect(load({ locals } as any)).rejects.toMatchObject({
+			status: 302,
+			location: '/admin/login'
+		});
 	});
 
 	it('should return grouped lessons if admin', async () => {
