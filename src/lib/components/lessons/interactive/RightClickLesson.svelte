@@ -5,6 +5,7 @@
 	import { ContextMenu } from 'bits-ui';
 	import * as m from '$lib/paraglide/messages.js';
 	import { fly } from 'svelte/transition';
+	import { coerceVariant, RIGHT_CLICK_THEMES, type RightClickTheme } from '$lib/lessons/gameConfig';
 
 	interface Props {
 		lesson: Lesson;
@@ -22,9 +23,9 @@
 	};
 	const targetCount = config.targetCount || 6;
 	const timeLimit = config.timeLimit || 50;
-	const theme = config.theme || 'default';
+	const theme = coerceVariant(config.theme, RIGHT_CLICK_THEMES, 'default');
 
-	const themes: Record<string, any> = {
+	const themes: Record<RightClickTheme, any> = {
 		default: {
 			icon: '📦',
 			label: 'Κουτί',
@@ -35,7 +36,7 @@
 			label: 'Δώρο',
 			content: '🎉'
 		}
-	};
+	} satisfies Record<RightClickTheme, unknown>;
 	let currentTheme = $derived(themes[theme] || themes.default);
 
 	let score = $state(0);

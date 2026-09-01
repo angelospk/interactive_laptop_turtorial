@@ -28,10 +28,19 @@
 		return initial.map((url, i) => {
 			let type: Tab['type'] = 'search';
 			let title = url;
-			if (url === 'home') { type = 'home'; title = 'Αρχική'; }
-			else if (url.includes('news')) { type = 'news'; title = 'Ειδήσεις'; }
-			else if (url.includes('weather')) { type = 'weather'; title = 'Καιρός'; }
-			else if (url.includes('gov')) { type = 'gov'; title = 'Gov.gr'; }
+			if (url === 'home') {
+				type = 'home';
+				title = 'Αρχική';
+			} else if (url.includes('news')) {
+				type = 'news';
+				title = 'Ειδήσεις';
+			} else if (url.includes('weather')) {
+				type = 'weather';
+				title = 'Καιρός';
+			} else if (url.includes('gov')) {
+				type = 'gov';
+				title = 'Gov.gr';
+			}
 			return { id: i + 1, title, url, type };
 		});
 	}

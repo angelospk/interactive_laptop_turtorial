@@ -186,7 +186,8 @@ export const module1Lessons: NewLesson[] = [
             targetCount: 20,
             timeLimit: 300,
             gameMode: true,
-            theme: 'default', // TODO: Implement shape path theme
+            theme: 'shape-path',
+            pathId: 'zigzag',
             instructions: 'Ακολουθήστε τη διαδρομή με το ποντίκι χωρίς να βγείτε έξω!'
         },
         enabled: true,

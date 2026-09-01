@@ -4,6 +4,7 @@
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { toast } from 'svelte-sonner';
+	import { coerceVariant, CLICK_THEMES, type ClickTheme } from '$lib/lessons/gameConfig';
 
 	interface Props {
 		lesson: Lesson;
@@ -22,10 +23,10 @@
 	};
 	const targetCount = config.targetCount || 10;
 	const timeLimit = config.timeLimit || 45;
-	const theme = config.theme || 'default';
+	const theme = coerceVariant(config.theme, CLICK_THEMES, 'default');
 
 	// Theme assets/styles
-	const themes: Record<string, any> = {
+	const themes: Record<ClickTheme, any> = {
 		default: {
 			targetClass: 'bg-red-500 border-4 border-white rounded-full shadow-lg',
 			content: 'CLICK',
@@ -67,7 +68,7 @@
 			// Placeholder, logic handled in derived/state
 			isMixed: true
 		}
-	};
+	} satisfies Record<ClickTheme, unknown>;
 
 	// State for mixed mode
 	let mixedType = $state<'click' | 'double-click' | 'right-click'>('click');

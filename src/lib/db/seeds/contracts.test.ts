@@ -16,6 +16,7 @@ import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import { parseMacSimConfig } from '$lib/lessons/macSim';
 import { parseGovSimConfig } from '$lib/lessons/govSim';
 import { parseHealthSimConfig } from '$lib/lessons/healthSim';
+import { parsePrimitiveGameConfig, isPrimitiveLessonType } from '$lib/lessons/gameConfig';
 import el from '../../../../messages/el.json';
 import en from '../../../../messages/en.json';
 
@@ -110,6 +111,38 @@ describe('health-simulation playability', () => {
 		expect(sims.length).toBeGreaterThan(0);
 		for (const l of sims) {
 			expect(() => parseHealthSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
+		}
+	});
+});
+
+// The gap that let bd-5t4 ship: the simulation lessonTypes each had a parser,
+// the mouse/keyboard drills had none. A seed could name any theme it liked.
+describe('primitive lesson playability', () => {
+	const primitives = allLessons.filter((l) => isPrimitiveLessonType(l.lessonType));
+
+	it('covers a meaningful share of the catalogue', () => {
+		expect(primitives.length).toBeGreaterThan(20);
+	});
+
+	// Disabled lessons are checked too: a lesson nobody can reach today is
+	// exactly the one that rots before somebody re-enables it.
+	it('every seeded primitive lesson has a playable config', () => {
+		const broken: string[] = [];
+		for (const l of primitives) {
+			try {
+				parsePrimitiveGameConfig(l.lessonType, l.config);
+			} catch (e) {
+				broken.push(`${l.id} (${l.lessonType}): ${(e as Error).message}`);
+			}
+		}
+		expect(broken, `unplayable lessons:\n${broken.join('\n')}`).toEqual([]);
+	});
+
+	it('registers a contract for every primitive type actually seeded', () => {
+		for (const l of primitives) {
+			expect(() => parsePrimitiveGameConfig(l.lessonType, l.config)).not.toThrow(
+				/No playability contract/
+			);
 		}
 	});
 });
