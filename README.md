@@ -15,6 +15,7 @@ Svelte 5 educational platform for teaching elderly users Windows 11 skills.
 - 📊 Per-user progress tracking
 - 🧩 Dynamic Lesson System (Drag & Drop, Click, Hover, Quiz, etc.)
 - 🎣 Phishing & scam-recognition module with "Scam or Not?" (`scam-spotter`) exercises — 28 realistic Greek scenarios across 4 channels (email, SMS, Viber/messaging, phone/vishing) with per-signal explanations
+- ✅ **Playability contracts** — every seeded lesson is certified at build time, not at the learner's expense. Simulation lessons already had config parsers (`parseMobileSimConfig`, `parseMacSimConfig`, …); the primitive drills (hover/click/drag/typing/quiz…) now have them too in `src/lib/lessons/gameConfig.ts`, and components pair the same variant tuples with `satisfies Record<Theme, …>` so a theme with no renderer fails the build. `contracts.test.ts` runs the parsers over all 218 seeded lessons, including disabled ones
 - 🎯 Multi-level difficulty system (Beginner/Intermediate/Advanced)
 - 🌍 Bilingual support (English/Greek) via inlang
 - 💾 SQLite database (local dev + Turso for production)
