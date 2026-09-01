@@ -3,7 +3,12 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { parseHoverConfig, pathFor, type HoverTheme } from '$lib/lessons/hoverConfig';
+	import {
+		parseHoverConfig,
+		pathFor,
+		type HoverConfig,
+		type HoverTheme
+	} from '$lib/lessons/hoverConfig';
 	import { createPathRun, advancePathRun, pathRunScore, type Point } from '$lib/lessons/shapePath';
 
 	interface Props {
@@ -17,7 +22,18 @@
 	// Validated by the shared contract, so an unimplemented theme can never reach
 	// the renderer (bd-5t4). `THEME_LABELS` is keyed by HoverTheme, so adding a
 	// theme to the contract without handling it here fails to compile.
-	const config = parseHoverConfig(lesson.config);
+	// A live database can still hold a row seeded before the contract existed, so
+	// an invalid config degrades to a readable message rather than throwing
+	// through the renderer and blanking the page for the learner.
+	let configError = $state<string | null>(null);
+	let parsed: HoverConfig;
+	try {
+		parsed = parseHoverConfig(lesson.config);
+	} catch (e) {
+		configError = (e as Error).message;
+		parsed = parseHoverConfig({ theme: 'balloons' });
+	}
+	const config = parsed;
 	const targetCount = config.targetCount;
 	const timeLimit = config.timeLimit;
 	const theme = config.theme;
@@ -151,7 +167,13 @@
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="hover-lesson">
-		{#if !gameStarted}
+		{#if configError}
+			<div class="start-screen">
+				<h2>Το μάθημα δεν είναι διαθέσιμο</h2>
+				<p>Χρειάζεται ενημέρωση του περιεχομένου. Δοκιμάστε ένα άλλο μάθημα.</p>
+				<button class="start-button" onclick={onBack}>Πίσω</button>
+			</div>
+		{:else if !gameStarted}
 			<div class="start-screen">
 				<h2>{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
 				<p>
@@ -408,15 +430,6 @@
 
 	.target.hovering {
 		animation: pulse 0.5s ease;
-	}
-
-	.target-inner {
-		width: 80px;
-		height: 80px;
-		background: radial-gradient(circle, #ef4444 0%, #dc2626 50%, #991b1b 100%);
-		border-radius: 50%;
-		box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-		border: 4px solid white;
 	}
 
 	/* Shape-path Theme */
