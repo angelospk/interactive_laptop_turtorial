@@ -15,7 +15,14 @@ const t = (key: string | null | undefined) => {
 // Τα πεδία του config που περιέχουν κείμενο ορατό στον μαθητή.
 const TEXT_FIELDS = ['instructions', 'goal', 'question', 'prompt', 'hint', 'explanation'] as const;
 
-const oneLine = (s: unknown) => String(s).replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim();
+// `\n` also shows up as a literal two-character escape inside seed strings, not
+// only as a real newline -- collapse both so a cell never breaks the table.
+const oneLine = (s: unknown) =>
+	String(s)
+		.replace(/\\[rn]/g, ' ')
+		.replace(/\s+/g, ' ')
+		.replace(/\|/g, '\\|')
+		.trim();
 
 const lines: string[] = [
 	'# Review μαθημάτων',

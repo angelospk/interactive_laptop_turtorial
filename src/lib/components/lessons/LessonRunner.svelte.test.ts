@@ -41,9 +41,10 @@ const mockLessons = [
 	}
 ];
 
+type Screen = ReturnType<typeof render>;
+
 /** The title heading — plain text would also match the "Μάθημα N από 3" counter. */
-const title = (screen: { getByRole: (r: string, o: object) => unknown }, name: string) =>
-	screen.getByRole('heading', { name });
+const title = (screen: Screen, name: string) => screen.getByRole('heading', { name });
 
 const mount = (props: Record<string, unknown> = {}) =>
 	render(
