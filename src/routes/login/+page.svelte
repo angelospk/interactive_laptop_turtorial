@@ -80,15 +80,6 @@
 	<div class="relative w-full max-w-md" data-reveal use:reveal>
 		<div class="bezel-shell shadow-soft-lg">
 			<div class="bezel-core px-7 py-9 sm:px-9">
-				<!-- Eyebrow -->
-				<div class="mb-6 flex justify-center">
-					<span
-						class="rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-brand uppercase"
-					>
-						Ψηφιακές Δεξιότητες
-					</span>
-				</div>
-
 				<header class="mb-8 text-center">
 					<h1 class="text-4xl font-extrabold text-foreground sm:text-[2.75rem]">{m.app_title()}</h1>
 					<p class="mt-3 text-lg text-muted-foreground">{m.app_subtitle()}</p>

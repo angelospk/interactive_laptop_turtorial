@@ -98,11 +98,6 @@
 
 		<!-- Hero -->
 		<section class="mb-14 max-w-3xl" data-reveal use:reveal>
-			<span
-				class="mb-5 inline-block rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-brand uppercase"
-			>
-				{#if data.user}Καλώς ήρθατε{:else}Ψηφιακές Δεξιότητες{/if}
-			</span>
 			<h1 class="text-4xl font-extrabold text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
 				{messages.app_title()}
 			</h1>
@@ -220,7 +215,7 @@
 			{@const dm = DEVICE_META[preferredDevice]}
 			<section class="mb-12" data-reveal use:reveal>
 				<div class="mb-5 flex flex-wrap items-center gap-3">
-					<h2 class="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+					<h2 class="flex items-center gap-2 text-xl font-bold text-foreground sm:text-2xl">
 						<dm.icon class="h-4 w-4" strokeWidth={2} aria-hidden="true" />
 						Για τη συσκευή σου · {dm.label}
 					</h2>
@@ -252,7 +247,7 @@
 			{#each groupedModules as group (group.category?.id)}
 				<section data-reveal use:reveal>
 					<div class="mb-5 flex items-baseline gap-3">
-						<h2 class="text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+						<h2 class="text-xl font-bold text-foreground sm:text-2xl">
 							{group.category?.title}
 						</h2>
 						<span class="h-px flex-1 bg-border"></span>

@@ -48,11 +48,6 @@
 			</Button>
 
 			<div class="mt-6 flex items-baseline gap-3">
-				<span
-					class="inline-block rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-brand uppercase"
-				>
-					Μαθήματα
-				</span>
 				{#if moduleLessons.length > 0}
 					<span class="text-sm font-medium text-muted-foreground tabular-nums">
 						{moduleLessons.length} μαθήματα
@@ -100,7 +95,7 @@
 					{#each sections as section (section.title)}
 						<section data-reveal use:reveal>
 							<div class="mb-5 flex items-baseline gap-3">
-								<h2 class="text-sm font-semibold tracking-[0.14em] text-brand uppercase">
+								<h2 class="text-xl font-bold text-foreground sm:text-2xl">
 									{section.title}
 								</h2>
 								<span class="h-px flex-1 bg-border"></span>
