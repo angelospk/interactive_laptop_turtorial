@@ -10,9 +10,17 @@ export const load: PageServerLoad = async () => {
         .where(eq(modules.enabled, true))
         .orderBy(asc(modules.orderIndex));
 
-    // Fetch lesson counts and IDs per module
+    // Enabled lessons only, and with enough of each row to work out where
+    // somebody left off. A lesson switched off since their last visit is not
+    // somewhere to send them back to.
     const allLessons = await db
-        .select({ id: lessons.id, moduleId: lessons.moduleId })
+        .select({
+            id: lessons.id,
+            moduleId: lessons.moduleId,
+            lessonKey: lessons.lessonKey,
+            titleKey: lessons.titleKey,
+            orderIndex: lessons.orderIndex
+        })
         .from(lessons)
         .where(eq(lessons.enabled, true));
 
@@ -31,6 +39,10 @@ export const load: PageServerLoad = async () => {
     return {
         modules: allModules,
         moduleCounts,
-        moduleLessonIds
+        moduleLessonIds,
+        // The home page turns this into the "welcome back" card. Sent whole
+        // rather than resolved here, because the progress it is matched against
+        // is loaded by the layout, one level up.
+        lessons: allLessons
     };
 };

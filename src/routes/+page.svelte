@@ -18,6 +18,8 @@
 		type ModuleDevice
 	} from '$lib/config/moduleOrganization';
 	import DeviceOnboarding from '$lib/components/DeviceOnboarding.svelte';
+	import ResumeCard from '$lib/components/ResumeCard.svelte';
+	import { describeGap, pickResumePoint, type ResumeLesson } from '$lib/resume';
 
 	// Cast messages to any to avoid indexing errors until types are generated
 	const messages = m as any;
@@ -47,6 +49,15 @@
 	);
 
 	let changeDeviceOpen = $state(false);
+
+	// Where they were, and where they go next. Recomputed rather than stored:
+	// the progress map is already here, and a stored "current lesson" would go
+	// stale the moment a lesson is disabled or reordered.
+	let resume = $derived(
+		pickResumePoint((data.lessons ?? []) as ResumeLesson[], data.progress ?? {})
+	);
+	const lessonTitle = (lesson: ResumeLesson) =>
+		typeof messages[lesson.titleKey] === 'function' ? messages[lesson.titleKey]() : lesson.lessonKey;
 </script>
 
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
@@ -102,6 +113,16 @@
 				</p>
 			{/if}
 		</section>
+
+		{#if data.user}
+			<ResumeCard
+				last={resume.last}
+				next={resume.next}
+				gap={describeGap(resume.daysAway)}
+				finished={resume.finished}
+				{lessonTitle}
+			/>
+		{/if}
 
 		<!-- Module grid, grouped into themed categories -->
 		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string | null }, num: number)}
