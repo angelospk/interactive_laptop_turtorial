@@ -21,7 +21,7 @@
 
 <div class="mx-auto max-w-3xl p-4">
 	{#if toc.length}
-		<details bind:this={tocEl} class="bg-muted/40 mb-6 rounded-lg border px-4 py-2">
+		<details bind:this={tocEl} class="mb-6 rounded-lg border bg-muted/40 px-4 py-2">
 			<summary class="flex cursor-pointer items-center gap-2 py-1 font-medium select-none">
 				<List class="h-4 w-4" /> Περιεχόμενα
 			</summary>

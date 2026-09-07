@@ -22,6 +22,24 @@
 	}>();
 
 	let content = $state(initialText || (config.initialText as string) || '');
+
+	const escapeHtml = (s: string) =>
+		s.replace(
+			/[&<>"']/g,
+			(c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+		);
+
+	/**
+	 * Seed text is rendered into a contenteditable, so it must be HTML. Escape
+	 * every character first: the previous guard (`!content.includes('<')`) both
+	 * leaked raw markup for everything else and silently blanked the document
+	 * whenever the learner typed a `<` (bd-k50).
+	 */
+	const renderParagraphs = (text: string) =>
+		text
+			.split('\n')
+			.map((line: string) => `<p>${line ? escapeHtml(line) : '<br>'}</p>`)
+			.join('');
 	let fontSize = $state('14');
 	let isBulletActive = $state(false);
 	let isBoldActive = $state(false);
@@ -65,7 +83,8 @@
 	}
 
 	function handleAlign(align: 'left' | 'center' | 'right') {
-		const cmd = align === 'left' ? 'justifyLeft' : align === 'center' ? 'justifyCenter' : 'justifyRight';
+		const cmd =
+			align === 'left' ? 'justifyLeft' : align === 'center' ? 'justifyCenter' : 'justifyRight';
 		execCmd(cmd);
 		currentAlign = align;
 		onAction('format-align', { align });
@@ -266,8 +285,8 @@
 			aria-multiline="true"
 			aria-label="Επεξεργαστής κειμένου"
 		>
-			{#if content && !content.includes('<')}
-				{@html content.split('\n').map((line: string) => `<p>${line || '<br>'}</p>`).join('')}
+			{#if content}
+				{@html renderParagraphs(content)}
 			{/if}
 		</div>
 	</div>

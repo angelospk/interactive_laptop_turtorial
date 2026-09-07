@@ -38,7 +38,8 @@ export const module8Lessons: NewLesson[] = [
 			goal: 'navigate-site',
 			targetUrl: 'gov.gr',
 			initialApps: ['browser'],
-			instructions: '1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης (πάνω μέρος).\n2. Πατήστε Enter.\n3. Ελέγξτε ότι εμφανίζεται το 🔒 λουκετάκι!\n\n💡 Το λουκετάκι σημαίνει ασφαλής σύνδεση.'
+			instructions:
+				'1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης (πάνω μέρος).\n2. Πατήστε Enter.\n3. Ελέγξτε ότι εμφανίζεται το 🔒 λουκετάκι!\n\n💡 Το λουκετάκι σημαίνει ασφαλής σύνδεση.'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson1'
@@ -78,7 +79,8 @@ export const module8Lessons: NewLesson[] = [
 			targetChoice: 'accept',
 			targetUrl: 'news247.gr',
 			initialApps: ['browser'],
-			instructions: '1. Πληκτρολογήστε "news247.gr" στη γραμμή διεύθυνσης.\n2. Πατήστε Enter.\n3. Θα εμφανιστεί παράθυρο για cookies.\n4. Πατήστε "Αποδοχή" για να συνεχίσετε.\n\n💡 Τα cookies αποθηκεύουν τις προτιμήσεις σας.'
+			instructions:
+				'1. Πληκτρολογήστε "news247.gr" στη γραμμή διεύθυνσης.\n2. Πατήστε Enter.\n3. Θα εμφανιστεί παράθυρο για cookies.\n4. Πατήστε "Αποδοχή" για να συνεχίσετε.\n\n💡 Τα cookies αποθηκεύουν τις προτιμήσεις σας.'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson3'
@@ -117,7 +119,8 @@ export const module8Lessons: NewLesson[] = [
 			goal: 'secure-login',
 			targetUrl: 'piraeusbank.gr',
 			initialApps: ['browser'],
-			instructions: '1. Πληκτρολογήστε "piraeusbank.gr" στη γραμμή διεύθυνσης και πατήστε Enter.\n2. Συμπληρώστε:\n   • Όνομα χρήστη: οτιδήποτε\n   • Κωδικός: Kwdikos1!\n\n💡 Ισχυρός κωδικός = 8+ χαρακτήρες + αριθμοί + σύμβολα (!@#)\n\n3. Πατήστε "Είσοδος".'
+			instructions:
+				'1. Πληκτρολογήστε "piraeusbank.gr" στη γραμμή διεύθυνσης και πατήστε Enter.\n2. Συμπληρώστε:\n   • Όνομα χρήστη: οτιδήποτε\n   • Κωδικός: Kwdikos1!\n\n💡 Ισχυρός κωδικός = 8+ χαρακτήρες + αριθμοί + σύμβολα (!@#)\n\n3. Πατήστε "Είσοδος".'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson5'
@@ -135,7 +138,8 @@ export const module8Lessons: NewLesson[] = [
 			goal: 'gov-service',
 			targetUrl: 'gov.gr',
 			initialApps: ['browser'],
-			instructions: '1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης.\n2. Επιλέξτε "Υπεύθυνη Δήλωση" από τη λίστα.\n3. Συμπληρώστε:\n   • Ονοματεπώνυμο\n   • ΑΦΜ (9 ψηφία, π.χ. 123456789)\n4. Πατήστε "Υποβολή".'
+			instructions:
+				'1. Πληκτρολογήστε "gov.gr" στη γραμμή διεύθυνσης.\n2. Επιλέξτε "Υπεύθυνη Δήλωση" από τη λίστα.\n3. Συμπληρώστε:\n   • Ονοματεπώνυμο\n   • ΑΦΜ (9 ψηφία, π.χ. 123456789)\n4. Πατήστε "Υποβολή".'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson6'
@@ -200,7 +204,8 @@ export const module8Lessons: NewLesson[] = [
 		config: {
 			goal: 'open-privacy-settings',
 			initialApps: ['browser'],
-			instructions: '1. Πατήστε το μενού του browser (⋮ ή ☰).\n2. Επιλέξτε "Ρυθμίσεις".\n3. Βρείτε την ενότητα "Απόρρητο και ασφάλεια".\n\n💡 Εδώ μπορείτε να διαγράψετε ιστορικό και cookies.'
+			instructions:
+				'1. Πατήστε το μενού του browser (⋮ ή ☰).\n2. Επιλέξτε "Ρυθμίσεις".\n3. Βρείτε την ενότητα "Απόρρητο και ασφάλεια".\n\n💡 Εδώ μπορείτε να διαγράψετε ιστορικό και cookies.'
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson9'

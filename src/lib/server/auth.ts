@@ -26,8 +26,18 @@ export async function getUserByUsername(username: string): Promise<User | undefi
     return user;
 }
 
-export async function updateLastLogin(userId: string): Promise<void> {
-    await db.update(users).set({ lastLogin: new Date() }).where(eq(users.id, userId));
+/**
+ * Stamps the login time and returns the REFRESHED row. Callers sign the session
+ * cookie from this value, so returning the pre-update row would advertise the
+ * previous login time (bd-hem).
+ */
+export async function updateLastLogin(userId: string): Promise<User | undefined> {
+    const [user] = await db
+        .update(users)
+        .set({ lastLogin: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+    return user;
 }
 
 export async function loginOrCreateUser(username: string): Promise<UserSession> {
@@ -43,7 +53,8 @@ export async function loginOrCreateUser(username: string): Promise<UserSession> 
     if (!user) {
         user = await createUser(sanitized, sanitized);
     } else {
-        await updateLastLogin(user.id);
+        // Use the refreshed row: the cookie is signed from what we return here.
+        user = (await updateLastLogin(user.id)) ?? user;
     }
 
     return toUserSession(user);

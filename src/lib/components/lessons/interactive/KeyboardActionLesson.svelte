@@ -70,7 +70,7 @@
 	let currentTarget = $derived(steps[currentStep]);
 
 	// Detect if F-keys are present to show Mac warning
-	let showMacWarning = $derived(config.keys?.some(k => k.startsWith('F')));
+	let showMacWarning = $derived(config.keys?.some((k) => k.startsWith('F')));
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (completed || !currentTarget) return;
@@ -152,14 +152,18 @@
 						{currentTarget?.label}
 					</div>
 					{#if (currentTarget as any)?.description}
-						<div class="text-xl text-slate-600 font-medium mb-4">
+						<div class="mb-4 text-xl font-medium text-slate-600">
 							{(currentTarget as any).description}
 						</div>
 					{/if}
 
 					{#if showMacWarning}
-						<div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 max-w-md mx-auto">
-							<span class="font-bold">Mac Users:</span> You may need to hold the <span class="font-mono bg-yellow-100 px-1 rounded">Fn</span> key while pressing F-keys (e.g. Fn + F1).
+						<div
+							class="mx-auto mt-4 max-w-md rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800"
+						>
+							<span class="font-bold">Mac Users:</span> You may need to hold the
+							<span class="rounded bg-yellow-100 px-1 font-mono">Fn</span> key while pressing F-keys
+							(e.g. Fn + F1).
 						</div>
 					{/if}
 

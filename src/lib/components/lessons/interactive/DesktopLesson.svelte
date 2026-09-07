@@ -55,9 +55,18 @@
 	const pinnedAppIds = ['explorer', 'browser', 'email', 'settings'];
 
 	// State
-	let openApps = $state<{ id: string; appId: string; minimized: boolean; maximized: boolean }[]>(
-		[]
-	);
+	// `settingsPage` is per instance: a deep link must be able to say "this
+	// window, this page" without touching the lesson config every other app
+	// shares (bd-cc7).
+	let openApps = $state<
+		{
+			id: string;
+			appId: string;
+			minimized: boolean;
+			maximized: boolean;
+			settingsPage?: string;
+		}[]
+	>([]);
 	let startMenuOpen = $state(false);
 	let showTaskView = $state(false);
 	let completed = $state(false);
@@ -130,33 +139,15 @@
 		startMenuOpen = false;
 	}
 
+	/**
+	 * Opens Settings on a specific page — the taskbar's Quick Settings entry
+	 * point. Records the page on the instance so an already-open window
+	 * navigates instead of staying wherever the learner left it.
+	 */
 	function openSettingsToPage(page: string) {
-		// If Settings is already open, just update it?
-		// For now, simple implementation: open settings, passing page in config would be tricky dynamically
-		// But SettingsApp listens to a prop or internal logic?
-		// We need to pass the target page to the SettingsApp.
-		// The standard `openApp` doesn't support params.
-		// Let's assume `openApp` works, and `SettingsApp` handles internal state if we could pass it.
-		// For this MVP, we'll just open the app. Deep linking was partly implemented in SettingsApp via config.initialPage.
-		// But here we might need to re-mount or signal the app.
-
-		// Checking if it's already open
-		const existing = openApps.find((a) => a.appId === 'settings');
-		if (!existing) {
-			openApp('settings');
-			// We can't easily set the initialPage prop dynamically for a specific instance unless we store instance-specific configs in openApps state.
-			// But for now, opening it is the main requirement.
-		} else {
-			// Bring to front
-			openApp('settings');
-		}
-
-		// Hack: We will update the config passed to ALL SettingsApps to navigate?
-		// Or simpler: The QuickSettings component in Taskbar calls onOpenSettings.
-		// That callback in Taskbar calls openSettingsToPage here.
-		// We can try to force the 'config' prop of the SettingsApp to have the new page.
-		// But `config` is derived from `lesson.config`.
-		// We would need local overrides.
+		openApp('settings');
+		const instance = openApps.find((a) => a.appId === 'settings');
+		if (instance) instance.settingsPage = page;
 	}
 
 	function closeApp(instanceId: string) {
@@ -267,7 +258,9 @@
 						<appDef.component
 							config={{
 								...config,
-								...(instance.appId === 'settings' ? { initialPage: config.initialPage } : {})
+								...(instance.appId === 'settings'
+									? { initialPage: instance.settingsPage ?? config.initialPage }
+									: {})
 							}}
 							onAction={handleAppAction}
 							initialFiles={config.initialFiles}

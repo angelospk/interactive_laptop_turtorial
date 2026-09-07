@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
@@ -28,7 +29,11 @@
 		isLastModule?: boolean;
 	}>();
 
-	let currentLessonIndex = $state(startIndex);
+	// Reassignable `$derived`: `startIndex` is authoritative, Next/Prev override
+	// it, and a fresh startIndex after invalidateAll() takes over again. As plain
+	// `$state` it was captured once and then silently disagreed with the progress
+	// the rest of the component was rendering (bd-afz).
+	let currentLessonIndex = $derived(startIndex);
 	let currentLesson = $derived(lessons[currentLessonIndex]);
 
 	// Optimistic UI state
@@ -62,8 +67,8 @@
 					clearInterval(countdownInterval);
 					countdownInterval = null;
 					countdownRemaining = null;
-					// Call nextLesson after layout is updated to prevent reactive jump bugs
-					setTimeout(() => nextLesson(), 10);
+					// Advance after the pending DOM update, not after a guessed 10ms.
+					tick().then(() => nextLesson());
 				}
 			}
 		}, 1000);
@@ -185,22 +190,19 @@
 	// Fullscreen state
 	let isFullscreen = $state(false);
 	let lessonContainer: HTMLElement;
-	let dismissedFullscreenPrompt = $state(false);
 
 	// True when the current lesson recommends fullscreen
-	let fullscreenRecommended = $derived(
-		!!(currentLesson?.config as any)?.fullscreen
-	);
+	let fullscreenRecommended = $derived(!!(currentLesson?.config as any)?.fullscreen);
 
-	// Reset dismissal when lesson changes so prompt re-appears on each new lesson
-	$effect(() => {
-		const _ = currentLesson?.id;
-		dismissedFullscreenPrompt = false;
-	});
+	// Which lesson the learner dismissed the prompt for. Storing the id instead
+	// of a boolean means the banner reappears on the next lesson without an
+	// effect writing state — that extra render pass made it flicker and shift
+	// the layout on every lesson change (bd-afz).
+	let dismissedForLessonId = $state<string | null>(null);
 
 	// Show banner when lesson recommends fullscreen and we're not already there
 	let showFullscreenBanner = $derived(
-		fullscreenRecommended && !isFullscreen && !dismissedFullscreenPrompt
+		fullscreenRecommended && !isFullscreen && dismissedForLessonId !== currentLesson?.id
 	);
 
 	function toggleFullscreen() {
@@ -214,7 +216,7 @@
 	}
 
 	function enterFullscreenFromBanner() {
-		dismissedFullscreenPrompt = true;
+		dismissedForLessonId = currentLesson?.id ?? null;
 		toggleFullscreen();
 	}
 
@@ -231,17 +233,24 @@
 	// Auto-scroll to lesson content when lesson changes
 	let lessonCard: HTMLElement;
 
-	$effect(() => {
-		// Track currentLessonIndex changes
-		const _ = currentLessonIndex;
+	// Deep links land mid-page already; scrolling on mount produced a visible
+	// jump 100ms after paint. Only *changes* scroll, and each one cancels the
+	// previous frame so rapid Next/Prev cannot stack smooth scrolls (bd-afz).
+	let lastScrolledIndex = $state<number | null>(null);
 
-		// Small timeout to ensure DOM is updated
-		setTimeout(() => {
-			lessonCard?.scrollIntoView({
-				behavior: 'smooth',
-				block: 'start'
-			});
-		}, 100);
+	$effect(() => {
+		const index = currentLessonIndex;
+		if (lastScrolledIndex === null) {
+			lastScrolledIndex = index;
+			return;
+		}
+		if (lastScrolledIndex === index) return;
+		lastScrolledIndex = index;
+
+		const frame = requestAnimationFrame(() => {
+			lessonCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+		return () => cancelAnimationFrame(frame);
 	});
 </script>
 
@@ -274,26 +283,37 @@
 				{/if}
 			</Button>
 		</div>
-		<Button onclick={nextLesson} disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}>
+		<Button
+			onclick={nextLesson}
+			disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}
+		>
 			{currentLessonIndex === lessons.length - 1
-				? (nextModuleId ? 'Επόμενη Ενότητα' : getMessage('nav_finish'))
+				? nextModuleId
+					? 'Επόμενη Ενότητα'
+					: getMessage('nav_finish')
 				: getMessage('nav_next')}
 		</Button>
 	</div>
 
 	{#if showFullscreenBanner}
-		<div class="flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm">
+		<div
+			class="flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
+		>
 			<div class="flex items-center gap-2">
 				<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
 				<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
 			</div>
-			<div class="flex items-center gap-2 shrink-0">
-				<Button size="sm" onclick={enterFullscreenFromBanner} class="bg-blue-600 text-white hover:bg-blue-700">
+			<div class="flex shrink-0 items-center gap-2">
+				<Button
+					size="sm"
+					onclick={enterFullscreenFromBanner}
+					class="bg-blue-600 text-white hover:bg-blue-700"
+				>
 					Πλήρης οθόνη
 				</Button>
 				<button
 					class="rounded p-1 text-blue-500 hover:text-blue-700"
-					onclick={() => (dismissedFullscreenPrompt = true)}
+					onclick={() => (dismissedForLessonId = currentLesson?.id ?? null)}
 					title="Κλείσιμο"
 					aria-label="Κλείσιμο"
 				>
@@ -330,21 +350,31 @@
 	{#if mergedProgress[currentLesson.id]?.completed}
 		{@const isSuccess = (mergedProgress[currentLesson.id]?.score ?? 100) >= 50}
 		<div
-			class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-300 pointer-events-auto"
+			class="pointer-events-auto fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/40 p-4 backdrop-blur-[2px] duration-300 fade-in"
 		>
-			<div class="w-full max-w-xl mx-auto rounded-xl shadow-2xl p-10 text-center {isSuccess ? 'bg-green-50 border-t-8 border-green-500' : 'bg-red-50 border-t-8 border-red-500'} animate-in zoom-in-95 duration-500">
+			<div
+				class="mx-auto w-full max-w-xl rounded-xl p-10 text-center shadow-2xl {isSuccess
+					? 'border-t-8 border-green-500 bg-green-50'
+					: 'border-t-8 border-red-500 bg-red-50'} animate-in duration-500 zoom-in-95"
+			>
 				<div class="flex flex-col items-center gap-6">
-					<div class="flex h-20 w-20 items-center justify-center rounded-full {isSuccess ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+					<div
+						class="flex h-20 w-20 items-center justify-center rounded-full {isSuccess
+							? 'bg-green-100 text-green-600'
+							: 'bg-red-100 text-red-600'}"
+					>
 						{#if isSuccess}
 							<span class="text-4xl">✓</span>
 						{:else}
 							<span class="text-4xl">✕</span>
 						{/if}
 					</div>
-					
+
 					<div>
 						<h3 class="text-3xl font-extrabold {isSuccess ? 'text-green-800' : 'text-red-800'}">
-							{isSuccess ? (getMessage('lesson_completed') || 'Μπράβο, τα κατάφερες!') : 'Το μάθημα δεν ολοκληρώθηκε επιτυχώς'}
+							{isSuccess
+								? getMessage('lesson_completed') || 'Μπράβο, τα κατάφερες!'
+								: 'Το μάθημα δεν ολοκληρώθηκε επιτυχώς'}
 						</h3>
 						{#if mergedProgress[currentLesson.id]?.score !== undefined && mergedProgress[currentLesson.id]?.score !== 100}
 							<p class="mt-2 text-lg {isSuccess ? 'text-green-700' : 'text-red-700'}">
@@ -358,19 +388,24 @@
 									{getMessage('auto_advancing_in', { seconds: String(countdownRemaining) }) ||
 										`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
 								</span>
-								<button class="underline hover:text-green-900 cursor-pointer" onclick={cancelAutoAdvance}>
+								<button
+									class="cursor-pointer underline hover:text-green-900"
+									onclick={cancelAutoAdvance}
+								>
 									{getMessage('cancel') || 'Ακύρωση'}
 								</button>
 							</div>
 						{/if}
 					</div>
 
-					<div class="mt-4 flex flex-wrap items-center justify-center gap-4 w-full">
+					<div class="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
 						<Button
 							variant="outline"
 							size="lg"
 							onclick={handleRetry}
-							class="{isSuccess ? 'text-green-700 hover:bg-green-100 border-green-300' : 'text-red-700 hover:bg-red-100 border-red-300'} w-[200px] text-lg py-6"
+							class="{isSuccess
+								? 'border-green-300 text-green-700 hover:bg-green-100'
+								: 'border-red-300 text-red-700 hover:bg-red-100'} w-[200px] py-6 text-lg"
 						>
 							{getMessage('try_again') || 'Δοκίμασε ξανά'}
 						</Button>
@@ -380,7 +415,7 @@
 								<Button
 									size="lg"
 									onclick={nextLesson}
-									class="bg-green-600 text-white shadow-md hover:bg-green-700 w-[200px] text-lg py-6 flex-1 gap-2"
+									class="w-[200px] flex-1 gap-2 bg-green-600 py-6 text-lg text-white shadow-md hover:bg-green-700"
 								>
 									{getMessage('next_lesson') || 'Επόμενο Μάθημα'}
 									<span class="text-2xl">→</span>
@@ -389,7 +424,7 @@
 								<Button
 									size="lg"
 									onclick={nextLesson}
-									class="bg-blue-600 text-white shadow-md hover:bg-blue-700 w-[200px] text-lg py-6 flex-1 gap-2"
+									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
 									{'Επόμενη Ενότητα'}
 									<span class="text-2xl">→</span>
@@ -398,7 +433,7 @@
 								<Button
 									size="lg"
 									onclick={onExit}
-									class="bg-blue-600 text-white shadow-md hover:bg-blue-700 w-[200px] text-lg py-6 flex-1 gap-2"
+									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
 									{getMessage('back_to_modules') || 'Πίσω στις Ενότητες'}
 								</Button>

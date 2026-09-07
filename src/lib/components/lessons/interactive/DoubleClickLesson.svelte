@@ -3,6 +3,11 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import {
+		coerceVariant,
+		DOUBLE_CLICK_THEMES,
+		type DoubleClickTheme
+	} from '$lib/lessons/gameConfig';
 
 	interface Props {
 		lesson: Lesson;
@@ -20,10 +25,10 @@
 	};
 	const targetCount = config.targetCount || 5;
 	const timeLimit = config.timeLimit || 40;
-	const theme = config.theme || 'default';
+	const theme = coerceVariant(config.theme, DOUBLE_CLICK_THEMES, 'default');
 
 	// Theme assets
-	const themes: Record<string, any> = {
+	const themes: Record<DoubleClickTheme, any> = {
 		default: {
 			icon: '📂',
 			label: 'Φάκελος',
@@ -34,7 +39,7 @@
 			label: 'Θησαυρός',
 			bgClass: 'bg-yellow-50'
 		}
-	};
+	} satisfies Record<DoubleClickTheme, unknown>;
 	let currentTheme = $derived(themes[theme] || themes.default);
 
 	let score = $state(0);

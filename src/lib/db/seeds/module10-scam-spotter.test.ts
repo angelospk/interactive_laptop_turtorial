@@ -37,10 +37,9 @@ describe('module10 scam-spotter lesson seeds', () => {
 				expect(typeof card.id, `${lesson.id}: card.id`).toBe('string');
 				expect((card.id as string).trim()).not.toBe('');
 
-				expect(
-					['email', 'sms', 'viber', 'phone'],
-					`${lesson.id}/${card.id}: channel`
-				).toContain(card.channel);
+				expect(['email', 'sms', 'viber', 'phone'], `${lesson.id}/${card.id}: channel`).toContain(
+					card.channel
+				);
 
 				expect(typeof card.body, `${lesson.id}/${card.id}: body`).toBe('string');
 				expect((card.body as string).trim()).not.toBe('');
@@ -50,9 +49,9 @@ describe('module10 scam-spotter lesson seeds', () => {
 				const redFlags = card.redFlags as unknown[];
 				expect(Array.isArray(redFlags), `${lesson.id}/${card.id}: redFlags`).toBe(true);
 				expect(redFlags.length, `${lesson.id}/${card.id}: redFlags non-empty`).toBeGreaterThan(0);
-				expect(
-					redFlags.every((f) => typeof f === 'string' && (f as string).trim() !== '')
-				).toBe(true);
+				expect(redFlags.every((f) => typeof f === 'string' && (f as string).trim() !== '')).toBe(
+					true
+				);
 
 				expect(typeof card.explanation, `${lesson.id}/${card.id}: explanation`).toBe('string');
 				expect((card.explanation as string).trim()).not.toBe('');

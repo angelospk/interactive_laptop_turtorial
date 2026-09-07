@@ -27,14 +27,14 @@
 		onAction: (action: string, data?: any) => void;
 	}>();
 
-	let activeSection = $state(config?.initialPage || 'system');
-
-	// Sync with Global OS State
-	$effect(() => {
-		if (config?.initialPage) {
-			activeSection = config.initialPage;
-		}
-	});
+	/**
+	 * A reassignable `$derived`: `initialPage` is the default, clicking a tab
+	 * overrides it, and a NEW deep link (a different initialPage value) takes
+	 * over again. The old prop->state `$effect` reset the learner to the initial
+	 * page on every config object re-creation, so any tab they clicked snapped
+	 * back on the next render (bd-cc7).
+	 */
+	let activeSection = $derived((config?.initialPage as string) || 'system');
 
 	let printerConnected = $state(false);
 	let darkMode = $state(false);
@@ -193,7 +193,10 @@
 				'bluetooth'
 					? 'bg-blue-50 text-blue-700'
 					: 'text-slate-700 hover:bg-slate-100'}"
-				onclick={() => { activeSection = 'bluetooth'; onAction('open-bluetooth-settings', {}); }}
+				onclick={() => {
+					activeSection = 'bluetooth';
+					onAction('open-bluetooth-settings', {});
+				}}
 			>
 				<Bluetooth class="h-4 w-4" /> Bluetooth
 			</button>
@@ -202,7 +205,10 @@
 				'display'
 					? 'bg-blue-50 text-blue-700'
 					: 'text-slate-700 hover:bg-slate-100'}"
-				onclick={() => { activeSection = 'display'; onAction('open-display-settings', {}); }}
+				onclick={() => {
+					activeSection = 'display';
+					onAction('open-display-settings', {});
+				}}
 			>
 				<MonitorIcon class="h-4 w-4" /> Οθόνη
 			</button>
@@ -211,7 +217,10 @@
 				'accessibility'
 					? 'bg-blue-50 text-blue-700'
 					: 'text-slate-700 hover:bg-slate-100'}"
-				onclick={() => { activeSection = 'accessibility'; onAction('open-accessibility', {}); }}
+				onclick={() => {
+					activeSection = 'accessibility';
+					onAction('open-accessibility', {});
+				}}
 			>
 				<Accessibility class="h-4 w-4" /> Προσβασιμότητα
 			</button>
@@ -220,7 +229,10 @@
 				'sound'
 					? 'bg-blue-50 text-blue-700'
 					: 'text-slate-700 hover:bg-slate-100'}"
-				onclick={() => { activeSection = 'sound'; onAction('open-sound-settings', {}); }}
+				onclick={() => {
+					activeSection = 'sound';
+					onAction('open-sound-settings', {});
+				}}
 			>
 				<Volume2 class="h-4 w-4" /> Ήχος
 			</button>
@@ -396,7 +408,9 @@
 									{#if connectedBtDevice === device.id}
 										<span class="text-xs font-medium text-green-600">Συνδέθηκε</span>
 									{:else}
-										<Button size="sm" variant="outline" onclick={() => connectBluetooth(device.id)}>Σύνδεση</Button>
+										<Button size="sm" variant="outline" onclick={() => connectBluetooth(device.id)}
+											>Σύνδεση</Button
+										>
 									{/if}
 								</div>
 							{/each}
@@ -407,7 +421,7 @@
 		{:else if activeSection === 'display'}
 			<div class="space-y-6">
 				<h3 class="text-xl font-semibold">Οθόνη</h3>
-				<div class="rounded-lg border bg-white p-4 space-y-4">
+				<div class="space-y-4 rounded-lg border bg-white p-4">
 					<div class="flex items-center justify-between">
 						<span class="text-sm font-medium">Φωτεινότητα</span>
 						<span class="text-sm text-slate-500">75%</span>
@@ -422,7 +436,7 @@
 		{:else if activeSection === 'accessibility'}
 			<div class="space-y-6">
 				<h3 class="text-xl font-semibold">Προσβασιμότητα</h3>
-				<div class="rounded-lg border bg-white p-4 space-y-4">
+				<div class="space-y-4 rounded-lg border bg-white p-4">
 					{#each [['Μεγαλύτερο κείμενο', false], ['Υψηλή αντίθεση', false], ['Αναγνώστης οθόνης', false]] as [label]}
 						<div class="flex items-center justify-between py-1">
 							<span class="text-sm font-medium">{label}</span>
@@ -434,13 +448,19 @@
 		{:else if activeSection === 'sound'}
 			<div class="space-y-6">
 				<h3 class="text-xl font-semibold">Ήχος</h3>
-				<div class="rounded-lg border bg-white p-4 space-y-4">
-					<div class="flex items-center gap-3 mb-2">
+				<div class="space-y-4 rounded-lg border bg-white p-4">
+					<div class="mb-2 flex items-center gap-3">
 						<Volume2 class="h-5 w-5 text-slate-500" />
 						<span>Ένταση εξόδου</span>
 					</div>
-					<input type="range" min="0" max="100" bind:value={osState.volume} class="w-full"
-						oninput={() => onAction('change-volume', { value: osState.volume })} />
+					<input
+						type="range"
+						min="0"
+						max="100"
+						bind:value={osState.volume}
+						class="w-full"
+						oninput={() => onAction('change-volume', { value: osState.volume })}
+					/>
 					<div class="text-right text-sm text-slate-500">{osState.volume}%</div>
 				</div>
 			</div>

@@ -4,6 +4,7 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { coerceVariant, DRAG_THEMES, type DragTheme } from '$lib/lessons/gameConfig';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
@@ -20,10 +21,10 @@
 		}) || { itemCount: 3, dropZones: 3, theme: 'shapes' }
 	);
 
-	const theme = config.theme || 'shapes';
+	const theme = coerceVariant(config.theme, DRAG_THEMES, 'shapes');
 
 	// Theme Configurations
-	const themes: Record<string, any> = {
+	const themes: Record<DragTheme, any> = {
 		shapes: {
 			items: [
 				{ id: 'square', name: 'Τετράγωνο', color: 'bg-red-500', shapeClass: 'rounded-md' },
@@ -66,7 +67,7 @@
 				{ id: 'z4', name: '4', color: 'bg-slate-100' }
 			]
 		}
-	};
+	} satisfies Record<DragTheme, unknown>;
 
 	let currentTheme = $derived(themes[theme] || themes.shapes);
 	let pieces = $state<any[]>([]);

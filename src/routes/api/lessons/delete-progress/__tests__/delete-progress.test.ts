@@ -170,6 +170,29 @@ describe('POST /api/lessons/delete-progress', () => {
 		).rejects.toMatchObject({ status: 400 });
 	});
 
+	// Regression (bd-pfx): a bare truthiness check let non-strings through to
+	// eq(userProgress.lessonId, …), where the driver — not the handler — decides.
+	it.each([
+		['a number', 42],
+		['an object', { id: 'module1-lesson1' }],
+		['an array', ['module1-lesson1']],
+		['a boolean', true],
+		['whitespace only', '   ']
+	])('returns 400 when lessonId is %s', async (_label, value) => {
+		await expect(
+			POST(makeEvent({ lessonId: value }, { id: testUserId, username: 'testuser' }))
+		).rejects.toMatchObject({ status: 400 });
+	});
+
+	it('leaves existing progress untouched when the payload is rejected', async () => {
+		await insertProgress(currentDb, testUserId, testLessonId);
+		await expect(
+			POST(makeEvent({ lessonId: 42 }, { id: testUserId, username: 'testuser' }))
+		).rejects.toMatchObject({ status: 400 });
+		const rows = await currentDb.select().from(userProgress);
+		expect(rows).toHaveLength(1);
+	});
+
 	it('re-throws the 400 rather than masking it as a 500', async () => {
 		// The catch block discriminates SvelteKit errors by their `status` field;
 		// a regression there would turn this into a 500.

@@ -3,6 +3,13 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import {
+		parseHoverConfig,
+		pathFor,
+		type HoverConfig,
+		type HoverTheme
+	} from '$lib/lessons/hoverConfig';
+	import { createPathRun, advancePathRun, pathRunScore, type Point } from '$lib/lessons/shapePath';
 
 	interface Props {
 		lesson: Lesson;
@@ -12,19 +19,50 @@
 
 	let { lesson, onComplete, onBack }: Props = $props();
 
-	// Parse config
-	const config = lesson.config as {
-		targetCount: number;
-		timeLimit: number;
-		shape?: string;
-		targetSize?: string;
-		theme?: 'balloons' | 'moles' | 'simple';
-		gameMode?: boolean;
-		instructions?: string;
-	};
-	const targetCount = config.targetCount || 5;
-	const timeLimit = config.timeLimit || 30;
-	const theme = config.theme || 'simple';
+	// Validated by the shared contract, so an unimplemented theme can never reach
+	// the renderer (bd-5t4). `THEME_LABELS` is keyed by HoverTheme, so adding a
+	// theme to the contract without handling it here fails to compile.
+	// A live database can still hold a row seeded before the contract existed, so
+	// an invalid config degrades to a readable message rather than throwing
+	// through the renderer and blanking the page for the learner.
+	let configError = $state<string | null>(null);
+	let parsed: HoverConfig;
+	try {
+		parsed = parseHoverConfig(lesson.config);
+	} catch (e) {
+		configError = (e as Error).message;
+		parsed = parseHoverConfig({ theme: 'balloons' });
+	}
+	const config = parsed;
+	const targetCount = config.targetCount;
+	const timeLimit = config.timeLimit;
+	const theme = config.theme;
+
+	const THEME_LABELS = {
+		balloons: 'Σκάστε τα μπαλόνια',
+		'shape-path': 'Ακολουθήστε τη διαδρομή'
+	} satisfies Record<HoverTheme, string>;
+
+	// ── shape-path state ────────────────────────────────────────────────────
+	const path = pathFor(config);
+	let run = $state(createPathRun(path));
+	let playArea = $state<HTMLElement | null>(null);
+	let pointer = $state<Point | null>(null);
+
+	const pathD = path.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+	function handlePathMove(event: PointerEvent) {
+		if (!gameStarted || isComplete || !playArea) return;
+		const box = playArea.getBoundingClientRect();
+		if (box.width === 0 || box.height === 0) return;
+		const at: Point = {
+			x: ((event.clientX - box.left) / box.width) * 100,
+			y: ((event.clientY - box.top) / box.height) * 100
+		};
+		pointer = at;
+		run = advancePathRun(run, path, at, config.tolerance);
+		if (run.complete) endGame();
+	}
 
 	// Game state
 	let score = $state(0);
@@ -50,7 +88,8 @@
 
 	function startGame() {
 		gameStarted = true;
-		generateRandomPosition();
+		run = createPathRun(path);
+		if (theme !== 'shape-path') generateRandomPosition();
 
 		// Timer
 		intervalId = window.setInterval(() => {
@@ -99,6 +138,12 @@
 
 		isComplete = true;
 
+		if (theme === 'shape-path') {
+			const pathScore = pathRunScore(run, path);
+			setTimeout(() => onComplete(pathScore), 2000);
+			return;
+		}
+
 		// Calculate final score (0-100)
 		const completionBonus = (successfulHovers / targetCount) * 50;
 		const timeBonus = (timeRemaining / timeLimit) * 30;
@@ -122,7 +167,13 @@
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="hover-lesson">
-		{#if !gameStarted}
+		{#if configError}
+			<div class="start-screen">
+				<h2>Το μάθημα δεν είναι διαθέσιμο</h2>
+				<p>Χρειάζεται ενημέρωση του περιεχομένου. Δοκιμάστε ένα άλλο μάθημα.</p>
+				<button class="start-button" onclick={onBack}>Πίσω</button>
+			</div>
+		{:else if !gameStarted}
 			<div class="start-screen">
 				<h2>{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
 				<p>
@@ -132,8 +183,10 @@
 				</p>
 				<div class="game-info">
 					<div class="info-item">
-						<span class="label">{m.targets?.() || 'Στόχοι'}:</span>
-						<span class="value">{targetCount}</span>
+						<span class="label">
+							{theme === 'shape-path' ? 'Σημεία' : m.targets?.() || 'Στόχοι'}
+						</span>
+						<span class="value">{theme === 'shape-path' ? path.length : targetCount}</span>
 					</div>
 					<div class="info-item">
 						<span class="label">{m.time_limit?.() || 'Χρόνος'}:</span>
@@ -147,8 +200,13 @@
 		{:else if isComplete}
 			<div class="complete-screen">
 				<h2>✓ {m.lesson_complete?.() || 'Ολοκληρώθηκε'}!</h2>
-				<p>{m.successful_hovers?.() || 'Επιτυχίες'}: {successfulHovers}/{targetCount}</p>
-				<p>{m.final_score?.() || 'Βαθμολογία'}: {score}</p>
+				{#if theme === 'shape-path'}
+					<p>Φτάσατε στο τέλος της διαδρομής.</p>
+					<p>Εκτροπές: {run.slips}</p>
+				{:else}
+					<p>{m.successful_hovers?.() || 'Επιτυχίες'}: {successfulHovers}/{targetCount}</p>
+					<p>{m.final_score?.() || 'Βαθμολογία'}: {score}</p>
+				{/if}
 			</div>
 		{:else}
 			<!-- Game UI -->
@@ -156,28 +214,67 @@
 				<div class="hud">
 					<div class="stat">
 						<span class="stat-label">{m.progress?.() || 'Πρόοδος'}:</span>
-						<span class="stat-value">{successfulHovers}/{targetCount}</span>
+						<span class="stat-value">
+							{#if theme === 'shape-path'}
+								{run.reached}/{path.length - 1}
+							{:else}
+								{successfulHovers}/{targetCount}
+							{/if}
+						</span>
 					</div>
 					<div class="stat">
 						<span class="stat-label">{m.time?.() || 'Χρόνος'}:</span>
 						<span class="stat-value">{timeRemaining}s</span>
 					</div>
 					<div class="stat">
-						<span class="stat-label">{m.score?.() || 'Σκορ'}:</span>
-						<span class="stat-value">{score}</span>
+						<span class="stat-label">
+							{theme === 'shape-path' ? 'Εκτροπές' : m.score?.() || 'Σκορ'}:
+						</span>
+						<span class="stat-value">{theme === 'shape-path' ? run.slips : score}</span>
 					</div>
 				</div>
 
-				<div class="game-area">
-					<!-- Target -->
+				{#if theme === 'shape-path'}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						class="target"
-						class:hovering={isHovering}
-						style="left: {targetX}%; top: {targetY}%;"
-						onmouseenter={handleTargetHover}
-						onmouseleave={handleTargetLeave}
+						class="game-area"
+						bind:this={playArea}
+						onpointermove={handlePathMove}
+						aria-label={THEME_LABELS['shape-path']}
 					>
-						{#if theme === 'balloons'}
+						<svg class="path-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+							<path d={pathD} class="path-corridor" style="stroke-width: {config.tolerance * 2}" />
+							<path d={pathD} class="path-line" />
+						</svg>
+						{#each path as point, i (i)}
+							<div
+								class="waypoint"
+								class:done={i <= run.reached}
+								class:next={i === run.reached + 1}
+								style="left: {point.x}%; top: {point.y}%;"
+							>
+								{i <= run.reached ? '✓' : i + 1}
+							</div>
+						{/each}
+						{#if pointer && run.outside}
+							<div class="off-path-hint" style="left: {pointer.x}%; top: {pointer.y}%;">
+								Επιστρέψτε στη γραμμή
+							</div>
+						{/if}
+					</div>
+				{:else}
+					<div class="game-area">
+						<!-- Target -->
+						<div
+							class="target"
+							class:hovering={isHovering}
+							style="left: {targetX}%; top: {targetY}%;"
+							onmouseenter={handleTargetHover}
+							onmouseleave={handleTargetLeave}
+							role="button"
+							tabindex="0"
+							aria-label={THEME_LABELS.balloons}
+						>
 							<!-- Balloon Visual -->
 							<div class="balloon-wrapper">
 								<div class="balloon {isHovering ? 'popped' : ''}">
@@ -187,11 +284,9 @@
 								</div>
 								<div class="string"></div>
 							</div>
-						{:else}
-							<div class="target-inner"></div>
-						{/if}
+						</div>
 					</div>
-				</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -337,13 +432,81 @@
 		animation: pulse 0.5s ease;
 	}
 
-	.target-inner {
-		width: 80px;
-		height: 80px;
-		background: radial-gradient(circle, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+	/* Shape-path Theme */
+	.path-svg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.path-corridor {
+		fill: none;
+		stroke: rgba(102, 126, 234, 0.18);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.path-line {
+		fill: none;
+		stroke: #667eea;
+		stroke-width: 3;
+		stroke-dasharray: 6 5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.waypoint {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
-		box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-		border: 4px solid white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.15rem;
+		font-weight: 700;
+		background: white;
+		color: #6b7280;
+		border: 3px solid #cbd5e1;
+		pointer-events: none;
+	}
+
+	.waypoint.done {
+		background: #22c55e;
+		border-color: #16a34a;
+		color: white;
+	}
+
+	.waypoint.next {
+		border-color: #667eea;
+		color: #667eea;
+		animation: pulse-waypoint 1.2s ease-in-out infinite;
+	}
+
+	.off-path-hint {
+		position: absolute;
+		transform: translate(-50%, -160%);
+		background: #b91c1c;
+		color: white;
+		padding: 0.35rem 0.75rem;
+		border-radius: 6px;
+		font-size: 1rem;
+		white-space: nowrap;
+		pointer-events: none;
+	}
+
+	@keyframes pulse-waypoint {
+		0%,
+		100% {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		50% {
+			transform: translate(-50%, -50%) scale(1.18);
+		}
 	}
 
 	/* Balloon Theme */

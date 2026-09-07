@@ -5,6 +5,7 @@ import { signSessionCookie } from '$lib/server/session';
 import { getSessionSecret } from '$lib/server/sessionSecret';
 import { DEVICE_VALUES, type PreferredDevice } from '$lib/db/schema';
 import type { RequestHandler } from './$types';
+import { requireUser } from '$lib/server/guards';
 
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
@@ -18,9 +19,7 @@ function isDevice(value: unknown): value is PreferredDevice {
  * without an extra DB read on every request.
  */
 export const POST: RequestHandler = async ({ request, cookies, locals }) => {
-	if (!locals.user) {
-		return json({ error: 'Not authenticated' }, { status: 401 });
-	}
+	const user = requireUser(locals);
 
 	let body: unknown;
 	try {
@@ -31,13 +30,10 @@ export const POST: RequestHandler = async ({ request, cookies, locals }) => {
 
 	const device = (body as { device?: unknown })?.device;
 	if (!isDevice(device)) {
-		return json(
-			{ error: `device must be one of: ${DEVICE_VALUES.join(', ')}` },
-			{ status: 400 }
-		);
+		return json({ error: `device must be one of: ${DEVICE_VALUES.join(', ')}` }, { status: 400 });
 	}
 
-	const session = await updatePreferredDevice(locals.user.id, device);
+	const session = await updatePreferredDevice(user.id, device);
 	if (!session) {
 		return json({ error: 'User not found' }, { status: 404 });
 	}

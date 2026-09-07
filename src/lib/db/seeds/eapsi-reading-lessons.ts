@@ -5,401 +5,543 @@ import type { NewLesson } from '../schema';
 import { autoOrder } from './utils';
 
 const _readingLessons: Omit<NewLesson, 'orderIndex' | 'requiredLessonId'>[] = [
-    {
-        id: "read-esm001-c1-s3-module3",
-        moduleId: "module3",
-        lessonKey: "read-esm001-c1-s3",
-        titleKey: "Περιήγηση στα Windows 11",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm001/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fc4155a1109d4f9185b0587f5a2babe4" },
-        enabled: true,
-    },
-    {
-        id: "read-esm001-c1-s3-module1",
-        moduleId: "module1",
-        lessonKey: "read-esm001-c1-s3",
-        titleKey: "Περιήγηση στα Windows 11",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm001/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fc4155a1109d4f9185b0587f5a2babe4" },
-        enabled: true,
-    },
-    {
-        id: "read-esm001-c1-s4-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm001-c1-s4",
-        titleKey: "Ρυθμίσεις προσβασιμότητας",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm001/c1/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@5026b7bafa2b41938364575e256b5474" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c1-s2-module5",
-        moduleId: "module5",
-        lessonKey: "read-esm002-c1-s2",
-        titleKey: "Το διαδίκτυο",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c1/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@7ae0bf52d95746808ce80264df168ccd" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c1-s3-module5",
-        moduleId: "module5",
-        lessonKey: "read-esm002-c1-s3",
-        titleKey: "Ιστοσελίδες και προγράμματα περιήγησης",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@423188c92bed4bef82481d6184c3f11a" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c1-s4-module5",
-        moduleId: "module5",
-        lessonKey: "read-esm002-c1-s4",
-        titleKey: "Λειτουργίες προγράμματος περιήγησης",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c1/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@f4164070f5e34be18355a069a4ba48ee" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c2-s2-module5",
-        moduleId: "module5",
-        lessonKey: "read-esm002-c2-s2",
-        titleKey: "Μηχανές αναζήτησης",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c2/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@9674f6a2c276402d85d8d6d588993c89" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c2-s3-module13",
-        moduleId: "module13",
-        lessonKey: "read-esm002-c2-s3",
-        titleKey: "Αναζήτηση πληροφοριών με Μεγάλα Γλωσσικά Μοντέλα",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c2/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8899da4760940a59a9fc425e9bfb11c" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c3-s2-module12",
-        moduleId: "module12",
-        lessonKey: "read-esm002-c3-s2",
-        titleKey: "Χρήση επιλεγμένων ιστότοπων",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c3/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@cdb28419f7984a9fade0697580a422f7" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c3-s3-module12",
-        moduleId: "module12",
-        lessonKey: "read-esm002-c3-s3",
-        titleKey: "Χρήση διαδικτυακών υπηρεσιών του δημοσίου",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c3/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8b318dbee184ed785175251d48562d5" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c3-s4-module12",
-        moduleId: "module12",
-        lessonKey: "read-esm002-c3-s4",
-        titleKey: "Χρήση εξειδικευμένων ψηφιακών υπηρεσιών για άτομα με αναπηρία",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c3/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@4a101a852f134bc7b1a2591606104004" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c4-s2-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm002-c4-s2",
-        titleKey: "Ηλεκτρονικές αγορές",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c4/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@96dbd9c7713940359b8a3161b814c604" },
-        enabled: true,
-    },
-    {
-        id: "read-esm002-c4-s3-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm002-c4-s3",
-        titleKey: "Τραπεζικές συναλλαγές",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm002/c4/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@48b8d096f22c4a1e9e1644c921e55db0" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c1-s3-module6",
-        moduleId: "module6",
-        lessonKey: "read-eapsi001-c1-s3",
-        titleKey: "Το ηλεκτρονικό ταχυδρομείο",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@7eabb481930b49c3806bcc2d0cebe611" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c1-s4-module11",
-        moduleId: "module11",
-        lessonKey: "read-eapsi001-c1-s4",
-        titleKey: "H εφαρμογή Messenger",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c1/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@6290c9f668f14aa5a4e4a2ef59dc4036" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c1-s5-module11",
-        moduleId: "module11",
-        lessonKey: "read-eapsi001-c1-s5",
-        titleKey: "H εφαρμογή Viber",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c1/s5.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@0db3a7d131894bca8b4d45e053abe9b1" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c3-s3-module11",
-        moduleId: "module11",
-        lessonKey: "read-eapsi001-c3-s3",
-        titleKey: "Η εφαρμογή Microsoft Teams",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c3/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@d379e5ec271c4dbaa279a36c3ca51553" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c3-s4-module11",
-        moduleId: "module11",
-        lessonKey: "read-eapsi001-c3-s4",
-        titleKey: "Η εφαρμογή Google Meet",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c3/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@42f63d09c9f3429193d5368f2b8f5d82" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c3-s5-module11",
-        moduleId: "module11",
-        lessonKey: "read-eapsi001-c3-s5",
-        titleKey: "Η εφαρμογή Zoom",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c3/s5.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@c3324251adf84a4591bfc10a6a2bbc30" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c3-s6-word",
-        moduleId: "word",
-        lessonKey: "read-eapsi001-c3-s6",
-        titleKey: "Η πλατφόρμα Google Docs",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c3/s6.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@2d3578f9b3904a25a52f47b1951b1c1e" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c4-s2-module8",
-        moduleId: "module8",
-        lessonKey: "read-eapsi001-c4-s2",
-        titleKey: "Προσωπικά δεδομένα",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c4/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@fdfb4b9320bd4d1f9de664adcf76be56" },
-        enabled: true,
-    },
-    {
-        id: "read-eapsi001-c4-s3-module8",
-        moduleId: "module8",
-        lessonKey: "read-eapsi001-c4-s3",
-        titleKey: "Βασικές έννοιες και κανόνες καλής συμπεριφοράς στο διαδίκτυο",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/eapsi001/c4/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@204678c252d2495aa7be05792ee771af" },
-        enabled: true,
-    },
-    {
-        id: "read-esm004-c1-s2-word",
-        moduleId: "word",
-        lessonKey: "read-esm004-c1-s2",
-        titleKey: "Επεξεργαστής κειμένου",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm004/c1/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@fb2a20fabed74157aad31dd891fca4dc" },
-        enabled: true,
-    },
-    {
-        id: "read-esm004-c1-s3-module7",
-        moduleId: "module7",
-        lessonKey: "read-esm004-c1-s3",
-        titleKey: "Εφαρμογή υπολογιστικών φύλλων",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm004/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@64ba9c2d26ea497088cf16c212a3babc" },
-        enabled: true,
-    },
-    {
-        id: "read-esm004-c3-s5-module10",
-        moduleId: "module10",
-        lessonKey: "read-esm004-c3-s5",
-        titleKey: "Προκλήσεις στο ψηφιακό περιβάλλον",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm004/c3/s5.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@34dccf99121f4cb0951ec9c4ea7f88e7" },
-        enabled: true,
-    },
-    {
-        id: "read-esm005-c1-s2-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm005-c1-s2",
-        titleKey: "Βασικές έννοιες της κυβερνοασφάλειας",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm005/c1/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@eb20e51b53cb4f709151b15fb1202f1f" },
-        enabled: true,
-    },
-    {
-        id: "read-esm005-c1-s3-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm005-c1-s3",
-        titleKey: "Ασφαλής χρήση ψηφιακών τεχνολογιών",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm005/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@398e4513a67e43a9ac6c4a80017c4b0f" },
-        enabled: true,
-    },
-    {
-        id: "read-esm005-c1-s3-module10",
-        moduleId: "module10",
-        lessonKey: "read-esm005-c1-s3",
-        titleKey: "Ασφαλής χρήση ψηφιακών τεχνολογιών",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm005/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@398e4513a67e43a9ac6c4a80017c4b0f" },
-        enabled: true,
-    },
-    {
-        id: "read-esm005-c1-s4-module8",
-        moduleId: "module8",
-        lessonKey: "read-esm005-c1-s4",
-        titleKey: "Αντιμετώπιση περιστατικών παραβίασης δεδομένων",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm005/c1/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@4b5f87dea5fb4e6ebb1951dab2e7016b" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s2-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s2",
-        titleKey: "Κοινά προβλήματα υπολογιστή και πιθανές λύσεις",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s2.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@08cfb9ee24f44f688547f8ab14c582c1" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s3-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s3",
-        titleKey: "Κοινά προβλήματα κινητών συσκευών και πιθανές λύσεις",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s3.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@85e0f54cc9d14e98865a2dc1330bf6d5" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s4-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s4",
-        titleKey: "Απλοί τρόποι επίλυσης",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s4.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@87d43801a932408881c224e2003f0403" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s5-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s5",
-        titleKey: "Άλλα χρήσιμα εργαλεία επίλυσης προβλημάτων",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s5.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@db23e6fcdb794f59812e6c120516a074" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s6-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s6",
-        titleKey: "Βοήθεια από το διαδίκτυο",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s6.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@46e071a15f9f48848aa5d01192684548" },
-        enabled: true,
-    },
-    {
-        id: "read-esm006-c1-s7-module9",
-        moduleId: "module9",
-        lessonKey: "read-esm006-c1-s7",
-        titleKey: "Συμβουλές για πρόληψη προβλημάτων",
-        descriptionKey: "Θεωρία ΕΑΨΙ",
-        difficulty: "beginner",
-        lessonType: "reading",
-        config: { mdPath: "md/esm006/c1/s7.md", sourceUrl: "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@472064722a1b420a8982c85d6e5330d2" },
-        enabled: true,
-    },
+	{
+		id: 'read-esm001-c1-s3-module3',
+		moduleId: 'module3',
+		lessonKey: 'read-esm001-c1-s3',
+		titleKey: 'Περιήγηση στα Windows 11',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm001/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fc4155a1109d4f9185b0587f5a2babe4'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm001-c1-s3-module1',
+		moduleId: 'module1',
+		lessonKey: 'read-esm001-c1-s3',
+		titleKey: 'Περιήγηση στα Windows 11',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm001/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@fc4155a1109d4f9185b0587f5a2babe4'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm001-c1-s4-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm001-c1-s4',
+		titleKey: 'Ρυθμίσεις προσβασιμότητας',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm001/c1/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@5026b7bafa2b41938364575e256b5474'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c1-s2-module5',
+		moduleId: 'module5',
+		lessonKey: 'read-esm002-c1-s2',
+		titleKey: 'Το διαδίκτυο',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c1/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@7ae0bf52d95746808ce80264df168ccd'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c1-s3-module5',
+		moduleId: 'module5',
+		lessonKey: 'read-esm002-c1-s3',
+		titleKey: 'Ιστοσελίδες και προγράμματα περιήγησης',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@423188c92bed4bef82481d6184c3f11a'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c1-s4-module5',
+		moduleId: 'module5',
+		lessonKey: 'read-esm002-c1-s4',
+		titleKey: 'Λειτουργίες προγράμματος περιήγησης',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c1/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@f4164070f5e34be18355a069a4ba48ee'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c2-s2-module5',
+		moduleId: 'module5',
+		lessonKey: 'read-esm002-c2-s2',
+		titleKey: 'Μηχανές αναζήτησης',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c2/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@9674f6a2c276402d85d8d6d588993c89'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c2-s3-module13',
+		moduleId: 'module13',
+		lessonKey: 'read-esm002-c2-s3',
+		titleKey: 'Αναζήτηση πληροφοριών με Μεγάλα Γλωσσικά Μοντέλα',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c2/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8899da4760940a59a9fc425e9bfb11c'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c3-s2-module12',
+		moduleId: 'module12',
+		lessonKey: 'read-esm002-c3-s2',
+		titleKey: 'Χρήση επιλεγμένων ιστότοπων',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c3/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@cdb28419f7984a9fade0697580a422f7'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c3-s3-module12',
+		moduleId: 'module12',
+		lessonKey: 'read-esm002-c3-s3',
+		titleKey: 'Χρήση διαδικτυακών υπηρεσιών του δημοσίου',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c3/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@b8b318dbee184ed785175251d48562d5'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c3-s4-module12',
+		moduleId: 'module12',
+		lessonKey: 'read-esm002-c3-s4',
+		titleKey: 'Χρήση εξειδικευμένων ψηφιακών υπηρεσιών για άτομα με αναπηρία',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c3/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@4a101a852f134bc7b1a2591606104004'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c4-s2-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-esm002-c4-s2',
+		titleKey: 'Ηλεκτρονικές αγορές',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c4/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@96dbd9c7713940359b8a3161b814c604'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm002-c4-s3-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-esm002-c4-s3',
+		titleKey: 'Τραπεζικές συναλλαγές',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm002/c4/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@48b8d096f22c4a1e9e1644c921e55db0'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c1-s3-module6',
+		moduleId: 'module6',
+		lessonKey: 'read-eapsi001-c1-s3',
+		titleKey: 'Το ηλεκτρονικό ταχυδρομείο',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@7eabb481930b49c3806bcc2d0cebe611'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c1-s4-module11',
+		moduleId: 'module11',
+		lessonKey: 'read-eapsi001-c1-s4',
+		titleKey: 'H εφαρμογή Messenger',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c1/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@6290c9f668f14aa5a4e4a2ef59dc4036'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c1-s5-module11',
+		moduleId: 'module11',
+		lessonKey: 'read-eapsi001-c1-s5',
+		titleKey: 'H εφαρμογή Viber',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c1/s5.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@0db3a7d131894bca8b4d45e053abe9b1'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c3-s3-module11',
+		moduleId: 'module11',
+		lessonKey: 'read-eapsi001-c3-s3',
+		titleKey: 'Η εφαρμογή Microsoft Teams',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c3/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@d379e5ec271c4dbaa279a36c3ca51553'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c3-s4-module11',
+		moduleId: 'module11',
+		lessonKey: 'read-eapsi001-c3-s4',
+		titleKey: 'Η εφαρμογή Google Meet',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c3/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@42f63d09c9f3429193d5368f2b8f5d82'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c3-s5-module11',
+		moduleId: 'module11',
+		lessonKey: 'read-eapsi001-c3-s5',
+		titleKey: 'Η εφαρμογή Zoom',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c3/s5.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@c3324251adf84a4591bfc10a6a2bbc30'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c3-s6-word',
+		moduleId: 'word',
+		lessonKey: 'read-eapsi001-c3-s6',
+		titleKey: 'Η πλατφόρμα Google Docs',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c3/s6.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@2d3578f9b3904a25a52f47b1951b1c1e'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c4-s2-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-eapsi001-c4-s2',
+		titleKey: 'Προσωπικά δεδομένα',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c4/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@fdfb4b9320bd4d1f9de664adcf76be56'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-eapsi001-c4-s3-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-eapsi001-c4-s3',
+		titleKey: 'Βασικές έννοιες και κανόνες καλής συμπεριφοράς στο διαδίκτυο',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/eapsi001/c4/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@204678c252d2495aa7be05792ee771af'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm004-c1-s2-word',
+		moduleId: 'word',
+		lessonKey: 'read-esm004-c1-s2',
+		titleKey: 'Επεξεργαστής κειμένου',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm004/c1/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@fb2a20fabed74157aad31dd891fca4dc'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm004-c1-s3-module7',
+		moduleId: 'module7',
+		lessonKey: 'read-esm004-c1-s3',
+		titleKey: 'Εφαρμογή υπολογιστικών φύλλων',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm004/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@64ba9c2d26ea497088cf16c212a3babc'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm004-c3-s5-module10',
+		moduleId: 'module10',
+		lessonKey: 'read-esm004-c3-s5',
+		titleKey: 'Προκλήσεις στο ψηφιακό περιβάλλον',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm004/c3/s5.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm004+2025_S2/jump_to/block-v1:EAPSI+esm004+2025_S2+type@sequential+block@34dccf99121f4cb0951ec9c4ea7f88e7'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm005-c1-s2-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-esm005-c1-s2',
+		titleKey: 'Βασικές έννοιες της κυβερνοασφάλειας',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm005/c1/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@eb20e51b53cb4f709151b15fb1202f1f'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm005-c1-s3-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-esm005-c1-s3',
+		titleKey: 'Ασφαλής χρήση ψηφιακών τεχνολογιών',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm005/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@398e4513a67e43a9ac6c4a80017c4b0f'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm005-c1-s3-module10',
+		moduleId: 'module10',
+		lessonKey: 'read-esm005-c1-s3',
+		titleKey: 'Ασφαλής χρήση ψηφιακών τεχνολογιών',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm005/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@398e4513a67e43a9ac6c4a80017c4b0f'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm005-c1-s4-module8',
+		moduleId: 'module8',
+		lessonKey: 'read-esm005-c1-s4',
+		titleKey: 'Αντιμετώπιση περιστατικών παραβίασης δεδομένων',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm005/c1/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm005+2025_S2/jump_to/block-v1:EAPSI+esm005+2025_S2+type@sequential+block@4b5f87dea5fb4e6ebb1951dab2e7016b'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s2-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s2',
+		titleKey: 'Κοινά προβλήματα υπολογιστή και πιθανές λύσεις',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s2.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@08cfb9ee24f44f688547f8ab14c582c1'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s3-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s3',
+		titleKey: 'Κοινά προβλήματα κινητών συσκευών και πιθανές λύσεις',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s3.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@85e0f54cc9d14e98865a2dc1330bf6d5'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s4-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s4',
+		titleKey: 'Απλοί τρόποι επίλυσης',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s4.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@87d43801a932408881c224e2003f0403'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s5-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s5',
+		titleKey: 'Άλλα χρήσιμα εργαλεία επίλυσης προβλημάτων',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s5.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@db23e6fcdb794f59812e6c120516a074'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s6-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s6',
+		titleKey: 'Βοήθεια από το διαδίκτυο',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s6.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@46e071a15f9f48848aa5d01192684548'
+		},
+		enabled: true
+	},
+	{
+		id: 'read-esm006-c1-s7-module9',
+		moduleId: 'module9',
+		lessonKey: 'read-esm006-c1-s7',
+		titleKey: 'Συμβουλές για πρόληψη προβλημάτων',
+		descriptionKey: 'Θεωρία ΕΑΨΙ',
+		difficulty: 'beginner',
+		lessonType: 'reading',
+		config: {
+			mdPath: 'md/esm006/c1/s7.md',
+			sourceUrl:
+				'https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm006+2025_S2/jump_to/block-v1:EAPSI+esm006+2025_S2+type@sequential+block@472064722a1b420a8982c85d6e5330d2'
+		},
+		enabled: true
+	}
 ];
 
 // Group by module so autoOrder chains requiredLessonId within each module.
 // orderIndex offset by -1000 so reading (theory) lessons sort BEFORE the
 // module's interactive challenges (which use positive orderIndex).
 export const eapsiReadingLessons: NewLesson[] = (() => {
-    const byModule = new Map<string, typeof _readingLessons>();
-    for (const l of _readingLessons) {
-        if (!byModule.has(l.moduleId)) byModule.set(l.moduleId, []);
-        byModule.get(l.moduleId)!.push(l);
-    }
-    return [...byModule.values()].flatMap((group) => autoOrder(group).map((l) => ({ ...l, orderIndex: l.orderIndex - 1000 })));
+	const byModule = new Map<string, typeof _readingLessons>();
+	for (const l of _readingLessons) {
+		if (!byModule.has(l.moduleId)) byModule.set(l.moduleId, []);
+		byModule.get(l.moduleId)!.push(l);
+	}
+	return [...byModule.values()].flatMap((group) =>
+		autoOrder(group).map((l) => ({ ...l, orderIndex: l.orderIndex - 1000 }))
+	);
 })();
