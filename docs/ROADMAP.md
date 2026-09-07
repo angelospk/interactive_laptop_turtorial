@@ -121,3 +121,28 @@ Fixes (cookies, token) ──→ Φάση 1 (schema + detect + onboarding + tags
 ```
 
 Η Φάση 1 είναι μικρή (schema πεδίο + utility + ένα onboarding βήμα + optional tags) και ξεκλειδώνει όλα τα υπόλοιπα. Το ακριβό κομμάτι είναι το περιεχόμενο της Φάσης 2 — γι' αυτό το tagging είναι optional-by-default: το υπάρχον περιεχόμενο δεν χρειάζεται καμία αλλαγή για να δουλέψει το σύστημα.
+
+## Γνωστό κενό περιβάλλοντος: browser-mode tests σε αυτό το Mac (7 Σεπ 2026)
+
+`npx vitest run` δίνει **503 passed σε 33 από 47 test files**. Τα υπόλοιπα 14
+είναι browser-mode component tests και δεν τρέχουν:
+
+```
+browserType.launch: Executable doesn't exist at
+  ~/Library/Caches/ms-playwright/chromium_headless_shell-1194/chrome-mac/headless_shell
+```
+
+Το `npx playwright install chromium-headless-shell` **κατεβάζει** και τα 81,7 MiB
+(φτάνει 100%) και μετά κολλάει στην αποσυμπίεση: μένουν τα υποστηρικτικά αρχεία
+(`icudtl.dat`, `libEGL.dylib`, …) και λείπει το ίδιο το `headless_shell`.
+Δοκιμάστηκε τρεις φορές, μία με καθαρό cache· την τρίτη έμεινε ώρες. Το πλήρες
+`chromium` εγκαθίσταται κανονικά — μόνο το headless shell σκαλώνει.
+
+**Δεν είναι κώδικας.** Τα node tests καλύπτουν όλη τη λογική· τα 14 αρχεία είναι
+component rendering. Αν χρειαστούν:
+
+- δοκίμασε `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0 npx playwright install --force chromium-headless-shell`
+- ή στρέψε το vitest browser provider στο πλήρες `chromium` που ήδη υπάρχει
+- ή τρέξ' τα στο mini PC
+
+Καταγράφεται εδώ ώστε το επόμενο session να μη νομίσει ότι έσπασε κάτι.
