@@ -37,9 +37,14 @@ function makeEvent(course: string, sub: string, manifest: Manifest = MANIFEST) {
 	} as unknown as Parameters<typeof load>[0];
 }
 
+// `load` is typed `void | data` because it may throw a redirect; these cases
+// all return data, and the redirect cases assert on the throw instead.
+const loadData = async (event: Parameters<typeof load>[0]) =>
+	(await load(event)) as Exclude<Awaited<ReturnType<typeof load>>, void>;
+
 describe('library/[course]/[sub] load', () => {
 	it('returns the subsection with its course and chapter context', async () => {
-		const data = await load(makeEvent('esm005', 'c1-s2'));
+		const data = await loadData(makeEvent('esm005', 'c1-s2'));
 
 		expect(data.sub.title).toBe('Second');
 		expect(data.courseId).toBe('esm005');
@@ -48,21 +53,21 @@ describe('library/[course]/[sub] load', () => {
 	});
 
 	it('has no prev at the very first subsection', async () => {
-		const data = await load(makeEvent('esm005', 'c1-s1'));
+		const data = await loadData(makeEvent('esm005', 'c1-s1'));
 
 		expect(data.prev).toBeNull();
 		expect(data.next).toEqual({ id: 'c1-s2', title: 'Second' });
 	});
 
 	it('has no next at the very last subsection', async () => {
-		const data = await load(makeEvent('esm005', 'c2-s2'));
+		const data = await loadData(makeEvent('esm005', 'c2-s2'));
 
 		expect(data.next).toBeNull();
 		expect(data.prev).toEqual({ id: 'c2-s1', title: 'Third' });
 	});
 
 	it('links prev and next across the chapter boundary', async () => {
-		const data = await load(makeEvent('esm005', 'c1-s2'));
+		const data = await loadData(makeEvent('esm005', 'c1-s2'));
 
 		expect(data.prev).toEqual({ id: 'c1-s1', title: 'First' });
 		expect(data.next).toEqual({ id: 'c2-s1', title: 'Third' });
@@ -71,7 +76,7 @@ describe('library/[course]/[sub] load', () => {
 	it('resolves neighbours inside the requested course, not the first one', async () => {
 		// Both courses share subsection ids; a course-blind flatten would produce
 		// neighbours from esm005 while serving esm001.
-		const data = await load(makeEvent('esm001', 'c1-s2'));
+		const data = await loadData(makeEvent('esm001', 'c1-s2'));
 
 		expect(data.courseId).toBe('esm001');
 		expect(data.next).toEqual({ id: 'c2-s1', title: 'Third' });
@@ -109,7 +114,7 @@ describe('library/[course]/[sub] load', () => {
 			]
 		};
 
-		const data = await load(makeEvent('esm009', 'only-s1', solo));
+		const data = await loadData(makeEvent('esm009', 'only-s1', solo));
 
 		expect(data.prev).toBeNull();
 		expect(data.next).toBeNull();

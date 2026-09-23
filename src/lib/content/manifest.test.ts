@@ -52,7 +52,7 @@ describe('loadManifest', () => {
 		await loadManifest(fetchFn as unknown as typeof fetch);
 
 		expect(fetchFn).toHaveBeenCalledTimes(1);
-		expect(String(fetchFn.mock.calls[0][0])).toMatch(/manifest\.json$/);
+		expect(String((fetchFn.mock.calls[0] as unknown[])[0])).toMatch(/manifest\.json$/);
 	});
 
 	it('throws with the status code when the response is not ok', async () => {

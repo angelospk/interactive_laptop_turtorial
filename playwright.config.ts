@@ -1,3 +1,6 @@
+// The app reads its configuration from .env; without this the admin test runs
+// against a password the server does not have.
+import 'dotenv/config';
 import { defineConfig } from '@playwright/test';
 
 // When E2E_BASE_URL is set, run against an already-running server (e.g. `bun run dev`)
