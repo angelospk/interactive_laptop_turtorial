@@ -156,9 +156,9 @@
 				data-testid="mobile-recents-button"
 				onclick={onRecents}
 				aria-label="Πρόσφατες εφαρμογές"
-				class="absolute right-4 flex h-7 w-7 items-center justify-center rounded-md border-2 border-slate-500 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				class="absolute right-2 flex h-11 w-11 items-center justify-center rounded-md focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
 			>
-				<span aria-hidden="true" class="h-3.5 w-3.5 rounded-sm border-2 border-slate-500"></span>
+				<span aria-hidden="true" class="h-6 w-6 rounded-md border-2 border-slate-500"></span>
 			</button>
 		{/if}
 		{#if onHome}
@@ -166,7 +166,7 @@
 				type="button"
 				onclick={onHome}
 				aria-label="Αρχική οθόνη"
-				class="flex min-h-[28px] items-center justify-center px-6 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
+				class="flex min-h-11 items-center justify-center px-6 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
 			>
 				<span
 					data-testid="mobile-home-indicator"

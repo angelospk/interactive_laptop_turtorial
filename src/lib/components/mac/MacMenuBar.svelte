@@ -30,7 +30,7 @@
 </script>
 
 <div
-	class="absolute inset-x-0 top-0 z-20 flex h-8 items-center justify-between bg-black/40 px-3 [font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif] text-sm text-white backdrop-blur-md"
+	class="absolute inset-x-0 top-0 z-20 flex h-11 items-center justify-between bg-black/40 px-3 [font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif] text-sm text-white backdrop-blur-md"
 	role="menubar"
 	aria-label="Γραμμή μενού"
 >
@@ -73,7 +73,7 @@
 			{disabled}
 			aria-label="Spotlight αναζήτηση"
 			title="Spotlight (αναζήτηση)"
-			class="rounded px-1 text-base hover:bg-white/20 disabled:opacity-60"
+			class="flex h-11 min-w-11 items-center justify-center rounded px-2 text-xl hover:bg-white/20 disabled:opacity-60"
 			onclick={onSpotlight}
 		>
 			<span aria-hidden="true">🔍</span>

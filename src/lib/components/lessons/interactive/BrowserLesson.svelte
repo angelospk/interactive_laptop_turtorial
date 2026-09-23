@@ -183,7 +183,7 @@
 				<div class="flex items-end gap-1 border-b border-slate-300 bg-slate-100 px-2 pt-2">
 					{#each tabs as tab}
 						<div
-							class="group relative flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2 text-sm transition-colors select-none
+							class="group relative flex cursor-pointer items-center gap-2 rounded-t-lg py-0 pr-0 pl-4 text-sm transition-colors select-none
                             {activeTabId === tab.id
 								? 'bg-white font-medium text-slate-900 shadow-sm'
 								: 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
@@ -194,20 +194,25 @@
 						>
 							<Globe class="h-3 w-3" />
 							<span class="max-w-[100px] truncate">{tab.title}</span>
+							<!-- Always visible: a close button that appears only on hover cannot
+							     be found by a learner who does not know it is there. -->
 							<button
-								class="rounded-full p-0.5 opacity-0 group-hover:opacity-100 hover:bg-slate-200"
+								class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-300"
 								onclick={(e) => closeTab(tab.id, e)}
+								title="Κλείσιμο καρτέλας"
+								aria-label="Κλείσιμο καρτέλας"
 							>
-								<X class="h-3 w-3" />
+								<X class="h-4 w-4" />
 							</button>
 						</div>
 					{/each}
 					<button
-						class="mb-1 rounded-full p-2 hover:bg-slate-200"
+						class="mb-1 flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-200"
 						onclick={addTab}
 						title="Νέα καρτέλα"
+						aria-label="Νέα καρτέλα"
 					>
-						<Plus class="h-4 w-4 text-slate-600" />
+						<Plus class="h-5 w-5 text-slate-600" />
 					</button>
 				</div>
 
@@ -237,9 +242,10 @@
 						/>
 					</div>
 					<button
-						class="rounded-full p-2 hover:bg-slate-100"
+						class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100"
 						onclick={bookmarkSite}
 						title="Προσθήκη στα Αγαπημένα"
+						aria-label="Προσθήκη στα Αγαπημένα"
 					>
 						<Star
 							class="h-5 w-5 {bookmarkedSites.includes(activeTab.url)

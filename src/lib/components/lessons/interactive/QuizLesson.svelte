@@ -19,7 +19,9 @@
 	const questions = config.questions || [config]; // Fallback for single question config
 
 	let currentQuestionIndex = $state(0);
-	let selectedOption = $state<string | undefined>(undefined);
+	// '', not undefined: RadioGroup's value has a fallback and Svelte refuses to
+	// bind undefined to it, which crashed every quiz on open.
+	let selectedOption = $state('');
 	let submitted = $state(false);
 	let isCorrect = $state(false);
 	let score = $state(0);
@@ -50,7 +52,7 @@
 	function handleNext() {
 		if (currentQuestionIndex < questions.length - 1) {
 			currentQuestionIndex++;
-			selectedOption = undefined;
+			selectedOption = '';
 			submitted = false;
 			isCorrect = false;
 		} else {
@@ -58,17 +60,22 @@
 		}
 	}
 
+	// The result is reported after a short pause; if the learner leaves first,
+	// it must not fire from a destroyed component.
+	let finishTimer: ReturnType<typeof setTimeout> | undefined;
+	$effect(() => () => clearTimeout(finishTimer));
+
 	function finishQuiz() {
 		quizComplete = true;
 		const finalScore = Math.round((score / questions.length) * 100);
-		setTimeout(() => {
+		finishTimer = setTimeout(() => {
 			onComplete(finalScore);
 		}, 1500);
 	}
 
 	function handleRetry() {
 		submitted = false;
-		selectedOption = undefined;
+		selectedOption = '';
 		isCorrect = false;
 	}
 </script>
@@ -154,7 +161,7 @@
 					</Button>
 				{:else if isCorrect}
 					<Button size="lg" onclick={handleNext}>
-						{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish'}
+						{currentQuestionIndex < questions.length - 1 ? 'Επόμενη ερώτηση' : 'Τέλος'}
 					</Button>
 				{:else}
 					<Button size="lg" variant="secondary" onclick={handleRetry}>

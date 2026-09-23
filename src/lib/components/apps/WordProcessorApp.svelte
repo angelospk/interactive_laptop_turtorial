@@ -131,8 +131,10 @@
 		e.preventDefault();
 	}
 
+	// 44px: the lessons ask for exactly these buttons, and Word's real 28px ones
+	// are too small a target for the learners this is for.
 	const ribbonBtn =
-		'flex h-7 w-7 items-center justify-center rounded-sm text-slate-700 transition-colors hover:bg-[#d0d0ce]';
+		'flex h-11 w-11 items-center justify-center rounded-sm text-slate-700 transition-colors hover:bg-[#d0d0ce]';
 	const ribbonBtnActive = 'bg-[#cce4f7] text-[#2B579A] hover:bg-[#b8d9f2]';
 </script>
 
@@ -172,7 +174,7 @@
 		<div class="flex flex-col">
 			<div class="flex items-center gap-1 px-1 py-0.5">
 				<select
-					class="h-7 rounded-sm border border-[#c8c6c4] bg-white px-1 text-sm"
+					class="h-11 w-16 rounded-sm border border-[#c8c6c4] bg-white px-1 text-base"
 					value={fontSize}
 					onchange={(e) => handleFontSize(e.currentTarget.value)}
 					title="Μέγεθος γραμματοσειράς"
