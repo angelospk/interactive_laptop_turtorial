@@ -200,10 +200,10 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	<div class="flex flex-col items-center gap-4 py-4">
+	<div class="flex h-full min-h-0 flex-col items-center gap-3 py-2">
 		<p class="max-w-xl text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
-		<MacDesktop class="my-2 max-w-3xl">
+		<MacDesktop class="max-w-3xl flex-1">
 			<MacMenuBar
 				activeLabel={appLabel(activeAppId ?? finderApp?.id ?? null)}
 				{canQuit}

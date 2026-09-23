@@ -15,7 +15,10 @@
 
 <div
 	class={cn(
-		'relative h-[600px] w-full overflow-hidden rounded-xl border-4 border-slate-800 bg-gradient-to-br from-sky-400 via-indigo-400 to-purple-500 shadow-2xl select-none',
+		// Sized by its container, not by a fixed 600px: the lesson shell now hands the
+		// simulation whatever height the screen has, and a hardcoded height either
+		// wasted it or pushed the Dock below the fold.
+		'relative h-full max-h-full min-h-[18rem] w-full overflow-hidden rounded-xl border-4 border-slate-800 bg-gradient-to-br from-sky-400 via-indigo-400 to-purple-500 shadow-2xl select-none',
 		className
 	)}
 >

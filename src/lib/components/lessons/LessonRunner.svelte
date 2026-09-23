@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
@@ -12,6 +12,7 @@
 		lessons,
 		progress,
 		startIndex = 0,
+		navigation = 0,
 		onExit,
 		onLessonChange,
 		moduleId = null,
@@ -21,6 +22,8 @@
 		lessons: Lesson[];
 		progress: Record<string, any>;
 		startIndex?: number;
+		/** Counts real navigations; a change means "go to startIndex", even the same one. */
+		navigation?: number;
 		onExit?: () => void;
 		/** Called with the new lessonKey when the runner moves within the module (for URL sync). */
 		onLessonChange?: (lessonKey: string) => void;
@@ -29,11 +32,31 @@
 		isLastModule?: boolean;
 	}>();
 
-	// Reassignable `$derived`: `startIndex` is authoritative, Next/Prev override
-	// it, and a fresh startIndex after invalidateAll() takes over again. As plain
-	// `$state` it was captured once and then silently disagreed with the progress
-	// the rest of the component was rendering (bd-afz).
-	let currentLessonIndex = $derived(startIndex);
+	// `startIndex` is where the route params say we are; Next/Prev move from
+	// there. Next rewrites the address bar with a *shallow* replaceState, which
+	// leaves the params — and so startIndex — at the arrival lesson, and every
+	// `invalidateAll()` re-emits that stale number. So the runner jumps to
+	// startIndex only on a real navigation (`navigation` changed), or when the
+	// number itself changes. Comparing numbers alone missed a real navigation
+	// back to the arrival lesson: it re-emits the very same number.
+	let currentLessonIndex = $state(startIndex);
+	let syncedStartIndex = startIndex;
+	let syncedNavigation = navigation;
+
+	$effect(() => {
+		const incoming = startIndex;
+		const nav = navigation;
+		if (incoming === syncedStartIndex && nav === syncedNavigation) return;
+		syncedStartIndex = incoming;
+		syncedNavigation = nav;
+		// Arriving is not finishing: no result overlay or countdown comes along.
+		untrack(() => {
+			cancelAutoAdvance();
+			justCompletedLessonId = null;
+		});
+		currentLessonIndex = incoming;
+	});
+
 	let currentLesson = $derived(lessons[currentLessonIndex]);
 
 	// Optimistic UI state
@@ -46,8 +69,11 @@
 	// All lessons are now unlocked - users can navigate freely
 	let isLocked = $derived(false);
 
-	// Setup countdown state
+	// Setup countdown state. The countdown belongs to the lesson that armed it:
+	// a timer left over from lesson 3 must never advance lesson 1, which is what
+	// the learner saw ("δεν έβγαλε καν timer, απλά με μετακίνησε").
 	let countdownRemaining = $state<number | null>(null);
+	let countdownLessonId = $state<string | null>(null);
 	let countdownInterval: any = null;
 
 	$effect(() => {
@@ -56,19 +82,37 @@
 		};
 	});
 
+	// Any lesson change — click, countdown, or a load re-run — disarms a timer
+	// that was counting for a different lesson.
+	$effect(() => {
+		const id = currentLesson?.id ?? null;
+		if (countdownLessonId !== null && countdownLessonId !== id) cancelAutoAdvance();
+	});
+
 	function startAutoAdvance() {
+		const armedFor = currentLesson?.id ?? null;
+		if (armedFor === null) return;
+
+		countdownLessonId = armedFor;
 		countdownRemaining = 5; // 5 seconds
 		if (countdownInterval !== null) clearInterval(countdownInterval);
 
 		countdownInterval = setInterval(() => {
+			if (currentLesson?.id !== armedFor) {
+				cancelAutoAdvance();
+				return;
+			}
 			if (countdownRemaining !== null) {
 				countdownRemaining -= 1;
 				if (countdownRemaining <= 0) {
 					clearInterval(countdownInterval);
 					countdownInterval = null;
 					countdownRemaining = null;
+					countdownLessonId = null;
 					// Advance after the pending DOM update, not after a guessed 10ms.
-					tick().then(() => nextLesson());
+					tick().then(() => {
+						if (currentLesson?.id === armedFor) nextLesson();
+					});
 				}
 			}
 		}, 1000);
@@ -80,14 +124,61 @@
 			countdownInterval = null;
 		}
 		countdownRemaining = null;
+		countdownLessonId = null;
 	}
 
-	async function handleLessonComplete(score: number) {
-		const isFirstCompletion = !mergedProgress[currentLesson.id]?.completed;
+	// The result overlay belongs to a completion that just happened here. Keying
+	// it off stored progress meant walking into an already-finished lesson opened
+	// a full-screen "Μπράβο" over a lesson the learner had not played yet.
+	let justCompletedLessonId = $state<string | null>(null);
+	let showResultOverlay = $derived(
+		!!currentLesson &&
+			justCompletedLessonId === currentLesson.id &&
+			!!mergedProgress[currentLesson.id]?.completed
+	);
+
+	// Per lesson, bumped by every completion of it and by Retry on it: a save that
+	// comes back after a newer completion of the same lesson, or after Retry, must
+	// not touch the screen — it would restore cleared progress or start a hidden
+	// countdown. Per lesson, because finishing another lesson is not a reason to
+	// drop this one's save.
+	const attempts = new Map<string, number>();
+	const nextAttempt = (lessonId: string) => {
+		const n = (attempts.get(lessonId) ?? 0) + 1;
+		attempts.set(lessonId, n);
+		return n;
+	};
+	// One queue per lesson: every request for a lesson waits for the one before
+	// it, so saves and Retry's deletes reach the server in the order they were
+	// made. Otherwise a late save could undo a delete, or a late delete wipe a
+	// newer result.
+	const serverQueues = new Map<string, Promise<unknown>>();
+	function inOrder<T>(lessonId: string, request: () => Promise<T> | T): Promise<T> {
+		const run = (serverQueues.get(lessonId) ?? Promise.resolve()).then(request);
+		serverQueues.set(
+			lessonId,
+			run.catch(() => undefined)
+		);
+		return run;
+	}
+
+	/**
+	 * `lessonId` is captured where the renderer was created, not read from the
+	 * current state: a drill reports its result on a short delay, and if the
+	 * learner moved on in the meantime the result belongs to the lesson they
+	 * left — crediting the one now on screen would mark it complete unplayed and
+	 * arm the auto-advance from there.
+	 */
+	async function handleLessonComplete(score: number, lessonId: string) {
+		if (lessonId !== currentLesson?.id) return;
+		const mine = nextAttempt(lessonId);
+
+		const isFirstCompletion = !mergedProgress[lessonId]?.completed;
 		const isSuccess = score >= 50;
+		justCompletedLessonId = lessonId;
 
 		// Optimistically update UI immediately
-		localUpdates[currentLesson.id] = {
+		localUpdates[lessonId] = {
 			completed: true,
 			score,
 			stars: score <= 33 ? 1 : score <= 66 ? 2 : 3, // Estimate stars
@@ -95,51 +186,77 @@
 		};
 
 		// Save progress using the new API endpoint
-		const res = await fetch('/api/lessons/complete', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				lessonId: currentLesson.id,
-				score
-			})
-		});
+		// Skipped if a Retry came first: this result no longer stands.
+		const res = await inOrder(lessonId, () =>
+			mine === attempts.get(lessonId)
+				? fetch('/api/lessons/complete', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ lessonId, score })
+					})
+				: null
+		);
+		if (!res) return;
+		// Read the body before the freshness check: Retry can land while it arrives.
+		const data = res.ok ? await res.json() : null;
+		if (mine !== attempts.get(lessonId)) return;
 
 		if (res.ok) {
-			const data = await res.json();
 			// Update with actual server response if needed, or just rely on invalidateAll
 			if (data.progress) {
-				localUpdates[currentLesson.id] = data.progress;
+				localUpdates[lessonId] = data.progress;
 			}
 
-			if (isFirstCompletion && isSuccess) {
+			// The request outlives the lesson: a learner who pressed Επόμενο while it
+			// was in flight must not come back to an overlay, or a countdown, armed
+			// for a lesson they already left. The stored progress above still stands.
+			if (lessonId !== currentLesson?.id) {
+				if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
+				await invalidateAll();
+				return;
+			}
+
+			// Only with the result still on screen: a learner who left and came back
+			// meanwhile no longer sees it, and would be carried off by a hidden countdown.
+			if (isFirstCompletion && isSuccess && justCompletedLessonId === lessonId) {
 				startAutoAdvance();
 			}
 
 			await invalidateAll(); // Refresh data to get updated progress
 		} else {
 			// Revert optimistic update on failure
-			const { [currentLesson.id]: _, ...rest } = localUpdates;
+			const { [lessonId]: _, ...rest } = localUpdates;
 			localUpdates = rest;
+			if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
 			console.error('Failed to save progress');
 		}
 	}
 
+	// Part of the lesson's key: Retry must hand the learner a fresh drill, not the
+	// finished one whose progress was just cleared.
+	let retryEpoch = $state(0);
+
 	async function handleRetry() {
+		retryEpoch++;
 		cancelAutoAdvance();
+		justCompletedLessonId = null;
+		const lessonId = currentLesson.id;
+		nextAttempt(lessonId);
 		// Clear local state immediately for instant UI feedback
-		const { [currentLesson.id]: _, ...rest } = localUpdates;
-		localUpdates = rest;
+		// A tombstone, not just a removal: until the delete reloads the server's
+		// progress, that still says "completed", and a quick replay would look
+		// like a repeat instead of the first completion it now is.
+		localUpdates = { ...localUpdates, [lessonId]: { completed: false } };
 
-		// Delete progress from database
+		// Delete progress from database, in turn with this lesson's other requests.
 		try {
-			const res = await fetch('/api/lessons/delete-progress', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					lessonId: currentLesson.id
+			const res = await inOrder(lessonId, () =>
+				fetch('/api/lessons/delete-progress', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ lessonId })
 				})
-			});
-
+			);
 			if (res.ok) {
 				await invalidateAll(); // Refresh to get updated state
 			}
@@ -156,6 +273,7 @@
 
 	function nextLesson() {
 		cancelAutoAdvance();
+		justCompletedLessonId = null;
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
 			syncUrl();
@@ -168,6 +286,7 @@
 
 	function prevLesson() {
 		cancelAutoAdvance();
+		justCompletedLessonId = null;
 		if (currentLessonIndex > 0) {
 			currentLessonIndex--;
 			syncUrl();
@@ -254,38 +373,48 @@
 	});
 </script>
 
-<div class="space-y-6" class:fullscreen-active={isFullscreen} bind:this={lessonContainer}>
+<div class="lesson-runner" class:fullscreen-active={isFullscreen} bind:this={lessonContainer}>
 	<!-- Portal target for dialogs/modals in fullscreen mode -->
 	<div id="fullscreen-portal-target" class="fullscreen-portal-container"></div>
 
-	<div class="flex items-center justify-between" class:hidden={isFullscreen}>
-		<Button variant="outline" onclick={prevLesson} disabled={currentLessonIndex === 0}>
+	<!--
+		In fullscreen only the "leave fullscreen" control stays: hiding the whole row
+		left the learner inside a full-screen lesson with no visible way out.
+	-->
+	<nav class="lesson-nav" aria-label={getMessage('lesson_nav_aria') || 'Πλοήγηση μαθήματος'}>
+		<Button
+			variant="outline"
+			onclick={prevLesson}
+			disabled={currentLessonIndex === 0}
+			class="min-h-12 px-5 text-base {isFullscreen ? 'invisible' : ''}"
+		>
 			{getMessage('nav_previous')}
 		</Button>
 		<div class="flex items-center gap-2">
-			<span class="text-sm font-medium text-slate-500">
+			<span class="text-base font-semibold text-slate-600" class:invisible={isFullscreen}>
 				{getMessage('lesson_x_of_y', {
 					current: String(currentLessonIndex + 1),
 					total: String(lessons.length)
 				})}
 			</span>
 			<Button
-				variant="ghost"
-				size="icon"
+				variant={isFullscreen ? 'secondary' : 'ghost'}
 				onclick={toggleFullscreen}
-				title={isFullscreen ? getMessage('fullscreen_exit') : getMessage('fullscreen_enter')}
-				class="h-8 w-8"
+				aria-label={isFullscreen ? getMessage('fullscreen_exit') : getMessage('fullscreen_enter')}
+				class="min-h-12 min-w-12 gap-2 px-3"
 			>
 				{#if isFullscreen}
-					<Minimize2 class="h-4 w-4" />
+					<Minimize2 class="h-5 w-5" />
+					<span class="text-base">{getMessage('fullscreen_exit')}</span>
 				{:else}
-					<Maximize2 class="h-4 w-4" />
+					<Maximize2 class="h-5 w-5" />
 				{/if}
 			</Button>
 		</div>
 		<Button
 			onclick={nextLesson}
 			disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}
+			class="min-h-12 px-5 text-base {isFullscreen ? 'invisible' : ''}"
 		>
 			{currentLessonIndex === lessons.length - 1
 				? nextModuleId
@@ -293,11 +422,11 @@
 					: getMessage('nav_finish')
 				: getMessage('nav_next')}
 		</Button>
-	</div>
+	</nav>
 
 	{#if showFullscreenBanner}
 		<div
-			class="flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
+			class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
 		>
 			<div class="flex items-center gap-2">
 				<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
@@ -323,9 +452,12 @@
 		</div>
 	{/if}
 
-	<div bind:this={lessonCard}>
-		<Card>
-			<CardContent>
+	<div class="lesson-card" bind:this={lessonCard}>
+		<Card class="flex h-full min-h-0 flex-col overflow-hidden py-0">
+			<!-- Scrolls when a lesson is taller than the screen (a short laptop, or the
+			     browser zoomed in). Lessons built on LessonTemplate scroll inside and
+			     never trigger it; a quiz, sized to its content, used to be cut off. -->
+			<CardContent class="min-h-0 flex-1 overflow-y-auto px-0 py-0">
 				{#if isLocked}
 					<div class="flex h-64 items-center justify-center rounded-md bg-slate-100 text-slate-500">
 						<div class="text-center">
@@ -335,10 +467,11 @@
 					</div>
 				{:else}
 					<!-- Use the new LessonRenderer component -->
-					{#key currentLesson.id}
+					{#key `${currentLesson.id}:${retryEpoch}`}
+						{@const renderedLessonId = currentLesson.id}
 						<LessonRenderer
 							lesson={currentLesson}
-							onComplete={handleLessonComplete}
+							onComplete={(score: number) => handleLessonComplete(score, renderedLessonId)}
 							onBack={handleBack}
 						/>
 					{/key}
@@ -347,7 +480,7 @@
 		</Card>
 	</div>
 
-	{#if mergedProgress[currentLesson.id]?.completed}
+	{#if showResultOverlay}
 		{@const isSuccess = (mergedProgress[currentLesson.id]?.score ?? 100) >= 50}
 		<div
 			class="pointer-events-auto fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/40 p-4 backdrop-blur-[2px] duration-300 fade-in"
@@ -447,6 +580,58 @@
 </div>
 
 <style>
+	/* Navigation row, optional fullscreen banner, then the lesson card taking the
+	   rest. The banner row is declared even when the banner is absent — with only
+	   two rows declared it landed in an implicit row and pushed the card past the
+	   bottom of the screen. `minmax(0, 1fr)` lets the card shrink; a plain `1fr`
+	   would let the lesson push the page taller and bring back the document
+	   scrollbar. */
+	.lesson-runner {
+		display: grid;
+		grid-template-rows: auto auto minmax(0, 1fr);
+		gap: 0.5rem;
+		min-block-size: 0;
+		block-size: 100%;
+	}
+
+	.lesson-nav {
+		grid-row: 1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	/* The shared button's `focus-visible:ring` resolves to a fully transparent
+	   box-shadow and its base utilities zero the outline width, so a keyboard user
+	   saw nothing move at all. `!important` is what it takes to beat a utility
+	   that sets the same property; the alternative is editing the button every
+	   screen shares. */
+	.lesson-nav :global(button:focus-visible) {
+		outline: 3px solid #b45309 !important;
+		outline-offset: 3px;
+	}
+
+	.fullscreen-banner {
+		grid-row: 2;
+	}
+
+	.lesson-card {
+		/* Explicit row: without it the card was auto-placed into row 2 and the
+		   flexible row 3 stayed empty, so the lesson did not actually take the
+		   space the layout had reserved for it. */
+		grid-row: 3;
+		min-block-size: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.lesson-card > :global(*) {
+		min-block-size: 0;
+		flex: 1;
+	}
+
 	.fullscreen-active {
 		position: fixed;
 		top: 0;
@@ -457,9 +642,14 @@
 		height: 100vh;
 		width: 100vw;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		overflow-y: auto;
 		padding: 0;
 		margin: 0;
+		/* Fullscreen keeps a slim row for the "leave fullscreen" control. */
+		grid-template-rows: auto minmax(0, 1fr);
+	}
+
+	.fullscreen-active .lesson-card {
+		grid-row: 2;
 	}
 
 	.fullscreen-active :global(.lesson-template) {
