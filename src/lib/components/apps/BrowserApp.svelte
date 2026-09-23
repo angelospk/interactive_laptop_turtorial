@@ -28,17 +28,35 @@
 	} from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
+	import { matchesShortcut, shortcutSteps, type LearnerDevice } from '$lib/lessons/shortcuts';
 
-	let { config = {}, onAction } = $props<{
+	let {
+		config = {},
+		onAction,
+		device = null,
+		active = true
+	} = $props<{
 		config?: any;
 		onAction: (action: string, data?: any) => void;
+		/** Keyboard the learner chose; decides whether ⌘ or Ctrl is the shortcut key. */
+		device?: LearnerDevice;
+		/** False while the window is minimised, so a keypress cannot finish a hidden lesson. */
+		active?: boolean;
 	}>();
 
 	type Tab = {
 		id: number;
 		title: string;
 		url: string;
-		type: 'home' | 'search' | 'news' | 'weather' | 'gov' | 'banking' | 'history' | 'browser-settings';
+		type:
+			| 'home'
+			| 'search'
+			| 'news'
+			| 'weather'
+			| 'gov'
+			| 'banking'
+			| 'history'
+			| 'browser-settings';
 		isSecure: boolean;
 		// Per-tab visual history stack (back/forward). Purely cosmetic — never emits onAction.
 		stack: string[];
@@ -52,7 +70,15 @@
 	};
 
 	let tabs = $state<Tab[]>([
-		{ id: 1, title: 'Αρχική', url: 'home', type: 'home', isSecure: true, stack: ['home'], stackIndex: 0 }
+		{
+			id: 1,
+			title: 'Αρχική',
+			url: 'home',
+			type: 'home',
+			isSecure: true,
+			stack: ['home'],
+			stackIndex: 0
+		}
 	]);
 	let activeTabId = $state(1);
 	let addressBarInput = $state('');
@@ -415,6 +441,23 @@
 		onAction('zoom-page', { direction });
 	}
 
+	let findInput = $state<HTMLInputElement>();
+
+	// The zoom and find lessons name a keyboard shortcut, so the keyboard has to
+	// work — and the real browser must not zoom or open its own find bar instead.
+	function handleShortcut(e: KeyboardEvent) {
+		if (!active) return;
+		const pressed = (action: string) =>
+			matchesShortcut(e, shortcutSteps([action], device)[0].keys, device);
+		if (config.goal === 'zoom-page' && (pressed('zoom-in') || pressed('zoom-out'))) {
+			e.preventDefault();
+			handleZoom(pressed('zoom-in') ? 'in' : 'out');
+		} else if (config.goal === 'find-on-page' && pressed('find')) {
+			e.preventDefault();
+			findInput?.focus();
+		}
+	}
+
 	function handleFindOnPage() {
 		if (findBarInput.trim()) {
 			onAction('find-on-page', { term: findBarInput });
@@ -443,6 +486,8 @@
 		return m[key]?.() || key;
 	}
 </script>
+
+<svelte:window onkeydown={handleShortcut} />
 
 <div class="relative flex h-full w-full flex-col overflow-hidden bg-white">
 	<!-- Cookie Banner Overlay -->
@@ -508,17 +553,25 @@
 				</span>
 				<span class="max-w-[100px] truncate">{tab.title}</span>
 				<button
-					class="rounded-full p-0.5 transition-opacity hover:bg-slate-200 {activeTabId === tab.id
+					class="flex h-11 w-11 items-center justify-center rounded-full transition-opacity hover:bg-slate-200 {activeTabId ===
+					tab.id
 						? 'opacity-100'
 						: 'opacity-0 group-hover:opacity-100'}"
 					onclick={(e) => closeTab(tab.id, e)}
+					title="Κλείσιμο καρτέλας"
+					aria-label="Κλείσιμο καρτέλας"
 				>
-					<X class="h-3 w-3" />
+					<X class="h-4 w-4" />
 				</button>
 			</div>
 		{/each}
-		<button class="mb-1 ml-1 rounded-full p-1.5 hover:bg-[#cdd1d7]" onclick={addTab} title="Νέα καρτέλα">
-			<Plus class="h-4 w-4 text-slate-600" />
+		<button
+			class="mb-1 ml-1 flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#cdd1d7]"
+			onclick={addTab}
+			title="Νέα καρτέλα"
+			aria-label="Νέα καρτέλα"
+		>
+			<Plus class="h-5 w-5 text-slate-600" />
 		</button>
 	</div>
 
@@ -563,7 +616,7 @@
 			</div>
 			<input
 				type="text"
-				class="w-full rounded-full bg-slate-100 py-1.5 pr-10 pl-9 text-sm outline-none hover:bg-slate-200/70 focus:bg-white focus:ring-2 focus:shadow-md {activeTab.isSecure
+				class="w-full rounded-full bg-slate-100 py-3 pr-12 pl-9 text-sm outline-none hover:bg-slate-200/70 focus:bg-white focus:shadow-md focus:ring-2 {activeTab.isSecure
 					? 'focus:ring-green-500'
 					: 'focus:ring-red-500'}"
 				placeholder="Πληκτρολογήστε μια διεύθυνση Web"
@@ -574,9 +627,10 @@
 			/>
 			<!-- Chrome-style bookmark star inside the address bar -->
 			<button
-				class="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1 hover:bg-slate-200"
+				class="absolute top-1/2 right-0 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full hover:bg-slate-200"
 				onclick={bookmarkSite}
 				title="Προσθήκη στα Αγαπημένα"
+				aria-label="Προσθήκη στα Αγαπημένα"
 			>
 				<Star
 					class="h-4 w-4 {bookmarkedSites.includes(activeTab.url)
@@ -590,11 +644,21 @@
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
 			{#if config.goal === 'zoom-page'}
-				<button class="rounded-full p-2 hover:bg-slate-100" onclick={() => handleZoom('out')} title="Σμίκρυνση">
-					<ZoomOut class="h-5 w-5 text-slate-400" />
+				<button
+					class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+					onclick={() => handleZoom('out')}
+					title="Σμίκρυνση"
+					aria-label="Σμίκρυνση"
+				>
+					<ZoomOut class="h-7 w-7 text-slate-700" />
 				</button>
-				<button class="rounded-full p-2 hover:bg-slate-100" onclick={() => handleZoom('in')} title="Μεγέθυνση">
-					<ZoomIn class="h-5 w-5 text-slate-400" />
+				<button
+					class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+					onclick={() => handleZoom('in')}
+					title="Μεγέθυνση"
+					aria-label="Μεγέθυνση"
+				>
+					<ZoomIn class="h-7 w-7 text-slate-700" />
 				</button>
 			{/if}
 			<!-- Visual-only three-dot menu -->
@@ -642,6 +706,7 @@
 				type="text"
 				class="flex-1 rounded border px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
 				placeholder="Αναζήτηση στη σελίδα..."
+				bind:this={findInput}
 				bind:value={findBarInput}
 				onkeydown={(e) => e.key === 'Enter' && handleFindOnPage()}
 			/>
@@ -652,9 +717,13 @@
 	<!-- 3. Content Area -->
 	<div class="relative flex-1 overflow-y-auto bg-slate-50">
 		{#if config.goal === 'download-file'}
-			<div class="absolute right-4 bottom-4 z-10 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 shadow-md">
+			<div
+				class="absolute right-4 bottom-4 z-10 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 shadow-md"
+			>
 				<Download class="h-5 w-5 text-blue-600" />
-				<span class="text-sm font-medium text-blue-900">{config.targetFilename || 'document.pdf'}</span>
+				<span class="text-sm font-medium text-blue-900"
+					>{config.targetFilename || 'document.pdf'}</span
+				>
 				<button
 					class="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
 					onclick={handleDownload}
@@ -826,7 +895,7 @@
 						>
 							<Newspaper class="h-10 w-10 text-slate-400" />
 						</div>
-						<h2 class="font-serif text-3xl font-bold leading-tight">
+						<h2 class="font-serif text-3xl leading-tight font-bold">
 							Νέα πλατφόρμα εκπαίδευσης για αρχάριους
 						</h2>
 						<p class="leading-relaxed text-slate-700">
@@ -845,7 +914,7 @@
 								<Newspaper class="h-6 w-6 text-slate-400" />
 							</div>
 							<div class="p-4">
-								<h3 class="font-serif text-lg font-bold leading-snug">
+								<h3 class="font-serif text-lg leading-snug font-bold">
 									Ο καιρός το σαββατοκύριακο: Ηλιοφάνεια σε όλη τη χώρα
 								</h3>
 								<p class="mt-1 text-sm text-slate-500">πριν από 2 ώρες</p>
@@ -856,7 +925,7 @@
 								<Newspaper class="h-6 w-6 text-slate-400" />
 							</div>
 							<div class="p-4">
-								<h3 class="font-serif text-lg font-bold leading-snug">
+								<h3 class="font-serif text-lg leading-snug font-bold">
 									Πώς να αναγνωρίσετε ένα ύποπτο email
 								</h3>
 								<p class="mt-1 text-sm text-slate-500">πριν από 5 ώρες</p>
@@ -871,7 +940,7 @@
 				<header class="mb-8 border-b border-slate-200 pb-4">
 					<div class="flex items-center gap-3">
 						<span class="rounded bg-[#003476] px-2.5 py-1.5 text-2xl font-bold text-white">ΓΔ</span>
-						<h1 class="text-3xl font-bold lowercase text-[#003476]">Gov.gr</h1>
+						<h1 class="text-3xl font-bold text-[#003476] lowercase">Gov.gr</h1>
 					</div>
 					<p class="mt-2 text-slate-600">Ενιαία Ψηφιακή Πύλη της Δημόσιας Διοίκησης</p>
 				</header>
@@ -988,9 +1057,8 @@
 									</div>
 								{/if}
 							</div>
-							<Button
-								class="w-full bg-blue-800 text-white hover:bg-blue-900"
-								onclick={loginBank}>Login</Button
+							<Button class="w-full bg-blue-800 text-white hover:bg-blue-900" onclick={loginBank}
+								>Login</Button
 							>
 						</div>
 						<p class="mt-4 text-xs text-slate-500">Ποτέ μην δίνετε τον κωδικό σας τηλεφωνικά!</p>
@@ -1049,10 +1117,7 @@
 											placeholder="0.00"
 										/>
 									</div>
-									<Button
-										class="bg-blue-800 text-white hover:bg-blue-900"
-										onclick={transferMoney}
-									>
+									<Button class="bg-blue-800 text-white hover:bg-blue-900" onclick={transferMoney}>
 										{t('bank_transfer_button')}
 									</Button>
 								</div>
@@ -1157,7 +1222,10 @@
 				<div class="space-y-2">
 					{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i}
 						<button
-							class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i === 1 ? 'border-blue-300 bg-blue-50' : ''}"
+							class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i ===
+							1
+								? 'border-blue-300 bg-blue-50'
+								: ''}"
 							onclick={() => i === 1 && handlePrivacySettings()}
 						>
 							<div class="flex items-center gap-3">
@@ -1166,7 +1234,9 @@
 								{:else}
 									<Globe class="h-4 w-4 text-slate-400" />
 								{/if}
-								<span class="{i === 1 ? 'font-medium text-blue-700' : 'text-slate-700'}">{section}</span>
+								<span class={i === 1 ? 'font-medium text-blue-700' : 'text-slate-700'}
+									>{section}</span
+								>
 							</div>
 							<ArrowRight class="h-4 w-4 text-slate-400" />
 						</button>

@@ -6,6 +6,8 @@
 	import { CheckCircle, Copy, Scissors, Clipboard } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
+	import { page } from '$app/state';
+	import { formatShortcut, type LearnerDevice } from '$lib/lessons/shortcuts';
 
 	interface Props {
 		lesson: Lesson;
@@ -25,9 +27,12 @@
 		modifierLabel?: string;
 	};
 
-	// Windows/Linux use Ctrl, macOS uses Cmd (⌘). The instructions must be truthful
-	// per platform (Mac track, CURRICULUM_PLAN §5).
-	const mod = config.modifierLabel ?? 'Ctrl';
+	// The instructions must be truthful per platform (Mac track, CURRICULUM_PLAN
+	// §5). A lesson that is *about* one platform can still pin the label; every
+	// other lesson follows the device the learner chose during onboarding, instead
+	// of showing a Mac learner the Ctrl they do not have.
+	const device = $derived((page.data?.user?.preferredDevice ?? null) as LearnerDevice);
+	const mod = $derived(config.modifierLabel ?? formatShortcut(['primary'], device));
 
 	let sourceValue = $state(config.sampleText || config.sourceText || 'Κείμενο για αντιγραφή');
 	let targetValue = $state('');

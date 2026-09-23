@@ -13,6 +13,9 @@
 	import { untrack } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
+	import { page } from '$app/state';
+	import { fillShortcutText, type LearnerDevice } from '$lib/lessons/shortcuts';
+	import { frontmostWindowId } from '$lib/components/desktop/frontmost';
 	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
 
 	// Import Apps
@@ -68,6 +71,12 @@
 		}[]
 	>([]);
 	let startMenuOpen = $state(false);
+	// Only the window in front reacts to keyboard shortcuts.
+	const frontmostId = $derived(frontmostWindowId(openApps));
+
+	// The keyboard the learner chose in onboarding: instructions and the apps'
+	// own shortcuts follow it, so a Mac learner is never told to press Ctrl.
+	const device = $derived((page.data?.user?.preferredDevice ?? null) as LearnerDevice);
 	let showTaskView = $state(false);
 	let completed = $state(false);
 
@@ -230,7 +239,7 @@
 				<div class="flex gap-3 p-4">
 					<Info class="h-5 w-5 shrink-0 text-blue-600" />
 					<div class="flex-1 text-sm whitespace-pre-line text-blue-900">
-						{config.instructions}
+						{fillShortcutText(config.instructions, device)}
 					</div>
 				</div>
 			</Card>
@@ -263,6 +272,8 @@
 									: {})
 							}}
 							onAction={handleAppAction}
+							{device}
+							active={instance.id === frontmostId}
 							initialFiles={config.initialFiles}
 							initialData={config.initialData}
 							emails={config.emails}

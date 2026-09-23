@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { allLessons } from './index';
 import { allModules } from './modules';
+import { fillShortcutText } from '$lib/lessons/shortcuts';
 import {
 	moduleCategories,
 	moduleSections,
@@ -321,5 +322,31 @@ describe('i18n locale parity (el ↔ en)', () => {
 	it('has no key present in en but missing from el', () => {
 		const missing = [...enKeys].filter((k) => !elKeys.has(k));
 		expect(missing, `missing from el: ${missing.join(', ')}`).toEqual([]);
+	});
+});
+
+// A lesson that tells a Mac learner to press "Ctrl+F" teaches a key that does
+// nothing on their keyboard. Prose names shortcuts with {{shortcut:<action>}}
+// (see $lib/lessons/shortcuts) and only the Mac track may pin ⌘ itself.
+describe('shortcut prose', () => {
+	const pinnedToMac = (moduleId: string) => moduleId.startsWith('mac');
+
+	it('never hardcodes one platform’s shortcut key outside the Mac track', () => {
+		const offenders = allLessons
+			.filter((lesson) => !pinnedToMac(lesson.moduleId))
+			.filter((lesson) => /\bCtrl\s*[+-]|\bCmd\b|⌘/.test(JSON.stringify(lesson.config ?? {})))
+			.map((lesson) => lesson.id);
+		expect(offenders, `hardcoded shortcut in: ${offenders.join(', ')}`).toEqual([]);
+	});
+
+	it('only uses shortcut tokens the shortcut module can fill', () => {
+		const unfilled = allLessons.flatMap((lesson) =>
+			[
+				...fillShortcutText(JSON.stringify(lesson.config ?? {}), 'mac').matchAll(
+					/\{\{[a-z]+:[a-z-]+\}\}/g
+				)
+			].map((match) => `${lesson.id}: ${match[0]}`)
+		);
+		expect(unfilled).toEqual([]);
 	});
 });

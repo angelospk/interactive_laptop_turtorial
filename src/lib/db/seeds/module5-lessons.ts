@@ -178,7 +178,7 @@ export const module5Lessons: NewLesson[] = [
 			goal: 'zoom-page',
 			initialApps: ['browser'],
 			instructions:
-				'Μεγεθύνετε τη σελίδα: Χρησιμοποιήστε Ctrl+ για μεγέθυνση ή Ctrl- για σμίκρυνση.'
+				'Μεγεθύνετε τη σελίδα: κρατήστε πατημένο το {{key:primary}} και πατήστε το + για μεγέθυνση ή το − για σμίκρυνση. Μπορείτε και να πατήσετε τα κουμπιά με τον μεγεθυντικό φακό, πάνω δεξιά.'
 		},
 		enabled: true,
 		requiredLessonId: 'module5-lesson8'
@@ -198,7 +198,7 @@ export const module5Lessons: NewLesson[] = [
 			goal: 'find-on-page',
 			initialApps: ['browser'],
 			instructions:
-				'Αναζήτηση στη σελίδα: Πατήστε Ctrl+F για να εμφανιστεί το πεδίο αναζήτησης, και γράψτε στο πεδίο αναζήτησης στη σελίδα.'
+				'Αναζήτηση στη σελίδα: πατήστε {{shortcut:find}} ή κάντε κλικ στο κίτρινο πεδίο αναζήτησης. Γράψτε μια λέξη και πατήστε «Εύρεση».'
 		},
 		enabled: true,
 		requiredLessonId: 'module5-lesson9'

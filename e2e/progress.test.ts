@@ -10,18 +10,23 @@ test('user progress persistence', async ({ page }) => {
 	await page.getByRole('button', { name: loginButton }).click();
 	await expect(page).toHaveURL('/');
 
-	// 2. Verify welcome message
+	// 2. First run asks which device to learn; it blocks the page until answered.
+	const picker = page.getByRole('dialog').filter({ hasText: 'Τι θέλεις να μάθεις' });
+	await picker.getByRole('button', { name: /Υπολογιστής Windows/ }).click();
+	await expect(picker).toBeHidden();
+
+	// 3. Verify welcome message
 	await expect(page.getByText(new RegExp(username)).first()).toBeVisible();
 
-	// 3. Logout
+	// 4. Logout
 	await page.getByRole('button', { name: /Αποσύνδεση/ }).click();
 	await expect(page).toHaveURL('/login');
 
-	// 4. Login again with same username
+	// 5. Login again with same username
 	await page.fill('#username', username);
 	await page.getByRole('button', { name: loginButton }).click();
 	await expect(page).toHaveURL('/');
 
-	// 5. Verify user is recognized again
+	// 6. Verify user is recognized again
 	await expect(page.getByText(new RegExp(username)).first()).toBeVisible();
 });

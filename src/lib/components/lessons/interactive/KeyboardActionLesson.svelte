@@ -6,6 +6,8 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 	import { CheckCircle } from '@lucide/svelte';
+	import { page } from '$app/state';
+	import { matchesStep, shortcutSteps } from '$lib/lessons/shortcuts';
 
 	interface Props {
 		lesson: Lesson;
@@ -23,49 +25,45 @@
 		repetitions?: number;
 	};
 
+	// The learner told us which device they are learning during onboarding, and it
+	// travels in the session, so it is available during SSR too — no flash of
+	// Windows shortcuts before hydration.
+	const device = $derived(
+		(page.data?.user?.preferredDevice ?? null) as import('$lib/lessons/shortcuts').LearnerDevice
+	);
+
 	// State
 	let currentStep = $state(0);
 	let completed = $state(false);
 	let lastPressed = $state('');
-	let steps = $state<{ label: string; keys: string[]; completed: boolean }[]>([]);
+	let completedSteps = $state<boolean[]>([]);
+	let completionTimer: number | null = null;
 
-	// Initialize steps based on config
-	$effect(() => {
-		if (steps.length > 0) return;
-
+	// Steps follow the chosen device, so they are derived, not pushed once into
+	// state: the labels would otherwise be frozen at whatever the first render
+	// guessed. Completion is tracked alongside, by index.
+	const baseSteps = $derived.by<
+		{ label: string; keys: string[]; macKeys?: string[]; description?: string }[]
+	>(() => {
 		if (config.action === 'language-switch') {
 			const reps = config.repetitions || 3;
-			for (let i = 0; i < reps; i++) {
-				steps.push({
-					label: 'Alt + Shift',
-					keys: ['Alt', 'Shift'],
-					completed: false
-				});
-			}
-		} else if (config.shortcuts) {
-			const shortcutMap: Record<string, { label: string; keys: string[]; description: string }> = {
-				copy: { label: 'Ctrl + C', keys: ['Control', 'c'], description: 'Αντιγραφή (Copy)' },
-				paste: { label: 'Ctrl + V', keys: ['Control', 'v'], description: 'Επικόλληση (Paste)' },
-				cut: { label: 'Ctrl + X', keys: ['Control', 'x'], description: 'Αποκοπή (Cut)' },
-				undo: { label: 'Ctrl + Z', keys: ['Control', 'z'], description: 'Αναίρεση (Undo)' },
-				redo: { label: 'Ctrl + Y', keys: ['Control', 'y'], description: 'Επανάληψη (Redo)' }
-			};
-
-			config.shortcuts.forEach((s) => {
-				if (shortcutMap[s]) {
-					steps.push({ ...shortcutMap[s], completed: false });
-				}
-			});
-		} else if (config.keys) {
-			config.keys.forEach((k) => {
-				steps.push({
-					label: k,
-					keys: [k],
-					completed: false
-				});
-			});
+			// Alt+Shift is the Windows chord; a Mac switches language with
+			// Control+Space, so the step comes from the shared action table.
+			const [step] = shortcutSteps(['language-switch'], device);
+			return Array.from({ length: reps }, () => ({
+				label: step.label,
+				keys: step.keys,
+				macKeys: step.macKeys
+			}));
 		}
+		if (config.shortcuts) return shortcutSteps(config.shortcuts, device);
+		if (config.keys) return config.keys.map((k) => ({ label: k, keys: [k] }));
+		return [];
 	});
+
+	const steps = $derived(
+		baseSteps.map((step, i) => ({ ...step, completed: completedSteps[i] === true }))
+	);
 
 	let currentTarget = $derived(steps[currentStep]);
 
@@ -90,30 +88,25 @@
 		// Update display
 		lastPressed = Array.from(pressedKeys).join(' + ');
 
-		// Check match
-		const requiredKeys = currentTarget.keys.map((k) => k.toLowerCase());
-		const allMatch = requiredKeys.every((k) => {
-			if (k === 'control') return e.ctrlKey;
-			if (k === 'alt') return e.altKey;
-			if (k === 'shift') return e.shiftKey;
-			return pressedKeys.has(k);
-		});
-
-		// For language switch (Alt+Shift), we need to be careful as it might not fire standard keydown in some browsers/OS
-		// But usually it fires Alt then Shift
+		// The Windows chord (Alt+Shift) may arrive as two separate presses, so
+		// accept it as soon as both are held; other platforms use a normal chord.
 		if (config.action === 'language-switch') {
-			// Special handling for Alt+Shift
-			if (e.altKey && e.shiftKey) {
+			const wantsAltShift =
+				currentTarget.keys.includes('alt') && currentTarget.keys.includes('shift');
+			if ((wantsAltShift && e.altKey && e.shiftKey) || matchesStep(e, currentTarget, device)) {
 				completeStep();
 			}
-		} else if (allMatch) {
+			return;
+		}
+
+		if (matchesStep(e, currentTarget, device)) {
 			e.preventDefault(); // Prevent browser action (like save or print)
 			completeStep();
 		}
 	}
 
 	function completeStep() {
-		steps[currentStep].completed = true;
+		completedSteps[currentStep] = true;
 		toast.success(m.good_effort ? m.good_effort() : 'Good!');
 
 		if (currentStep < steps.length - 1) {
@@ -122,7 +115,8 @@
 		} else {
 			completed = true;
 			toast.success(m.perfect ? m.perfect() : 'Perfect!');
-			setTimeout(() => {
+			completionTimer = window.setTimeout(() => {
+				completionTimer = null;
 				onComplete(100);
 			}, 1500);
 		}
@@ -132,6 +126,8 @@
 		window.addEventListener('keydown', handleKeydown);
 		return () => {
 			window.removeEventListener('keydown', handleKeydown);
+			// A result that lands after the learner has moved on belongs to nobody.
+			if (completionTimer !== null) clearTimeout(completionTimer);
 		};
 	});
 </script>
@@ -147,7 +143,7 @@
 
 			{#if !completed}
 				<div class="current-task py-8">
-					<p class="mb-4 text-lg text-slate-500">Press the following keys:</p>
+					<p class="mb-4 text-lg text-slate-500">Πάτησε τα εξής πλήκτρα:</p>
 					<div class="key-display mb-2 animate-pulse text-5xl font-bold text-primary">
 						{currentTarget?.label}
 					</div>
@@ -161,22 +157,22 @@
 						<div
 							class="mx-auto mt-4 max-w-md rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800"
 						>
-							<span class="font-bold">Mac Users:</span> You may need to hold the
-							<span class="rounded bg-yellow-100 px-1 font-mono">Fn</span> key while pressing F-keys
-							(e.g. Fn + F1).
+							<span class="font-bold">Σε Mac:</span> ίσως χρειαστεί να κρατάς πατημένο το
+							<span class="rounded bg-yellow-100 px-1 font-mono">Fn</span> όσο πατάς τα F-πλήκτρα (π.χ.
+							Fn + F1).
 						</div>
 					{/if}
 
 					{#if lastPressed}
 						<div class="mt-4 text-sm text-slate-400">
-							Detected: <span class="rounded bg-slate-100 px-2 py-1 font-mono">{lastPressed}</span>
+							Πάτησες: <span class="rounded bg-slate-100 px-2 py-1 font-mono">{lastPressed}</span>
 						</div>
 					{/if}
 				</div>
 			{:else}
 				<div class="completion-message py-8 text-green-600">
 					<CheckCircle class="mx-auto mb-4 h-16 w-16" />
-					<h2 class="text-3xl font-bold">Lesson Completed!</h2>
+					<h2 class="text-3xl font-bold">{m.lesson_complete?.() || 'Ολοκληρώθηκε'}!</h2>
 				</div>
 			{/if}
 		</div>
