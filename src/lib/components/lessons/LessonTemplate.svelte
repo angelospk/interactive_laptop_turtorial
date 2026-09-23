@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { ArrowLeft, HelpCircle } from 'lucide-svelte';
 	import type { Lesson } from '$lib/db/schema';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Snippet } from 'svelte';
 	import TutorialAssistant from '$lib/components/ui/TutorialAssistant.svelte';
+	import { getAssistantContent } from '$lib/lessons/assistant';
 
 	interface Props {
 		lesson: Lesson;
@@ -27,20 +27,33 @@
 	};
 
 	const difficultyColor = $derived(difficultyColors[lesson.difficulty] || '#6b7280');
+
+	// Only what the assistant genuinely adds on top of what is already on screen.
+	const assistantContent = $derived(getAssistantContent({ config: lesson.config, description }));
+
+	// The lesson body is the page's scroller now, so it has to start at the top
+	// when the learner moves to another lesson instead of inheriting the previous
+	// lesson's scroll position.
+	let contentEl = $state<HTMLElement | undefined>();
+
+	$effect(() => {
+		const id = lesson.id;
+		if (contentEl && id) contentEl.scrollTop = 0;
+	});
 </script>
 
 <div class="lesson-template">
-	<!-- Header -->
+	<!--
+		Header. The "Πίσω" button that used to live here was the third control in a
+		row saying the same thing (breadcrumb, page back button, this one) and cost
+		a line of the lesson's own height. The breadcrumb above the lesson is the
+		single way back now.
+	-->
 	<header class="lesson-header">
-		<button class="back-button" onclick={onBack}>
-			<ArrowLeft size={20} />
-			<span>{m.back()}</span>
-		</button>
-
-		<div class="lesson-info">
-			<h1 class="lesson-title">{title}</h1>
+		<h1 class="lesson-title">{title}</h1>
+		{#if description}
 			<p class="lesson-description">{description}</p>
-		</div>
+		{/if}
 
 		<div class="lesson-meta">
 			<span class="difficulty-badge" style="background-color: {difficultyColor}">
@@ -53,17 +66,11 @@
 	</header>
 
 	<!-- Lesson Content -->
-	<div class="lesson-content">
+	<div class="lesson-content" bind:this={contentEl}>
 		{@render children()}
 	</div>
 
-	<TutorialAssistant
-		title="Βοηθός"
-		lessonId={lesson.id}
-		instructions={(lesson.config as any)?.tutorialSteps ||
-			(lesson.config as any)?.instructions ||
-			description}
-	/>
+	<TutorialAssistant title="Βοηθός" lessonId={lesson.id} instructions={assistantContent} />
 </div>
 
 <style>
@@ -85,76 +92,47 @@
 	.lesson-header {
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(10px);
-		padding: 1.5rem 2rem;
+		padding: 0.75rem 1.25rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: 0.75rem;
+		row-gap: 0.25rem;
 	}
 
 	/* Compact header in fullscreen */
 	:global(:fullscreen) .lesson-header {
-		padding: 0.75rem 1.5rem;
+		padding: 0.5rem 1.5rem;
 	}
 
 	:global(:fullscreen) .lesson-title {
 		font-size: 1.25rem;
-		margin-bottom: 0.25rem;
 	}
 
 	:global(:fullscreen) .lesson-description {
-		font-size: 0.85rem;
-	}
-
-	:global(:fullscreen) .back-button {
-		padding: 0.25rem 0.75rem;
-		font-size: 0.8rem;
-		margin-bottom: 0.5rem;
-	}
-
-	:global(:fullscreen) .lesson-info {
-		margin-bottom: 0.5rem;
-	}
-
-	.back-button {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
-		background: rgba(255, 255, 255, 0.2);
-		border: none;
-		border-radius: 6px;
-		color: white;
 		font-size: 0.9rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-		margin-bottom: 1rem;
-	}
-
-	.back-button:hover {
-		background: rgba(255, 255, 255, 0.3);
-		transform: translateX(-4px);
-	}
-
-	.lesson-info {
-		margin-bottom: 1rem;
 	}
 
 	.lesson-title {
-		font-size: 2rem;
+		font-size: 1.375rem;
 		font-weight: 700;
 		color: white;
-		margin-bottom: 0.5rem;
+		margin: 0;
 	}
 
 	.lesson-description {
 		font-size: 1rem;
 		color: rgba(255, 255, 255, 0.9);
 		margin: 0;
+		flex: 1 1 16rem;
 	}
 
 	.lesson-meta {
 		display: flex;
-		gap: 1rem;
+		gap: 0.75rem;
 		align-items: center;
+		margin-inline-start: auto;
 	}
 
 	.difficulty-badge {
@@ -173,10 +151,14 @@
 		text-transform: capitalize;
 	}
 
+	/* The lesson body is the only scroller: the page itself must not grow, or the
+	   learner has to scroll to find the button that starts the lesson. */
 	.lesson-content {
 		flex: 1;
-		padding: 2rem;
+		min-block-size: 0;
+		padding: 1rem 1.25rem;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 	}
 
 	/* Ensure content fills and scrolls in fullscreen */

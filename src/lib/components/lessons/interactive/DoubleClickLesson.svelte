@@ -24,7 +24,6 @@
 		instructions?: string;
 	};
 	const targetCount = config.targetCount || 5;
-	const timeLimit = config.timeLimit || 40;
 	const theme = coerceVariant(config.theme, DOUBLE_CLICK_THEMES, 'default');
 
 	// Theme assets
@@ -44,12 +43,34 @@
 
 	let score = $state(0);
 	let successfulClicks = $state(0);
-	let timeRemaining = $state(timeLimit);
+
 	let isComplete = $state(false);
-	let gameStarted = $state(false);
+	// The exercise is live from the moment it opens. The old "Έναρξη" gate was a
+	// button an elderly learner had to find before anything responded, and it sat
+	// below the fold on a laptop screen. `timeLimit` stays in the config contract
+	// for the 218 seeded lessons but no longer runs a clock, scores, or ends a
+	// lesson — being slow is not failing.
 
 	let targets = $state<{ id: number; x: number; y: number; opened: boolean }[]>([]);
-	let intervalId: number | null = null;
+
+	// Every deferred callback is tracked so leaving the lesson cancels it. An
+	// uncancelled one fires from a destroyed component into the runner, which
+	// reads whatever lesson is on screen *now* and marks that one complete.
+	let timers: number[] = [];
+
+	function later(fn: () => void, ms: number) {
+		const id = window.setTimeout(() => {
+			timers = timers.filter((t) => t !== id);
+			fn();
+		}, ms);
+		timers.push(id);
+		return id;
+	}
+
+	function clearTimers() {
+		for (const id of timers) clearTimeout(id);
+		timers = [];
+	}
 
 	function generateTargets() {
 		const newTargets = [];
@@ -65,28 +86,20 @@
 	}
 
 	function startGame() {
-		gameStarted = true;
 		generateTargets();
-
-		intervalId = window.setInterval(() => {
-			timeRemaining--;
-			if (timeRemaining <= 0) {
-				endGame();
-			}
-		}, 1000);
 	}
 
 	function handleDoubleClick(id: number) {
-		if (!gameStarted || isComplete) return;
+		if (isComplete) return;
 
 		const target = targets.find((t) => t.id === id);
 		if (target && !target.opened) {
 			target.opened = true;
 			successfulClicks++;
 
-			// Score calculation
-			const efficiency = Math.max(0, 10 - (timeLimit - timeRemaining) / 10); // simple efficiency bonus
-			score += 20 + Math.round(efficiency);
+			// Accuracy only, on the same 0-100 scale the learner sees. Adding a
+			// rounded slice per target drifted off 100 for counts like 3.
+			score = Math.round((successfulClicks / targetCount) * 100);
 
 			if (successfulClicks >= targetCount) {
 				endGame();
@@ -95,40 +108,24 @@
 	}
 
 	function endGame() {
-		if (intervalId) {
-			clearInterval(intervalId);
-			intervalId = null;
-		}
-
 		isComplete = true;
 
-		const finalScore = Math.min(100, score + Math.round((timeRemaining / timeLimit) * 20));
+		const finalScore = Math.min(100, Math.round((successfulClicks / targetCount) * 100));
 
-		setTimeout(() => {
+		later(() => {
 			onComplete(finalScore);
 		}, 2000);
 	}
 
 	onMount(() => {
-		return () => {
-			if (intervalId) {
-				clearInterval(intervalId);
-			}
-		};
+		startGame();
+		return clearTimers;
 	});
 </script>
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="dbl-lesson {currentTheme.bgClass} h-full rounded-lg transition-colors duration-500">
-		{#if !gameStarted}
-			<div class="start-screen">
-				<h2 class="mb-4 text-2xl font-bold">{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
-				<p class="mb-6 text-slate-600">
-					{config.instructions || 'Κάντε διπλό κλικ για να ανοίξετε τα αντικείμενα.'}
-				</p>
-				<button class="start-button" onclick={startGame}>{m.start_lesson?.() || 'Έναρξη'}</button>
-			</div>
-		{:else if isComplete}
+		{#if isComplete}
 			<div class="complete-screen">
 				<h2 class="mb-2 text-3xl font-bold text-green-600">
 					✓ {m.lesson_complete?.() || 'Ολοκληρώθηκε'}!
@@ -140,13 +137,15 @@
 			</div>
 		{:else}
 			<div class="game-ui">
+				<p class="mx-4 mt-4 text-center text-lg font-semibold text-slate-700">
+					{config.instructions || 'Κάντε διπλό κλικ για να ανοίξετε τα αντικείμενα.'}
+				</p>
 				<div
 					class="hud mx-4 mt-4 flex justify-between rounded-lg bg-white/80 p-4 shadow-sm backdrop-blur"
 				>
 					<div class="font-bold text-slate-700">
 						{m.progress?.() || 'Πρόοδος'}: {successfulClicks}/{targetCount}
 					</div>
-					<div class="font-mono text-blue-600">{m.time?.() || 'Χρόνος'}: {timeRemaining}s</div>
 					<div class="font-bold text-green-600">{m.score?.() || 'Σκορ'}: {score}</div>
 				</div>
 				<div
@@ -184,7 +183,6 @@
 	.dbl-lesson {
 		height: 100%;
 	}
-	.start-screen,
 	.complete-screen {
 		display: flex;
 		flex-direction: column;
@@ -194,15 +192,6 @@
 		background: white;
 		border-radius: 12px;
 		padding: 2rem;
-	}
-	.start-button {
-		padding: 1rem 2rem;
-		background: #667eea;
-		color: white;
-		border: none;
-		border-radius: 8px;
-		font-size: 1.1rem;
-		cursor: pointer;
 	}
 	.game-ui {
 		display: flex;

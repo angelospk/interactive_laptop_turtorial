@@ -57,7 +57,9 @@
 		pickResumePoint((data.lessons ?? []) as ResumeLesson[], data.progress ?? {})
 	);
 	const lessonTitle = (lesson: ResumeLesson) =>
-		typeof messages[lesson.titleKey] === 'function' ? messages[lesson.titleKey]() : lesson.lessonKey;
+		typeof messages[lesson.titleKey] === 'function'
+			? messages[lesson.titleKey]()
+			: lesson.lessonKey;
 </script>
 
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
@@ -73,11 +75,10 @@
 		<!-- Header -->
 		<header class="mb-12 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex flex-wrap items-center gap-2.5">
-				<LogoutButton />
 				<Button
 					variant="outline"
 					href="/library"
-					class="h-11 gap-2 rounded-full px-5 text-base shadow-soft"
+					class="shadow-soft h-11 gap-2 rounded-full px-5 text-base"
 				>
 					<BookOpen class="h-5 w-5 text-brand" strokeWidth={1.75} />
 					Βιβλιοθήκη
@@ -93,15 +94,24 @@
 					</Button>
 				{/if}
 			</div>
-			<LanguageToggle />
+			<div class="flex flex-wrap items-center gap-2.5">
+				<LanguageToggle />
+				{#if data.user}
+					<LogoutButton />
+				{/if}
+			</div>
 		</header>
 
 		<!-- Hero -->
 		<section class="mb-14 max-w-3xl" data-reveal use:reveal>
-			<h1 class="text-4xl font-extrabold text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
+			<h1
+				class="text-4xl font-extrabold text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]"
+			>
 				{messages.app_title()}
 			</h1>
-			<p class="mt-4 max-w-xl text-lg text-muted-foreground sm:text-xl">{messages.app_subtitle()}</p>
+			<p class="mt-4 max-w-xl text-lg text-muted-foreground sm:text-xl">
+				{messages.app_subtitle()}
+			</p>
 			{#if data.user}
 				<p class="mt-3 text-base text-foreground/70">
 					{messages.welcome_user({ displayName: data.user.displayName || data.user.username })}
@@ -120,7 +130,10 @@
 		{/if}
 
 		<!-- Module grid, grouped into themed categories -->
-		{#snippet moduleCard(module: { id: string; titleKey: string; descriptionKey: string | null }, num: number)}
+		{#snippet moduleCard(
+			module: { id: string; titleKey: string; descriptionKey: string | null },
+			num: number
+		)}
 			{@const completion = getCompletion(module.id)}
 			{@const moduleProgress = completion.overallPercent}
 			{@const done = completion.allComplete}
@@ -130,7 +143,7 @@
 				href={`/modules/${module.id}`}
 				data-reveal
 				use:reveal={{ delay: 40 + (num % 4) * 50 }}
-				class="group bezel-shell block shadow-soft transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-soft-lg focus-visible:ring-4 focus-visible:ring-brand/20 focus-visible:outline-none"
+				class="group bezel-shell shadow-soft hover:shadow-soft-lg block transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 focus-visible:ring-4 focus-visible:ring-brand/20 focus-visible:outline-none"
 			>
 				<div class="bezel-core flex h-full flex-col gap-5 p-6 sm:p-7">
 					<div class="flex items-start justify-between gap-4">
@@ -157,7 +170,7 @@
 								{/if}
 							</span>
 						{:else}
-							<span class="text-sm font-semibold tabular-nums text-muted-foreground">
+							<span class="text-sm font-semibold text-muted-foreground tabular-nums">
 								{moduleProgress}%
 							</span>
 						{/if}
@@ -169,8 +182,8 @@
 						</h2>
 						<p class="mt-2 line-clamp-2 text-base text-muted-foreground">
 							{module.descriptionKey && messages[module.descriptionKey]
-							? messages[module.descriptionKey]()
-							: ''}
+								? messages[module.descriptionKey]()
+								: ''}
 						</p>
 						{#if deviceTags}
 							<div class="mt-3 flex flex-wrap gap-1.5">
@@ -235,9 +248,11 @@
 						{/each}
 					</div>
 				{:else}
-					<div class="rounded-2xl border border-dashed border-border bg-secondary/40 p-6 text-base text-muted-foreground">
-						Τα ξεχωριστά μαθήματα για <strong>{dm.label}</strong> έρχονται σύντομα. Στο μεταξύ,
-						όλα τα μαθήματα πιο κάτω ισχύουν και για τη δική σου συσκευή.
+					<div
+						class="rounded-2xl border border-dashed border-border bg-secondary/40 p-6 text-base text-muted-foreground"
+					>
+						Τα ξεχωριστά μαθήματα για <strong>{dm.label}</strong> έρχονται σύντομα. Στο μεταξύ, όλα τα
+						μαθήματα πιο κάτω ισχύουν και για τη δική σου συσκευή.
 					</div>
 				{/if}
 			</section>
@@ -251,7 +266,7 @@
 							{group.category?.title}
 						</h2>
 						<span class="h-px flex-1 bg-border"></span>
-						<span class="text-xs font-medium tabular-nums text-muted-foreground">
+						<span class="text-xs font-medium text-muted-foreground tabular-nums">
 							{group.modules.length}
 						</span>
 					</div>

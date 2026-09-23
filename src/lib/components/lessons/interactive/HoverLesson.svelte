@@ -35,7 +35,6 @@
 	}
 	const config = parsed;
 	const targetCount = config.targetCount;
-	const timeLimit = config.timeLimit;
 	const theme = config.theme;
 
 	const THEME_LABELS = {
@@ -51,8 +50,27 @@
 
 	const pathD = path.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
+	// Every deferred callback is tracked so leaving the lesson cancels it. An
+	// uncancelled one fires from a destroyed component into the runner, which
+	// reads whatever lesson is on screen *now* and marks that one complete.
+	let timers: number[] = [];
+
+	function later(fn: () => void, ms: number) {
+		const id = window.setTimeout(() => {
+			timers = timers.filter((t) => t !== id);
+			fn();
+		}, ms);
+		timers.push(id);
+		return id;
+	}
+
+	function clearTimers() {
+		for (const id of timers) clearTimeout(id);
+		timers = [];
+	}
+
 	function handlePathMove(event: PointerEvent) {
-		if (!gameStarted || isComplete || !playArea) return;
+		if (isComplete || !playArea) return;
 		const box = playArea.getBoundingClientRect();
 		if (box.width === 0 || box.height === 0) return;
 		const at: Point = {
@@ -67,17 +85,18 @@
 	// Game state
 	let score = $state(0);
 	let successfulHovers = $state(0);
-	let timeRemaining = $state(timeLimit);
 	let isComplete = $state(false);
-	let gameStarted = $state(false);
+	// The exercise is live from the moment it opens. The old "Έναρξη" gate was a
+	// button an elderly learner had to find before anything responded, and it sat
+	// below the fold on a laptop screen. `timeLimit` stays in the config contract
+	// for the 218 seeded lessons but no longer runs a clock, scores, or ends a
+	// lesson — being slow is not failing.
 
 	// Target state
 	let targetX = $state(50);
 	let targetY = $state(50);
 	let isHovering = $state(false);
 	let currentTargetIndex = $state(0);
-
-	let intervalId: number | null = null;
 
 	// Generate random position for target
 	function generateRandomPosition() {
@@ -87,36 +106,24 @@
 	}
 
 	function startGame() {
-		gameStarted = true;
 		run = createPathRun(path);
 		if (theme !== 'shape-path') generateRandomPosition();
-
-		// Timer
-		intervalId = window.setInterval(() => {
-			timeRemaining--;
-
-			if (timeRemaining <= 0) {
-				endGame();
-			}
-		}, 1000);
 	}
 
 	function handleTargetHover() {
-		if (!gameStarted || isComplete || isHovering) return;
+		if (isComplete || isHovering) return;
 
 		isHovering = true;
 		successfulHovers++;
 		currentTargetIndex++;
 
-		// Calculate score based on remaining time (faster = better score)
-		const timeTaken = timeLimit - timeRemaining;
-		const efficiency = Math.max(0, 100 - timeTaken * 2);
-		score += Math.round(efficiency);
+		// Accuracy only, on the same 0-100 scale the learner sees.
+		score = Math.min(100, Math.round(score + 100 / targetCount));
 
 		// Audio feedback would be nice here
 
 		// Generate new target after short delay
-		setTimeout(() => {
+		later(() => {
 			if (successfulHovers >= targetCount) {
 				endGame();
 			} else {
@@ -131,37 +138,26 @@
 	}
 
 	function endGame() {
-		if (intervalId) {
-			clearInterval(intervalId);
-			intervalId = null;
-		}
-
 		isComplete = true;
 
 		if (theme === 'shape-path') {
 			const pathScore = pathRunScore(run, path);
-			setTimeout(() => onComplete(pathScore), 2000);
+			later(() => onComplete(pathScore), 2000);
 			return;
 		}
 
 		// Calculate final score (0-100)
-		const completionBonus = (successfulHovers / targetCount) * 50;
-		const timeBonus = (timeRemaining / timeLimit) * 30;
-		const accuracyScore = score / targetCount;
+		const finalScore = Math.min(100, Math.round((successfulHovers / targetCount) * 100));
+		score = finalScore;
 
-		const finalScore = Math.min(100, Math.round(completionBonus + timeBonus + accuracyScore * 0.2));
-
-		setTimeout(() => {
+		later(() => {
 			onComplete(finalScore);
 		}, 2000);
 	}
 
 	onMount(() => {
-		return () => {
-			if (intervalId) {
-				clearInterval(intervalId);
-			}
-		};
+		startGame();
+		return clearTimers;
 	});
 </script>
 
@@ -171,31 +167,7 @@
 			<div class="start-screen">
 				<h2>Το μάθημα δεν είναι διαθέσιμο</h2>
 				<p>Χρειάζεται ενημέρωση του περιεχομένου. Δοκιμάστε ένα άλλο μάθημα.</p>
-				<button class="start-button" onclick={onBack}>Πίσω</button>
-			</div>
-		{:else if !gameStarted}
-			<div class="start-screen">
-				<h2>{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
-				<p>
-					{config.instructions ||
-						m.hover_instructions?.() ||
-						'Μετακινήστε το ποντίκι πάνω από τους στόχους.'}
-				</p>
-				<div class="game-info">
-					<div class="info-item">
-						<span class="label">
-							{theme === 'shape-path' ? 'Σημεία' : m.targets?.() || 'Στόχοι'}
-						</span>
-						<span class="value">{theme === 'shape-path' ? path.length : targetCount}</span>
-					</div>
-					<div class="info-item">
-						<span class="label">{m.time_limit?.() || 'Χρόνος'}:</span>
-						<span class="value">{timeLimit}s</span>
-					</div>
-				</div>
-				<button class="start-button" onclick={startGame}>
-					{m.start_lesson?.() || 'Έναρξη'}
-				</button>
+				<button class="back-button" onclick={onBack}>Πίσω</button>
 			</div>
 		{:else if isComplete}
 			<div class="complete-screen">
@@ -211,6 +183,11 @@
 		{:else}
 			<!-- Game UI -->
 			<div class="game-ui">
+				<p class="play-instructions">
+					{config.instructions ||
+						m.hover_instructions?.() ||
+						'Μετακινήστε το ποντίκι πάνω από τους στόχους.'}
+				</p>
 				<div class="hud">
 					<div class="stat">
 						<span class="stat-label">{m.progress?.() || 'Πρόοδος'}:</span>
@@ -221,10 +198,6 @@
 								{successfulHovers}/{targetCount}
 							{/if}
 						</span>
-					</div>
-					<div class="stat">
-						<span class="stat-label">{m.time?.() || 'Χρόνος'}:</span>
-						<span class="stat-value">{timeRemaining}s</span>
 					</div>
 					<div class="stat">
 						<span class="stat-label">
@@ -299,6 +272,23 @@
 		flex-direction: column;
 	}
 
+	.back-button {
+		min-height: 48px;
+		padding: 0 1.5rem;
+		border: none;
+		border-radius: 0.5rem;
+		background: #4f46e5;
+		color: white;
+		font-size: 1.05rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.back-button:focus-visible {
+		outline: 3px solid #f59e0b;
+		outline-offset: 2px;
+	}
+
 	.start-screen,
 	.complete-screen {
 		display: flex;
@@ -326,53 +316,19 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.game-info {
-		display: flex;
-		gap: 2rem;
-		margin: 2rem 0;
-	}
-
-	.info-item {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.info-item .label {
-		font-size: 0.9rem;
-		color: #9ca3af;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.info-item .value {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #667eea;
-	}
-
-	.start-button {
-		margin-top: 1rem;
-		padding: 1rem 3rem;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
-		border: none;
-		border-radius: 8px;
-		font-size: 1.1rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: transform 0.2s;
-	}
-
-	.start-button:hover {
-		transform: scale(1.05);
-	}
-
 	.game-ui {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	.play-instructions {
+		text-align: center;
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #1f2937;
+		margin: 0 0 0.5rem;
 	}
 
 	.hud {

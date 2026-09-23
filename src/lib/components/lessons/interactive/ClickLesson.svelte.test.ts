@@ -41,15 +41,32 @@ describe('ClickLesson click-pattern validation', () => {
 			onBack: vi.fn()
 		});
 
-		await screen.getByRole('button', { name: /Έναρξη|Start/ }).click();
-
+		// The lesson is live on open — no start gate to press first.
 		// mixedType is 'double-click' → a single click is the wrong pattern.
 		await screen.getByRole('button', { name: '2x CLICK' }).click();
 
-		expect(toastError).toHaveBeenCalledTimes(1);
+		// Judged after a pause: it may still become the first half of a double-click.
+		await vi.waitFor(() => expect(toastError).toHaveBeenCalledTimes(1));
 		expect(onComplete).not.toHaveBeenCalled();
 		// Progress counter must stay at 0 successful clicks.
 		await expect.element(screen.getByText(/0\/3/)).toBeInTheDocument();
+	});
+
+	// A double-click arrives as click, click, dblclick. The two clicks were each
+	// judged wrong: the learner doing exactly what was asked saw "needs a
+	// double-click!" and lost 20 points.
+	it('does not scold the two clicks that make up a correct double-click', async () => {
+		const screen = render(ClickLesson, {
+			lesson: makeLesson({ targetCount: 3, timeLimit: 45, theme: 'mixed' }),
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
+		await screen.getByRole('button', { name: '2x CLICK' }).dblClick();
+		await expect.element(screen.getByText(/1\/3/)).toBeInTheDocument();
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+		expect(toastError).not.toHaveBeenCalled();
+		// Score label comes from the message catalogue; one of three, no penalty.
+		await expect.element(screen.getByText(/:\s*33\b/)).toBeInTheDocument();
 	});
 
 	it('accepts the correct click and completes the lesson', async () => {
@@ -60,7 +77,6 @@ describe('ClickLesson click-pattern validation', () => {
 			onBack: vi.fn()
 		});
 
-		await screen.getByRole('button', { name: /Έναρξη|Start/ }).click();
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 
 		expect(toastError).not.toHaveBeenCalled();

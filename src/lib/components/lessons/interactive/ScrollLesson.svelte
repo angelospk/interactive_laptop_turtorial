@@ -20,24 +20,31 @@
 	};
 
 	const targetDistance = config.scrollDistance || 200;
-	const timeLimit = config.timeLimit || 40;
 
 	let scrollY = $state(0);
 	let progress = $derived(Math.min(100, (scrollY / targetDistance) * 100));
-	let timeRemaining = $state(timeLimit);
-	let gameStarted = $state(false);
+	// Live from the moment it opens: the old "Έναρξη" gate was a button the learner
+	// had to find first, and the clock could fail them for being slow. `timeLimit`
+	// stays in the config contract but drives nothing.
 	let isComplete = $state(false);
-	let intervalId: number | null = null;
 
-	function startGame() {
-		gameStarted = true;
-		intervalId = window.setInterval(() => {
-			timeRemaining--;
-			if (timeRemaining <= 0) {
-				// Fail or end? Let's just end with partial score
-				endGame();
-			}
-		}, 1000);
+	// Every deferred callback is tracked so leaving the lesson cancels it. An
+	// uncancelled one fires from a destroyed component into the runner, which
+	// reads whatever lesson is on screen *now* and marks that one complete.
+	let timers: number[] = [];
+
+	function later(fn: () => void, ms: number) {
+		const id = window.setTimeout(() => {
+			timers = timers.filter((t) => t !== id);
+			fn();
+		}, ms);
+		timers.push(id);
+		return id;
+	}
+
+	function clearTimers() {
+		for (const id of timers) clearTimeout(id);
+		timers = [];
 	}
 
 	function handleScroll(e: UIEvent) {
@@ -50,38 +57,25 @@
 	}
 
 	function endGame() {
-		if (intervalId) clearInterval(intervalId);
 		isComplete = true;
 		const success = scrollY >= targetDistance;
-		const score = success
-			? Math.min(100, 80 + Math.round((timeRemaining / timeLimit) * 20))
-			: Math.round(progress);
+		const score = success ? 100 : Math.round(progress);
 
-		setTimeout(() => {
+		later(() => {
 			onComplete(score);
 		}, 2000);
 	}
 
 	onMount(() => {
-		return () => {
-			if (intervalId) clearInterval(intervalId);
-		};
+		// Nothing to arm: the scroll area is live as soon as it renders — only the
+		// deferred result callback needs cancelling when the learner moves on.
+		return clearTimers;
 	});
 </script>
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="scroll-lesson flex h-full flex-col">
-		{#if !gameStarted}
-			<div
-				class="start-screen flex flex-1 flex-col items-center justify-center rounded-lg bg-white p-8"
-			>
-				<h2 class="mb-4 text-2xl font-bold">{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
-				<p class="mb-6 text-slate-600">
-					{config.instructions || 'Κυλήστε μέχρι το τέλος της σελίδας.'}
-				</p>
-				<button class="start-button" onclick={startGame}>{m.start_lesson?.() || 'Έναρξη'}</button>
-			</div>
-		{:else if isComplete}
+		{#if isComplete}
 			<div
 				class="complete-screen flex flex-1 flex-col items-center justify-center rounded-lg bg-white p-8"
 			>
@@ -89,8 +83,8 @@
 					✓ {m.lesson_complete?.() || 'Ολοκληρώθηκε'}!
 				</h2>
 				<p class="text-lg text-slate-500">
-					Score: {scrollY >= targetDistance
-						? Math.min(100, 80 + Math.round((timeRemaining / timeLimit) * 20))
+					{m.final_score?.() || 'Βαθμολογία'}: {scrollY >= targetDistance
+						? 100
 						: Math.round(progress)}
 				</p>
 			</div>
@@ -98,8 +92,10 @@
 			<div
 				class="flex shrink-0 items-center justify-between rounded-t-lg bg-blue-600 p-4 text-white"
 			>
-				<div class="font-bold">Goal: {Math.round(progress)}%</div>
-				<div class="font-mono">Time: {timeRemaining}s</div>
+				<div class="font-bold">
+					{config.instructions || 'Κυλήστε μέχρι το τέλος της σελίδας.'}
+				</div>
+				<div class="font-mono">{m.progress?.() || 'Πρόοδος'}: {Math.round(progress)}%</div>
 			</div>
 
 			<!-- Scroll Container -->
@@ -152,13 +148,4 @@
 </LessonTemplate>
 
 <style>
-	.start-button {
-		padding: 1rem 2rem;
-		background: #667eea;
-		color: white;
-		border: none;
-		border-radius: 8px;
-		font-size: 1.1rem;
-		cursor: pointer;
-	}
 </style>

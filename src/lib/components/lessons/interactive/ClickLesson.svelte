@@ -22,7 +22,6 @@
 		instructions?: string;
 	};
 	const targetCount = config.targetCount || 10;
-	const timeLimit = config.timeLimit || 45;
 	const theme = coerceVariant(config.theme, CLICK_THEMES, 'default');
 
 	// Theme assets/styles
@@ -95,17 +94,56 @@
 		return themes[theme] || themes.default;
 	});
 
-	let score = $state(0);
 	let successfulClicks = $state(0);
 	let wrongClicks = $state(0);
-	let timeRemaining = $state(timeLimit);
+	// One 0-100 number, derived rather than accumulated: a penalty subtracted from
+	// a running total got clamped away when the total was still 0, so the learner
+	// watched 10 points come off and still scored 100.
+	let score = $derived(
+		Math.max(0, Math.round((successfulClicks / targetCount) * 100) - wrongClicks * 10)
+	);
 	let isComplete = $state(false);
-	let gameStarted = $state(false);
+	// The exercise is live from the moment it opens. The old "Έναρξη" gate was a
+	// button an elderly learner had to find before anything responded, and it sat
+	// below the fold on a laptop screen. `timeLimit` stays in the config contract
+	// for the 218 seeded lessons but no longer runs a clock, scores, or ends a
+	// lesson — being slow is not failing.
 	let targetX = $state(50);
 	let targetY = $state(50);
-	let intervalId: number | null = null;
 
 	// Get error message for wrong click type
+	// Every deferred callback is tracked so leaving the lesson cancels it. An
+	// uncancelled one fires from a destroyed component into the runner, which
+	// reads whatever lesson is on screen *now* and marks that one complete.
+	let timers: number[] = [];
+
+	function later(fn: () => void, ms: number) {
+		const id = window.setTimeout(() => {
+			timers = timers.filter((t) => t !== id);
+			fn();
+		}, ms);
+		timers.push(id);
+		return id;
+	}
+
+	// A double-click arrives as click, click, dblclick. On a double-click target a
+	// single click is only a mistake once no second click has followed; judging
+	// each click straight away scolded the learner for the very thing asked.
+	const DOUBLE_CLICK_WAIT = 600;
+	let pendingSingleClick: number | null = null;
+
+	function cancelPendingSingleClick() {
+		if (pendingSingleClick === null) return;
+		clearTimeout(pendingSingleClick);
+		timers = timers.filter((t) => t !== pendingSingleClick);
+		pendingSingleClick = null;
+	}
+
+	function clearTimers() {
+		for (const id of timers) clearTimeout(id);
+		timers = [];
+	}
+
 	function getWrongClickMessage(): string {
 		switch (currentTheme.type) {
 			case 'click':
@@ -121,10 +159,9 @@
 
 	// Handle wrong click type in mixed mode
 	function handleWrongClick() {
-		if (!gameStarted || isComplete) return;
+		if (isComplete) return;
 		toast.error(getWrongClickMessage());
-		wrongClicks++;
-		score = Math.max(0, score - 10); // Penalty for wrong click
+		wrongClicks++; // Costs 10 points, via `score` above.
 	}
 
 	function generateRandomPosition() {
@@ -137,28 +174,15 @@
 		}
 	}
 
-	function startGame() {
-		gameStarted = true;
-		generateRandomPosition();
-
-		intervalId = window.setInterval(() => {
-			timeRemaining--;
-			if (timeRemaining <= 0) {
-				endGame();
-			}
-		}, 1000);
-	}
-
 	function handleTargetClick() {
-		if (!gameStarted || isComplete) return;
+		if (isComplete) return;
 
 		// Play sound effect (optional, placeholder for now)
 		// new Audio('/pop.mp3').play().catch(() => {});
 
+		// Accuracy only, on the same 0-100 scale the learner sees: taking your time
+		// scores the same as rushing.
 		successfulClicks++;
-		const timeTaken = timeLimit - timeRemaining;
-		const efficiency = Math.max(0, 100 - timeTaken * 2);
-		score += Math.round(efficiency);
 
 		if (successfulClicks >= targetCount) {
 			endGame();
@@ -168,43 +192,25 @@
 	}
 
 	function endGame() {
-		if (intervalId) {
-			clearInterval(intervalId);
-			intervalId = null;
-		}
-
 		isComplete = true;
 
-		const completionBonus = (successfulClicks / targetCount) * 50;
-		const timeBonus = (timeRemaining / timeLimit) * 30;
-		const accuracyScore = score / targetCount;
-		const finalScore = Math.min(100, Math.round(completionBonus + timeBonus + accuracyScore * 0.2));
+		// The number submitted is the number in the HUD, penalties included.
+		const finalScore = score;
 
-		setTimeout(() => {
+		later(() => {
 			onComplete(finalScore);
 		}, 2000);
 	}
 
 	onMount(() => {
-		return () => {
-			if (intervalId) {
-				clearInterval(intervalId);
-			}
-		};
+		generateRandomPosition();
+		return clearTimers;
 	});
 </script>
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="click-lesson {currentTheme.bgClass} h-full rounded-lg transition-colors duration-500">
-		{#if !gameStarted}
-			<div class="start-screen">
-				<h2 class="mb-4 text-2xl font-bold">{m.lesson_instructions?.() || 'Οδηγίες'}</h2>
-				<p class="mb-6 text-slate-600">
-					{config.instructions || 'Κάντε κλικ στους στόχους όσο πιο γρήγορα μπορείτε!'}
-				</p>
-				<button class="start-button" onclick={startGame}>{m.start_lesson?.() || 'Έναρξη'}</button>
-			</div>
-		{:else if isComplete}
+		{#if isComplete}
 			<div class="complete-screen">
 				<h2 class="mb-2 text-3xl font-bold text-green-600">
 					✓ {m.lesson_complete?.() || 'Ολοκληρώθηκε'}!
@@ -216,13 +222,15 @@
 			</div>
 		{:else}
 			<div class="game-ui">
+				<p class="mx-4 mt-4 text-center text-lg font-semibold text-slate-700">
+					{config.instructions || 'Κάντε κλικ στους στόχους.'}
+				</p>
 				<div
-					class="hud mx-4 mt-4 flex justify-between rounded-lg bg-white/80 p-4 shadow-sm backdrop-blur"
+					class="hud mx-4 mt-2 flex justify-between rounded-lg bg-white/80 p-4 shadow-sm backdrop-blur"
 				>
 					<div class="font-bold text-slate-700">
 						{m.progress?.() || 'Πρόοδος'}: {successfulClicks}/{targetCount}
 					</div>
-					<div class="font-mono text-blue-600">{m.time?.() || 'Χρόνος'}: {timeRemaining}s</div>
 					<div class="font-bold text-green-600">{m.score?.() || 'Σκορ'}: {score}</div>
 				</div>
 				<div
@@ -236,6 +244,11 @@
 							// In mixed mode, validate click type; in other modes, accept any click
 							if (theme !== 'mixed' || currentTheme.type === 'click') {
 								handleTargetClick();
+							} else if (currentTheme.type === 'double-click') {
+								pendingSingleClick ??= later(() => {
+									pendingSingleClick = null;
+									handleWrongClick();
+								}, DOUBLE_CLICK_WAIT);
 							} else {
 								handleWrongClick();
 							}
@@ -249,6 +262,7 @@
 							}
 						}}
 						ondblclick={() => {
+							cancelPendingSingleClick();
 							if (theme !== 'mixed' || currentTheme.type === 'double-click') {
 								handleTargetClick();
 							} else {
@@ -269,7 +283,6 @@
 	.click-lesson {
 		height: 100%;
 	}
-	.start-screen,
 	.complete-screen {
 		display: flex;
 		flex-direction: column;
@@ -279,15 +292,6 @@
 		background: white;
 		border-radius: 12px;
 		padding: 2rem;
-	}
-	.start-button {
-		padding: 1rem 2rem;
-		background: #667eea;
-		color: white;
-		border: none;
-		border-radius: 8px;
-		font-size: 1.1rem;
-		cursor: pointer;
 	}
 	.game-ui {
 		display: flex;
