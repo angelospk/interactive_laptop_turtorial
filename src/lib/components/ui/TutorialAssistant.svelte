@@ -17,7 +17,12 @@
 	// The assistant used to open itself the first time a learner reached a lesson.
 	// With 218 lessons that is "every lesson", landing on top of the exercise with
 	// a sentence the learner had just read. Help is now something you ask for.
-	let isOpen = $state(false);
+	// Moving to another lesson closes the panel: help asked for one exercise is
+	// not help for the next one.
+	let isOpen = $derived.by(() => {
+		void lessonId;
+		return false;
+	});
 	let launcherEl = $state<HTMLButtonElement | undefined>();
 	let closeEl = $state<HTMLButtonElement | undefined>();
 
@@ -32,17 +37,6 @@
 	const hasContent = $derived(steps.length > 0 || text !== '');
 
 	const panelId = $derived(`tutorial-assistant-${lessonId || 'lesson'}`);
-
-	// Moving to another lesson closes the panel: help asked for one exercise is
-	// not help for the next one.
-	let openForLessonId = lessonId;
-	$effect(() => {
-		const id = lessonId;
-		if (id !== openForLessonId) {
-			openForLessonId = id;
-			isOpen = false;
-		}
-	});
 
 	async function open() {
 		isOpen = true;
@@ -60,15 +54,12 @@
 	// Escape is the reflex for "make this go away". In fullscreen the browser may
 	// consume it to leave fullscreen first, which is why the visible close button
 	// is not optional.
-	$effect(() => {
-		if (!isOpen) return;
-		function onKeydown(event: KeyboardEvent) {
-			if (event.key === 'Escape') close();
-		}
-		document.addEventListener('keydown', onKeydown);
-		return () => document.removeEventListener('keydown', onKeydown);
-	});
+	function onDocumentKeydown(event: KeyboardEvent) {
+		if (isOpen && event.key === 'Escape') close();
+	}
 </script>
+
+<svelte:document onkeydown={onDocumentKeydown} />
 
 {#if visible && hasContent}
 	<div class="assistant">

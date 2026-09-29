@@ -181,7 +181,7 @@
 			>
 				<!-- 1. Tab Bar -->
 				<div class="flex items-end gap-1 border-b border-slate-300 bg-slate-100 px-2 pt-2">
-					{#each tabs as tab}
+					{#each tabs as tab (tab.id)}
 						<div
 							class="group relative flex cursor-pointer items-center gap-2 rounded-t-lg py-0 pr-0 pl-4 text-sm transition-colors select-none
                             {activeTabId === tab.id

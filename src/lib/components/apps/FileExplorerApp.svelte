@@ -62,21 +62,17 @@
 
 	// Get fullscreen portal target when in fullscreen mode (client-side only)
 	let portalTarget = $state<HTMLElement | undefined>(undefined);
-	onMount(() => {
-		// Update portal target reactively based on fullscreen state
-		const updatePortalTarget = () => {
-			const fullscreenEl = document.fullscreenElement;
-			if (fullscreenEl) {
-				portalTarget = document.getElementById('fullscreen-portal-target') || undefined;
-			} else {
-				portalTarget = undefined;
-			}
-		};
+	// Update portal target reactively based on fullscreen state
+	function updatePortalTarget() {
+		const fullscreenEl = document.fullscreenElement;
+		if (fullscreenEl) {
+			portalTarget = document.getElementById('fullscreen-portal-target') || undefined;
+		} else {
+			portalTarget = undefined;
+		}
+	}
 
-		updatePortalTarget();
-		document.addEventListener('fullscreenchange', updatePortalTarget);
-		return () => document.removeEventListener('fullscreenchange', updatePortalTarget);
-	});
+	onMount(updatePortalTarget);
 
 	let currentItems = $derived(items.filter((i) => i.parentId === currentFolderId));
 	let currentPath = $derived(getPath(currentFolderId));
@@ -217,6 +213,8 @@
 		}
 	}
 </script>
+
+<svelte:document onfullscreenchange={updatePortalTarget} />
 
 <div class="flex h-full flex-col overflow-hidden bg-white">
 	<!-- Command Bar (Win11 style) -->

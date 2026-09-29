@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Lesson } from '$lib/db/schema';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import MacDesktop from '$lib/components/mac/MacDesktop.svelte';
 	import MacMenuBar from '$lib/components/mac/MacMenuBar.svelte';
@@ -183,10 +183,6 @@
 			}
 		}
 	}
-	onMount(() => {
-		window.addEventListener('keydown', onKeydown);
-	});
-	onDestroy(() => window.removeEventListener('keydown', onKeydown));
 
 	const highlightDockAppId = $derived(
 		showHint && !done && config.targetAppId && config.dockAppIds.includes(config.targetAppId)
@@ -198,6 +194,8 @@
 		return (id && config.apps.find((a: MacSimApp) => a.id === id)?.label) || 'Finder';
 	}
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="flex h-full min-h-0 flex-col items-center gap-3 py-2">

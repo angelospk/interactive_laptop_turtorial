@@ -348,7 +348,7 @@
 				<h3 class="text-xl font-semibold">Εφαρμογές & Δυνατότητες</h3>
 
 				<div class="space-y-2">
-					{#each installedApps as app}
+					{#each installedApps as app (app.id)}
 						<div class="flex items-center justify-between rounded-lg border bg-white p-4">
 							<div class="flex items-center gap-3">
 								<div
@@ -399,7 +399,7 @@
 					{#if bluetoothEnabled}
 						<div class="mt-4 space-y-2 border-t pt-4">
 							<p class="mb-2 text-sm text-slate-500">Διαθέσιμες συσκευές</p>
-							{#each bluetoothDevices as device}
+							{#each bluetoothDevices as device (device.id)}
 								<div class="flex items-center justify-between rounded p-2 hover:bg-slate-50">
 									<div>
 										<div class="font-medium">{device.name}</div>

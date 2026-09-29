@@ -11,13 +11,10 @@
 		(lesson.config as { action?: string; shortcuts?: string[]; keys?: string[] }) || {}
 	);
 
-	let completedKeys = $state(new Set<string>());
-
 	// Reset state when lesson changes
-	$effect(() => {
-		// Access config to trigger reactivity
-		const _ = config;
-		completedKeys = new Set();
+	let completedKeys = $derived.by(() => {
+		void config;
+		return new Set<string>();
 	});
 
 	function handleKeyDown(e: KeyboardEvent) {

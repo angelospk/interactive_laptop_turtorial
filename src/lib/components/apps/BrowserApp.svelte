@@ -153,14 +153,6 @@
 
 	let activeTab = $derived(tabs.find((t) => t.id === activeTabId) || tabs[0]);
 
-	// Reset internal states when tab changes
-	$effect(() => {
-		if (activeTab.type === 'banking' && bankState !== 'login') {
-			// Optional: reset bank state on navigation away/back? Keeping it persistent for now per tab logic would be complex.
-			// For simplicity, banking state is global to the app instance.
-		}
-	});
-
 	function addTab() {
 		const newId = Math.max(...tabs.map((t) => t.id)) + 1;
 		// Start with empty/home tab
@@ -516,7 +508,7 @@
 
 	<!-- 1. Tab Bar (Chrome-like) -->
 	<div class="flex items-end gap-0.5 bg-[#dee1e6] px-2 pt-1.5">
-		{#each tabs as tab}
+		{#each tabs as tab (tab.id)}
 			<div
 				class="group relative -mb-px flex max-w-[200px] cursor-pointer items-center gap-2 rounded-t-lg px-3 py-2 text-sm transition-colors select-none {activeTabId ===
 				tab.id

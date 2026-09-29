@@ -114,7 +114,7 @@
 		<CardContent>
 			<p class="mb-4 text-sm text-slate-600">Πέρνα τον κέρσορα πάνω από τις φούσκες.</p>
 			<div class="relative h-48 w-full rounded-md bg-slate-100">
-				{#each bubbles as bubble}
+				{#each bubbles as bubble (bubble.id)}
 					<div
 						class="absolute h-8 w-8 rounded-full transition-colors"
 						class:bg-blue-500={!bubble.hovered}
@@ -173,7 +173,7 @@
 			<div class="flex h-48 items-center justify-around">
 				<!-- Pieces -->
 				<div class="flex flex-col gap-4">
-					{#each puzzlePieces as piece}
+					{#each puzzlePieces as piece (piece.id)}
 						{#if !piece.dropped}
 							<div
 								draggable="true"
@@ -194,7 +194,7 @@
 				</div>
 				<!-- Targets -->
 				<div class="flex flex-col gap-4">
-					{#each puzzlePieces as piece}
+					{#each puzzlePieces as piece (piece.id)}
 						<div
 							ondragover={handleDragOver}
 							ondrop={(e) => handleDrop(e, piece.id)}

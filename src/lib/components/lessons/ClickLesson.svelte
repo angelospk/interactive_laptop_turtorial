@@ -48,7 +48,7 @@
 <div
 	class="flex min-h-[200px] flex-wrap items-center justify-center gap-4 rounded-md border border-slate-200 bg-slate-50 p-8"
 >
-	{#each targets as target}
+	{#each targets as target (target.id)}
 		{#if target.active}
 			<Button onclick={() => handleClick(target.id)} class="animate-in duration-300 zoom-in">
 				Click Me!

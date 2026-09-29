@@ -21,7 +21,7 @@
 		}) || { itemCount: 3, dropZones: 3, theme: 'shapes' }
 	);
 
-	const theme = coerceVariant(config.theme, DRAG_THEMES, 'shapes');
+	const theme = $derived(coerceVariant(config.theme, DRAG_THEMES, 'shapes'));
 
 	// Theme Configurations
 	const themes: Record<DragTheme, any> = {
@@ -142,7 +142,7 @@
 		</div>
 
 		<div class="flex min-h-[100px] flex-wrap justify-center gap-4">
-			{#each pieces as piece}
+			{#each pieces as piece (piece.id)}
 				{#if !piece.dropped}
 					<div
 						draggable="true"
@@ -170,7 +170,7 @@
 		</div>
 
 		<div class="mt-auto flex flex-wrap justify-center gap-8 border-t border-slate-200 pt-12">
-			{#each zones as zone}
+			{#each zones as zone (zone.id)}
 				<div
 					ondragover={handleDragOver}
 					ondrop={(e) => handleDrop(e, zone.id)}
@@ -203,7 +203,7 @@
 					{/if}
 
 					<!-- Show dropped items inside? -->
-					{#each pieces.filter((p) => p.dropped && p.target === zone.id) as droppedPiece}
+					{#each pieces.filter((p) => p.dropped && p.target === zone.id) as droppedPiece (droppedPiece.id)}
 						<div class="absolute inset-0 flex items-center justify-center bg-green-100/50">
 							<span class="text-3xl">✅</span>
 						</div>

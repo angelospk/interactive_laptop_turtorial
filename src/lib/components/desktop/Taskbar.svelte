@@ -90,7 +90,7 @@
 		{/if}
 
 		<!-- Taskbar Items -->
-		{#each apps as app}
+		{#each apps as app (app.id)}
 			{@const isOpen = openAppIds.includes(app.id)}
 			<div class="group relative">
 				<Button

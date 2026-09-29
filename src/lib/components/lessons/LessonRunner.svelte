@@ -340,14 +340,9 @@
 	}
 
 	// Listen for fullscreen changes
-	$effect(() => {
-		function handleFullscreenChange() {
-			isFullscreen = !!document.fullscreenElement;
-		}
-
-		document.addEventListener('fullscreenchange', handleFullscreenChange);
-		return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-	});
+	function handleFullscreenChange() {
+		isFullscreen = !!document.fullscreenElement;
+	}
 
 	// Auto-scroll to lesson content when lesson changes
 	let lessonCard: HTMLElement;
@@ -372,6 +367,8 @@
 		return () => cancelAnimationFrame(frame);
 	});
 </script>
+
+<svelte:document onfullscreenchange={handleFullscreenChange} />
 
 <div class="lesson-runner" class:fullscreen-active={isFullscreen} bind:this={lessonContainer}>
 	<!-- Portal target for dialogs/modals in fullscreen mode -->

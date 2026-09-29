@@ -64,7 +64,7 @@
 								<div
 									class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-600 text-white transition-colors group-hover:bg-slate-500"
 								>
-									<svelte:component this={appDef.icon} class="h-8 w-8" />
+									<appDef.icon class="h-8 w-8" />
 								</div>
 
 								<!-- App Name -->

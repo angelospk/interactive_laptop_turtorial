@@ -155,7 +155,7 @@
 
 		<div class="mt-4 flex items-center justify-between">
 			<div class="flex gap-1">
-				{#each challenges as challenge, i}
+				{#each challenges as challenge, i (challenge.id)}
 					<button
 						class="h-4 w-4 rounded-full transition-colors"
 						class:bg-green-500={challenge.completed}

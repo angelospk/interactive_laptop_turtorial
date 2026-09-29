@@ -12,9 +12,6 @@
 		(lesson.config as { text: string; timeLimit: number }) || { text: 'simple', timeLimit: 60 }
 	);
 
-	let targetText = $state('');
-	let userInput = $state('');
-
 	// Simple text mapping for demo purposes
 	const textMap: Record<string, string> = {
 		simple: 'hello world',
@@ -27,9 +24,11 @@
 		'full-test': 'Programming is fun and rewarding.'
 	};
 
-	$effect(() => {
-		targetText = textMap[config.text] || config.text || 'hello';
-		userInput = '';
+	const targetText = $derived(textMap[config.text] || config.text || 'hello');
+	// Reset the learner's input whenever the lesson config changes.
+	let userInput = $derived.by(() => {
+		void config;
+		return '';
 	});
 
 	function handleInput() {

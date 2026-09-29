@@ -40,7 +40,7 @@
 </script>
 
 <div class="relative h-64 w-full rounded-md bg-slate-100 border-2 border-slate-200 overflow-hidden">
-    {#each bubbles as bubble}
+    {#each bubbles as bubble (bubble.id)}
         <div
             class="absolute h-12 w-12 rounded-full transition-all duration-300 flex items-center justify-center shadow-sm"
             class:bg-blue-500={!bubble.hovered}

@@ -123,14 +123,14 @@
 	}
 
 	onMount(() => {
-		window.addEventListener('keydown', handleKeydown);
 		return () => {
-			window.removeEventListener('keydown', handleKeydown);
 			// A result that lands after the learner has moved on belongs to nobody.
 			if (completionTimer !== null) clearTimeout(completionTimer);
 		};
 	});
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <LessonTemplate {lesson} {onBack}>
 	<div class="keyboard-lesson mx-auto max-w-3xl">
