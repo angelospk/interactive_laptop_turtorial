@@ -14,7 +14,17 @@ describe('FileExplorerApp keyboard', () => {
 		const tile = screen.getByRole('button', { name: /Λίστα Ψώνια\.txt/ });
 		(tile.element() as HTMLElement).focus();
 		await userEvent.keyboard('{Enter}');
+		expect(onAction).toHaveBeenCalledTimes(1);
 		expect(onAction).toHaveBeenCalledWith('select-file', { id: '3' });
+	});
+
+	it('selects a folder with Space without opening it', async () => {
+		const onAction = vi.fn();
+		const screen = render(FileExplorerApp, { onAction });
+		(screen.getByRole('button', { name: /^Έγγραφα/ }).element() as HTMLElement).focus();
+		await userEvent.keyboard(' ');
+		expect(onAction).toHaveBeenCalledWith('select-file', { id: '1' });
+		await expect.element(screen.getByText('Συνταγή Κέικ.txt')).not.toBeInTheDocument();
 	});
 
 	it('opens a folder with Enter', async () => {
