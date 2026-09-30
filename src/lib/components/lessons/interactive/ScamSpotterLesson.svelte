@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import {
@@ -89,32 +89,15 @@
 	const focusAfterUpdate = (el: () => HTMLElement | null) => tick().then(() => el()?.focus());
 	onMount(() => focusAfterUpdate(() => titleEl));
 
-	// The score is reported a moment after the result appears, or at once if the
-	// learner leaves first: pressing "Επιστροφή" quickly must not lose it.
-	let resultTimer: ReturnType<typeof setTimeout> | undefined;
-	let pendingScore: number | null = null;
-	function reportScore() {
-		clearTimeout(resultTimer);
-		if (pendingScore === null) return;
-		const score = pendingScore;
-		pendingScore = null;
-		onComplete(score);
-	}
-	function leave() {
-		reportScore();
-		onBack();
-	}
-	// Torn down some other way: nothing is reported into whatever opened next.
-	onDestroy(() => clearTimeout(resultTimer));
-
 	function finish() {
 		if (completed) return;
 		completed = true;
 		finished = true;
 		const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
 		focusAfterUpdate(() => doneEl);
-		pendingScore = score;
-		resultTimer = setTimeout(reportScore, 1400);
+		// Reported now, not after a pause: any way of leaving the result (Back here,
+		// Next/Previous in the lesson runner) would otherwise lose it.
+		onComplete(score);
 	}
 </script>
 
@@ -331,9 +314,9 @@
 
 		<CardFooter class="flex justify-between rounded-b-lg border-t bg-slate-50 p-6">
 			{#if finished}
-				<Button size="lg" class="h-12 text-lg" onclick={leave}>Επιστροφή στις ασκήσεις</Button>
+				<Button size="lg" class="h-12 text-lg" onclick={onBack}>Επιστροφή στις ασκήσεις</Button>
 			{:else}
-				<Button variant="ghost" class="h-12 text-base" onclick={leave}>Πίσω</Button>
+				<Button variant="ghost" class="h-12 text-base" onclick={onBack}>Πίσω</Button>
 			{/if}
 			{#if !finished && card && answer !== null}
 				<Button size="lg" class="h-12 text-lg" onclick={next}>

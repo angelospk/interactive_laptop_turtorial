@@ -19,13 +19,16 @@ const lesson = {
 	}
 } as never;
 
-// Leaving the result straight away used to cancel the only report of the score.
-test('leaving right after finishing still reports the score, once', async () => {
+// The score used to be reported 1.4s after the result appeared, so any way of
+// leaving in that window — Back here, or the lesson runner's Next/Previous —
+// lost it. It is reported the moment the drill is finished.
+test('the score is reported the moment the drill is finished, once', async () => {
 	const onComplete = vi.fn();
 	const onBack = vi.fn();
 	const screen = render(ScamSpotterLesson, { lesson, onComplete, onBack });
 	await screen.getByRole('button', { name: /Απάτη$/ }).click();
 	await screen.getByRole('button', { name: 'Ολοκλήρωση' }).click();
+	expect(onComplete).toHaveBeenCalledExactlyOnceWith(100);
 	await screen.getByRole('button', { name: 'Επιστροφή στις ασκήσεις' }).click();
 
 	expect(onComplete).toHaveBeenCalledExactlyOnceWith(100);
