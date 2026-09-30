@@ -308,7 +308,7 @@ describe('a save that outlives its lesson', () => {
 		);
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
@@ -431,7 +431,7 @@ describe('a save that outlives its lesson', () => {
 		await play();
 		await screen.getByRole('button', { name: 'Δοκίμασε ξανά' }).click();
 		await play(); // waits for the reset
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await play();
 
 		releaseDelete({});
@@ -468,7 +468,7 @@ describe('a save that outlives its lesson', () => {
 			await new Promise((resolve) => setTimeout(resolve, 2400));
 		};
 		await play();
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
 		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
 		await play();
@@ -518,16 +518,17 @@ describe('a save that outlives its lesson', () => {
 		expect(events).toEqual(['saved', 'deleted', 'deleted', 'saved']);
 	});
 
-	// Replaying straight after Retry, with the delete still on its way: the stale
-	// "completed" from the server made the new result look like a repeat, so the
-	// countdown to the next lesson never started.
-	test('a replay straight after Retry counts as a first completion', async () => {
+	// Replaying straight after Retry, with the delete still on its way: the new
+	// result shows, and its save reaches the server after the reset, not before.
+	test('a replay straight after Retry shows its result and is saved after the reset', async () => {
 		let releaseDelete!: (value: unknown) => void;
 		const deleting = new Promise((resolve) => (releaseDelete = resolve));
+		const order: string[] = [];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn(async (url: string) => {
 				if (url.includes('delete')) await deleting;
+				order.push(url.includes('delete') ? 'deleted' : 'saved');
 				return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
 			})
 		);
@@ -549,8 +550,9 @@ describe('a save that outlives its lesson', () => {
 		await play();
 		releaseDelete({});
 
-		await new Promise((resolve) => setTimeout(resolve, 6500));
-		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+		await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+		await vi.waitFor(() => expect(order).toEqual(['saved', 'deleted', 'saved']));
+		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
 	});
 
 	// Away and back before the save returns: the lesson is on screen again, but the
@@ -571,7 +573,7 @@ describe('a save that outlives its lesson', () => {
 		);
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
 		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
@@ -601,9 +603,9 @@ describe('a save that outlives its lesson', () => {
 		// The drill reports its result after ~2s; the save then hangs.
 		await new Promise((resolve) => setTimeout(resolve, 2400));
 
-		// The optimistic overlay for the finished lesson is up; the learner uses the
-		// navigation button, not the overlay, and leaves while the save is pending.
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		// The optimistic overlay for the finished lesson is up; the learner moves on
+		// from it while the save is still pending.
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 
 		release({});
@@ -617,5 +619,204 @@ describe('a save that outlives its lesson', () => {
 		// …and no countdown carrying the learner on to lesson 3.
 		await new Promise((resolve) => setTimeout(resolve, 6500));
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+	});
+});
+
+describe('the result after a lesson', () => {
+	const clickOnly = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{ ...mockLessons[1], id: 'lesson-2b', titleKey: 'Μάθημα 2' }
+	];
+
+	afterEach(() => vi.unstubAllGlobals());
+
+	test('is a named dialog that takes the keyboard with it', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => ({ progress: { completed: true, score: 100 } })
+			}))
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: clickOnly, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+
+		const dialog = screen.getByRole('dialog', { name: /ολοκληρώθηκε/ });
+		await expect.element(dialog).toBeInTheDocument();
+		// Focus lands on the next step, and what lies behind cannot be tabbed into.
+		await expect.element(screen.getByRole('button', { name: /Επόμενο Μάθημα/ })).toHaveFocus();
+		expect(document.querySelector('.lesson-nav')?.closest('[inert]')).not.toBeNull();
+	});
+
+	test('a save that cannot reach the server says so, in Greek, and can be retried', async () => {
+		let online = false;
+		const fetchMock = vi.fn(async () => {
+			if (!online) throw new TypeError('Failed to fetch');
+			return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: clickOnly, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+
+		const alert = screen.getByRole('alert');
+		await expect.element(alert).toHaveTextContent(/δεν αποθηκεύτηκε/i);
+		// Not presented as a success the server never recorded.
+		await expect
+			.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ }))
+			.not.toBeInTheDocument();
+
+		online = true;
+		await screen.getByRole('button', { name: /Αποθήκευση ξανά/ }).click();
+		await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+		await expect.element(screen.getByRole('alert')).not.toBeInTheDocument();
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+});
+
+// No time pressure: a first success used to start "Επόμενο σε 5 δευτερόλεπτα"
+// and carry a slow reader off before they had finished reading the result.
+test('a success waits for the learner: no countdown, no automatic move', async () => {
+	vi.stubGlobal(
+		'fetch',
+		vi.fn(async () => ({
+			ok: true,
+			json: async () => ({ progress: { completed: true, score: 100 } })
+		}))
+	);
+	const lessons = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{ ...mockLessons[1], id: 'lesson-2b', titleKey: 'Μάθημα 2' }
+	];
+	const screen = render(
+		LessonRunner as never,
+		{ lessons, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+	);
+	await screen.getByRole('button', { name: 'CLICK' }).click();
+	await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+	await expect.element(screen.getByText(/Επόμενο σε/)).not.toBeInTheDocument();
+
+	await new Promise((resolve) => setTimeout(resolve, 6500));
+	await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
+	await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+	vi.unstubAllGlobals();
+});
+
+// Fullscreen used to hide Previous/Next, leaving a beginner inside a lesson with
+// no familiar way on. And arriving already in fullscreen was not noticed at all.
+test('in fullscreen the lesson can still be moved through', async () => {
+	Object.defineProperty(document, 'fullscreenElement', {
+		configurable: true,
+		get: () => document.body
+	});
+	try {
+		const screen = mount();
+		await expect
+			.element(screen.getByRole('button', { name: /Έξοδος πλήρους οθόνης/ }))
+			.toBeInTheDocument();
+		await expect.element(screen.getByRole('button', { name: /Επόμενο/ })).toBeVisible();
+		await screen.getByRole('button', { name: /Επόμενο/ }).click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+	} finally {
+		delete (document as unknown as Record<string, unknown>).fullscreenElement;
+	}
+});
+
+describe('failed saves and the result dialog, reviewed', () => {
+	const twoClicks = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{
+			...mockLessons[1],
+			id: 'lesson-click-2',
+			lessonKey: 'click-two',
+			titleKey: 'Μάθημα 2',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		}
+	];
+	afterEach(() => vi.unstubAllGlobals());
+
+	// Two lessons failing to save, the first one late: each keeps its own retry.
+	test('a late failure of one lesson does not hide the failure of another', async () => {
+		let failFirst!: () => void;
+		const firstGate = new Promise<void>((resolve) => (failFirst = resolve));
+		let online = false;
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async (_url: string, init: { body: string }) => {
+				const { lessonId } = JSON.parse(init.body);
+				if (lessonId === 'lesson-click' && !online) await firstGate;
+				if (!online) throw new TypeError('Failed to fetch');
+				return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
+			})
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: twoClicks, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await expect.element(screen.getByRole('dialog')).toBeInTheDocument();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+
+		failFirst(); // lesson 1's save now fails, late
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+
+		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
+		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+		online = true;
+		await screen.getByRole('button', { name: /Αποθήκευση ξανά/ }).click();
+		await expect.element(screen.getByRole('dialog')).toBeInTheDocument();
+	});
+
+	test('Tab stays inside the result, even with the fullscreen hint showing', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => ({ progress: { completed: true, score: 100 } })
+			}))
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: twoClicks, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		const dialog = screen.getByRole('dialog');
+		await expect.element(dialog).toBeInTheDocument();
+		expect(document.querySelector('.lesson-notices')?.closest('[inert]')).not.toBeNull();
+
+		const { userEvent } = await import('vitest/browser');
+		for (let i = 0; i < 6; i++) {
+			await userEvent.keyboard(i % 2 ? '{Shift>}{Tab}{/Shift}' : '{Tab}');
+			expect(dialog.element().contains(document.activeElement)).toBe(true);
+		}
+		for (let i = 0; i < 4; i++) {
+			await userEvent.keyboard('{Tab}');
+			expect(dialog.element().contains(document.activeElement)).toBe(true);
+		}
 	});
 });

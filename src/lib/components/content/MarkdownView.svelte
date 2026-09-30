@@ -41,20 +41,23 @@
 {#if loading}
 	<div class="flex justify-center py-8">
 		<div
-			class="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent"
+			class="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"
 		></div>
 	</div>
 {:else if error}
 	<p class="text-red-500">Σφάλμα φόρτωσης περιεχομένου: {error}</p>
 {:else}
-	<article class="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-img:rounded-lg">
+	<article
+		class="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-img:rounded-lg"
+	>
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html html}
 	</article>
 	{#if sourceUrl}
-		<p class="text-muted-foreground mt-8 border-t pt-4 text-sm">
+		<p class="mt-8 border-t pt-4 text-base text-muted-foreground">
+			Πηγή:
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external source URL, not an app route -->
-			Πηγή: <a class="underline" href={sourceUrl} target="_blank" rel="noopener noreferrer"
+			<a class="underline" href={sourceUrl} target="_blank" rel="noopener noreferrer"
 				>Εθνική Ακαδημία Ψηφιακών Ικανοτήτων (nadia.gov.gr)</a
 			>
 		</p>

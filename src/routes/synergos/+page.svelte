@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	// «Για τον βοηθό μου» — the page a relative opens, once, on a phone, standing
 	// next to the learner.
 	//
@@ -19,16 +20,15 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import TabletSmartphone from '@lucide/svelte/icons/tablet-smartphone';
 	import {
+		categoryTitle,
+		isModuleForDevice,
 		groupModulesByCategory,
 		getModuleCompletion,
 		type ModuleDevice
 	} from '$lib/config/moduleOrganization';
 	import { countProgress, pickTogetherActivity } from '$lib/together';
 
-	const messages = m as unknown as Record<
-		string,
-		(params?: Record<string, unknown>) => string
-	>;
+	const messages = m as unknown as Record<string, (params?: Record<string, unknown>) => string>;
 
 	let { data } = $props();
 
@@ -73,17 +73,20 @@
 
 <main class="min-h-[100dvh] bg-background">
 	<div class="mx-auto max-w-2xl px-4 py-6 sm:px-6 md:py-10">
-		<header class="mb-8 print:hidden">
+		<header class="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
 			<Button variant="outline" href="/" class="shadow-soft h-12 gap-2 rounded-full px-5 text-base">
 				<ArrowLeft class="h-5 w-5" strokeWidth={1.75} />
 				Πίσω στην αρχική
 			</Button>
+			<TextSizeToggle />
 		</header>
 
 		<h1 class="text-3xl font-extrabold text-foreground sm:text-4xl">Για τον βοηθό μου</h1>
 		<p class="mt-3 text-lg text-muted-foreground">
 			{#if learnerName}
-				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα {learnerName ? `στον/στην ${learnerName}` : ''}.
+				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα {learnerName
+					? `στον/στην ${learnerName}`
+					: ''}.
 			{:else}
 				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα στον μαθητή.
 			{/if}
@@ -101,7 +104,7 @@
 				<p class="mt-1 text-base text-muted-foreground">
 					{#if activity.isReview}
 						Τα έχει τελειώσει όλα. Αυτό αξίζει να το ξανακάνετε μαζί.
-					{:else if preferredDevice}
+					{:else if preferredDevice && isModuleForDevice(activity.moduleId, preferredDevice)}
 						Στο {DEVICE_META[preferredDevice].label} · περίπου 5 λεπτά
 					{:else}
 						Περίπου 5 λεπτά
@@ -158,14 +161,12 @@
 			{#each groupedModules as group (group.category?.id)}
 				<section class="break-inside-avoid">
 					<h2 class="mb-4 text-xl font-bold text-foreground sm:text-2xl">
-						{group.category?.title}
+						{group.category ? categoryTitle(group.category, m) : ''}
 					</h2>
 					<div class="space-y-3">
 						{#each group.modules as module (module.id)}
 							{@const completion = getCompletion(module.id)}
-							<div
-								class="break-inside-avoid rounded-2xl border border-border p-4 sm:p-5"
-							>
+							<div class="break-inside-avoid rounded-2xl border border-border p-4 sm:p-5">
 								<div class="flex flex-wrap items-baseline justify-between gap-2">
 									<h3 class="text-lg font-semibold text-foreground">
 										{messages[module.titleKey] ? messages[module.titleKey]() : module.id}

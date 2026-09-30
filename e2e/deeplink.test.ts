@@ -16,6 +16,8 @@ test.describe('A — lesson deep-linking', () => {
 		await expect(page).toHaveURL('/modules/module1/hover-balloons');
 		// Breadcrumb anchors the user (accessibility for the target audience).
 		await expect(page.getByRole('navigation', { name: 'Διαδρομή' })).toBeVisible();
+		// The tab, the history list and the offline page all name the lesson.
+		await expect(page).toHaveTitle(/^Βασική Κίνηση Ποντικιού — /);
 	});
 
 	test('unknown lesson redirects to the grid with a notice', async ({ page }) => {
@@ -37,6 +39,17 @@ test.describe('A — lesson deep-linking', () => {
 		// A lesson card links into a deep URL.
 		await expect(page.locator('a[href^="/modules/module1/"]').first()).toBeVisible();
 	});
+
+	test('module grid names the module it belongs to', async ({ page }) => {
+		await page.goto('/login');
+		await login(page, `dl_${Date.now()}`);
+		await expect(page).toHaveURL('/');
+		await page.goto('/modules/module1');
+		// Arriving from a shared link or the back button, the learner must see
+		// which module this is, not just a lesson count.
+		await expect(page.getByRole('heading', { level: 1, name: 'Ποντίκι & Κλικ' })).toBeVisible();
+		await expect(page).toHaveTitle(/Ποντίκι & Κλικ/);
+	});
 });
 
 test.describe('B — redirect after login', () => {
@@ -57,6 +70,7 @@ test.describe('D — library to lesson bridge', () => {
 		// Library is public — no login needed.
 		await page.goto('/library/esm005/esm005-c1-s2');
 		await expect(page.getByRole('heading', { name: 'Δοκιμάστε το στην πράξη' })).toBeVisible();
+		await expect(page).toHaveTitle(/ — Βιβλιοθήκη$/);
 		const link = page.locator('a[href="/modules/module10/scam-spotter-email"]');
 		await expect(link).toBeVisible();
 	});

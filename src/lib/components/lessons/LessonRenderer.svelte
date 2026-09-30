@@ -10,38 +10,43 @@
 
 	let { lesson, onComplete, onBack }: Props = $props();
 
-	const componentPromise = $derived(lessonTypeRegistry[lesson.lessonType]?.(lesson));
+	const componentPromise = $derived(
+		lessonTypeRegistry[lesson.lessonType]?.(lesson).catch((error: unknown) => {
+			console.error('Lesson failed to open', lesson.lessonType, error);
+			throw error;
+		})
+	);
 </script>
 
 <!-- Keyed by lesson.id: SvelteKit preserves this component across same-route
      param navigation, so without the key a lesson component would keep the
      previous lesson's local state (done/feedback/config snapshot) — codex review. -->
-{#key lesson.id}
-{#if componentPromise}
-	{#await componentPromise}
-		<div class="flex h-full items-center justify-center">
-			<div
-				class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"
-			></div>
-		</div>
-	{:then module}
-		<module.default {lesson} {onComplete} {onBack} />
-	{:catch error}
-		<div class="error-container">
-			<h2>Error Loading Lesson</h2>
-			<p>Failed to load the lesson component.</p>
-			<p class="text-sm text-red-300">{error.message}</p>
-			<button onclick={onBack}>Go Back</button>
-		</div>
-	{/await}
-{:else}
-	<div class="error-container">
-		<h2>Lesson Type Not Implemented</h2>
-		<p>The lesson type "{lesson.lessonType}" has not been implemented yet.</p>
-		<p>Please contact support or try another lesson.</p>
-		<button onclick={onBack}>Go Back</button>
+<!-- Calm, Greek, and with one way out. The technical cause goes to the console:
+     on screen it only suggests the learner broke something. -->
+{#snippet failed()}
+	<div class="error-container" role="alert">
+		<h2>Αυτό το μάθημα δεν άνοιξε</h2>
+		<p>Δεν φταίτε εσείς. Δοκιμάστε ξανά αργότερα ή διαλέξτε ένα άλλο μάθημα.</p>
+		<button onclick={onBack}>Πίσω στα μαθήματα</button>
 	</div>
-{/if}
+{/snippet}
+
+{#key lesson.id}
+	{#if componentPromise}
+		{#await componentPromise}
+			<div class="flex h-full items-center justify-center">
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"
+				></div>
+			</div>
+		{:then module}
+			<module.default {lesson} {onComplete} {onBack} />
+		{:catch}
+			{@render failed()}
+		{/await}
+	{:else}
+		{@render failed()}
+	{/if}
 {/key}
 
 <style>
@@ -75,7 +80,8 @@
 		color: #667eea;
 		border: none;
 		border-radius: 6px;
-		font-size: 1rem;
+		min-height: 48px;
+		font-size: 1.125rem;
 		font-weight: 600;
 		cursor: pointer;
 		transition: transform 0.2s;

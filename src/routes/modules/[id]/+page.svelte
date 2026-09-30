@@ -32,14 +32,6 @@
 	function checkLocked(index: number, lesson: Lesson) {
 		return isLessonLocked(index, lesson, moduleLessons, progress);
 	}
-
-	// Request fullscreen during the click gesture so the lesson page can stay fullscreen
-	// after client-side navigation (browsers block fullscreen on a fresh page load).
-	function requestFullscreenOnNavigate() {
-		if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-			document.documentElement.requestFullscreen().catch(() => {});
-		}
-	}
 </script>
 
 <svelte:head>
@@ -99,7 +91,6 @@
 					progress={progress[lesson.id]}
 					isLocked={locked}
 					href={`/modules/${$page.params.id}/${encodeURIComponent(lesson.lessonKey)}`}
-					onclick={requestFullscreenOnNavigate}
 				/>
 			</div>
 		{/snippet}

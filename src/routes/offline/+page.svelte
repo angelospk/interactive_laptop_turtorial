@@ -1,6 +1,41 @@
 <script lang="ts">
-	// Static offline fallback. Kept dependency-free and prerenderable so the
-	// service worker can precache it and show it when a navigation fails offline.
+	// Static offline fallback, precached by the service worker and shown when a
+	// navigation fails offline. The list below is read from that same cache in
+	// the browser, so the page itself still needs nothing from the server.
+	import { onMount } from 'svelte';
+	import { offlinePages, readTitles, titleFromHtml } from '$lib/offlineLessons';
+
+	type Entry = { href: string; label: string; reload: boolean };
+	let entries = $state<Entry[]>([]);
+
+	onMount(async () => {
+		if (typeof caches === 'undefined') return;
+		try {
+			const urls: string[] = [];
+			for (const name of await caches.keys()) {
+				const cache = await caches.open(name);
+				for (const request of await cache.keys()) urls.push(request.url);
+			}
+			const remembered = readTitles();
+			const found: Entry[] = [];
+			for (const page of offlinePages(urls, location.origin)) {
+				const html = page.hasHtml
+					? await (await caches.match(new URL(page.href, location.origin).href))?.text()
+					: undefined;
+				// The cached page's own title, else the one noted on the visit, else
+				// the last part of the address: never two links with the same name.
+				const title =
+					(html && titleFromHtml(html)) ||
+					remembered[page.path] ||
+					decodeURIComponent(page.path.split('/').pop() ?? '');
+				const kind = page.kind === 'lesson' ? 'Μάθημα' : 'Θεωρία';
+				found.push({ href: page.href, label: `${kind}: ${title}`, reload: page.hasHtml });
+			}
+			entries = found;
+		} catch {
+			// Storage unavailable: the retry button is still there.
+		}
+	});
 </script>
 
 <svelte:head>
@@ -17,6 +52,19 @@
 			διαθέσιμα. Μόλις επανέλθει η σύνδεση, όλα θα δουλέψουν ξανά κανονικά.
 		</p>
 		<button type="button" onclick={() => location.reload()}>Δοκιμάστε ξανά</button>
+		{#if entries.length}
+			<h2>Ανοίγουν και χωρίς ίντερνετ</h2>
+			<ul>
+				{#each entries as entry (entry.href)}
+					<li>
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- paths come from the cache, not a route id -->
+						<a href={entry.href} data-sveltekit-reload={entry.reload ? '' : undefined}
+							>{entry.label}</a
+						>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	</div>
 </main>
 
@@ -61,5 +109,29 @@
 	}
 	button:hover {
 		background: #1d4ed8;
+	}
+	h2 {
+		font-size: 1.3rem;
+		font-weight: 700;
+		margin: 2rem 0 0.75rem;
+	}
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 0.5rem;
+		text-align: left;
+	}
+	a {
+		display: flex;
+		align-items: center;
+		min-height: 48px;
+		padding: 0.5rem 1rem;
+		border: 1px solid #cbd5e1;
+		border-radius: 0.75rem;
+		font-size: 1.15rem;
+		color: #1d4ed8;
+		text-decoration: underline;
 	}
 </style>

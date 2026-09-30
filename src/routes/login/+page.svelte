@@ -13,15 +13,20 @@
 
 	let username = $state('');
 	let loading = $state(false);
+	// Shown next to the field until the name changes: a toast disappears before
+	// a slow reader has worked out what to fix.
+	let errorMessage = $state<string | null>(null);
 
-	async function handleLogin() {
+	async function handleLogin(event?: SubmitEvent) {
+		event?.preventDefault();
 		const trimmed = username.trim().toLowerCase();
 
 		if (!trimmed || trimmed.length < 2) {
-			toast.error(m.login_error_username_short());
+			errorMessage = m.login_error_username_short();
 			return;
 		}
 
+		errorMessage = null;
 		loading = true;
 
 		try {
@@ -47,15 +52,9 @@
 			// eslint-disable-next-line svelte/no-navigation-without-resolve -- target is validated by safeRedirect (same-origin path from ?redirectTo), not a route id
 			goto(target, { replaceState: true });
 		} catch (error) {
-			toast.error(error instanceof Error ? error.message : m.login_error_failed());
+			errorMessage = error instanceof Error ? error.message : m.login_error_failed();
 		} finally {
 			loading = false;
-		}
-	}
-
-	function handleKeyPress(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			handleLogin();
 		}
 	}
 </script>
@@ -87,35 +86,52 @@
 					<p class="mt-3 text-lg text-muted-foreground">{m.app_subtitle()}</p>
 				</header>
 
-				<div class="space-y-3">
-					<Label for="username" class="text-base font-semibold">{m.login_username()}</Label>
-					<Input
-						id="username"
-						type="text"
-						placeholder={m.login_username_placeholder()}
-						bind:value={username}
-						onkeypress={handleKeyPress}
-						disabled={loading}
-						class="h-14 rounded-2xl border-border/70 bg-background px-5 text-lg shadow-soft transition-all focus-visible:ring-4 focus-visible:ring-brand/15"
-						autocomplete="username"
-					/>
-					<p class="text-sm text-muted-foreground">{m.login_help()}</p>
-				</div>
+				<form onsubmit={handleLogin} novalidate>
+					<!-- Enter before the page has finished loading submits natively, and a
+					     GET replaces the query: carry the destination along so it survives. -->
+					{#if $page.url.searchParams.get('redirectTo')}
+						<input
+							type="hidden"
+							name="redirectTo"
+							value={$page.url.searchParams.get('redirectTo')}
+						/>
+					{/if}
+					<div class="space-y-3">
+						<Label for="username" class="text-base font-semibold">{m.login_username()}</Label>
+						<Input
+							id="username"
+							type="text"
+							placeholder={m.login_username_placeholder()}
+							bind:value={username}
+							oninput={() => (errorMessage = null)}
+							disabled={loading}
+							aria-invalid={errorMessage ? 'true' : undefined}
+							aria-describedby={errorMessage ? 'username-error username-help' : 'username-help'}
+							class="shadow-soft h-14 rounded-2xl border-border/70 bg-background px-5 text-lg transition-all focus-visible:ring-4 focus-visible:ring-brand/15"
+							autocomplete="username"
+						/>
+						{#if errorMessage}
+							<p id="username-error" role="alert" class="text-base font-semibold text-destructive">
+								{errorMessage}
+							</p>
+						{/if}
+						<p id="username-help" class="text-sm text-muted-foreground">{m.login_help()}</p>
+					</div>
 
-				<!-- Premium CTA with nested "island" trailing icon -->
-				<button
-					type="button"
-					onclick={handleLogin}
-					disabled={loading || !username.trim()}
-					class="group mt-7 flex w-full items-center justify-between gap-3 rounded-full bg-brand py-3 pr-2 pl-7 text-lg font-semibold text-brand-foreground shadow-soft transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-soft-lg focus-visible:ring-4 focus-visible:ring-brand/25 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
-				>
-					<span>{loading ? m.login_loading() : m.login_button()}</span>
-					<span
-						class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-foreground/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105"
+					<!-- Premium CTA with nested "island" trailing icon -->
+					<button
+						type="submit"
+						disabled={loading || !username.trim()}
+						class="group shadow-soft hover:shadow-soft-lg mt-7 flex w-full items-center justify-between gap-3 rounded-full bg-brand py-3 pr-2 pl-7 text-lg font-semibold text-brand-foreground transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:ring-4 focus-visible:ring-brand/25 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
 					>
-						<ArrowRight class="h-5 w-5" strokeWidth={2} />
-					</span>
-				</button>
+						<span>{loading ? m.login_loading() : m.login_button()}</span>
+						<span
+							class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-foreground/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105"
+						>
+							<ArrowRight class="h-5 w-5" strokeWidth={2} />
+						</span>
+					</button>
+				</form>
 
 				<p class="mt-4 text-center text-sm text-muted-foreground">{m.login_no_password()}</p>
 

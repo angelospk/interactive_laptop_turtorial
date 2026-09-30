@@ -9,7 +9,11 @@
 // Pure, so the awkward orders — everything done, nothing started, a device with
 // no modules of its own — can be argued with in a test.
 
-import { getBasePathLessonIds, isModuleForDevice, type ModuleDevice } from './config/moduleOrganization';
+import {
+	getBasePathLessonIds,
+	isModuleForDevice,
+	type ModuleDevice
+} from './config/moduleOrganization';
 
 export type LessonMeta = { id: string; lessonKey: string; titleKey: string };
 export type ProgressMap = Record<string, { completed?: boolean } | undefined>;
@@ -38,28 +42,29 @@ export function pickTogetherActivity(
 ): Activity | null {
 	const done = (id: string) => progress[id]?.completed === true;
 
-	// Modules for the learner's own device first; the rest keep their order.
-	const ordered = device
-		? [
-				...moduleIds.filter((m) => isModuleForDevice(m, device)),
-				...moduleIds.filter((m) => !isModuleForDevice(m, device))
-			]
-		: [...moduleIds];
+	// The learner's own device is finished first — basics, then extras — and
+	// only then does another device's basic route come up. Otherwise a Mac
+	// learner was handed Windows steps under a heading naming their Mac.
+	const own = device ? moduleIds.filter((m) => isModuleForDevice(m, device)) : [...moduleIds];
+	const other = device ? moduleIds.filter((m) => !isModuleForDevice(m, device)) : [];
+	const ordered = [...own, ...other];
 
-	// Pass one: the basic route, which is the part that was designed to be
-	// enough on its own.
-	for (const moduleId of ordered) {
-		const base = getBasePathLessonIds(moduleId);
-		if (!base) continue;
-		const lessons = lessonsByModule[moduleId] ?? [];
-		const next = lessons.find((l) => base.includes(l.id) && !done(l.id));
-		if (next) return { moduleId, lesson: next, isReview: false };
-	}
+	for (const group of [own, other]) {
+		// Pass one: the basic route, which is the part that was designed to be
+		// enough on its own.
+		for (const moduleId of group) {
+			const base = getBasePathLessonIds(moduleId);
+			if (!base) continue;
+			const lessons = lessonsByModule[moduleId] ?? [];
+			const next = lessons.find((l) => base.includes(l.id) && !done(l.id));
+			if (next) return { moduleId, lesson: next, isReview: false };
+		}
 
-	// Pass two: anything unfinished at all.
-	for (const moduleId of ordered) {
-		const next = (lessonsByModule[moduleId] ?? []).find((l) => !done(l.id));
-		if (next) return { moduleId, lesson: next, isReview: false };
+		// Pass two: anything unfinished at all.
+		for (const moduleId of group) {
+			const next = (lessonsByModule[moduleId] ?? []).find((l) => !done(l.id));
+			if (next) return { moduleId, lesson: next, isReview: false };
+		}
 	}
 
 	// Everything is done. Offer the first lesson of the device's first module

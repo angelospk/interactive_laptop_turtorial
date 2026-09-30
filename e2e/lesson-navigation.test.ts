@@ -122,9 +122,8 @@ test.describe('lesson transitions stay in sync with the URL', () => {
 test.describe('completing a lesson advances once, forwards', () => {
 	// A reading lesson completes with one button, so the completion path can be
 	// exercised without playing a mini-game.
-	test('completion keeps the learner in place until the countdown advances once', async ({
-		page
-	}) => {
+	// No countdown: the result stays until the learner moves on themselves.
+	test('completion keeps the learner in place until they choose to move on', async ({ page }) => {
 		await login(page, `nav_${Date.now()}_f`);
 		await openLesson(page, MODULE, FIRST);
 
@@ -132,15 +131,13 @@ test.describe('completing a lesson advances once, forwards', () => {
 
 		// The result overlay belongs to the lesson just finished — no teleport.
 		await expect(page.getByRole('heading', { name: /Μπράβο|ολοκληρώθηκε/ })).toBeVisible();
-		await expect(page.getByText(/Επόμενο σε \d+ δευτερόλεπτα|Αυτόματη μετάβαση/)).toBeVisible();
+		await expect(page.getByText(/Επόμενο σε \d+ δευτερόλεπτα/)).toHaveCount(0);
+		await page.waitForTimeout(7000);
 		expect(lessonKey(page)).toBe(FIRST);
-
-		// …and when it fires, it moves exactly one lesson forward.
-		await expect(page).toHaveURL(`/modules/${MODULE}/${SECOND}`, { timeout: 15000 });
-		expect(await counter(page)).toBe('2');
+		expect(await counter(page)).toBe('1');
 	});
 
-	test('pressing "Επόμενο Μάθημα" during the countdown advances exactly once', async ({ page }) => {
+	test('pressing "Επόμενο Μάθημα" on the result advances exactly once', async ({ page }) => {
 		await login(page, `nav_${Date.now()}_g`);
 		await openLesson(page, MODULE, FIRST);
 
@@ -150,7 +147,7 @@ test.describe('completing a lesson advances once, forwards', () => {
 		await expect(page).toHaveURL(`/modules/${MODULE}/${SECOND}`);
 		expect(await counter(page)).toBe('2');
 
-		// The cancelled countdown must not fire a second transition afterwards.
+		// Nothing fires a second transition afterwards.
 		await page.waitForTimeout(7000);
 		expect(lessonKey(page)).toBe(SECOND);
 		expect(await counter(page)).toBe('2');
@@ -160,7 +157,7 @@ test.describe('completing a lesson advances once, forwards', () => {
 	// lesson. The forward walk is `replaceState`, so `params.lesson` still points
 	// at the lesson the learner arrived on, and the `invalidateAll()` that saving
 	// progress triggers used to re-serve that one — the learner finished lesson 3
-	// and landed on lesson 1, with the countdown then carrying them to lesson 2.
+	// and landed on lesson 1.
 	test('finishing a lesson reached with Next does not teleport the learner backwards', async ({
 		page
 	}) => {
@@ -175,15 +172,15 @@ test.describe('completing a lesson advances once, forwards', () => {
 
 		await page.getByRole('button', { name: /Το διάβασα/ }).click();
 
-		// Still on lesson 3 while the countdown runs…
-		await expect(page.getByText(/Επόμενο σε \d+ δευτερόλεπτα|Αυτόματη μετάβαση/)).toBeVisible();
+		// Still on lesson 3 once the save has reloaded the page data…
+		await expect(page.getByRole('heading', { name: /Μπράβο|ολοκληρώθηκε/ })).toBeVisible();
+		await page.waitForLoadState('networkidle');
 		expect(await counter(page)).toBe('3');
 		expect(lessonKey(page)).toBe(READING_LESSONS[2]);
 
-		// …and it advances to lesson 4, not back to the start of the module.
-		await expect(page).toHaveURL(`/modules/${READING_MODULE}/${READING_LESSONS[3]}`, {
-			timeout: 15000
-		});
+		// …and moving on goes to lesson 4, not back to the start of the module.
+		await page.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
+		await expect(page).toHaveURL(`/modules/${READING_MODULE}/${READING_LESSONS[3]}`);
 		expect(await counter(page)).toBe('4');
 	});
 
@@ -193,7 +190,8 @@ test.describe('completing a lesson advances once, forwards', () => {
 		await login(page, `nav_${Date.now()}_h`);
 		await openLesson(page, MODULE, FIRST);
 		await page.getByRole('button', { name: /Το διάβασα/ }).click();
-		await expect(page).toHaveURL(`/modules/${MODULE}/${SECOND}`, { timeout: 15000 });
+		await page.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
+		await expect(page).toHaveURL(`/modules/${MODULE}/${SECOND}`);
 
 		await page.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
 		await expect(page).toHaveURL(`/modules/${MODULE}/${FIRST}`);

@@ -17,6 +17,19 @@ export interface ModuleCategory {
 	moduleIds: string[];
 }
 
+/**
+ * The category's title in the learner's language. The Greek `title` above
+ * stays the source of truth and the fallback; the message catalogue holds the
+ * translations under `category_<id>`.
+ */
+export function categoryTitle(
+	category: Pick<ModuleCategory, 'id' | 'title'>,
+	messages: Record<string, unknown>
+): string {
+	const message = messages[`category_${category.id.replace(/-/g, '_')}`];
+	return typeof message === 'function' ? (message as () => string)() : category.title;
+}
+
 export const moduleCategories: ModuleCategory[] = [
 	{ id: 'basics', title: 'Τα πρώτα βήματα', moduleIds: ['module1', 'module2'] },
 	{

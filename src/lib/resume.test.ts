@@ -7,11 +7,7 @@ function lesson(id: string, moduleId: string, orderIndex: number): ResumeLesson 
 	return { id, moduleId, lessonKey: id, titleKey: `title.${id}`, orderIndex };
 }
 
-const LESSONS = [
-	lesson('a', 'module1', 1),
-	lesson('b', 'module1', 2),
-	lesson('c', 'module2', 1)
-];
+const LESSONS = [lesson('a', 'module1', 1), lesson('b', 'module1', 2), lesson('c', 'module2', 1)];
 
 describe('pickResumePoint', () => {
 	it('sends a brand-new learner to the very first lesson and mentions no history', () => {
@@ -54,7 +50,11 @@ describe('pickResumePoint', () => {
 		const point = pickResumePoint(
 			LESSONS,
 			{
-				a: { completed: true, completedAt: '2026-08-01T09:00:00Z', lastAttemptAt: '2026-09-06T09:00:00Z' },
+				a: {
+					completed: true,
+					completedAt: '2026-08-01T09:00:00Z',
+					lastAttemptAt: '2026-09-06T09:00:00Z'
+				},
 				b: { completed: true, completedAt: '2026-09-04T09:00:00Z' }
 			},
 			NOW
@@ -94,6 +94,61 @@ describe('pickResumePoint', () => {
 	it('orders across modules, not just within one', () => {
 		const point = pickResumePoint(LESSONS, { a: { completed: true }, b: { completed: true } }, NOW);
 		expect(point.next?.id).toBe('c');
+	});
+});
+
+describe('pickResumePoint with curriculum order and device', () => {
+	const CURRICULUM = [
+		lesson('w1', 'module2', 1),
+		lesson('w2', 'module2', 2),
+		lesson('x1', 'module10', 1),
+		lesson('a1', 'android', 1),
+		lesson('u1', 'module1', 1)
+	];
+	const ORDER = ['module1', 'module2', 'module10', 'android'];
+
+	it('follows the curriculum order, not the alphabet', () => {
+		// Alphabetically 'android' sorts first and module10 before module2.
+		const done = { completed: true };
+		const point = pickResumePoint(CURRICULUM, { u1: done }, NOW, { moduleOrder: ORDER });
+		expect(point.next?.id).toBe('w1');
+	});
+
+	it('ignores lessons whose module is switched off', () => {
+		const point = pickResumePoint(CURRICULUM, {}, NOW, { moduleOrder: ['module10'] });
+		expect(point.next?.id).toBe('x1');
+		expect(point.finished).toBe(false);
+	});
+
+	it('finishes the module they were in before opening a new one', () => {
+		const point = pickResumePoint(
+			CURRICULUM,
+			{ w1: { completed: true, completedAt: '2026-09-06T09:00:00Z' } },
+			NOW,
+			{ moduleOrder: ORDER }
+		);
+		// u1 (module1) comes first in the curriculum, but they were in module2.
+		expect(point.last?.id).toBe('w1');
+		expect(point.next?.id).toBe('w2');
+	});
+
+	it('does not send a Windows learner into the Android track', () => {
+		const done = { completed: true };
+		const point = pickResumePoint(CURRICULUM, { u1: done, w1: done, w2: done }, NOW, {
+			moduleOrder: ['module1', 'module2', 'android', 'module10'],
+			isRelevant: (moduleId) => moduleId !== 'android'
+		});
+		expect(point.next?.id).toBe('x1');
+	});
+
+	it('still offers other devices once their own lessons are all done', () => {
+		const done = { completed: true };
+		const point = pickResumePoint(CURRICULUM, { u1: done, w1: done, w2: done, x1: done }, NOW, {
+			moduleOrder: ORDER,
+			isRelevant: (moduleId) => moduleId !== 'android'
+		});
+		expect(point.next?.id).toBe('a1');
+		expect(point.finished).toBe(false);
 	});
 });
 
