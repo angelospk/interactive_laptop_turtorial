@@ -5,7 +5,7 @@
 	import { onMount } from 'svelte';
 	import { offlinePages, readTitles, titleFromHtml } from '$lib/offlineLessons';
 
-	type Entry = { path: string; label: string; reload: boolean };
+	type Entry = { href: string; label: string; reload: boolean };
 	let entries = $state<Entry[]>([]);
 
 	onMount(async () => {
@@ -20,7 +20,7 @@
 			const found: Entry[] = [];
 			for (const page of offlinePages(urls, location.origin)) {
 				const html = page.hasHtml
-					? await (await caches.match(new URL(page.path, location.origin).href))?.text()
+					? await (await caches.match(new URL(page.href, location.origin).href))?.text()
 					: undefined;
 				// The cached page's own title, else the one noted on the visit, else
 				// the last part of the address: never two links with the same name.
@@ -29,7 +29,7 @@
 					remembered[page.path] ||
 					decodeURIComponent(page.path.split('/').pop() ?? '');
 				const kind = page.kind === 'lesson' ? 'Μάθημα' : 'Θεωρία';
-				found.push({ path: page.path, label: `${kind}: ${title}`, reload: page.hasHtml });
+				found.push({ href: page.href, label: `${kind}: ${title}`, reload: page.hasHtml });
 			}
 			entries = found;
 		} catch {
@@ -55,10 +55,10 @@
 		{#if entries.length}
 			<h2>Ανοίγουν και χωρίς ίντερνετ</h2>
 			<ul>
-				{#each entries as entry (entry.path)}
+				{#each entries as entry (entry.href)}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- paths come from the cache, not a route id -->
 					<li>
-						<a href={entry.path} data-sveltekit-reload={entry.reload ? '' : undefined}
+						<a href={entry.href} data-sveltekit-reload={entry.reload ? '' : undefined}
 							>{entry.label}</a
 						>
 					</li>

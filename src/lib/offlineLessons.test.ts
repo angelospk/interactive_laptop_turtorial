@@ -15,8 +15,18 @@ describe('offlinePages', () => {
 			`${O}/modules/module1`
 		]);
 		expect(pages).toEqual([
-			{ path: '/modules/module1/hover-balloons', kind: 'lesson', hasHtml: true },
-			{ path: '/library/basics/mouse', kind: 'theory', hasHtml: true }
+			{
+				path: '/modules/module1/hover-balloons',
+				kind: 'lesson',
+				hasHtml: true,
+				href: '/modules/module1/hover-balloons'
+			},
+			{
+				path: '/library/basics/mouse',
+				kind: 'theory',
+				hasHtml: true,
+				href: '/library/basics/mouse'
+			}
 		]);
 	});
 
@@ -30,10 +40,17 @@ describe('offlinePages', () => {
 
 	it('knows when only the data of a page was kept, not its HTML', () => {
 		expect(offlinePages([`${O}/modules/m/a/__data.json`])).toEqual([
-			{ path: '/modules/m/a', kind: 'lesson', hasHtml: false }
+			{ path: '/modules/m/a', kind: 'lesson', hasHtml: false, href: '/modules/m/a' }
 		]);
 		expect(offlinePages([`${O}/modules/m/a/__data.json`, `${O}/modules/m/a`])).toEqual([
-			{ path: '/modules/m/a', kind: 'lesson', hasHtml: true }
+			{ path: '/modules/m/a', kind: 'lesson', hasHtml: true, href: '/modules/m/a' }
+		]);
+	});
+
+	// The service worker looks pages up by their exact address, query included.
+	it('links to the exact address the page was kept under', () => {
+		expect(offlinePages([`${O}/modules/m/a?utm_source=email`])).toEqual([
+			{ path: '/modules/m/a', kind: 'lesson', hasHtml: true, href: '/modules/m/a?utm_source=email' }
 		]);
 	});
 });

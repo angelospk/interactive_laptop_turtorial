@@ -10,7 +10,13 @@
  * full load for the service worker to answer it. Otherwise only its data was
  * kept (a client-side visit), and an in-app link is what can use that.
  */
-export type OfflinePage = { path: string; kind: 'lesson' | 'theory'; hasHtml: boolean };
+export type OfflinePage = {
+	path: string;
+	kind: 'lesson' | 'theory';
+	hasHtml: boolean;
+	/** Where to link: the exact cached address (query included) when the HTML was kept. */
+	href: string;
+};
 
 const LESSON = /^\/modules\/[^/]+\/[^/]+$/;
 const THEORY = /^\/library\/[^/]+\/[^/]+$/;
@@ -30,9 +36,10 @@ export function offlinePages(urls: readonly string[], origin?: string): OfflineP
 		const path = url.pathname.replace(/\/__data\.json$/, '');
 		const kind = LESSON.test(path) ? 'lesson' : THEORY.test(path) ? 'theory' : null;
 		if (!kind) continue;
+		const href = isData ? path : url.pathname + url.search;
 		const known = byPath.get(path);
-		if (known) known.hasHtml ||= !isData;
-		else byPath.set(path, { path, kind, hasHtml: !isData });
+		if (!known) byPath.set(path, { path, kind, hasHtml: !isData, href });
+		else if (!isData && !known.hasHtml) Object.assign(known, { hasHtml: true, href });
 	}
 	return [...byPath.values()];
 }
