@@ -74,6 +74,8 @@
 </script>
 
 {#if isOpen && !isMinimized}
+	<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 	<div
 		class={cn(
 			'absolute flex flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-2xl transition-all duration-100 [font-family:Segoe_UI,system-ui,sans-serif]',
@@ -91,6 +93,8 @@
 		role="application"
 	>
 		<!-- Title Bar -->
+		<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="flex h-9 cursor-move items-center justify-between border-b border-black/5 bg-neutral-100 pl-3 select-none"
 			onmousedown={startDrag}

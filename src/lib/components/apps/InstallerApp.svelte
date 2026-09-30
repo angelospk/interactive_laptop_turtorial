@@ -75,9 +75,9 @@
 			{:else if step === 2}
 				<h3 class="mb-4 font-semibold">Βήμα 2: Επιλογή Τοποθεσίας</h3>
 				<div class="mb-4">
-					<label class="mb-2 block text-sm text-slate-600">Φάκελος εγκατάστασης:</label>
+					<label for="installer-path" class="mb-2 block text-sm text-slate-600">Φάκελος εγκατάστασης:</label>
 					<div class="flex gap-2">
-						<input type="text" value="C:\Program Files\{appName}" readonly class="w-full rounded border p-2 text-sm text-slate-500 bg-slate-100" />
+						<input id="installer-path" type="text" value="C:\Program Files\{appName}" readonly class="w-full rounded border p-2 text-sm text-slate-500 bg-slate-100" />
 						<Button variant="outline" size="sm">Αλλαγή...</Button>
 					</div>
 				</div>

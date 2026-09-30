@@ -141,11 +141,15 @@
 					</div>
 					<div class="font-bold text-green-600">{m.score?.() || 'Σκορ'}: {score}</div>
 				</div>
+				<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
 					oncontextmenu={(e) => e.preventDefault()}
 				>
 					{#each targets as target (target.id)}
+						<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							class="absolute flex cursor-pointer flex-col items-center gap-2 transition-transform select-none hover:scale-110"
 							style="left: {target.x}%; top: {target.y}%;"

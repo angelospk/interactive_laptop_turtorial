@@ -115,6 +115,8 @@
 			<p class="mb-4 text-sm text-slate-600">Πέρνα τον κέρσορα πάνω από τις φούσκες.</p>
 			<div class="relative h-48 w-full rounded-md bg-slate-100">
 				{#each bubbles as bubble (bubble.id)}
+					<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="absolute h-8 w-8 rounded-full transition-colors"
 						class:bg-blue-500={!bubble.hovered}
@@ -151,6 +153,8 @@
 		</CardHeader>
 		<CardContent>
 			<p class="mb-4 text-sm text-slate-600">Κάνε διπλό κλικ για να ανοίξεις τον φάκελο.</p>
+			<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="flex h-48 items-center justify-center"
 				ondblclick={handleDoubleClick}
@@ -175,6 +179,8 @@
 				<div class="flex flex-col gap-4">
 					{#each puzzlePieces as piece (piece.id)}
 						{#if !piece.dropped}
+							<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								draggable="true"
 								ondragstart={(e) => handleDragStart(e, piece.id)}
@@ -195,6 +201,8 @@
 				<!-- Targets -->
 				<div class="flex flex-col gap-4">
 					{#each puzzlePieces as piece (piece.id)}
+						<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							ondragover={handleDragOver}
 							ondrop={(e) => handleDrop(e, piece.id)}
@@ -215,6 +223,8 @@
 	<Card>
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
+				<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="flex h-full flex-col items-center justify-center rounded-lg bg-amber-100 p-4 text-center"
 					oncontextmenu={(e) => {

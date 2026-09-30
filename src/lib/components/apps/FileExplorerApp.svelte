@@ -342,6 +342,8 @@
 
 		<ContextMenu.Root>
 		<ContextMenu.Trigger class="flex-1 overflow-y-auto p-4">
+			<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="grid h-full grid-cols-4 content-start gap-4"
 				ondragover={(e) => e.preventDefault()}
@@ -350,6 +352,8 @@
 				{#each currentItems as item (item.id)}
 					<ContextMenu.Root>
 						<ContextMenu.Trigger>
+							<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+							<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 							<div
 								class="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-transparent p-3 transition-colors hover:bg-slate-100"
 								class:bg-blue-100={selectedItemId === item.id}

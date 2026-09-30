@@ -23,12 +23,14 @@
 </script>
 
 <div class="flex flex-col gap-4 p-4">
+	<!-- scroll container must be focusable for keyboard scrolling -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 	<div
 		class="h-64 overflow-y-scroll rounded-md border-2 border-slate-200 bg-slate-50 p-8 text-center shadow-inner"
 		onscroll={handleScroll}
 		tabindex="0"
 		role="region"
-		aria-label="Scrollable content"
+		aria-label="Περιοχή κύλισης"
 	>
 		<p class="mb-8 text-lg font-medium text-slate-700">Scroll down to find the secret code...</p>
 

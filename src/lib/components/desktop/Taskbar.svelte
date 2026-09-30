@@ -42,6 +42,8 @@
 	// Close QuickSettings when clicking elsewhere (implemented via Desktop wrapper mostly, but good to have API)
 </script>
 
+<!-- stops click from reaching the backdrop -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
 	class="absolute right-0 bottom-0 left-0 z-50 flex h-12 items-center bg-slate-900/85 px-2 backdrop-blur-xl [font-family:Segoe_UI,system-ui,sans-serif]"
 	onclick={(e) => e.stopPropagation()}

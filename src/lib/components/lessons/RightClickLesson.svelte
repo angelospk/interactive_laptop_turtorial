@@ -24,6 +24,8 @@
 >
 	<ContextMenu.Root>
 		<ContextMenu.Trigger>
+			<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="flex h-64 w-64 cursor-context-menu flex-col items-center justify-center rounded-lg border-2 border-amber-200 bg-amber-100 transition-colors hover:bg-amber-200"
 				oncontextmenu={() => {

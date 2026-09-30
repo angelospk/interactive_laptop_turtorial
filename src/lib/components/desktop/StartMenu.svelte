@@ -28,6 +28,8 @@
 </script>
 
 {#if isOpen}
+	<!-- stops click from reaching the backdrop -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div
 		class="absolute bottom-14 left-1/2 z-50 flex h-[500px] w-[600px] max-w-[calc(100%-2rem)] -translate-x-1/2 flex-col overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 text-white shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5 fade-in duration-200 [font-family:Segoe_UI,system-ui,sans-serif]"
 		onclick={(e) => e.stopPropagation()}

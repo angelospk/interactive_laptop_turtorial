@@ -30,6 +30,8 @@
 </script>
 
 {#if isOpen}
+	<!-- click-outside backdrop; the close button is the keyboard path -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm"
 		onclick={handleBackdropClick}

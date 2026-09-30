@@ -268,6 +268,8 @@
 						>
 							{label}
 							<!-- Resize handle -->
+							<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								class="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400"
 								onmousedown={(e) => startResize(label, e)}

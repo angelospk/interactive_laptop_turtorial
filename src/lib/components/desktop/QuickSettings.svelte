@@ -31,6 +31,8 @@
 </script>
 
 {#if isOpen}
+	<!-- stops click from reaching the backdrop -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div
 		class="absolute bottom-14 right-4 z-50 w-80 rounded-xl border border-white/10 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur-xl transition-all [font-family:Segoe_UI,system-ui,sans-serif]"
 		transition:slide={{ duration: 200, axis: 'y' }}

@@ -150,6 +150,8 @@
 		</CardHeader>
 		<CardContent>
 			<!-- Desktop Simulation -->
+			<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<div
 				class="relative h-[500px] w-full overflow-hidden rounded-lg border-4 border-slate-800 bg-[url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center shadow-2xl"
 				onclick={() => {
@@ -158,6 +160,8 @@
 			>
 				<!-- The Window -->
 				{#if windowState.isOpen && !windowState.isMinimized}
+					<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div
 						class="absolute flex flex-col overflow-hidden rounded-lg bg-white shadow-xl transition-all duration-100"
 						style="left: {windowState.isMaximized
@@ -170,6 +174,8 @@
 						onclick={(e) => e.stopPropagation()}
 					>
 						<!-- Title Bar -->
+						<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 						<div
 							class="flex h-10 cursor-move items-center justify-between border-b bg-slate-100 px-2 select-none"
 							onmousedown={startDrag}
@@ -212,6 +218,8 @@
 
 				<!-- Quick Settings Panel -->
 				{#if quickSettingsOpen}
+					<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div
 						class="absolute right-4 bottom-14 w-80 animate-in rounded-xl border border-slate-700 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur duration-200 slide-in-from-bottom-5 fade-in"
 						onclick={(e) => e.stopPropagation()}
@@ -274,6 +282,8 @@
 				{/if}
 
 				<!-- Taskbar -->
+				<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 				<div
 					class="absolute right-0 bottom-0 left-0 flex h-12 items-center justify-between bg-slate-900/90 px-4 backdrop-blur"
 					onclick={(e) => e.stopPropagation()}
