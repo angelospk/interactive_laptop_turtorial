@@ -19,7 +19,7 @@
 <div class="mx-auto max-w-6xl px-4 pt-20 pb-8 sm:px-6 lg:flex lg:gap-8">
 	<div class="min-w-0 flex-1 lg:max-w-3xl">
 		<!-- breadcrumb -->
-		<nav class="text-muted-foreground mb-4 text-sm">
+		<nav class="text-muted-foreground mb-4 text-base">
 			<a class="hover:text-foreground hover:underline" href="/library">Βιβλιοθήκη</a>
 			<span class="mx-1">›</span>
 			<span>{data.courseTitle}</span>
@@ -73,10 +73,10 @@
 					class="h-auto max-w-[48%] flex-col items-start py-2 text-left whitespace-normal"
 					href="/library/{data.courseId}/{data.prev.id}"
 				>
-					<span class="text-muted-foreground flex items-center gap-1 text-xs"
+					<span class="text-muted-foreground flex items-center gap-1 text-sm"
 						><ChevronLeft class="h-3 w-3" /> Προηγούμενο</span
 					>
-					<span class="text-sm leading-snug font-medium break-words whitespace-normal"
+					<span class="text-base leading-snug font-medium break-words whitespace-normal"
 						>{data.prev.title}</span
 					>
 				</Button>
@@ -89,10 +89,10 @@
 					class="h-auto max-w-[48%] flex-col items-end py-2 text-right whitespace-normal"
 					href="/library/{data.courseId}/{data.next.id}"
 				>
-					<span class="text-muted-foreground flex items-center gap-1 text-xs"
+					<span class="text-muted-foreground flex items-center gap-1 text-sm"
 						>Επόμενο <ChevronRight class="h-3 w-3" /></span
 					>
-					<span class="text-sm leading-snug font-medium break-words whitespace-normal"
+					<span class="text-base leading-snug font-medium break-words whitespace-normal"
 						>{data.next.title}</span
 					>
 				</Button>

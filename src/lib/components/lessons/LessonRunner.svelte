@@ -169,9 +169,22 @@
 	 * left — crediting the one now on screen would mark it complete unplayed and
 	 * arm the auto-advance from there.
 	 */
+	// A result the server never received. Shown in plain words with a way to send
+	// it again, instead of a "Μπράβο" that quietly disappears or a console line.
+	let unsavedResult = $state<{ lessonId: string; score: number } | null>(null);
+	let showUnsaved = $derived(!!unsavedResult && unsavedResult.lessonId === currentLesson?.id);
+
+	function retrySave() {
+		if (!unsavedResult) return;
+		const { lessonId, score } = unsavedResult;
+		unsavedResult = null;
+		handleLessonComplete(score, lessonId);
+	}
+
 	async function handleLessonComplete(score: number, lessonId: string) {
 		if (lessonId !== currentLesson?.id) return;
 		const mine = nextAttempt(lessonId);
+		if (unsavedResult?.lessonId === lessonId) unsavedResult = null;
 
 		const isFirstCompletion = !mergedProgress[lessonId]?.completed;
 		const isSuccess = score >= 50;
@@ -187,21 +200,28 @@
 
 		// Save progress using the new API endpoint
 		// Skipped if a Retry came first: this result no longer stands.
-		const res = await inOrder(lessonId, () =>
-			mine === attempts.get(lessonId)
-				? fetch('/api/lessons/complete', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ lessonId, score })
-					})
-				: null
-		);
-		if (!res) return;
-		// Read the body before the freshness check: Retry can land while it arrives.
-		const data = res.ok ? await res.json() : null;
+		let res: Response | null;
+		let data: { progress?: Record<string, any> } | null = null;
+		try {
+			res = await inOrder(lessonId, () =>
+				mine === attempts.get(lessonId)
+					? fetch('/api/lessons/complete', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ lessonId, score })
+						})
+					: null
+			);
+			if (!res) return;
+			// Read the body before the freshness check: Retry can land while it arrives.
+			data = res.ok ? await res.json() : null;
+		} catch {
+			// Offline or the server unreachable: the same as a refused save.
+			res = new Response(null, { status: 503 });
+		}
 		if (mine !== attempts.get(lessonId)) return;
 
-		if (res.ok) {
+		if (res.ok && data) {
 			// Update with actual server response if needed, or just rely on invalidateAll
 			if (data.progress) {
 				localUpdates[lessonId] = data.progress;
@@ -228,7 +248,7 @@
 			const { [lessonId]: _, ...rest } = localUpdates;
 			localUpdates = rest;
 			if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
-			console.error('Failed to save progress');
+			unsavedResult = { lessonId, score };
 		}
 	}
 
@@ -238,6 +258,7 @@
 
 	async function handleRetry() {
 		retryEpoch++;
+		unsavedResult = null;
 		cancelAutoAdvance();
 		justCompletedLessonId = null;
 		const lessonId = currentLesson.id;
@@ -366,6 +387,24 @@
 		});
 		return () => cancelAnimationFrame(frame);
 	});
+
+	// The result is a modal moment: the keyboard goes to its next step, and comes
+	// back to where it was once the result is gone.
+	let resultDialog = $state<HTMLElement | null>(null);
+	$effect(() => {
+		if (!showResultOverlay || !resultDialog) return;
+		const before = document.activeElement as HTMLElement | null;
+		const dialog = resultDialog;
+		tick().then(() => {
+			const primary =
+				dialog.querySelector<HTMLElement>('[data-primary]') ??
+				dialog.querySelector<HTMLElement>('button');
+			primary?.focus();
+		});
+		return () => {
+			if (before?.isConnected && !before.closest('[inert]')) before.focus();
+		};
+	});
 </script>
 
 <svelte:document onfullscreenchange={handleFullscreenChange} />
@@ -378,7 +417,11 @@
 		In fullscreen only the "leave fullscreen" control stays: hiding the whole row
 		left the learner inside a full-screen lesson with no visible way out.
 	-->
-	<nav class="lesson-nav" aria-label={getMessage('lesson_nav_aria') || 'Πλοήγηση μαθήματος'}>
+	<nav
+		class="lesson-nav"
+		inert={showResultOverlay}
+		aria-label={getMessage('lesson_nav_aria') || 'Πλοήγηση μαθήματος'}
+	>
 		<Button
 			variant="outline"
 			onclick={prevLesson}
@@ -421,35 +464,48 @@
 		</Button>
 	</nav>
 
-	{#if showFullscreenBanner}
-		<div
-			class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
-		>
-			<div class="flex items-center gap-2">
-				<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
-				<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
+	<!-- One row for notices, however many are up: a second notice in its own row
+	     would push the lesson card past the bottom of the screen. -->
+	<div class="lesson-notices">
+		{#if showFullscreenBanner}
+			<div
+				class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
+			>
+				<div class="flex items-center gap-2">
+					<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
+					<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
+				</div>
+				<div class="flex shrink-0 items-center gap-2">
+					<Button
+						onclick={enterFullscreenFromBanner}
+						class="min-h-11 bg-blue-600 px-4 text-base text-white hover:bg-blue-700"
+					>
+						Πλήρης οθόνη
+					</Button>
+					<button
+						class="min-h-11 rounded-lg px-3 text-base font-medium text-blue-700 underline hover:text-blue-900 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none"
+						onclick={() => (dismissedForLessonId = currentLesson?.id ?? null)}
+					>
+						Όχι τώρα
+					</button>
+				</div>
 			</div>
-			<div class="flex shrink-0 items-center gap-2">
-				<Button
-					size="sm"
-					onclick={enterFullscreenFromBanner}
-					class="bg-blue-600 text-white hover:bg-blue-700"
-				>
-					Πλήρης οθόνη
-				</Button>
-				<button
-					class="rounded p-1 text-blue-500 hover:text-blue-700"
-					onclick={() => (dismissedForLessonId = currentLesson?.id ?? null)}
-					title="Κλείσιμο"
-					aria-label="Κλείσιμο"
-				>
-					✕
-				</button>
-			</div>
-		</div>
-	{/if}
+		{/if}
 
-	<div class="lesson-card" bind:this={lessonCard}>
+		{#if showUnsaved}
+			<div
+				role="alert"
+				class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-900"
+			>
+				<span
+					>Το αποτέλεσμα δεν αποθηκεύτηκε. Ελέγξτε τη σύνδεση στο ίντερνετ και πατήστε ξανά.</span
+				>
+				<Button onclick={retrySave} class="min-h-12 px-5 text-base">Αποθήκευση ξανά</Button>
+			</div>
+		{/if}
+	</div>
+
+	<div class="lesson-card" inert={showResultOverlay} bind:this={lessonCard}>
 		<Card class="flex h-full min-h-0 flex-col overflow-hidden py-0">
 			<!-- Scrolls when a lesson is taller than the screen (a short laptop, or the
 			     browser zoomed in). Lessons built on LessonTemplate scroll inside and
@@ -483,7 +539,11 @@
 			class="pointer-events-auto fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/40 p-4 backdrop-blur-[2px] duration-300 fade-in"
 		>
 			<div
-				class="mx-auto w-full max-w-xl rounded-xl p-10 text-center shadow-2xl {isSuccess
+				bind:this={resultDialog}
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="lesson-result-title"
+				class="mx-auto max-h-full w-full max-w-xl overflow-y-auto rounded-xl p-6 text-center shadow-2xl sm:p-10 {isSuccess
 					? 'border-t-8 border-green-500 bg-green-50'
 					: 'border-t-8 border-red-500 bg-red-50'} animate-in duration-500 zoom-in-95"
 			>
@@ -501,7 +561,10 @@
 					</div>
 
 					<div>
-						<h3 class="text-3xl font-extrabold {isSuccess ? 'text-green-800' : 'text-red-800'}">
+						<h3
+							id="lesson-result-title"
+							class="text-3xl font-extrabold {isSuccess ? 'text-green-800' : 'text-red-800'}"
+						>
 							{isSuccess
 								? getMessage('lesson_completed') || 'Μπράβο, τα κατάφερες!'
 								: 'Το μάθημα δεν ολοκληρώθηκε επιτυχώς'}
@@ -519,7 +582,7 @@
 										`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
 								</span>
 								<button
-									class="cursor-pointer underline hover:text-green-900"
+									class="min-h-11 min-w-11 cursor-pointer rounded-lg px-4 underline hover:text-green-900 focus-visible:ring-4 focus-visible:ring-green-300 focus-visible:outline-none"
 									onclick={cancelAutoAdvance}
 								>
 									{getMessage('cancel') || 'Ακύρωση'}
@@ -544,6 +607,7 @@
 							{#if currentLessonIndex < lessons.length - 1}
 								<Button
 									size="lg"
+									data-primary
 									onclick={nextLesson}
 									class="w-[200px] flex-1 gap-2 bg-green-600 py-6 text-lg text-white shadow-md hover:bg-green-700"
 								>
@@ -553,6 +617,7 @@
 							{:else if nextModuleId}
 								<Button
 									size="lg"
+									data-primary
 									onclick={nextLesson}
 									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
@@ -562,6 +627,7 @@
 							{:else}
 								<Button
 									size="lg"
+									data-primary
 									onclick={onExit}
 									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
@@ -610,8 +676,12 @@
 		outline-offset: 3px;
 	}
 
-	.fullscreen-banner {
+	.lesson-notices {
 		grid-row: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		min-block-size: 0;
 	}
 
 	.lesson-card {
@@ -641,12 +711,9 @@
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		padding: 0;
 		margin: 0;
-		/* Fullscreen keeps a slim row for the "leave fullscreen" control. */
-		grid-template-rows: auto minmax(0, 1fr);
-	}
-
-	.fullscreen-active .lesson-card {
-		grid-row: 2;
+		/* Fullscreen keeps a slim row for the "leave fullscreen" control, and the
+		   notices row so a failed save is still announced. */
+		grid-template-rows: auto auto minmax(0, 1fr);
 	}
 
 	.fullscreen-active :global(.lesson-template) {

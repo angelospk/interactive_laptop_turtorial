@@ -83,6 +83,19 @@ describe('pickTogetherActivity', () => {
 		expect(a?.moduleId).toBe('android');
 	});
 
+	it("finishes the learner's own device, extras included, before another device's basics", () => {
+		const MAC_BASE = getBasePathLessonIds('mac') ?? [];
+		expect(MAC_BASE.length).toBeGreaterThan(0);
+		const extra = 'android-extra-not-in-base';
+		const lessons = {
+			mac: MAC_BASE.map(meta),
+			android: [...ANDROID_BASE.map(meta), meta(extra)]
+		};
+		const progress = Object.fromEntries(ANDROID_BASE.map((id) => [id, { completed: true }]));
+		const a = pickTogetherActivity(['mac', 'android'], lessons, progress, 'android');
+		expect(a?.lesson.id).toBe(extra);
+	});
+
 	it('is null only when there is genuinely nothing to point at', () => {
 		expect(pickTogetherActivity([], {}, {}, 'android')).toBeNull();
 		expect(pickTogetherActivity(['android'], { android: [] }, {}, 'android')).toBeNull();

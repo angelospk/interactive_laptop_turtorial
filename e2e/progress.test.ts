@@ -30,3 +30,34 @@ test('user progress persistence', async ({ page }) => {
 	// 6. Verify user is recognized again
 	await expect(page.getByText(new RegExp(username)).first()).toBeVisible();
 });
+
+test('resetting all progress asks first, and Cancel keeps it', async ({ page }) => {
+	await page.goto('/login');
+	await page.fill('#username', `reset_${Date.now()}`);
+	await page.getByRole('button', { name: loginButton }).click();
+	await expect(page).toHaveURL('/');
+	const picker = page.getByRole('dialog').filter({ hasText: 'Τι θέλεις να μάθεις' });
+	await picker.getByRole('button', { name: /Υπολογιστής Windows/ }).click();
+	await expect(picker).toBeHidden();
+
+	const resets: string[] = [];
+	page.on('request', (r) => {
+		if (r.url().includes('/api/lessons/reset')) resets.push(r.url());
+	});
+
+	// One stray click must not wipe months of work.
+	await page.getByRole('button', { name: 'Επανέναρξη Προόδου' }).click();
+	const confirm = page.getByRole('alertdialog');
+	await expect(confirm).toBeVisible();
+	await confirm.getByRole('button', { name: 'Άκυρο' }).click();
+	await expect(confirm).toBeHidden();
+	expect(resets).toHaveLength(0);
+
+	await page.getByRole('button', { name: 'Επανέναρξη Προόδου' }).click();
+	await page
+		.getByRole('alertdialog')
+		.getByRole('button', { name: /Ναι, διαγραφή/ })
+		.click();
+	await expect(page.getByText('Η πρόοδός σας διαγράφηκε')).toBeVisible();
+	expect(resets).toHaveLength(1);
+});

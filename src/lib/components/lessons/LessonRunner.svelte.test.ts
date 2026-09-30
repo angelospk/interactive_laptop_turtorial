@@ -308,7 +308,7 @@ describe('a save that outlives its lesson', () => {
 		);
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
@@ -431,7 +431,7 @@ describe('a save that outlives its lesson', () => {
 		await play();
 		await screen.getByRole('button', { name: 'Δοκίμασε ξανά' }).click();
 		await play(); // waits for the reset
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await play();
 
 		releaseDelete({});
@@ -468,7 +468,7 @@ describe('a save that outlives its lesson', () => {
 			await new Promise((resolve) => setTimeout(resolve, 2400));
 		};
 		await play();
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
 		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
 		await play();
@@ -571,7 +571,7 @@ describe('a save that outlives its lesson', () => {
 		);
 		await screen.getByRole('button', { name: 'CLICK' }).click();
 		await new Promise((resolve) => setTimeout(resolve, 2400));
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
 		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
@@ -601,9 +601,9 @@ describe('a save that outlives its lesson', () => {
 		// The drill reports its result after ~2s; the save then hangs.
 		await new Promise((resolve) => setTimeout(resolve, 2400));
 
-		// The optimistic overlay for the finished lesson is up; the learner uses the
-		// navigation button, not the overlay, and leaves while the save is pending.
-		await screen.getByRole('button', { name: 'Επόμενο', exact: true }).click();
+		// The optimistic overlay for the finished lesson is up; the learner moves on
+		// from it while the save is still pending.
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
 
 		release({});
@@ -617,5 +617,67 @@ describe('a save that outlives its lesson', () => {
 		// …and no countdown carrying the learner on to lesson 3.
 		await new Promise((resolve) => setTimeout(resolve, 6500));
 		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+	});
+});
+
+describe('the result after a lesson', () => {
+	const clickOnly = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{ ...mockLessons[1], id: 'lesson-2b', titleKey: 'Μάθημα 2' }
+	];
+
+	afterEach(() => vi.unstubAllGlobals());
+
+	test('is a named dialog that takes the keyboard with it', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => ({ progress: { completed: true, score: 100 } })
+			}))
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: clickOnly, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+
+		const dialog = screen.getByRole('dialog', { name: /ολοκληρώθηκε/ });
+		await expect.element(dialog).toBeInTheDocument();
+		// Focus lands on the next step, and what lies behind cannot be tabbed into.
+		await expect.element(screen.getByRole('button', { name: /Επόμενο Μάθημα/ })).toHaveFocus();
+		expect(document.querySelector('.lesson-nav')?.closest('[inert]')).not.toBeNull();
+	});
+
+	test('a save that cannot reach the server says so, in Greek, and can be retried', async () => {
+		let online = false;
+		const fetchMock = vi.fn(async () => {
+			if (!online) throw new TypeError('Failed to fetch');
+			return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: clickOnly, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+
+		const alert = screen.getByRole('alert');
+		await expect.element(alert).toHaveTextContent(/δεν αποθηκεύτηκε/i);
+		// Not presented as a success the server never recorded.
+		await expect
+			.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ }))
+			.not.toBeInTheDocument();
+
+		online = true;
+		await screen.getByRole('button', { name: /Αποθήκευση ξανά/ }).click();
+		await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+		await expect.element(screen.getByRole('alert')).not.toBeInTheDocument();
+		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 });

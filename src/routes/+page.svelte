@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { toast } from 'svelte-sonner';
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
 	import LanguageToggle from '$lib/components/LanguageToggle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
@@ -15,6 +17,7 @@
 		getModuleDevices,
 		modulesSpecificToDevice,
 		getModuleCompletion,
+		isModuleForDevice,
 		type ModuleDevice
 	} from '$lib/config/moduleOrganization';
 	import DeviceOnboarding from '$lib/components/DeviceOnboarding.svelte';
@@ -50,11 +53,24 @@
 
 	let changeDeviceOpen = $state(false);
 
+	// Wiping every completed lesson cannot be undone, so it is never one click.
+	let resetConfirmOpen = $state(false);
+	async function confirmReset() {
+		resetConfirmOpen = false;
+		if (await appState.resetProgress()) toast.success(messages.progress_reset_done());
+		else toast.error(messages.progress_reset_failed());
+	}
+
 	// Where they were, and where they go next. Recomputed rather than stored:
 	// the progress map is already here, and a stored "current lesson" would go
 	// stale the moment a lesson is disabled or reordered.
 	let resume = $derived(
-		pickResumePoint((data.lessons ?? []) as ResumeLesson[], data.progress ?? {})
+		pickResumePoint((data.lessons ?? []) as ResumeLesson[], data.progress ?? {}, new Date(), {
+			moduleOrder: (data.modules ?? []).map((module) => module.id),
+			isRelevant: preferredDevice
+				? (moduleId) => isModuleForDevice(moduleId, preferredDevice!)
+				: undefined
+		})
 	);
 	const lessonTitle = (lesson: ResumeLesson) =>
 		typeof messages[lesson.titleKey] === 'function'
@@ -236,7 +252,7 @@
 					<Button
 						variant="ghost"
 						onclick={() => (changeDeviceOpen = true)}
-						class="h-8 rounded-full px-3 text-xs text-muted-foreground hover:text-foreground"
+						class="h-11 rounded-full px-4 text-base text-muted-foreground hover:text-foreground"
 					>
 						Αλλαγή συσκευής
 					</Button>
@@ -279,17 +295,41 @@
 			{/each}
 		</div>
 
-		<div class="mt-12 text-center">
-			<Button
-				variant="ghost"
-				onclick={() => appState.resetProgress()}
-				class="text-sm text-muted-foreground hover:text-foreground"
-			>
-				{messages.progress_reset()}
-			</Button>
-		</div>
+		{#if data.user}
+			<div class="mt-12 text-center">
+				<Button
+					variant="ghost"
+					onclick={() => (resetConfirmOpen = true)}
+					class="h-11 text-base text-muted-foreground hover:text-foreground"
+				>
+					{messages.progress_reset()}
+				</Button>
+			</div>
+		{/if}
 	</div>
 </main>
+
+<AlertDialog.Root bind:open={resetConfirmOpen}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title class="text-xl">{messages.progress_reset_title()}</AlertDialog.Title>
+			<AlertDialog.Description class="text-base">
+				{messages.progress_reset_body()}
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel class="h-12 text-base"
+				>{messages.progress_reset_cancel()}</AlertDialog.Cancel
+			>
+			<AlertDialog.Action
+				class="h-12 bg-destructive text-base text-white hover:bg-destructive/90"
+				onclick={confirmReset}
+			>
+				{messages.progress_reset_confirm()}
+			</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
 
 <!-- Change-device modal, opened from the "Για τη συσκευή σου" chip -->
 {#if data.user}

@@ -57,13 +57,31 @@ export function wholeDaysBetween(then: Date, now: Date): number {
  * since they last saw it is not somewhere to send them back to, and it must not
  * become the thing the card is about.
  */
+export type ResumeOptions = {
+  /**
+   * Enabled module ids in curriculum order. Lessons of any other module are
+   * left out (their module is switched off). Without it, modules sort by id.
+   */
+  moduleOrder?: readonly string[];
+  /**
+   * Whether a module is meant for this learner's device. "Συνέχεια" prefers
+   * those, and only offers the rest once they are all done.
+   */
+  isRelevant?: (moduleId: string) => boolean;
+};
+
 export function pickResumePoint(
   lessons: readonly ResumeLesson[],
   progress: Readonly<Record<string, ResumeProgress>>,
-  now: Date = new Date()
+  now: Date = new Date(),
+  { moduleOrder, isRelevant = () => true }: ResumeOptions = {}
 ): ResumePoint {
-  const ordered = [...lessons].sort(
-    (a, b) => a.moduleId.localeCompare(b.moduleId) || a.orderIndex - b.orderIndex
+  const rank = moduleOrder ? new Map(moduleOrder.map((id, i) => [id, i])) : null;
+  const ordered = (rank ? lessons.filter((l) => rank.has(l.moduleId)) : [...lessons]).sort(
+    (a, b) =>
+      (rank
+        ? rank.get(a.moduleId)! - rank.get(b.moduleId)!
+        : a.moduleId.localeCompare(b.moduleId)) || a.orderIndex - b.orderIndex
   );
 
   let last: ResumeLesson | null = null;
@@ -83,7 +101,14 @@ export function pickResumePoint(
     }
   }
 
-  const next = ordered.find((l) => !progress[l.id]?.completed) ?? null;
+  // Finish the module they were in, then the next one meant for their device,
+  // and only then anything else: a Windows learner is not sent to Android.
+  const unfinished = ordered.filter((l) => !progress[l.id]?.completed);
+  const next =
+    unfinished.find((l) => last && l.moduleId === last.moduleId && isRelevant(l.moduleId)) ??
+    unfinished.find((l) => isRelevant(l.moduleId)) ??
+    unfinished[0] ??
+    null;
 
   return {
     last,

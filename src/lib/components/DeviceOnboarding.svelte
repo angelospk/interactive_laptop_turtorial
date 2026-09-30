@@ -83,6 +83,9 @@
 			await invalidateAll();
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Κάτι πήγε στραβά';
+		} finally {
+			// The change-device dialog stays mounted: a stale `saving` would leave
+			// every choice disabled the next time it opens.
 			saving = null;
 		}
 	}
@@ -90,7 +93,7 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="max-w-2xl"
+		class="max-h-[calc(100dvh-1rem)] max-w-2xl overflow-y-auto p-4 sm:p-6"
 		interactOutsideBehavior={dismissable ? 'close' : 'ignore'}
 		escapeKeydownBehavior={dismissable ? 'close' : 'ignore'}
 		showCloseButton={dismissable}
@@ -113,24 +116,24 @@
 					type="button"
 					onclick={() => choose(opt.device)}
 					disabled={saving !== null}
-					class="relative flex flex-col items-center gap-3 rounded-2xl border-2 border-gray-200 p-6 text-center transition hover:border-blue-500 hover:bg-blue-50 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none disabled:opacity-50"
+					class="relative flex flex-row items-center gap-4 rounded-2xl border-2 border-gray-200 p-4 text-left transition hover:border-blue-500 hover:bg-blue-50 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none disabled:opacity-50 sm:flex-col sm:gap-3 sm:p-6 sm:text-center"
 					class:border-blue-500={highlighted === opt.device}
 					class:bg-blue-50={highlighted === opt.device}
 				>
 					{#if isCurrent}
 						<span
-							class="absolute -top-3 rounded-full bg-emerald-600 px-3 py-1 text-sm font-semibold text-white"
+							class="absolute -top-3 right-3 rounded-full bg-emerald-600 px-3 py-1 text-sm font-semibold text-white sm:right-auto"
 						>
 							Η συσκευή σου
 						</span>
 					{:else if isHint}
 						<span
-							class="absolute -top-3 rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white"
+							class="absolute -top-3 right-3 rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white sm:right-auto"
 						>
 							Μάλλον αυτό
 						</span>
 					{/if}
-					<opt.icon class="size-14 text-blue-700" aria-hidden="true" />
+					<opt.icon class="size-10 shrink-0 text-blue-700 sm:size-14" aria-hidden="true" />
 					<span class="text-lg font-semibold text-gray-900">{opt.label}</span>
 					{#if saving === opt.device}
 						<span class="text-sm text-blue-600">Αποθήκευση…</span>

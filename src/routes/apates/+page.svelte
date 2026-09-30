@@ -17,9 +17,10 @@
 		selected = i;
 	}
 
+	// The drill keeps its result on screen; the learner leaves it when done
+	// reading, and the list then remembers the score.
 	function handleComplete(score: number) {
 		lastScore = score;
-		selected = null;
 	}
 
 	function handleBack() {
@@ -68,10 +69,10 @@
 			<h1 class="text-3xl font-bold">Απάτη ή Όχι;</h1>
 		</div>
 
-		<p class="text-muted-foreground mb-6 text-lg leading-relaxed">
+		<p class="mb-6 text-lg leading-relaxed text-muted-foreground">
 			Κάθε μέρα φτάνουν ψεύτικα μηνύματα που προσπαθούν να σας ξεγελάσουν. Εδώ εξασκείστε να τα
-			ξεχωρίζετε — <strong>δωρεάν και χωρίς λογαριασμό</strong>. Διαβάστε κάθε μήνυμα και αποφασίστε:
-			είναι απάτη ή νόμιμο;
+			ξεχωρίζετε — <strong>δωρεάν και χωρίς λογαριασμό</strong>. Διαβάστε κάθε μήνυμα και
+			αποφασίστε: είναι απάτη ή νόμιμο;
 		</p>
 
 		{#if lastScore !== null}
@@ -95,18 +96,18 @@
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<p class="text-muted-foreground mb-4 text-sm">
+						<p class="mb-4 text-sm text-muted-foreground">
 							{ex.config?.cards?.length ?? 0} μηνύματα για εξάσκηση.
 						</p>
-						<Button class="w-full" onclick={() => start(i)}>Ξεκινήστε</Button>
+						<Button class="h-12 w-full text-lg" onclick={() => start(i)}>Ξεκινήστε</Button>
 					</CardContent>
 				</Card>
 			{/each}
 		</div>
 
-		<p class="text-muted-foreground mt-8 text-center text-sm">
+		<p class="mt-8 text-center text-base text-muted-foreground">
 			Θέλετε περισσότερο υλικό; Δείτε τη
-			<a class="text-primary underline" href="/library">Βιβλιοθήκη Θεωρίας</a>.
+			<a class="text-primary inline-block py-2 underline" href="/library">Βιβλιοθήκη Θεωρίας</a>.
 		</p>
 	</div>
 {/if}

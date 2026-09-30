@@ -47,4 +47,19 @@ describe('LessonRenderer', () => {
 		// The previous lesson's feedback must NOT survive the switch.
 		await expect.element(screen.getByText(/Όχι αυτό/)).not.toBeInTheDocument();
 	});
+
+	it('an unknown lesson type explains itself in Greek, without technical words', async () => {
+		const onBack = vi.fn();
+		const screen = render(LessonRenderer, {
+			lesson: { id: 'x', moduleId: 'm', lessonType: 'no-such-type', config: {} } as never,
+			onComplete: () => {},
+			onBack
+		});
+		await expect
+			.element(screen.getByRole('heading', { name: 'Αυτό το μάθημα δεν άνοιξε' }))
+			.toBeInTheDocument();
+		await expect.element(screen.getByText(/no-such-type/)).not.toBeInTheDocument();
+		await screen.getByRole('button', { name: 'Πίσω στα μαθήματα' }).click();
+		expect(onBack).toHaveBeenCalledOnce();
+	});
 });

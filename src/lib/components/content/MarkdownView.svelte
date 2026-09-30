@@ -47,12 +47,12 @@
 {:else if error}
 	<p class="text-red-500">Σφάλμα φόρτωσης περιεχομένου: {error}</p>
 {:else}
-	<article class="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-img:rounded-lg">
+	<article class="prose prose-lg dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-img:rounded-lg">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html html}
 	</article>
 	{#if sourceUrl}
-		<p class="text-muted-foreground mt-8 border-t pt-4 text-sm">
+		<p class="text-muted-foreground mt-8 border-t pt-4 text-base">
 			Πηγή: <a class="underline" href={sourceUrl} target="_blank" rel="noopener noreferrer"
 				>Εθνική Ακαδημία Ψηφιακών Ικανοτήτων (nadia.gov.gr)</a
 			>

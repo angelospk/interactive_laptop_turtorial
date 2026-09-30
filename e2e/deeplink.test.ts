@@ -37,6 +37,17 @@ test.describe('A — lesson deep-linking', () => {
 		// A lesson card links into a deep URL.
 		await expect(page.locator('a[href^="/modules/module1/"]').first()).toBeVisible();
 	});
+
+	test('module grid names the module it belongs to', async ({ page }) => {
+		await page.goto('/login');
+		await login(page, `dl_${Date.now()}`);
+		await expect(page).toHaveURL('/');
+		await page.goto('/modules/module1');
+		// Arriving from a shared link or the back button, the learner must see
+		// which module this is, not just a lesson count.
+		await expect(page.getByRole('heading', { level: 1, name: 'Ποντίκι & Κλικ' })).toBeVisible();
+		await expect(page).toHaveTitle(/Ποντίκι & Κλικ/);
+	});
 });
 
 test.describe('B — redirect after login', () => {

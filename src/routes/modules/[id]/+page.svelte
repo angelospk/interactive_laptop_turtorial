@@ -10,6 +10,14 @@
 
 	let { data } = $props();
 
+	const messages = m as unknown as Record<string, (() => string) | undefined>;
+	let moduleTitle = $derived(
+		(data.moduleTitleKey && messages[data.moduleTitleKey]?.()) || $page.params.id!
+	);
+	let moduleDescription = $derived(
+		data.moduleDescriptionKey ? messages[data.moduleDescriptionKey]?.() : undefined
+	);
+
 	let moduleLessons = $derived(data.moduleLessons || []);
 	let progress = $derived((data.progress || {}) as Record<string, any>);
 
@@ -32,6 +40,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{moduleTitle} — {m.app_title()}</title>
+</svelte:head>
+
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
 		<div
@@ -47,13 +59,15 @@
 				{m.back_to_modules ? m.back_to_modules() : 'Πίσω στις Ενότητες'}
 			</Button>
 
-			<div class="mt-6 flex items-baseline gap-3">
-				{#if moduleLessons.length > 0}
-					<span class="text-sm font-medium text-muted-foreground tabular-nums">
-						{moduleLessons.length} μαθήματα
-					</span>
-				{/if}
-			</div>
+			<h1 class="mt-6 text-3xl font-extrabold text-foreground sm:text-4xl">{moduleTitle}</h1>
+			{#if moduleDescription}
+				<p class="mt-2 text-lg text-muted-foreground">{moduleDescription}</p>
+			{/if}
+			{#if moduleLessons.length > 0}
+				<p class="mt-2 text-base font-medium text-muted-foreground tabular-nums">
+					{moduleLessons.length} μαθήματα
+				</p>
+			{/if}
 		</div>
 
 		{#if notice === 'locked' || notice === 'missing'}

@@ -19,6 +19,7 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import TabletSmartphone from '@lucide/svelte/icons/tablet-smartphone';
 	import {
+		isModuleForDevice,
 		groupModulesByCategory,
 		getModuleCompletion,
 		type ModuleDevice
@@ -80,7 +81,9 @@
 		<h1 class="text-3xl font-extrabold text-foreground sm:text-4xl">Για τον βοηθό μου</h1>
 		<p class="mt-3 text-lg text-muted-foreground">
 			{#if learnerName}
-				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα {learnerName ? `στον/στην ${learnerName}` : ''}.
+				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα {learnerName
+					? `στον/στην ${learnerName}`
+					: ''}.
 			{:else}
 				Αυτή η σελίδα είναι για όποιον κάθεται δίπλα στον μαθητή.
 			{/if}
@@ -98,7 +101,7 @@
 				<p class="mt-1 text-base text-muted-foreground">
 					{#if activity.isReview}
 						Τα έχει τελειώσει όλα. Αυτό αξίζει να το ξανακάνετε μαζί.
-					{:else if preferredDevice}
+					{:else if preferredDevice && isModuleForDevice(activity.moduleId, preferredDevice)}
 						Στο {DEVICE_META[preferredDevice].label} · περίπου 5 λεπτά
 					{:else}
 						Περίπου 5 λεπτά
@@ -160,9 +163,7 @@
 					<div class="space-y-3">
 						{#each group.modules as module (module.id)}
 							{@const completion = getCompletion(module.id)}
-							<div
-								class="break-inside-avoid rounded-2xl border border-border p-4 sm:p-5"
-							>
+							<div class="break-inside-avoid rounded-2xl border border-border p-4 sm:p-5">
 								<div class="flex flex-wrap items-baseline justify-between gap-2">
 									<h3 class="text-lg font-semibold text-foreground">
 										{messages[module.titleKey] ? messages[module.titleKey]() : module.id}

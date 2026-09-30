@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import {
@@ -78,12 +79,17 @@
 		answer = null;
 	}
 
+	let resultTimer: ReturnType<typeof setTimeout> | undefined;
+	// Leaving before the result is reported must not report it into whatever
+	// the learner opened next.
+	onDestroy(() => clearTimeout(resultTimer));
+
 	function finish() {
 		if (completed) return;
 		completed = true;
 		finished = true;
 		const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-		setTimeout(() => onComplete(score), 1400);
+		resultTimer = setTimeout(() => onComplete(score), 1400);
 	}
 </script>
 
@@ -126,7 +132,7 @@
 							<div class="min-w-0 flex-1">
 								<p class="font-semibold text-slate-900">{card.from}</p>
 								{#if card.fromAddress}
-									<p class="truncate text-sm text-slate-500">
+									<p class="sender-detail text-base break-all text-slate-600">
 										<span class="sr-only">Διεύθυνση αποστολέα: </span>{card.fromAddress}
 									</p>
 								{/if}
@@ -180,9 +186,9 @@
 							</div>
 							<div class="min-w-0 flex-1">
 								<p class="text-xs text-slate-300">Εισερχόμενη κλήση</p>
-								<p class="truncate font-semibold">{card.from}</p>
+								<p class="sender-detail font-semibold break-words">{card.from}</p>
 								{#if card.fromAddress}
-									<p class="truncate text-sm text-slate-400">{card.fromAddress}</p>
+									<p class="sender-detail text-base break-all text-slate-300">{card.fromAddress}</p>
 								{/if}
 							</div>
 						</div>
@@ -285,9 +291,13 @@
 		</CardContent>
 
 		<CardFooter class="flex justify-between rounded-b-lg border-t bg-slate-50 p-6">
-			<Button variant="ghost" onclick={onBack}>Πίσω</Button>
+			{#if finished}
+				<Button size="lg" class="h-12 text-lg" onclick={onBack}>Επιστροφή στις ασκήσεις</Button>
+			{:else}
+				<Button variant="ghost" class="h-12 text-base" onclick={onBack}>Πίσω</Button>
+			{/if}
 			{#if !finished && card && answer !== null}
-				<Button size="lg" onclick={next}>
+				<Button size="lg" class="h-12 text-lg" onclick={next}>
 					{isLast ? 'Ολοκλήρωση' : 'Επόμενο'}
 				</Button>
 			{/if}
