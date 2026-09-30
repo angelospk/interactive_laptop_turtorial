@@ -30,19 +30,23 @@
 </script>
 
 {#if isOpen}
-	<!-- click-outside backdrop; the close button is the keyboard path -->
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- click-outside backdrop; the named close button is the keyboard path -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div
 		class="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm"
 		onclick={handleBackdropClick}
-		role="button"
-		tabindex="-1"
 	>
 		<div class="relative w-full max-w-4xl rounded-xl bg-slate-800/90 p-8 shadow-2xl backdrop-blur [font-family:Segoe_UI,system-ui,sans-serif]">
 			<!-- Header -->
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold text-white">Προβολή Εργασιών</h2>
-				<Button variant="ghost" size="icon" class="text-white hover:bg-slate-700" onclick={onClose}>
+				<Button
+					variant="ghost"
+					size="icon"
+					class="text-white hover:bg-slate-700"
+					aria-label="Κλείσιμο"
+					onclick={onClose}
+				>
 					<X class="h-5 w-5" />
 				</Button>
 			</div>

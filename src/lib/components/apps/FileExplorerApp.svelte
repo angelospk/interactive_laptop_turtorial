@@ -352,12 +352,19 @@
 				{#each currentItems as item (item.id)}
 					<ContextMenu.Root>
 						<ContextMenu.Trigger>
-							<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
-							<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 							<div
 								class="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-transparent p-3 transition-colors hover:bg-slate-100"
 								class:bg-blue-100={selectedItemId === item.id}
 								class:border-blue-300={selectedItemId === item.id}
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => {
+									if (e.key !== 'Enter' && e.key !== ' ') return;
+									e.preventDefault();
+									selectedItemId = item.id;
+									onAction('select-file', { id: item.id });
+									if (e.key === 'Enter' && item.type === 'folder') navigate(item.id);
+								}}
 								onclick={(e) => {
 									e.stopPropagation();
 									selectedItemId = item.id;
