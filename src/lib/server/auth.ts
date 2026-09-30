@@ -1,4 +1,4 @@
-import { db, users, type User, type NewUser } from '$lib/db/client';
+import { db, users, type User } from '$lib/db/client';
 import { eq } from 'drizzle-orm';
 import type { PreferredDevice } from '$lib/db/schema';
 import type { UserSession } from '$lib/types';

@@ -12,7 +12,6 @@
 		Clock,
 		History,
 		Lock,
-		Unlock,
 		ShieldAlert,
 		ZoomIn,
 		ZoomOut,
@@ -36,8 +35,12 @@
 		device = null,
 		active = true
 	} = $props<{
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: {
+			initialTabs?: string[];
+			goal?: string;
+			targetFilename?: string;
+		};
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 		/** Keyboard the learner chose; decides whether ⌘ or Ctrl is the shortcut key. */
 		device?: LearnerDevice;
 		/** False while the window is minimised, so a keypress cannot finish a hidden lesson. */
@@ -474,8 +477,7 @@
 
 	// Helper to get localized string safely
 	function t(key: string) {
-		// @ts-ignore
-		return m[key]?.() || key;
+		return (m as unknown as Record<string, (() => string) | undefined>)[key]?.() || key;
 	}
 </script>
 
@@ -666,7 +668,7 @@
 					<div
 						class="absolute top-full right-0 z-40 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
 					>
-						{#each ['Νέα καρτέλα', 'Ιστορικό', 'Λήψεις', 'Αγαπημένα', 'Ρυθμίσεις'] as item}
+						{#each ['Νέα καρτέλα', 'Ιστορικό', 'Λήψεις', 'Αγαπημένα', 'Ρυθμίσεις'] as item (item)}
 							<button
 								class="block w-full cursor-default px-4 py-1.5 text-left text-sm text-slate-400"
 								disabled
@@ -1136,7 +1138,7 @@
 			<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
 				<h2 class="mb-6 text-2xl font-bold">Ιστορικό</h2>
 				<div class="space-y-0 overflow-hidden rounded-lg border">
-					{#each history as item}
+					{#each history as item, i (i)}
 						<div
 							class="flex cursor-pointer items-center justify-between border-b p-4 last:border-0 hover:bg-slate-50"
 							onclick={() => navigate(item.url)}
@@ -1179,7 +1181,7 @@
 					<p class="text-sm text-slate-300">Ρωτήστε οτιδήποτε</p>
 				</header>
 				<div class="flex-1 space-y-4 overflow-y-auto p-4">
-					{#each aiChatMessages as msg}
+					{#each aiChatMessages as msg, i (i)}
 						<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
 							<div
 								class="max-w-xs rounded-2xl px-4 py-2 text-sm {msg.role === 'user'
@@ -1212,7 +1214,7 @@
 			<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
 				<h2 class="mb-6 text-2xl font-bold text-slate-900">Ρυθμίσεις</h2>
 				<div class="space-y-2">
-					{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i}
+					{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i (section)}
 						<button
 							class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i ===
 							1

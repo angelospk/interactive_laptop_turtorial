@@ -2,7 +2,7 @@
 	import { toast } from 'svelte-sonner';
 	import type { Lesson } from '$lib/db/schema';
 
-	let { lesson, onComplete } = $props<{
+	let { onComplete } = $props<{
 		lesson: Lesson;
 		onComplete: (score: number) => void;
 	}>();

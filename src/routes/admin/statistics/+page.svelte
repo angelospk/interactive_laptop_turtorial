@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
 	// Calculate module completion rates
 	const moduleCompletionRates = $derived(
-		data.moduleStats.map((mod: any) => ({
+		data.moduleStats.map((mod) => ({
 			...mod,
 			completionRate:
 				mod.totalLessons > 0
@@ -17,10 +16,10 @@
 
 	// Get top performing lesson and lowest performing lesson
 	const sortedLessons = $derived(
-		[...data.lessonStats].sort((a: any, b: any) => b.totalCompletions - a.totalCompletions)
+		[...data.lessonStats].sort((a, b) => b.totalCompletions - a.totalCompletions)
 	);
 	const mostCompletedLesson = $derived(sortedLessons[0]);
-	const leastCompletedLesson = $derived(sortedLessons.filter((l: any) => l.enabled).reverse()[0]);
+	const leastCompletedLesson = $derived(sortedLessons.filter((l) => l.enabled).reverse()[0]);
 
 	// Calculate average user progress
 	const avgLessonsPerUser = $derived(
@@ -76,7 +75,7 @@
 	<div class="mb-8">
 		<h2 class="mb-4 text-2xl font-bold">Στατιστικά ανά Ενότητα</h2>
 		<div class="grid gap-4">
-			{#each moduleCompletionRates as module}
+			{#each moduleCompletionRates as module (module.moduleId)}
 				<Card>
 					<CardHeader>
 						<CardTitle class="capitalize">{module.moduleId}</CardTitle>
@@ -154,7 +153,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.lessonStats as lesson}
+					{#each data.lessonStats as lesson (lesson.lessonId)}
 						<tr class="border-t hover:bg-slate-50">
 							<td class="px-4 py-3 text-sm capitalize">{lesson.moduleId}</td>
 							<td class="px-4 py-3 text-sm">{lesson.titleKey}</td>
@@ -195,7 +194,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data.userEngagementStats as user}
+					{#each data.userEngagementStats as user (user.userId)}
 						{@const progressPercent =
 							data.totalLessons > 0
 								? ((user.completedLessons / data.totalLessons) * 100).toFixed(1)

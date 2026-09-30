@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import MarkdownView from '$lib/components/content/MarkdownView.svelte';
 	import ContentToc from '$lib/components/content/ContentToc.svelte';
 	import LessonNavBar from '$lib/components/content/LessonNavBar.svelte';
@@ -20,7 +21,7 @@
 	<div class="min-w-0 flex-1 lg:max-w-3xl">
 		<!-- breadcrumb -->
 		<nav class="text-muted-foreground mb-4 text-sm">
-			<a class="hover:text-foreground hover:underline" href="/library">Βιβλιοθήκη</a>
+			<a class="hover:text-foreground hover:underline" href={resolve('/library')}>Βιβλιοθήκη</a>
 			<span class="mx-1">›</span>
 			<span>{data.courseTitle}</span>
 			<span class="mx-1">›</span>
@@ -34,11 +35,11 @@
 			<div class="mt-8 border-t pt-4">
 				<h3 class="mb-3 font-semibold">Δοκιμάστε το στην πράξη</h3>
 				<ul class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-					{#each data.sub.lessonLinks as link}
+					{#each data.sub.lessonLinks as link, li (li)}
 						<li>
 							<a
 								class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-lg px-4 py-3 text-base font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-								href="/modules/{link.module}/{link.lesson}"
+								href={resolve('/modules/[id]/[lesson]', { id: link.module, lesson: link.lesson })}
 							>
 								<span aria-hidden="true">▶</span>
 								{link.label ?? 'Άσκηση'}
@@ -53,11 +54,11 @@
 			<div class="mt-6 {data.sub.lessonLinks?.length ? '' : 'border-t pt-4'}">
 				<h3 class="mb-2 font-semibold">Σχετικές ασκήσεις</h3>
 				<ul class="flex flex-wrap gap-2">
-					{#each data.sub.modules as mod}
+					{#each data.sub.modules as mod, mi (mi)}
 						<li>
 							<a
 								class="bg-secondary hover:bg-secondary/80 focus-visible:ring-ring inline-block rounded-lg px-4 py-2 text-base focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-								href="/modules/{mod}">{mod}</a
+								href={resolve('/modules/[id]', { id: mod })}>{mod}</a
 							>
 						</li>
 					{/each}

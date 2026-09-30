@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { X } from 'lucide-svelte';
+	import type { Icon as LucideIcon } from 'lucide-svelte';
 
 	let {
 		isOpen = false,
@@ -11,7 +12,7 @@
 	} = $props<{
 		isOpen: boolean;
 		openApps: { id: string; appId: string; minimized: boolean; maximized: boolean }[];
-		availableApps: { id: string; name: string; icon: any }[];
+		availableApps: { id: string; name: string; icon: typeof LucideIcon }[];
 		onClose: () => void;
 		onAppClick: (instanceId: string) => void;
 	}>();
@@ -53,7 +54,7 @@
 				<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
 					{#each openApps as app (app.id)}
 						{@const appDef = availableApps.find(
-							(a: { id: string; name: string; icon: any }) => a.id === app.appId
+							(a: { id: string; name: string; icon: typeof LucideIcon }) => a.id === app.appId
 						)}
 						{#if appDef}
 							<button

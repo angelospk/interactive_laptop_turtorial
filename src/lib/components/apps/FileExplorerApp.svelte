@@ -24,12 +24,11 @@
 
 	let {
 		initialFiles = [],
-		config = {},
 		onAction
 	} = $props<{
-		initialFiles?: any[];
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		initialFiles?: FileSystemItem[];
+		config?: Record<string, unknown>;
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	type ItemType = 'folder' | 'image' | 'text';
@@ -305,7 +304,7 @@
 		</Button>
 		<div class="flex h-8 flex-1 items-center gap-0.5 rounded-md border bg-white px-2 text-sm">
 			<Home class="mr-1 h-4 w-4 shrink-0 text-slate-500" />
-			{#each currentPath as part, i}
+			{#each currentPath as part, i (i)}
 				{#if i > 0}
 					<ChevronRight class="h-3.5 w-3.5 shrink-0 text-slate-400" />
 				{/if}

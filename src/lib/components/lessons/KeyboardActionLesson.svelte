@@ -46,6 +46,7 @@
 					if (!completedKeys.has(s)) {
 						completedKeys.add(s);
 						// Force update set
+						// eslint-disable-next-line svelte/prefer-svelte-reactivity -- reactivity comes from reassigning the whole Set, not from mutating it
 						completedKeys = new Set(completedKeys);
 						toast.success(`Shortcut ${s} detected!`);
 						checkCompletion();
@@ -95,7 +96,7 @@
 
 	<div class="flex flex-wrap justify-center gap-4">
 		{#if config.shortcuts}
-			{#each config.shortcuts as s}
+			{#each config.shortcuts as s, i (i)}
 				<div
 					class="rounded border-2 p-4 transition-colors duration-300"
 					class:bg-green-100={completedKeys.has(s)}
@@ -110,7 +111,7 @@
 				</div>
 			{/each}
 		{:else if config.keys}
-			{#each config.keys as k}
+			{#each config.keys as k, i (i)}
 				<div
 					class="min-w-[60px] rounded border-2 p-4 text-center transition-colors duration-300"
 					class:bg-green-100={completedKeys.has(k)}

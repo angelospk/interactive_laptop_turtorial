@@ -30,9 +30,7 @@ class AppState {
 	}
 
 	setProgress(lessonId: string, progress: UserLessonProgress) {
-		const newMap = new Map(this.progressMap);
-		newMap.set(lessonId, progress);
-		this.progressMap = newMap;
+		this.progressMap = new Map([...this.progressMap, [lessonId, progress]]);
 	}
 
 	clearProgress() {

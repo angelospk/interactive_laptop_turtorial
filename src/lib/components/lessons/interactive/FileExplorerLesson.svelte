@@ -26,7 +26,14 @@
 		onBack: () => void;
 	}>();
 
-	const config = lesson.config as any;
+	const config = lesson.config as {
+		action?: string;
+		targetName?: string;
+		targetFile?: string;
+		oldName?: string;
+		newName?: string;
+		targetFolder?: string;
+	} | null;
 	const action = config?.action || 'navigate';
 
 	type ItemType = 'folder' | 'image' | 'text';
@@ -258,7 +265,7 @@
 					</Button>
 					<div class="flex flex-1 items-center gap-1 rounded border bg-white px-2 py-1 text-sm">
 						<Home class="h-4 w-4 text-slate-500" />
-						{#each currentPath as part, i}
+						{#each currentPath as part, i (i)}
 							{#if i > 0}
 								<span class="text-slate-400">/</span>
 							{/if}

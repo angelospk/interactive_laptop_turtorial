@@ -2,7 +2,6 @@
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import { Input } from '$lib/components/ui/input';
-	import { Button } from '$lib/components/ui/button';
 	import { CheckCircle, XCircle } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
@@ -71,7 +70,6 @@
 	let inputValue = $state('');
 	let isCorrect = $derived(inputValue === challenge.target);
 	let startTime = $state<number | null>(null);
-	let completed = $state(false);
 
 	// Initialize with correction text if needed
 	$effect(() => {

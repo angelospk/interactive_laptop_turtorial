@@ -109,7 +109,7 @@
 						<h3 class="text-2xl font-bold text-slate-700">Start Scrolling!</h3>
 					</div>
 
-					{#each Array(10) as _, i}
+					{#each { length: 10 }, i (i)}
 						<div
 							class="mx-auto max-w-2xl rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
 						>

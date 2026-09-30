@@ -2,13 +2,7 @@
 	import { toast } from 'svelte-sonner';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
-	import {
-		Card,
-		CardContent,
-		CardHeader,
-		CardTitle,
-		CardDescription
-	} from '$lib/components/ui/card';
+	import { Card, CardContent, CardHeader, CardDescription } from '$lib/components/ui/card';
 	import { Slider } from '$lib/components/ui/slider';
 	import {
 		Minus,
@@ -29,7 +23,7 @@
 		onBack: () => void;
 	}>();
 
-	const config = lesson.config as any;
+	const config = lesson.config as { action?: string } | null;
 	const action = config?.action || 'open';
 
 	// Window state

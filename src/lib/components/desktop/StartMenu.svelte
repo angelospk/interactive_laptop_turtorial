@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Search, Power, Settings, User } from 'lucide-svelte';
-	import { cn } from '$lib/utils';
+	import { Search, Power, User } from 'lucide-svelte';
+	import type { Icon as LucideIcon } from 'lucide-svelte';
 
 	let {
 		isOpen,
@@ -10,7 +10,7 @@
 		onClose
 	} = $props<{
 		isOpen: boolean;
-		apps: { id: string; name: string; icon: any }[];
+		apps: { id: string; name: string; icon: typeof LucideIcon }[];
 		onAppClick: (appId: string) => void;
 		onClose: () => void;
 	}>();
@@ -21,7 +21,7 @@
 	const filteredApps = $derived(
 		searchQuery.trim() === ''
 			? apps
-			: apps.filter((app: { id: string; name: string; icon: any }) =>
+			: apps.filter((app: { id: string; name: string; icon: typeof LucideIcon }) =>
 					app.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
 				)
 	);

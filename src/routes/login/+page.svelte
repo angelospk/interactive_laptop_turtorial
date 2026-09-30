@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -43,6 +44,7 @@
 
 			// Send the user back where they were heading (validated), else home.
 			const target = safeRedirect($page.url.searchParams.get('redirectTo')) ?? '/';
+			// eslint-disable-next-line svelte/no-navigation-without-resolve -- target is validated by safeRedirect (same-origin path from ?redirectTo), not a route id
 			goto(target, { replaceState: true });
 		} catch (error) {
 			toast.error(error instanceof Error ? error.message : m.login_error_failed());
@@ -120,7 +122,7 @@
 				<!-- Library bridge -->
 				<div class="mt-7 border-t border-border/60 pt-6">
 					<a
-						href="/library"
+						href={resolve('/library')}
 						class="group flex items-center justify-between gap-3 rounded-2xl bg-secondary/60 px-5 py-4 text-base font-medium text-foreground transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-secondary focus-visible:ring-4 focus-visible:ring-brand/15 focus-visible:outline-none"
 					>
 						<span class="flex items-center gap-3">

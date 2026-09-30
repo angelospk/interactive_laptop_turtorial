@@ -96,7 +96,6 @@
 	let targetX = $state(50);
 	let targetY = $state(50);
 	let isHovering = $state(false);
-	let currentTargetIndex = $state(0);
 
 	// Generate random position for target
 	function generateRandomPosition() {
@@ -115,7 +114,6 @@
 
 		isHovering = true;
 		successfulHovers++;
-		currentTargetIndex++;
 
 		// Accuracy only, on the same 0-100 scale the learner sees.
 		score = Math.min(100, Math.round(score + 100 / targetCount));
@@ -208,7 +206,6 @@
 				</div>
 
 				{#if theme === 'shape-path'}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="game-area"
 						bind:this={playArea}

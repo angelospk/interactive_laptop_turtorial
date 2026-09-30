@@ -17,11 +17,11 @@
 		onAction
 	} = $props<{
 		initialText?: string;
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: { initialText?: string };
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
-	let content = $state(initialText || (config.initialText as string) || '');
+	let content = $state(initialText || config.initialText || '');
 
 	const escapeHtml = (s: string) =>
 		s.replace(
@@ -51,7 +51,7 @@
 		return text.trim() ? text.trim().split(/\s+/).length : 0;
 	}
 
-	let wordCount = $state(countWords(initialText || (config.initialText as string) || ''));
+	let wordCount = $state(countWords(initialText || config.initialText || ''));
 
 	const fontSizes = ['10', '11', '12', '14', '16', '18', '20', '24', '28', '32', '36'];
 
@@ -288,6 +288,7 @@
 			aria-label="Επεξεργαστής κειμένου"
 		>
 			{#if content}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -- renderParagraphs escapes all user text via escapeHtml first -->
 				{@html renderParagraphs(content)}
 			{/if}
 		</div>

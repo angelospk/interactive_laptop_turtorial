@@ -12,7 +12,13 @@
 		onBack: () => void;
 	}>();
 
-	const config = lesson.config as any;
+	const config = lesson.config as {
+		goal?: string;
+		action?: string;
+		initialTabs?: string[];
+		targetSite?: string;
+		targetUrl?: string;
+	} | null;
 	const action = config?.goal || config?.action || 'new-tab';
 
 	type Tab = {

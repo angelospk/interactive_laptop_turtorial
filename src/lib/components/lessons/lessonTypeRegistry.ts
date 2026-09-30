@@ -8,7 +8,13 @@ import type { Lesson } from '$lib/db/schema';
  */
 export const lessonTypeRegistry: Record<
 	string,
-	(lesson: Lesson) => Promise<{ default: Component<any> }>
+	(lesson: Lesson) => Promise<{
+		default: Component<{
+			lesson: Lesson;
+			onComplete: (score: number) => void;
+			onBack: () => void;
+		}>;
+	}>
 > = {
 	hover: () => import('./interactive/HoverLesson.svelte'),
 	click: () => import('./interactive/ClickLesson.svelte'),

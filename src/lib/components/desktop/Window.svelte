@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Minus, Square, X, GripHorizontal } from 'lucide-svelte';
+	import { Minus, Square, X } from 'lucide-svelte';
+	import type { Icon as LucideIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 	import { cn } from '$lib/utils';
 
@@ -22,7 +23,7 @@
 		class: className
 	} = $props<{
 		title: string;
-		icon: any;
+		icon: typeof LucideIcon | undefined;
 		isOpen: boolean;
 		isMinimized: boolean;
 		isMaximized: boolean;

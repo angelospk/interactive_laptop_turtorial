@@ -29,6 +29,9 @@
 	let helpOpen = $state(false);
 	let saving = $state<ChoosableDevice | null>(null);
 	let error = $state<string | null>(null);
+	// Deliberately $state + $effect (not $derived): detection must wait until after
+	// hydration so the client's first render matches the server's ('unknown').
+	// eslint-disable-next-line svelte/prefer-writable-derived -- avoid SSR/hydration mismatch
 	let guess = $state<Device>('unknown');
 
 	$effect(() => {

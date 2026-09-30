@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 	import ContentToc from './ContentToc.svelte';
 	import type { TocEntry } from './renderMarkdown';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -53,7 +54,7 @@
 			<div class="flex flex-1 justify-start">
 				{#if prev}
 					<a
-						href="/library/{courseId}/{prev.id}"
+						href={resolve('/library/[course]/[sub]', { course: courseId, sub: prev.id })}
 						title={prev.title}
 						class="hover:bg-muted text-muted-foreground hover:text-foreground flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5"
 					>
@@ -98,7 +99,7 @@
 			<div class="flex flex-1 justify-end">
 				{#if next}
 					<a
-						href="/library/{courseId}/{next.id}"
+						href={resolve('/library/[course]/[sub]', { course: courseId, sub: next.id })}
 						title={next.title}
 						class="hover:bg-muted text-muted-foreground hover:text-foreground flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5"
 					>

@@ -6,8 +6,6 @@ import Database from 'better-sqlite3';
 import { createClient } from '@libsql/client';
 import * as schema from './schema';
 
-// Check if we're in production (Vercel)
-const isProduction = process.env.NODE_ENV === 'production';
 
 // Create database connection based on environment
 const env = {

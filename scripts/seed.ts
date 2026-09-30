@@ -1,6 +1,5 @@
 import { db, lessons } from '../src/lib/db/client';
 import { allLessons } from '../src/lib/db/seeds';
-import { sql } from 'drizzle-orm';
 
 async function seed() {
     console.log('🌱 Seeding database...');

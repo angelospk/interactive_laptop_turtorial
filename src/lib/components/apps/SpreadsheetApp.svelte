@@ -18,8 +18,8 @@
 		onAction
 	} = $props<{
 		initialData?: Record<string, string>;
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: { targetFormula?: string };
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	type CellStyle = {
@@ -156,7 +156,7 @@
 		}
 	}
 
-	function toggleStyle(prop: keyof CellStyle, value?: any) {
+	function toggleStyle(prop: keyof CellStyle, value?: CellStyle[keyof CellStyle]) {
 		if (!selectedCell) return;
 		const current = cellStyles[selectedCell] || {
 			bold: false,
@@ -261,7 +261,7 @@
 			<thead>
 				<tr>
 					<th class="w-10 border bg-slate-100"></th>
-					{#each colLabels as label}
+					{#each colLabels as label (label)}
 						<th
 							class="relative border bg-slate-100 px-2 py-1 font-normal text-slate-600 overflow-hidden"
 							style="width: {colWidths[label]}px;"
@@ -277,11 +277,11 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each Array(rows) as _, r}
+				{#each { length: rows }, r (r)}
 					{@const rowNum = r + 1}
 					<tr>
 						<td class="border bg-slate-100 text-center text-xs text-slate-500 w-10">{rowNum}</td>
-						{#each colLabels as col}
+						{#each colLabels as col (col)}
 							{@const cellId = `${col}${rowNum}`}
 							{@const style = cellStyles[cellId]}
 							{@const isSelected = selectedCell === cellId}

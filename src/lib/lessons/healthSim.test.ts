@@ -69,7 +69,8 @@ describe('parseHealthSimConfig', () => {
 	});
 
 	it('requires a code on the sms screen', () => {
-		const { code, ...noCode } = sms;
+		const noCode: Record<string, unknown> = { ...sms };
+		delete noCode.code;
 		expect(() => parseHealthSimConfig(noCode)).toThrow(/code/);
 	});
 

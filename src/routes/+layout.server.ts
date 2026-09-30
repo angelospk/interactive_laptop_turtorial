@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import { db, userProgress } from '$lib/db/client';
+import { db, userProgress, type UserProgress } from '$lib/db/client';
 import { eq } from 'drizzle-orm';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
@@ -19,7 +19,13 @@ export const load: LayoutServerLoad = async ({ locals }) => {
             .where(eq(userProgress.userId, locals.user.id));
 
         // Convert to map
-        const progressMap: Record<string, any> = {};
+        const progressMap: Record<
+            string,
+            Pick<
+                UserProgress,
+                'completed' | 'score' | 'stars' | 'attempts' | 'completedAt' | 'lastAttemptAt'
+            >
+        > = {};
         for (const item of progressData) {
             progressMap[item.lessonId] = {
                 completed: item.completed,

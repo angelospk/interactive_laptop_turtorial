@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Slider } from '$lib/components/ui/slider';
 	import { Wifi, Volume2, Sun, Battery, Bluetooth, Plane, Settings } from 'lucide-svelte';
 	import { osState } from '$lib/osState.svelte';
 	import { slide } from 'svelte/transition';
 
 	let {
         isOpen,
-        onClose,
         onOpenSettings
     } = $props<{
 		isOpen: boolean;

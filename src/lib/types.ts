@@ -1,3 +1,5 @@
+import type { Component } from 'svelte';
+
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
 // Lesson definition (in-code, registered in registry)
@@ -7,7 +9,7 @@ export type LessonDefinition = {
     key: string; // Unique key for this lesson
     titleKey: string; // i18n key
     descriptionKey?: string; // i18n key
-    component: any; // Svelte component
+    component: Component; // Svelte component
     difficulty: DifficultyLevel;
     order: number;
     prerequisites?: string[]; // Lesson IDs that must be completed first

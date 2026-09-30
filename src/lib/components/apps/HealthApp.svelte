@@ -226,7 +226,7 @@
 					Οι συνταγές μου
 				</h3>
 				<ul class="grid gap-3">
-					{#each config.prescriptions ?? [] as p}
+					{#each config.prescriptions ?? [] as p, i (i)}
 						<li class="rounded-xl border border-slate-200 bg-white p-4">
 							<p class="font-semibold text-slate-900">{p.title}</p>
 							<p class="text-sm text-slate-500">{p.detail}</p>
@@ -247,7 +247,7 @@
 			{/if}
 			<p class="mb-2 font-medium text-slate-700">Διαλέξτε ώρα:</p>
 			<div class="grid gap-2" role="radiogroup" aria-label="Διαθέσιμες ώρες">
-				{#each config.slots ?? [] as slot}
+				{#each config.slots ?? [] as slot, i (i)}
 					<button
 						role="radio"
 						aria-checked={selectedSlot === slot.id}

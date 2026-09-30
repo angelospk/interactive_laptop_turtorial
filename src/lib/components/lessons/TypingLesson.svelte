@@ -25,9 +25,9 @@
 	};
 
 	const targetText = $derived(textMap[config.text] || config.text || 'hello');
-	// Reset the learner's input whenever the lesson config changes.
+	// Reset the learner's input whenever the lesson config or its text changes.
 	let userInput = $derived.by(() => {
-		void config;
+		void config.text;
 		return '';
 	});
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Wifi, Volume2, Battery, LayoutGrid } from 'lucide-svelte';
+	import type { Icon as LucideIcon } from 'lucide-svelte';
 	import QuickSettings from './QuickSettings.svelte';
 
 	let {
@@ -12,7 +13,7 @@
 		onQuickSettingsClick,
 		onTaskViewClick
 	} = $props<{
-		apps: { id: string; name: string; icon: any }[];
+		apps: { id: string; name: string; icon: typeof LucideIcon }[];
 		openAppIds: string[];
 		onAppClick: (appId: string) => void;
 		onStartClick: () => void;

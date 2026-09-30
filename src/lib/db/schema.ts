@@ -1,5 +1,11 @@
-import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
+import {
+    sqliteTable,
+    text,
+    integer,
+    unique,
+    index,
+    type AnySQLiteColumn
+} from 'drizzle-orm/sqlite-core';
 
 // Modules table - ordered list of learning modules
 export const modules = sqliteTable('modules', {
@@ -48,7 +54,7 @@ export const lessons = sqliteTable('lessons', {
     lessonType: text('lesson_type').notNull(), // 'hover', 'click', 'drag', 'legacy-module-3', etc.
     config: text('config', { mode: 'json' }), // JSON configuration for lesson-specific settings
     enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true), // Admin can disable lessons
-    requiredLessonId: text('required_lesson_id').references((): any => lessons.id, { onDelete: 'set null' }), // Prerequisite lesson
+    requiredLessonId: text('required_lesson_id').references((): AnySQLiteColumn => lessons.id, { onDelete: 'set null' }), // Prerequisite lesson
 
     createdAt: integer('created_at', { mode: 'timestamp' })
         .notNull()

@@ -5,7 +5,6 @@
 		Printer,
 		Volume2,
 		Monitor,
-		Battery,
 		Moon,
 		Globe,
 		AppWindow,
@@ -23,8 +22,14 @@
 	import { osState } from '$lib/osState.svelte';
 
 	let { config = {}, onAction } = $props<{
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: {
+			initialPage?: string;
+			targetSsid?: string;
+			requiredPassword?: string;
+			goal?: string;
+			targetAppId?: string;
+		};
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	/**
@@ -295,7 +300,7 @@
 
 					{#if osState.wifiEnabled}
 						<div class="mt-4 space-y-2 border-t pt-4">
-							{#each osState.availableNetworks as net}
+							{#each osState.availableNetworks as net, i (i)}
 								<div class="flex items-center justify-between rounded p-2 hover:bg-slate-50">
 									<span class="flex items-center gap-2">
 										<Wifi class="h-4 w-4 text-slate-400" />
@@ -437,7 +442,7 @@
 			<div class="space-y-6">
 				<h3 class="text-xl font-semibold">Προσβασιμότητα</h3>
 				<div class="space-y-4 rounded-lg border bg-white p-4">
-					{#each [['Μεγαλύτερο κείμενο', false], ['Υψηλή αντίθεση', false], ['Αναγνώστης οθόνης', false]] as [label]}
+					{#each [['Μεγαλύτερο κείμενο', false], ['Υψηλή αντίθεση', false], ['Αναγνώστης οθόνης', false]] as [label] (label)}
 						<div class="flex items-center justify-between py-1">
 							<span class="text-sm font-medium">{label}</span>
 							<Switch checked={false} onCheckedChange={() => {}} />

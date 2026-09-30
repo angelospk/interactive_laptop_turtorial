@@ -1,9 +1,11 @@
 import type { Lesson } from '$lib/db/schema';
 
+type ProgressMap = Record<string, { completed?: boolean } | undefined>;
+
 export function getModuleProgress(
     moduleId: string,
     moduleLessonIds: Record<string, string[]>,
-    userProgress: Record<string, any>
+    userProgress: ProgressMap
 ): number {
     const lessonIds = moduleLessonIds?.[moduleId] || [];
     if (lessonIds.length === 0) return 0;
@@ -15,12 +17,14 @@ export function getModuleProgress(
     return Math.round((completedCount / lessonIds.length) * 100);
 }
 
+// Positional signature kept for callers; every lesson is unlocked, so no argument is read.
 export function isLessonLocked(
     index: number,
     lesson: Lesson,
     lessons: Lesson[],
-    userProgress: Record<string, any>
-): boolean {
+    userProgress: Record<string, unknown>
+): boolean;
+export function isLessonLocked(): boolean {
     // All lessons are now unlocked - users can navigate freely
     return false;
 }

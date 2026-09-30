@@ -103,7 +103,7 @@
 	</div>
 
 	<div class="space-y-8">
-		{#each Object.entries(data.lessonsByModule) as [moduleId, lessons]}
+		{#each Object.entries(data.lessonsByModule) as [moduleId, lessons] (moduleId)}
 			<div class="rounded-lg border bg-card text-card-foreground shadow-sm">
 				<div class="flex items-center justify-between border-b p-6">
 					<h2 class="text-xl font-semibold capitalize">{moduleId}</h2>

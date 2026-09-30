@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
-	import { ContextMenu } from 'bits-ui';
 	import * as m from '$lib/paraglide/messages.js';
 	import { fly } from 'svelte/transition';
 	import { coerceVariant, RIGHT_CLICK_THEMES, type RightClickTheme } from '$lib/lessons/gameConfig';
@@ -24,7 +23,7 @@
 	const targetCount = config.targetCount || 6;
 	const theme = coerceVariant(config.theme, RIGHT_CLICK_THEMES, 'default');
 
-	const themes: Record<RightClickTheme, any> = {
+	const themes: Record<RightClickTheme, { icon: string; label: string; content: string }> = {
 		default: {
 			icon: '📦',
 			label: 'Κουτί',
@@ -146,7 +145,7 @@
 					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
 					oncontextmenu={(e) => e.preventDefault()}
 				>
-					{#each targets as target}
+					{#each targets as target (target.id)}
 						<div
 							class="absolute flex cursor-pointer flex-col items-center gap-2 transition-transform select-none hover:scale-110"
 							style="left: {target.x}%; top: {target.y}%;"

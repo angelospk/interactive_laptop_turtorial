@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { lessons, users, userProgress, DEVICE_VALUES, type NewLesson } from '../schema';
+import { lessons, users, DEVICE_VALUES, type NewLesson } from '../schema';
 import { allLessons, module1Lessons } from '../seeds';
 import { eq, and } from 'drizzle-orm';
 import { createTestDb, type TestDb } from './testDb';

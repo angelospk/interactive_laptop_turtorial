@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '../src/lib/db/schema.ts';
@@ -58,7 +57,6 @@ async function seed() {
     console.log(`\n📚 Total lessons to seed: ${allLessons.length}`);
 
     let inserted = 0;
-    let skipped = 0;
     let updated = 0;
 
     for (const lesson of allLessons) {

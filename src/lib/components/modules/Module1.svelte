@@ -135,7 +135,7 @@
 		<CardContent>
 			<p class="mb-4 text-sm text-slate-600">Κάνε κλικ για να εξαφανίσεις τα κουμπιά.</p>
 			<div class="flex h-48 items-center justify-center gap-2">
-				{#each clickTargets as target, i}
+				{#each clickTargets as target, i (i)}
 					{#if target}
 						<Button onclick={() => handleClickTarget(i)}>Πάτησέ με</Button>
 					{/if}

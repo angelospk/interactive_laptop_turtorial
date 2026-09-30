@@ -15,8 +15,16 @@
 	}>();
 
 	// Config: { questions: [{id: "q1", text: "...", options: [...]}, ...] }
-	const config = lesson.config as any;
-	const questions = config.questions || [config]; // Fallback for single question config
+	type QuizOption = { id: string; text: string; correct?: boolean };
+	type QuizQuestion = {
+		id?: string;
+		text?: string;
+		question?: string;
+		options: QuizOption[];
+		explanation?: string;
+	};
+	const config = lesson.config as Partial<QuizQuestion> & { questions?: QuizQuestion[] };
+	const questions = (config.questions || [config]) as QuizQuestion[]; // Fallback for single question config
 
 	let currentQuestionIndex = $state(0);
 	// '', not undefined: RadioGroup's value has a fallback and Svelte refuses to
@@ -30,14 +38,14 @@
 	let currentQuestion = $derived(questions[currentQuestionIndex]);
 
 	function t(key: string) {
-		// @ts-ignore
-		return m[key]?.() || key;
+		const messages = m as unknown as Record<string, (() => string) | undefined>;
+		return messages[key]?.() || key;
 	}
 
 	function handleSubmit() {
 		if (!selectedOption) return;
 
-		const option = currentQuestion.options.find((o: any) => o.id === selectedOption);
+		const option = currentQuestion.options.find((o) => o.id === selectedOption);
 		submitted = true;
 		isCorrect = !!option?.correct;
 
@@ -96,7 +104,7 @@
 		<CardContent class="space-y-8 p-8">
 			{#if !quizComplete}
 				<div class="text-xl font-medium text-slate-800">
-					{t(currentQuestion.text || currentQuestion.question)}
+					{t(currentQuestion.text || currentQuestion.question || '')}
 				</div>
 
 				<RadioGroup bind:value={selectedOption} class="space-y-4" disabled={submitted}>

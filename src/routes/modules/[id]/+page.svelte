@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import type { Lesson } from '$lib/db/schema';
+	import type { UserLessonProgress } from '$lib/types';
 	import { Button } from '$lib/components/ui/button';
 	import LessonCard from '$lib/components/ui/lesson/LessonCard.svelte';
 	import { ArrowLeft, Info } from '@lucide/svelte';
@@ -10,8 +12,16 @@
 
 	let { data } = $props();
 
+	const messages = m as unknown as Record<string, (() => string) | undefined>;
+	let moduleTitle = $derived(
+		(data.moduleTitleKey && messages[data.moduleTitleKey]?.()) || $page.params.id!
+	);
+	let moduleDescription = $derived(
+		data.moduleDescriptionKey ? messages[data.moduleDescriptionKey]?.() : undefined
+	);
+
 	let moduleLessons = $derived(data.moduleLessons || []);
-	let progress = $derived((data.progress || {}) as Record<string, any>);
+	let progress = $derived((data.progress || {}) as Record<string, UserLessonProgress | undefined>);
 
 	// For long modules, split the lessons into labelled sub-sections (null = plain grid).
 	let sections = $derived(buildLessonSections($page.params.id!, moduleLessons));
@@ -19,7 +29,7 @@
 	// Notice surfaced after a guarded redirect from a lesson URL (locked / missing).
 	let notice = $derived($page.url.searchParams.get('notice'));
 
-	function checkLocked(index: number, lesson: any) {
+	function checkLocked(index: number, lesson: Lesson) {
 		return isLessonLocked(index, lesson, moduleLessons, progress);
 	}
 
@@ -31,6 +41,10 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>{moduleTitle} — {m.app_title()}</title>
+</svelte:head>
 
 <main class="relative min-h-[100dvh] overflow-hidden bg-background">
 	<div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
@@ -47,13 +61,15 @@
 				{m.back_to_modules ? m.back_to_modules() : 'Πίσω στις Ενότητες'}
 			</Button>
 
-			<div class="mt-6 flex items-baseline gap-3">
-				{#if moduleLessons.length > 0}
-					<span class="text-sm font-medium text-muted-foreground tabular-nums">
-						{moduleLessons.length} μαθήματα
-					</span>
-				{/if}
-			</div>
+			<h1 class="mt-6 text-3xl font-extrabold text-foreground sm:text-4xl">{moduleTitle}</h1>
+			{#if moduleDescription}
+				<p class="mt-2 text-lg text-muted-foreground">{moduleDescription}</p>
+			{/if}
+			{#if moduleLessons.length > 0}
+				<p class="mt-2 text-base font-medium text-muted-foreground tabular-nums">
+					{moduleLessons.length} μαθήματα
+				</p>
+			{/if}
 		</div>
 
 		{#if notice === 'locked' || notice === 'missing'}
@@ -75,7 +91,7 @@
 			</div>
 		{/if}
 
-		{#snippet lessonItem(lesson: any, index: number)}
+		{#snippet lessonItem(lesson: Lesson, index: number)}
 			{@const locked = checkLocked(index, lesson)}
 			<div data-reveal use:reveal={{ delay: (index % 3) * 50 }}>
 				<LessonCard

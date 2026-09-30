@@ -2,13 +2,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Mail,
-		Star,
 		Send,
 		Inbox,
 		Trash2,
 		AlertTriangle,
 		Paperclip,
-		Archive,
 		Pencil,
 		Download,
 		FileText,
@@ -20,8 +18,8 @@
 	import { fly } from 'svelte/transition';
 
 	let { emails = [], onAction } = $props<{
-		emails?: any[];
-		onAction: (action: string, data?: any) => void;
+		emails?: Email[];
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	type Email = {

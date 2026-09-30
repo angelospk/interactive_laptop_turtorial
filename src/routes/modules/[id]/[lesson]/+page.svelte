@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, goto, replaceState } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import type { ComponentProps } from 'svelte';
 	import LessonRunner from '$lib/components/lessons/LessonRunner.svelte';
 	import { ArrowLeft } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
@@ -9,7 +11,7 @@
 	// SSR decides the initial lesson via `startIndex`; the client only mirrors
 	// advancement afterwards. No `$effect` racing against `$page.params` here.
 	let moduleLessons = $derived(data.moduleLessons || []);
-	let progress = $derived((data.progress || {}) as Record<string, any>);
+	let progress = $derived((data.progress || {}) as ComponentProps<typeof LessonRunner>['progress']);
 
 	// `replaceState` is shallow: it rewrites the address bar but leaves the route
 	// params, `page.url` and so `data.startIndex` at the last real navigation. The
@@ -23,14 +25,20 @@
 	});
 
 	function backToGrid() {
-		goto(`/modules/${data.moduleId}`);
+		goto(resolve('/modules/[id]', { id: data.moduleId }));
 	}
 
 	// Keep the URL in step with in-runner navigation so a refresh stays put.
 	// Shallow (replaceState) — the lesson list is already loaded, no reload needed.
 	function handleLessonChange(lessonKey: string) {
 		if (!lessonKey) return;
-		replaceState(`/modules/${data.moduleId}/${encodeURIComponent(lessonKey)}`, {});
+		replaceState(
+			resolve('/modules/[id]/[lesson]', {
+				id: data.moduleId,
+				lesson: encodeURIComponent(lessonKey)
+			}),
+			{}
+		);
 	}
 </script>
 
@@ -45,9 +53,9 @@
 		<!-- Breadcrumb doubles as the way back; a separate "back" button was a
 		     third row saying the same thing. -->
 		<nav aria-label={m.breadcrumb_aria()} class="flex min-w-0 items-center gap-1 text-base">
-			<a class="crumb-link" href="/">{m.nav_home()}</a>
+			<a class="crumb-link" href={resolve('/')}>{m.nav_home()}</a>
 			<span aria-hidden="true" class="text-muted-foreground">›</span>
-			<a class="crumb-link crumb-current" href={`/modules/${data.moduleId}`}>
+			<a class="crumb-link crumb-current" href={resolve('/modules/[id]', { id: data.moduleId })}>
 				<ArrowLeft class="h-5 w-5 shrink-0" aria-hidden="true" />
 				<span class="truncate">{m.breadcrumb_lessons()}</span>
 			</a>

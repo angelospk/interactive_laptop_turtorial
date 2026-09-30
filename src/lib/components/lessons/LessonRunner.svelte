@@ -1,12 +1,23 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import LessonRenderer from './LessonRenderer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { Maximize2, Minimize2 } from 'lucide-svelte';
+
+	// Shape of one lesson's progress: the stored row, or the optimistic update made here.
+	type LessonProgress = {
+		completed?: boolean;
+		score?: number | null;
+		stars?: number | null;
+		attempts?: number;
+		completedAt?: Date | string | null;
+		lastAttemptAt?: Date | string | null;
+	};
 
 	let {
 		lessons,
@@ -15,12 +26,10 @@
 		navigation = 0,
 		onExit,
 		onLessonChange,
-		moduleId = null,
-		nextModuleId = null,
-		isLastModule = false
+		nextModuleId = null
 	} = $props<{
 		lessons: Lesson[];
-		progress: Record<string, any>;
+		progress: Record<string, LessonProgress>;
 		startIndex?: number;
 		/** Counts real navigations; a change means "go to startIndex", even the same one. */
 		navigation?: number;
@@ -60,7 +69,7 @@
 	let currentLesson = $derived(lessons[currentLessonIndex]);
 
 	// Optimistic UI state
-	let localUpdates = $state<Record<string, any>>({});
+	let localUpdates = $state<Record<string, LessonProgress>>({});
 
 	// Merge prop progress with local updates
 	let mergedProgress = $derived({ ...progress, ...localUpdates });
@@ -74,7 +83,7 @@
 	// the learner saw ("δεν έβγαλε καν timer, απλά με μετακίνησε").
 	let countdownRemaining = $state<number | null>(null);
 	let countdownLessonId = $state<string | null>(null);
-	let countdownInterval: any = null;
+	let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 	$effect(() => {
 		return () => {
@@ -105,7 +114,7 @@
 			if (countdownRemaining !== null) {
 				countdownRemaining -= 1;
 				if (countdownRemaining <= 0) {
-					clearInterval(countdownInterval);
+					clearInterval(countdownInterval ?? undefined);
 					countdownInterval = null;
 					countdownRemaining = null;
 					countdownLessonId = null;
@@ -142,6 +151,7 @@
 	// not touch the screen — it would restore cleared progress or start a hidden
 	// countdown. Per lesson, because finishing another lesson is not a reason to
 	// drop this one's save.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- bookkeeping only, never read by the template or a $derived/$effect
 	const attempts = new Map<string, number>();
 	const nextAttempt = (lessonId: string) => {
 		const n = (attempts.get(lessonId) ?? 0) + 1;
@@ -152,6 +162,7 @@
 	// it, so saves and Retry's deletes reach the server in the order they were
 	// made. Otherwise a late save could undo a delete, or a late delete wipe a
 	// newer result.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- promise queue bookkeeping only, never read reactively
 	const serverQueues = new Map<string, Promise<unknown>>();
 	function inOrder<T>(lessonId: string, request: () => Promise<T> | T): Promise<T> {
 		const run = (serverQueues.get(lessonId) ?? Promise.resolve()).then(request);
@@ -225,7 +236,8 @@
 			await invalidateAll(); // Refresh data to get updated progress
 		} else {
 			// Revert optimistic update on failure
-			const { [lessonId]: _, ...rest } = localUpdates;
+			const rest = { ...localUpdates };
+			delete rest[lessonId];
 			localUpdates = rest;
 			if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
 			console.error('Failed to save progress');
@@ -278,7 +290,7 @@
 			currentLessonIndex++;
 			syncUrl();
 		} else if (nextModuleId) {
-			goto(`/modules/${nextModuleId}`);
+			goto(resolve('/modules/[id]', { id: nextModuleId }));
 		} else if (onExit) {
 			onExit();
 		}
@@ -302,8 +314,11 @@
 
 	// Helper to get message safely
 	function getMessage(key: string, params?: Record<string, string>) {
-		// @ts-ignore - Dynamic access to messages
-		return m[key]?.(params) || key;
+		const messages = m as unknown as Record<
+			string,
+			((params?: Record<string, string>) => string) | undefined
+		>;
+		return messages[key]?.(params) || key;
 	}
 
 	// Fullscreen state
@@ -311,7 +326,9 @@
 	let lessonContainer: HTMLElement;
 
 	// True when the current lesson recommends fullscreen
-	let fullscreenRecommended = $derived(!!(currentLesson?.config as any)?.fullscreen);
+	let fullscreenRecommended = $derived(
+		!!(currentLesson?.config as { fullscreen?: boolean } | null | undefined)?.fullscreen
+	);
 
 	// Which lesson the learner dismissed the prompt for. Storing the id instead
 	// of a boolean means the banner reappears on the next lesson without an
@@ -556,7 +573,7 @@
 									onclick={nextLesson}
 									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
-									{'Επόμενη Ενότητα'}
+									Επόμενη Ενότητα
 									<span class="text-2xl">→</span>
 								</Button>
 							{:else}

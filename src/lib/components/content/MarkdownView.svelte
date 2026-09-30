@@ -53,6 +53,7 @@
 	</article>
 	{#if sourceUrl}
 		<p class="text-muted-foreground mt-8 border-t pt-4 text-sm">
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external source URL, not an app route -->
 			Πηγή: <a class="underline" href={sourceUrl} target="_blank" rel="noopener noreferrer"
 				>Εθνική Ακαδημία Ψηφιακών Ικανοτήτων (nadia.gov.gr)</a
 			>

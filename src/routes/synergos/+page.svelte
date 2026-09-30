@@ -25,7 +25,10 @@
 	} from '$lib/config/moduleOrganization';
 	import { countProgress, pickTogetherActivity } from '$lib/together';
 
-	const messages = m as any;
+	const messages = m as unknown as Record<
+		string,
+		(params?: Record<string, unknown>) => string
+	>;
 
 	let { data } = $props();
 

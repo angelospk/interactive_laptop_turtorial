@@ -7,14 +7,12 @@
 		config = {},
 		onAction
 	} = $props<{
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: { appName?: string };
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	let step = $state(1);
-	let isInstalling = $state(false);
 	let progress = $state(0);
-	let isComplete = $state(false);
 	let eulaAccepted = $state(false);
 
 	const appName = config.appName || 'Super Browser';
@@ -31,14 +29,11 @@
 	}
 
 	function startInstall() {
-		isInstalling = true;
 		const interval = setInterval(() => {
 			progress += 5;
 			if (progress >= 100) {
 				clearInterval(interval);
-				isInstalling = false;
 				step = 4;
-				isComplete = true;
 				toast.success('Η εγκατάσταση ολοκληρώθηκε!');
 				onAction('install-complete', { appName });
 			}

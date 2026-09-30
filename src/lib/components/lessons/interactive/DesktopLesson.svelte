@@ -10,8 +10,7 @@
 	import { Card } from '$lib/components/ui/card';
 	import { Info } from 'lucide-svelte';
 
-	import { untrack } from 'svelte';
-	import * as m from '$lib/paraglide/messages.js';
+	import { untrack, type ComponentProps } from 'svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { page } from '$app/state';
 	import { fillShortcutText, type LearnerDevice } from '$lib/lessons/shortcuts';
@@ -38,9 +37,17 @@
 	}>();
 
 	// Parse config
-	const config = (lesson.config as any) || {};
+	type DesktopConfig = Record<string, unknown> & {
+		goal?: string;
+		instructions?: string;
+		initialApps?: (string | { appId: string; minimized?: boolean; maximized?: boolean })[];
+		initialPage?: string;
+		initialFiles?: ComponentProps<typeof FileExplorerApp>['initialFiles'];
+		initialData?: Record<string, string>;
+		emails?: ComponentProps<typeof EmailApp>['emails'];
+	};
+	const config = (lesson.config as DesktopConfig | null) || {};
 	const goal = config.goal || '';
-	const tutorialSteps = (config.tutorialSteps || []) as string[];
 
 	// Define available apps
 	const availableApps = [
@@ -80,12 +87,6 @@
 	let showTaskView = $state(false);
 	let completed = $state(false);
 
-	// Helper to get localized string safely
-	function t(key: string) {
-		// @ts-ignore
-		return m[key]?.() || key;
-	}
-
 	// Derived Taskbar Apps: Pinned + Open but Unpinned
 	let taskbarApps = $derived.by(() => {
 		const pinned = availableApps.filter((a) => pinnedAppIds.includes(a.id));
@@ -107,7 +108,7 @@
 	$effect(() => {
 		if (config.initialApps) {
 			untrack(() => {
-				config.initialApps.forEach(
+				config.initialApps?.forEach(
 					(appItem: string | { appId: string; minimized?: boolean; maximized?: boolean }) => {
 						if (typeof appItem === 'string') {
 							openApp(appItem);
@@ -201,7 +202,7 @@
 	}
 
 	// Goal Checking Logic
-	function checkGoal(action: string, data: any = {}) {
+	function checkGoal(action: string, data: Record<string, unknown> = {}) {
 		if (completed) return;
 
 		try {
@@ -223,7 +224,7 @@
 		}
 	}
 
-	function handleAppAction(action: string, data: any) {
+	function handleAppAction(action: string, data?: Record<string, unknown>) {
 		try {
 			checkGoal(action, data);
 		} catch (err) {

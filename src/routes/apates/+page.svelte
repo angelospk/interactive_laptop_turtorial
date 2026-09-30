@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import ScamSpotterLesson from '$lib/components/lessons/interactive/ScamSpotterLesson.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
@@ -106,7 +107,7 @@
 
 		<p class="text-muted-foreground mt-8 text-center text-sm">
 			Θέλετε περισσότερο υλικό; Δείτε τη
-			<a class="text-primary underline" href="/library">Βιβλιοθήκη Θεωρίας</a>.
+			<a class="text-primary underline" href={resolve('/library')}>Βιβλιοθήκη Θεωρίας</a>.
 		</p>
 	</div>
 {/if}

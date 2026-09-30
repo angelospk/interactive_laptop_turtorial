@@ -10,7 +10,6 @@ const OUT = join(ROOT, 'static', 'kapi');
 mkdirSync(OUT, { recursive: true });
 
 /* ---------------- helpers (παράγουν HTML) ---------------- */
-const esc = (s) => s; // περιεχόμενο γραμμένο ήδη ασφαλές/σκόπιμο
 const card = (icon, title, body, extra = '', style = '') =>
 	`<div class="card ${extra}" ${style ? `style="${style}"` : ''}><h2><span class="ic">${icon}</span> ${title}</h2>${body}</div>`;
 const tips = (items) =>

@@ -11,12 +11,16 @@
 		children: Snippet;
 	}
 
-	let { lesson, onBack, children }: Props = $props();
+	// eslint-disable-next-line svelte/no-unused-props -- onBack is still passed by every lesson; the breadcrumb replaced the back button
+	let { lesson, children }: Props = $props();
+
+	// Message functions are looked up by key computed at runtime
+	const messages = m as unknown as Record<string, (() => string) | undefined>;
 
 	// Get translated title and description
-	const title = $derived((m as any)[lesson.titleKey]?.() || lesson.titleKey);
+	const title = $derived(messages[lesson.titleKey]?.() || lesson.titleKey);
 	const description = $derived(
-		lesson.descriptionKey ? (m as any)[lesson.descriptionKey]?.() || lesson.descriptionKey : ''
+		lesson.descriptionKey ? messages[lesson.descriptionKey]?.() || lesson.descriptionKey : ''
 	);
 
 	// Difficulty badge colors
@@ -57,10 +61,10 @@
 
 		<div class="lesson-meta">
 			<span class="difficulty-badge" style="background-color: {difficultyColor}">
-				{(m as any)[`difficulty_${lesson.difficulty}`]?.() || lesson.difficulty}
+				{messages[`difficulty_${lesson.difficulty}`]?.() || lesson.difficulty}
 			</span>
 			<span class="lesson-type">
-				{(m as any)[`type_${lesson.lessonType.replace(/-/g, '_')}`]?.() || lesson.lessonType}
+				{messages[`type_${lesson.lessonType.replace(/-/g, '_')}`]?.() || lesson.lessonType}
 			</span>
 		</div>
 	</header>

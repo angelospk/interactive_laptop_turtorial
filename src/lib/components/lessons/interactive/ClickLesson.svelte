@@ -25,7 +25,16 @@
 	const theme = coerceVariant(config.theme, CLICK_THEMES, 'default');
 
 	// Theme assets/styles
-	const themes: Record<ClickTheme, any> = {
+	type ThemeStyle = {
+		targetClass?: string;
+		content?: string;
+		bgClass?: string;
+		targetStyle?: string;
+		size?: string;
+		type?: string;
+		isMixed?: boolean;
+	};
+	const themes: Record<ClickTheme, ThemeStyle> = {
 		default: {
 			targetClass: 'bg-red-500 border-4 border-white rounded-full shadow-lg',
 			content: 'CLICK',
@@ -169,8 +178,8 @@
 		targetY = Math.random() * 80 + 10;
 
 		if (theme === 'mixed') {
-			const types = ['click', 'double-click', 'right-click'];
-			mixedType = types[Math.floor(Math.random() * types.length)] as any;
+			const types: (typeof mixedType)[] = ['click', 'double-click', 'right-click'];
+			mixedType = types[Math.floor(Math.random() * types.length)];
 		}
 	}
 
@@ -240,7 +249,7 @@
 						class="target absolute flex items-center justify-center transition-all duration-100 active:scale-90 {currentTheme.targetClass}"
 						style="left: {targetX}%; top: {targetY}%; {currentTheme.targetStyle ||
 							''} width: {currentTheme.size || '80px'}; height: {currentTheme.size || '80px'};"
-						onclick={(e) => {
+						onclick={() => {
 							// In mixed mode, validate click type; in other modes, accept any click
 							if (theme !== 'mixed' || currentTheme.type === 'click') {
 								handleTargetClick();

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import LogoutButton from '$lib/components/LogoutButton.svelte';
@@ -21,8 +22,11 @@
 	import ResumeCard from '$lib/components/ResumeCard.svelte';
 	import { describeGap, pickResumePoint, type ResumeLesson } from '$lib/resume';
 
-	// Cast messages to any to avoid indexing errors until types are generated
-	const messages = m as any;
+	// Cast messages to an indexable map to avoid indexing errors until types are generated
+	const messages = m as unknown as Record<
+		string,
+		(params?: Record<string, unknown>) => string
+	>;
 
 	// Get progress from server
 	let { data } = $props();
@@ -77,7 +81,7 @@
 			<div class="flex flex-wrap items-center gap-2.5">
 				<Button
 					variant="outline"
-					href="/library"
+					href={resolve('/library')}
 					class="shadow-soft h-11 gap-2 rounded-full px-5 text-base"
 				>
 					<BookOpen class="h-5 w-5 text-brand" strokeWidth={1.75} />
@@ -140,7 +144,7 @@
 			{@const baseDone = completion.baseComplete && !completion.allComplete}
 			{@const deviceTags = getModuleDevices(module.id)}
 			<a
-				href={`/modules/${module.id}`}
+				href={resolve('/modules/[id]', { id: module.id })}
 				data-reveal
 				use:reveal={{ delay: 40 + (num % 4) * 50 }}
 				class="group bezel-shell shadow-soft hover:shadow-soft-lg block transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 focus-visible:ring-4 focus-visible:ring-brand/20 focus-visible:outline-none"

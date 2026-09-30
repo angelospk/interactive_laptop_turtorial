@@ -39,14 +39,6 @@
 		takeaway?: string;
 	}
 
-	// Per-channel label shown on the verdict buttons / call screen.
-	const channelLabel: Record<ScamCard['channel'], string> = {
-		email: 'Email',
-		sms: 'SMS',
-		viber: 'Viber',
-		phone: 'Τηλεφωνική κλήση'
-	};
-
 	const config = $derived(lesson.config as { instructions?: string; cards?: ScamCard[] });
 	const cards = $derived(Array.isArray(config?.cards) ? config.cards : []);
 	const total = $derived(cards.length);

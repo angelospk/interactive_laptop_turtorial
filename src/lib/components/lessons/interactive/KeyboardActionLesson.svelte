@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Lesson } from '$lib/db/schema';
 	import LessonTemplate from '../LessonTemplate.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
@@ -74,6 +73,7 @@
 		if (completed || !currentTarget) return;
 
 		// Normalize keys
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local scratch value inside a handler, never read reactively
 		const pressedKeys = new Set<string>();
 		if (e.ctrlKey) pressedKeys.add('Control');
 		if (e.altKey) pressedKeys.add('Alt');
@@ -147,9 +147,9 @@
 					<div class="key-display mb-2 animate-pulse text-5xl font-bold text-primary">
 						{currentTarget?.label}
 					</div>
-					{#if (currentTarget as any)?.description}
+					{#if currentTarget?.description}
 						<div class="mb-4 text-xl font-medium text-slate-600">
-							{(currentTarget as any).description}
+							{currentTarget.description}
 						</div>
 					{/if}
 
@@ -178,7 +178,7 @@
 		</div>
 
 		<div class="progress-steps grid grid-cols-1 gap-4 md:grid-cols-2">
-			{#each steps as step, i}
+			{#each steps as step, i (i)}
 				<div
 					class="step-item flex items-center justify-between rounded-lg border p-4 transition-all duration-300
 					{step.completed

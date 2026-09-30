@@ -253,7 +253,6 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 	if (c.goal === 'mobile-scan-qr') {
 		if (!c.qrUrl || !c.targetHost) throw new Error('mobile-scan-qr needs qrUrl and targetHost');
 		try {
-			// eslint-disable-next-line no-new
 			new URL(c.qrUrl);
 		} catch {
 			throw new Error(`mobile-scan-qr qrUrl is not a valid URL ("${c.qrUrl}")`);

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { load } from '../+page.server';
-import { db } from '$lib/db/client';
 
 // Mock DB
 vi.mock('$lib/db/client', () => ({
@@ -30,22 +29,23 @@ vi.mock('@sveltejs/kit', () => ({
 	}
 }));
 
+const event = (locals: Partial<App.Locals>) =>
+	({ locals }) as unknown as Parameters<typeof load>[0];
+
 describe('Admin Page Load', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	it('should redirect to the admin login if not admin', async () => {
-		const locals = { admin: false } as any;
-		await expect(load({ locals } as any)).rejects.toMatchObject({
+		await expect(load(event({ admin: false }))).rejects.toMatchObject({
 			status: 302,
 			location: '/admin/login'
 		});
 	});
 
 	it('should return grouped lessons if admin', async () => {
-		const locals = { admin: true } as any;
-		const result = (await load({ locals } as any)) as import('../$types').PageData;
+		const result = (await load(event({ admin: true }))) as import('../$types').PageData;
 
 		expect(result.totalLessons).toBe(3);
 		expect(result.enabledCount).toBe(2);

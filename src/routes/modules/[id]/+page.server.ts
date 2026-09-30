@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ parent, params }) => {
 
     // Find the next module using the modules table (ordered by orderIndex)
     const allModules = await db
-        .select({ id: modules.id })
+        .select({ id: modules.id, titleKey: modules.titleKey, descriptionKey: modules.descriptionKey })
         .from(modules)
         .where(eq(modules.enabled, true))
         .orderBy(asc(modules.orderIndex));
@@ -28,9 +28,13 @@ export const load: PageServerLoad = async ({ parent, params }) => {
             ? sortedModuleIds[currentIndex + 1]
             : null;
 
+    const currentModule = allModules[currentIndex];
+
     return {
         ...layoutData,
         moduleLessons,
+        moduleTitleKey: currentModule?.titleKey ?? null,
+        moduleDescriptionKey: currentModule?.descriptionKey ?? null,
         nextModuleId,
         isLastModule: currentIndex === sortedModuleIds.length - 1
     };

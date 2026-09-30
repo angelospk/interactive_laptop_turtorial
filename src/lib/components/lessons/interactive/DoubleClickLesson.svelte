@@ -27,7 +27,7 @@
 	const theme = coerceVariant(config.theme, DOUBLE_CLICK_THEMES, 'default');
 
 	// Theme assets
-	const themes: Record<DoubleClickTheme, any> = {
+	const themes: Record<DoubleClickTheme, { icon: string; label: string; bgClass: string }> = {
 		default: {
 			icon: '📂',
 			label: 'Φάκελος',
@@ -151,7 +151,7 @@
 				<div
 					class="game-area relative m-4 flex-1 overflow-hidden rounded-lg border-2 border-slate-200/50"
 				>
-					{#each targets as target}
+					{#each targets as target (target.id)}
 						<button
 							class="absolute flex flex-col items-center gap-2 transition-transform select-none hover:scale-110 focus:outline-none"
 							style="left: {target.x}%; top: {target.y}%;"

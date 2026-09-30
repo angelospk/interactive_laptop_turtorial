@@ -10,7 +10,6 @@ import { resolve } from 'node:path';
  */
 
 const APPS_DIR = resolve(__dirname);
-const DESKTOP_DIR = resolve(__dirname, '../desktop');
 
 const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 	'BrowserApp.svelte': {

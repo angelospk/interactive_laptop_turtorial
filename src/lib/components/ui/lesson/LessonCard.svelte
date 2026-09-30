@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { Lock, CheckCircle2, Star, ArrowRight } from '@lucide/svelte';
 	import type { Lesson } from '$lib/db/schema';
+	import type { UserLessonProgress } from '$lib/types';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { lesson, progress, isLocked, onclick, href } = $props<{
 		lesson: Lesson;
-		progress: any;
+		progress: UserLessonProgress | undefined;
 		isLocked: boolean;
 		onclick?: (e?: Event) => void;
 		/** When provided (and not locked) the card renders as a real link for deep-linking. */
@@ -14,8 +15,8 @@
 
 	// Helper to get message safely
 	function getMessage(key: string) {
-		// @ts-ignore - Dynamic access to messages
-		return m[key]?.() || key;
+		// Dynamic access to messages
+		return (m as unknown as Record<string, (() => string) | undefined>)[key]?.() || key;
 	}
 
 	// Shared visual style for both the link and the disabled-button variants.
@@ -79,6 +80,7 @@
 {/snippet}
 
 {#if href && !isLocked}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href is supplied already resolved by the caller (generic pass-through) -->
 	<a {href} class={wrapperClass} onclick={(e) => onclick?.(e)} data-sveltekit-preload-data="hover">
 		{@render cardBody()}
 	</a>

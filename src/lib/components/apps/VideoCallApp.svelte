@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { Phone, PhoneOff, Mic, MicOff, Video, User } from 'lucide-svelte';
-	import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
 
 	let { config = {}, onAction } = $props<{
-		config?: any;
-		onAction: (action: string, data?: any) => void;
+		config?: { targetContact?: string };
+		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
 
 	type CallState = 'idle' | 'calling' | 'active';

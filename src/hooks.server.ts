@@ -69,7 +69,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 // Paraglide handle - Force Greek locale
 const handleParaglide: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, ({ request, locale }) => {
+	paraglideMiddleware(event.request, ({ request }) => {
 		event.request = request;
 
 		// Force Greek locale regardless of browser settings
