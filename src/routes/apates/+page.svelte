@@ -1,4 +1,6 @@
 <script lang="ts">
+	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
+	import { tick } from 'svelte';
 	import ScamSpotterLesson from '$lib/components/lessons/interactive/ScamSpotterLesson.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
@@ -23,8 +25,15 @@
 		lastScore = score;
 	}
 
-	function handleBack() {
+	// Back on the list, the keyboard lands on the exercise they came from rather
+	// than at the top of a page that was rebuilt under them.
+	// Pre-filled with null: `bind:ref` refuses an undefined slot.
+	let startButtons = $state<(HTMLElement | null)[]>(data.exercises.map(() => null));
+	async function handleBack() {
+		const from = selected;
 		selected = null;
+		await tick();
+		if (from !== null) startButtons[from]?.focus();
 	}
 
 	const channelIcons = { email: Mail, sms: MessageSquare, viber: MessageCircle, phone: Phone };
@@ -64,6 +73,7 @@
 	{/key}
 {:else}
 	<div class="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+		<div class="mb-4 flex justify-end"><TextSizeToggle /></div>
 		<div class="mb-6 flex items-center gap-3">
 			<ShieldAlert class="h-9 w-9 text-indigo-700" />
 			<h1 class="text-3xl font-bold">Απάτη ή Όχι;</h1>
@@ -99,7 +109,9 @@
 						<p class="mb-4 text-sm text-muted-foreground">
 							{ex.config?.cards?.length ?? 0} μηνύματα για εξάσκηση.
 						</p>
-						<Button class="h-12 w-full text-lg" onclick={() => start(i)}>Ξεκινήστε</Button>
+						<Button bind:ref={startButtons[i]} class="h-12 w-full text-lg" onclick={() => start(i)}
+							>Ξεκινήστε</Button
+						>
 					</CardContent>
 				</Card>
 			{/each}
@@ -107,7 +119,7 @@
 
 		<p class="mt-8 text-center text-base text-muted-foreground">
 			Θέλετε περισσότερο υλικό; Δείτε τη
-			<a class="text-primary inline-block py-2 underline" href="/library">Βιβλιοθήκη Θεωρίας</a>.
+			<a class="inline-block py-2 text-primary underline" href="/library">Βιβλιοθήκη Θεωρίας</a>.
 		</p>
 	</div>
 {/if}

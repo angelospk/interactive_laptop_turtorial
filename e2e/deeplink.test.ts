@@ -16,6 +16,8 @@ test.describe('A — lesson deep-linking', () => {
 		await expect(page).toHaveURL('/modules/module1/hover-balloons');
 		// Breadcrumb anchors the user (accessibility for the target audience).
 		await expect(page.getByRole('navigation', { name: 'Διαδρομή' })).toBeVisible();
+		// The tab, the history list and the offline page all name the lesson.
+		await expect(page).toHaveTitle(/^Βασική Κίνηση Ποντικιού — /);
 	});
 
 	test('unknown lesson redirects to the grid with a notice', async ({ page }) => {
@@ -68,6 +70,7 @@ test.describe('D — library to lesson bridge', () => {
 		// Library is public — no login needed.
 		await page.goto('/library/esm005/esm005-c1-s2');
 		await expect(page.getByRole('heading', { name: 'Δοκιμάστε το στην πράξη' })).toBeVisible();
+		await expect(page).toHaveTitle(/ — Βιβλιοθήκη$/);
 		const link = page.locator('a[href="/modules/module10/scam-spotter-email"]');
 		await expect(link).toBeVisible();
 	});

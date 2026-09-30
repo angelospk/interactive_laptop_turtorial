@@ -79,3 +79,27 @@ test('a login mistake stays on screen next to the name field', async ({ page }) 
 	await page.getByRole('button', { name: loginButton }).click();
 	await expect(page).toHaveURL('/');
 });
+
+test('controls say what they do, in words the learner reads', async ({ page }) => {
+	await page.goto('/login', { waitUntil: 'networkidle' });
+	// "EL/EN" meant nothing; the language names do, and the current one is marked.
+	const greek = page.getByRole('button', { name: 'Ελληνικά' });
+	await expect(greek).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute(
+		'aria-pressed',
+		'false'
+	);
+	expect((await greek.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+	await page.fill('#username', `words_${Date.now()}`);
+	await page.getByRole('button', { name: loginButton }).click();
+	await expect(page).toHaveURL('/');
+	const picker = page.getByRole('dialog').filter({ hasText: 'Τι θέλεις να μάθεις' });
+	await picker.getByRole('button', { name: /Υπολογιστής Windows/ }).click();
+	await page.getByRole('button', { name: 'Αλλαγή συσκευής' }).click();
+	// A screen reader announced the dialog's close button as "Close".
+	const close = page.getByRole('dialog').getByRole('button', { name: 'Κλείσιμο' });
+	await expect(close).toBeVisible();
+	// Measured once the dialog's zoom-in has settled.
+	await expect.poll(async () => (await close.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+});

@@ -15,21 +15,28 @@
 	}
 </script>
 
-<div class="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+<!-- Language names, not codes: "EL/EN" meant nothing to the people this is for. -->
+<div
+	class="flex items-center gap-1 rounded-lg bg-slate-100 p-1"
+	role="group"
+	aria-label="Γλώσσα / Language"
+>
 	<Button
 		variant={currentLocale === 'el' ? 'default' : 'ghost'}
-		size="sm"
 		onclick={() => switchTo('el')}
-		class="px-3 py-1 text-sm font-medium"
+		aria-pressed={currentLocale === 'el'}
+		lang="el"
+		class="min-h-11 px-3 text-base font-medium"
 	>
-		EL
+		Ελληνικά
 	</Button>
 	<Button
 		variant={currentLocale === 'en' ? 'default' : 'ghost'}
-		size="sm"
 		onclick={() => switchTo('en')}
-		class="px-3 py-1 text-sm font-medium"
+		aria-pressed={currentLocale === 'en'}
+		lang="en"
+		class="min-h-11 px-3 text-base font-medium"
 	>
-		EN
+		English
 	</Button>
 </div>

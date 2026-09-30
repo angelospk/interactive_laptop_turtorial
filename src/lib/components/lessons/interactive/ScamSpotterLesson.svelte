@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import {
@@ -67,6 +67,7 @@
 		if (answer !== null || !card) return; // already answered
 		answer = verdict;
 		if (verdict === card.isScam) correctCount++;
+		focusAfterUpdate(() => feedbackEl);
 	}
 
 	function next() {
@@ -77,7 +78,16 @@
 		}
 		index++;
 		answer = null;
+		focusAfterUpdate(() => titleEl);
 	}
+
+	// The screen changes under the learner three times per message. Focus goes
+	// where the new content starts, so the keyboard and a screen reader follow.
+	let titleEl = $state<HTMLElement | null>(null);
+	let feedbackEl = $state<HTMLElement | null>(null);
+	let doneEl = $state<HTMLElement | null>(null);
+	const focusAfterUpdate = (el: () => HTMLElement | null) => tick().then(() => el()?.focus());
+	onMount(() => focusAfterUpdate(() => titleEl));
 
 	let resultTimer: ReturnType<typeof setTimeout> | undefined;
 	// Leaving before the result is reported must not report it into whatever
@@ -89,6 +99,7 @@
 		completed = true;
 		finished = true;
 		const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+		focusAfterUpdate(() => doneEl);
 		resultTimer = setTimeout(() => onComplete(score), 1400);
 	}
 </script>
@@ -96,7 +107,11 @@
 <div class="flex min-h-[600px] w-full items-center justify-center bg-slate-100 p-4">
 	<Card class="w-full max-w-2xl shadow-lg">
 		<CardHeader class="rounded-t-lg bg-indigo-700 text-white">
-			<CardTitle class="flex items-center gap-2 text-2xl">
+			<CardTitle
+				bind:ref={titleEl}
+				tabindex={-1}
+				class="flex items-center gap-2 text-2xl focus-visible:outline-none"
+			>
 				<ShieldAlert class="h-6 w-6" />
 				Απάτη ή Όχι;
 				{#if total > 1}
@@ -111,7 +126,13 @@
 			{:else if finished}
 				<div class="py-8 text-center">
 					<CheckCircle2 class="mx-auto mb-4 h-14 w-14 text-green-600" />
-					<h2 class="mb-2 text-2xl font-bold text-slate-800">Ολοκληρώθηκε!</h2>
+					<h2
+						bind:this={doneEl}
+						tabindex="-1"
+						class="mb-2 text-2xl font-bold text-slate-800 focus-visible:outline-none"
+					>
+						Ολοκληρώθηκε!
+					</h2>
 					<p class="text-xl text-slate-700">Σωστές απαντήσεις: {correctCount} / {total}</p>
 				</div>
 			{:else if card}
@@ -249,9 +270,13 @@
 					</div>
 				{:else}
 					<!-- Feedback / reveal -->
-					<div aria-live="polite" class="space-y-4">
+					<!-- Focused on answer, which reads it out; a live region inserted at the
+					     same moment is announced unreliably, and twice when it is. -->
+					<div class="space-y-4">
 						<div
-							class="flex items-center gap-2 rounded-lg p-3 font-bold {wasCorrect
+							bind:this={feedbackEl}
+							tabindex="-1"
+							class="flex items-center gap-2 rounded-lg p-3 font-bold focus-visible:outline-none {wasCorrect
 								? 'bg-green-100 text-green-800'
 								: 'bg-red-100 text-red-800'}"
 						>

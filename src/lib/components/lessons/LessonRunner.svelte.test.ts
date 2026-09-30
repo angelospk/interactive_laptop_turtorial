@@ -518,16 +518,17 @@ describe('a save that outlives its lesson', () => {
 		expect(events).toEqual(['saved', 'deleted', 'deleted', 'saved']);
 	});
 
-	// Replaying straight after Retry, with the delete still on its way: the stale
-	// "completed" from the server made the new result look like a repeat, so the
-	// countdown to the next lesson never started.
-	test('a replay straight after Retry counts as a first completion', async () => {
+	// Replaying straight after Retry, with the delete still on its way: the new
+	// result shows, and its save reaches the server after the reset, not before.
+	test('a replay straight after Retry shows its result and is saved after the reset', async () => {
 		let releaseDelete!: (value: unknown) => void;
 		const deleting = new Promise((resolve) => (releaseDelete = resolve));
+		const order: string[] = [];
 		vi.stubGlobal(
 			'fetch',
 			vi.fn(async (url: string) => {
 				if (url.includes('delete')) await deleting;
+				order.push(url.includes('delete') ? 'deleted' : 'saved');
 				return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
 			})
 		);
@@ -549,8 +550,9 @@ describe('a save that outlives its lesson', () => {
 		await play();
 		releaseDelete({});
 
-		await new Promise((resolve) => setTimeout(resolve, 6500));
-		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+		await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+		await vi.waitFor(() => expect(order).toEqual(['saved', 'deleted', 'saved']));
+		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
 	});
 
 	// Away and back before the save returns: the lesson is on screen again, but the
@@ -680,4 +682,57 @@ describe('the result after a lesson', () => {
 		await expect.element(screen.getByRole('alert')).not.toBeInTheDocument();
 		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
+});
+
+// No time pressure: a first success used to start "Επόμενο σε 5 δευτερόλεπτα"
+// and carry a slow reader off before they had finished reading the result.
+test('a success waits for the learner: no countdown, no automatic move', async () => {
+	vi.stubGlobal(
+		'fetch',
+		vi.fn(async () => ({
+			ok: true,
+			json: async () => ({ progress: { completed: true, score: 100 } })
+		}))
+	);
+	const lessons = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{ ...mockLessons[1], id: 'lesson-2b', titleKey: 'Μάθημα 2' }
+	];
+	const screen = render(
+		LessonRunner as never,
+		{ lessons, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+	);
+	await screen.getByRole('button', { name: 'CLICK' }).click();
+	await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+	await expect.element(screen.getByText(/Επόμενο σε/)).not.toBeInTheDocument();
+
+	await new Promise((resolve) => setTimeout(resolve, 6500));
+	await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
+	await expect.element(screen.getByRole('dialog', { name: /ολοκληρώθηκε/ })).toBeInTheDocument();
+	vi.unstubAllGlobals();
+});
+
+// Fullscreen used to hide Previous/Next, leaving a beginner inside a lesson with
+// no familiar way on. And arriving already in fullscreen was not noticed at all.
+test('in fullscreen the lesson can still be moved through', async () => {
+	Object.defineProperty(document, 'fullscreenElement', {
+		configurable: true,
+		get: () => document.body
+	});
+	try {
+		const screen = mount();
+		await expect
+			.element(screen.getByRole('button', { name: /Έξοδος πλήρους οθόνης/ }))
+			.toBeInTheDocument();
+		await expect.element(screen.getByRole('button', { name: /Επόμενο/ })).toBeVisible();
+		await screen.getByRole('button', { name: /Επόμενο/ }).click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+	} finally {
+		delete (document as unknown as Record<string, unknown>).fullscreenElement;
+	}
 });

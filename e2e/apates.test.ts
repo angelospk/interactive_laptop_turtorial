@@ -36,3 +36,32 @@ test('the result stays until the learner leaves it, and sender details are whole
 	await page.getByRole('button', { name: 'Επιστροφή στις ασκήσεις' }).click();
 	await expect(page.getByRole('status')).toContainText(/σκορ/);
 });
+
+// Keyboard and screen-reader users must not be dropped at the top of the page
+// every time the screen changes under them.
+test('focus follows the learner through the drill and back', async ({ page }) => {
+	await page.goto('/apates', { waitUntil: 'networkidle' });
+	const focusedText = () =>
+		page.evaluate(() => {
+			const el = document.activeElement;
+			return el && el !== document.body ? (el.textContent ?? '').trim() : '';
+		});
+
+	await page.getByRole('button', { name: 'Ξεκινήστε' }).nth(1).focus();
+	await page.keyboard.press('Enter');
+	await expect.poll(focusedText).toMatch(/Απάτη ή Όχι/);
+
+	await page.getByRole('button', { name: /Απάτη$/ }).focus();
+	await page.keyboard.press('Enter');
+	await expect.poll(focusedText).toMatch(/Σωστά|Λάθος/);
+
+	const next = page.getByRole('button', { name: /^(Επόμενο|Ολοκλήρωση)$/ });
+	await next.focus();
+	await page.keyboard.press('Enter');
+	await expect.poll(focusedText).toMatch(/Απάτη ή Όχι|Ολοκληρώθηκε/);
+
+	await page.getByRole('button', { name: /^Πίσω$|Επιστροφή στις ασκήσεις/ }).focus();
+	await page.keyboard.press('Enter');
+	// Back on the list, on the exercise they came from.
+	await expect(page.getByRole('button', { name: 'Ξεκινήστε' }).nth(1)).toBeFocused();
+});

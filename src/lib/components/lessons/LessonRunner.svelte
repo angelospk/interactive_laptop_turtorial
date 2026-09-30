@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick, untrack } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
@@ -49,9 +49,8 @@
 		if (incoming === syncedStartIndex && nav === syncedNavigation) return;
 		syncedStartIndex = incoming;
 		syncedNavigation = nav;
-		// Arriving is not finishing: no result overlay or countdown comes along.
+		// Arriving is not finishing: no result overlay comes along.
 		untrack(() => {
-			cancelAutoAdvance();
 			justCompletedLessonId = null;
 		});
 		currentLessonIndex = incoming;
@@ -68,64 +67,6 @@
 	// Determine if current lesson is locked
 	// All lessons are now unlocked - users can navigate freely
 	let isLocked = $derived(false);
-
-	// Setup countdown state. The countdown belongs to the lesson that armed it:
-	// a timer left over from lesson 3 must never advance lesson 1, which is what
-	// the learner saw ("δεν έβγαλε καν timer, απλά με μετακίνησε").
-	let countdownRemaining = $state<number | null>(null);
-	let countdownLessonId = $state<string | null>(null);
-	let countdownInterval: any = null;
-
-	$effect(() => {
-		return () => {
-			if (countdownInterval !== null) clearInterval(countdownInterval);
-		};
-	});
-
-	// Any lesson change — click, countdown, or a load re-run — disarms a timer
-	// that was counting for a different lesson.
-	$effect(() => {
-		const id = currentLesson?.id ?? null;
-		if (countdownLessonId !== null && countdownLessonId !== id) cancelAutoAdvance();
-	});
-
-	function startAutoAdvance() {
-		const armedFor = currentLesson?.id ?? null;
-		if (armedFor === null) return;
-
-		countdownLessonId = armedFor;
-		countdownRemaining = 5; // 5 seconds
-		if (countdownInterval !== null) clearInterval(countdownInterval);
-
-		countdownInterval = setInterval(() => {
-			if (currentLesson?.id !== armedFor) {
-				cancelAutoAdvance();
-				return;
-			}
-			if (countdownRemaining !== null) {
-				countdownRemaining -= 1;
-				if (countdownRemaining <= 0) {
-					clearInterval(countdownInterval);
-					countdownInterval = null;
-					countdownRemaining = null;
-					countdownLessonId = null;
-					// Advance after the pending DOM update, not after a guessed 10ms.
-					tick().then(() => {
-						if (currentLesson?.id === armedFor) nextLesson();
-					});
-				}
-			}
-		}, 1000);
-	}
-
-	function cancelAutoAdvance() {
-		if (countdownInterval !== null) {
-			clearInterval(countdownInterval);
-			countdownInterval = null;
-		}
-		countdownRemaining = null;
-		countdownLessonId = null;
-	}
 
 	// The result overlay belongs to a completion that just happened here. Keying
 	// it off stored progress meant walking into an already-finished lesson opened
@@ -186,8 +127,6 @@
 		const mine = nextAttempt(lessonId);
 		if (unsavedResult?.lessonId === lessonId) unsavedResult = null;
 
-		const isFirstCompletion = !mergedProgress[lessonId]?.completed;
-		const isSuccess = score >= 50;
 		justCompletedLessonId = lessonId;
 
 		// Optimistically update UI immediately
@@ -228,18 +167,12 @@
 			}
 
 			// The request outlives the lesson: a learner who pressed Επόμενο while it
-			// was in flight must not come back to an overlay, or a countdown, armed
+			// was in flight must not come back to an overlay armed
 			// for a lesson they already left. The stored progress above still stands.
 			if (lessonId !== currentLesson?.id) {
 				if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
 				await invalidateAll();
 				return;
-			}
-
-			// Only with the result still on screen: a learner who left and came back
-			// meanwhile no longer sees it, and would be carried off by a hidden countdown.
-			if (isFirstCompletion && isSuccess && justCompletedLessonId === lessonId) {
-				startAutoAdvance();
 			}
 
 			await invalidateAll(); // Refresh data to get updated progress
@@ -259,7 +192,6 @@
 	async function handleRetry() {
 		retryEpoch++;
 		unsavedResult = null;
-		cancelAutoAdvance();
 		justCompletedLessonId = null;
 		const lessonId = currentLesson.id;
 		nextAttempt(lessonId);
@@ -293,7 +225,6 @@
 	}
 
 	function nextLesson() {
-		cancelAutoAdvance();
 		justCompletedLessonId = null;
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
@@ -306,7 +237,6 @@
 	}
 
 	function prevLesson() {
-		cancelAutoAdvance();
 		justCompletedLessonId = null;
 		if (currentLessonIndex > 0) {
 			currentLessonIndex--;
@@ -315,7 +245,6 @@
 	}
 
 	function handleBack() {
-		cancelAutoAdvance();
 		if (onExit) {
 			onExit();
 		}
@@ -364,6 +293,8 @@
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
 	}
+	// Arriving already in fullscreen fires no change event.
+	onMount(handleFullscreenChange);
 
 	// Auto-scroll to lesson content when lesson changes
 	let lessonCard: HTMLElement;
@@ -414,8 +345,8 @@
 	<div id="fullscreen-portal-target" class="fullscreen-portal-container"></div>
 
 	<!--
-		In fullscreen only the "leave fullscreen" control stays: hiding the whole row
-		left the learner inside a full-screen lesson with no visible way out.
+		The whole row stays in fullscreen: hiding it left the learner with no visible
+		way out, and hiding Previous/Next left them with no familiar way on.
 	-->
 	<nav
 		class="lesson-nav"
@@ -426,12 +357,12 @@
 			variant="outline"
 			onclick={prevLesson}
 			disabled={currentLessonIndex === 0}
-			class="min-h-12 px-5 text-base {isFullscreen ? 'invisible' : ''}"
+			class="min-h-12 px-5 text-base"
 		>
 			{getMessage('nav_previous')}
 		</Button>
 		<div class="flex items-center gap-2">
-			<span class="text-base font-semibold text-slate-600" class:invisible={isFullscreen}>
+			<span class="text-base font-semibold text-slate-600" class:fullscreen-counter={isFullscreen}>
 				{getMessage('lesson_x_of_y', {
 					current: String(currentLessonIndex + 1),
 					total: String(lessons.length)
@@ -454,7 +385,7 @@
 		<Button
 			onclick={nextLesson}
 			disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}
-			class="min-h-12 px-5 text-base {isFullscreen ? 'invisible' : ''}"
+			class="min-h-12 px-5 text-base"
 		>
 			{currentLessonIndex === lessons.length - 1
 				? nextModuleId
@@ -574,21 +505,6 @@
 								{getMessage('score')}: {mergedProgress[currentLesson.id].score}%
 							</p>
 						{/if}
-
-						{#if isSuccess && countdownRemaining !== null}
-							<div class="mt-4 flex flex-col items-center gap-2 text-lg font-medium text-green-800">
-								<span class="animate-pulse">
-									{getMessage('auto_advancing_in', { seconds: String(countdownRemaining) }) ||
-										`Επόμενο σε ${countdownRemaining} δευτερόλεπτα...`}
-								</span>
-								<button
-									class="min-h-11 min-w-11 cursor-pointer rounded-lg px-4 underline hover:text-green-900 focus-visible:ring-4 focus-visible:ring-green-300 focus-visible:outline-none"
-									onclick={cancelAutoAdvance}
-								>
-									{getMessage('cancel') || 'Ακύρωση'}
-								</button>
-							</div>
-						{/if}
 					</div>
 
 					<div class="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
@@ -674,6 +590,13 @@
 	.lesson-nav :global(button:focus-visible) {
 		outline: 3px solid #b45309 !important;
 		outline-offset: 3px;
+	}
+
+	/* On the fullscreen gradient the plain counter was unreadable. */
+	.fullscreen-counter {
+		border-radius: 9999px;
+		background: rgb(255 255 255 / 0.92);
+		padding: 0.25rem 0.75rem;
 	}
 
 	.lesson-notices {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	// «Για τον βοηθό μου» — the page a relative opens, once, on a phone, standing
 	// next to the learner.
 	//
@@ -71,11 +72,12 @@
 
 <main class="min-h-[100dvh] bg-background">
 	<div class="mx-auto max-w-2xl px-4 py-6 sm:px-6 md:py-10">
-		<header class="mb-8 print:hidden">
+		<header class="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
 			<Button variant="outline" href="/" class="shadow-soft h-12 gap-2 rounded-full px-5 text-base">
 				<ArrowLeft class="h-5 w-5" strokeWidth={1.75} />
 				Πίσω στην αρχική
 			</Button>
+			<TextSizeToggle />
 		</header>
 
 		<h1 class="text-3xl font-extrabold text-foreground sm:text-4xl">Για τον βοηθό μου</h1>

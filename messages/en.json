@@ -187,7 +187,6 @@
 	"fullscreen_enter": "Enter fullscreen",
 	"fullscreen_exit": "Exit fullscreen",
 	"lesson_nav_aria": "Lesson navigation",
-	"auto_advancing_in": "Next in {seconds} seconds...",
 	"cancel": "Cancel",
 	"word_lesson1_title": "1. Open the Editor",
 	"word_lesson1_desc": "Learn how to open the word processing application",
@@ -609,5 +608,6 @@
 	"module10_lesson13_title": "Scam or Not? (Android & iPhone)",
 	"module10_lesson13_desc": "The same scam message as it looks on Android vs iPhone. Learn to spot it regardless of device.",
 	"mac_lesson9_title": "9. Make the mouse pointer bigger",
-	"mac_lesson9_desc": "Adjust the pointer (cursor) size so it is easier to see."
+	"mac_lesson9_desc": "Adjust the pointer (cursor) size so it is easier to see.",
+	"dialog_close": "Close"
 }

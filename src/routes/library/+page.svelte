@@ -1,9 +1,13 @@
 <script lang="ts">
+	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	let { data } = $props();
 </script>
 
 <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-	<h1 class="mb-6 text-3xl font-bold">Βιβλιοθήκη Θεωρίας</h1>
+	<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+		<h1 class="text-3xl font-bold">Βιβλιοθήκη Θεωρίας</h1>
+		<TextSizeToggle />
+	</div>
 	{#each data.manifest.courses as course}
 		<section class="mb-8">
 			<h2 class="mb-2 text-2xl font-semibold">{course.title}</h2>

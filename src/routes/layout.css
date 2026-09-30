@@ -262,3 +262,8 @@ body:has(:fullscreen) [data-slot="dialog-content"] {
 	font-style: italic;
 	color: var(--muted-foreground);
 }
+/* "Μεγαλύτερα γράμματα" (src/lib/textSize.ts): everything is in rem, so this
+   scales text, spacing and targets together. */
+html.text-large {
+  font-size: 125%;
+}

@@ -20,7 +20,20 @@
 	let navigation = $state(0);
 	afterNavigate(() => {
 		navigation++;
+		shownKey = null;
 	});
+
+	// The tab title names the lesson on screen (and is what the offline page
+	// lists it by). Moving inside the runner is shallow, so it is tracked here.
+	const messages = m as unknown as Record<string, (() => string) | undefined>;
+	let shownKey = $state<string | null>(null);
+	let shownLesson = $derived(
+		moduleLessons.find((l: { lessonKey: string }) => l.lessonKey === shownKey) ??
+			moduleLessons[startIndex]
+	);
+	let lessonTitle = $derived(
+		(shownLesson && messages[shownLesson.titleKey]?.()) || shownLesson?.lessonKey || ''
+	);
 
 	function backToGrid() {
 		goto(`/modules/${data.moduleId}`);
@@ -30,6 +43,7 @@
 	// Shallow (replaceState) — the lesson list is already loaded, no reload needed.
 	function handleLessonChange(lessonKey: string) {
 		if (!lessonKey) return;
+		shownKey = lessonKey;
 		replaceState(`/modules/${data.moduleId}/${encodeURIComponent(lessonKey)}`, {});
 	}
 </script>
@@ -40,6 +54,10 @@
 	laptop and the document itself scrolled, so the button that starts the lesson
 	sat below the fold and learners assumed the lesson was broken.
 -->
+<svelte:head>
+	<title>{lessonTitle} — {m.app_title()}</title>
+</svelte:head>
+
 <div class="lesson-page">
 	<div class="lesson-bar">
 		<!-- Breadcrumb doubles as the way back; a separate "back" button was a

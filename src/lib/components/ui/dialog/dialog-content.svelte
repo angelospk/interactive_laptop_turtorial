@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { Dialog as DialogPrimitive } from "bits-ui";
 	import XIcon from "@lucide/svelte/icons/x";
 	import type { Snippet } from "svelte";
@@ -33,10 +34,10 @@
 		{@render children?.()}
 		{#if showCloseButton}
 			<DialogPrimitive.Close
-				class="ring-offset-background focus:ring-ring rounded-xs focus:outline-hidden absolute end-4 top-4 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+				class="ring-offset-background focus:ring-ring rounded-xs focus:outline-hidden absolute end-2 top-2 inline-flex size-11 items-center justify-center rounded-lg opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-5 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 			>
 				<XIcon />
-				<span class="sr-only">Close</span>
+				<span class="sr-only">{m.dialog_close()}</span>
 			</DialogPrimitive.Close>
 		{/if}
 	</DialogPrimitive.Content>

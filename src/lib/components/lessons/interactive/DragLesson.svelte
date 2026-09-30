@@ -69,16 +69,20 @@
 		}
 	} satisfies Record<DragTheme, unknown>;
 
-	let currentTheme = $derived(themes[theme] || themes.shapes);
+	// The board and the theme that renders it change together, once per attempt:
+	// a config update mid-game must not draw recycle bins around shape pieces.
+	let boardTheme = $state<DragTheme>('shapes');
 	let pieces = $state<any[]>([]);
 	let zones = $state<any[]>([]);
 	let draggingItem: string | null = null;
 
 	function initGame() {
-		if (theme === 'recycle') {
+		boardTheme = theme;
+		const currentTheme = themes[boardTheme];
+		if (boardTheme === 'recycle') {
 			pieces = currentTheme.items.map((i: any) => ({ ...i, dropped: false }));
 			zones = currentTheme.dropZones;
-		} else if (theme === 'puzzle') {
+		} else if (boardTheme === 'puzzle') {
 			pieces = currentTheme.items.map((i: any) => ({ ...i, dropped: false }));
 			zones = currentTheme.dropZones;
 		} else {
@@ -178,14 +182,14 @@
                     {zone.color || 'border-slate-300'}"
 					class:rounded-md={zone.shapeClass === 'rounded-md'}
 					class:rounded-full={zone.shapeClass === 'rounded-full'}
-					class:bg-green-50={theme === 'recycle'}
+					class:bg-green-50={boardTheme === 'recycle'}
 					role="region"
 					aria-label="Drop zone for {zone.name}"
 				>
-					{#if theme === 'recycle'}
+					{#if boardTheme === 'recycle'}
 						<span class="mb-2 text-4xl">{zone.icon}</span>
 						<span class="font-bold text-slate-600">{zone.name}</span>
-					{:else if theme === 'puzzle'}
+					{:else if boardTheme === 'puzzle'}
 						<span class="text-2xl font-bold text-slate-300">{zone.name}</span>
 					{:else if zone.isTriangle}
 						<!-- Triangle Outline using SVG because CSS borders are hard for outlines -->

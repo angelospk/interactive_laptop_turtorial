@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	import { appState } from '$lib/appState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
@@ -111,6 +112,7 @@
 				{/if}
 			</div>
 			<div class="flex flex-wrap items-center gap-2.5">
+				<TextSizeToggle />
 				<LanguageToggle />
 				{#if data.user}
 					<LogoutButton />
