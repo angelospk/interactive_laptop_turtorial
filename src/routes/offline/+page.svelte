@@ -3,9 +3,9 @@
 	// navigation fails offline. The list below is read from that same cache in
 	// the browser, so the page itself still needs nothing from the server.
 	import { onMount } from 'svelte';
-	import { offlinePages, titleFromHtml } from '$lib/offlineLessons';
+	import { offlinePages, readTitles, titleFromHtml } from '$lib/offlineLessons';
 
-	type Entry = { path: string; label: string };
+	type Entry = { path: string; label: string; reload: boolean };
 	let entries = $state<Entry[]>([]);
 
 	onMount(async () => {
@@ -16,12 +16,20 @@
 				const cache = await caches.open(name);
 				for (const request of await cache.keys()) urls.push(request.url);
 			}
+			const remembered = readTitles();
 			const found: Entry[] = [];
 			for (const page of offlinePages(urls, location.origin)) {
-				const html = await (await caches.match(new URL(page.path, location.origin).href))?.text();
-				const title = html ? titleFromHtml(html) : null;
+				const html = page.hasHtml
+					? await (await caches.match(new URL(page.path, location.origin).href))?.text()
+					: undefined;
+				// The cached page's own title, else the one noted on the visit, else
+				// the last part of the address: never two links with the same name.
+				const title =
+					(html && titleFromHtml(html)) ||
+					remembered[page.path] ||
+					decodeURIComponent(page.path.split('/').pop() ?? '');
 				const kind = page.kind === 'lesson' ? 'Μάθημα' : 'Θεωρία';
-				found.push({ path: page.path, label: title ? `${kind}: ${title}` : kind });
+				found.push({ path: page.path, label: `${kind}: ${title}`, reload: page.hasHtml });
 			}
 			entries = found;
 		} catch {
@@ -49,7 +57,11 @@
 			<ul>
 				{#each entries as entry (entry.path)}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- paths come from the cache, not a route id -->
-					<li><a href={entry.path}>{entry.label}</a></li>
+					<li>
+						<a href={entry.path} data-sveltekit-reload={entry.reload ? '' : undefined}
+							>{entry.label}</a
+						>
+					</li>
 				{/each}
 			</ul>
 		{/if}

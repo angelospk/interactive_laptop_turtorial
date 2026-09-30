@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { rememberTitle } from '$lib/offlineLessons';
 	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	import MarkdownView from '$lib/components/content/MarkdownView.svelte';
 	import ContentToc from '$lib/components/content/ContentToc.svelte';
@@ -12,6 +13,10 @@
 	let { data } = $props();
 
 	let toc = $state<TocEntry[]>([]);
+	// Noted for the offline page, which may only have this page's data cached.
+	$effect(() => {
+		rememberTitle(`/library/${data.courseId}/${data.sub.id}`, data.sub.title);
+	});
 </script>
 
 <LessonNavBar {toc} courseId={data.courseId} prev={data.prev} next={data.next} />

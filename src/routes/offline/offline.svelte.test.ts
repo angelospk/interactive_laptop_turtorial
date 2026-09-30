@@ -34,6 +34,36 @@ test('offers the lessons already opened on this device, by name', async () => {
 	await expect
 		.element(screen.getByRole('link', { name: /Θεωρία/ }))
 		.toHaveAttribute('href', '/library/basics/mouse');
+	// Saved as a whole page: a full load, which the service worker answers from cache.
+	await expect
+		.element(screen.getByRole('link', { name: /Βασική Κίνηση Ποντικιού/ }))
+		.toHaveAttribute('data-sveltekit-reload');
+});
+
+test('pages kept only as data still have their own names and open in-app', async () => {
+	const o = location.origin;
+	localStorage.setItem(
+		'offline-titles',
+		JSON.stringify({ '/modules/m/a': 'Διπλό Κλικ', '/modules/m/b': 'Σύρε και άφησε' })
+	);
+	stubCaches({
+		[`${o}/modules/m/a/__data.json`]: null,
+		[`${o}/modules/m/b/__data.json`]: null,
+		[`${o}/modules/m/c/__data.json`]: null
+	});
+	try {
+		const screen = render(OfflinePage);
+		const a = screen.getByRole('link', { name: 'Μάθημα: Διπλό Κλικ' });
+		await expect.element(a).toBeInTheDocument();
+		await expect.element(a).not.toHaveAttribute('data-sveltekit-reload');
+		await expect
+			.element(screen.getByRole('link', { name: 'Μάθημα: Σύρε και άφησε' }))
+			.toBeInTheDocument();
+		// Never seen with a title: still told apart by its address.
+		await expect.element(screen.getByRole('link', { name: 'Μάθημα: c' })).toBeInTheDocument();
+	} finally {
+		localStorage.removeItem('offline-titles');
+	}
 });
 
 test('says nothing about a list when nothing was saved', async () => {

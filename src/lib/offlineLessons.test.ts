@@ -15,8 +15,8 @@ describe('offlinePages', () => {
 			`${O}/modules/module1`
 		]);
 		expect(pages).toEqual([
-			{ path: '/modules/module1/hover-balloons', kind: 'lesson' },
-			{ path: '/library/basics/mouse', kind: 'theory' }
+			{ path: '/modules/module1/hover-balloons', kind: 'lesson', hasHtml: true },
+			{ path: '/library/basics/mouse', kind: 'theory', hasHtml: true }
 		]);
 	});
 
@@ -26,5 +26,14 @@ describe('offlinePages', () => {
 
 	it('is empty when nothing was opened', () => {
 		expect(offlinePages([])).toEqual([]);
+	});
+
+	it('knows when only the data of a page was kept, not its HTML', () => {
+		expect(offlinePages([`${O}/modules/m/a/__data.json`])).toEqual([
+			{ path: '/modules/m/a', kind: 'lesson', hasHtml: false }
+		]);
+		expect(offlinePages([`${O}/modules/m/a/__data.json`, `${O}/modules/m/a`])).toEqual([
+			{ path: '/modules/m/a', kind: 'lesson', hasHtml: true }
+		]);
 	});
 });

@@ -112,20 +112,27 @@
 	 */
 	// A result the server never received. Shown in plain words with a way to send
 	// it again, instead of a "Μπράβο" that quietly disappears or a console line.
-	let unsavedResult = $state<{ lessonId: string; score: number } | null>(null);
-	let showUnsaved = $derived(!!unsavedResult && unsavedResult.lessonId === currentLesson?.id);
+	// Per lesson: a late failure of one lesson must not replace another's.
+	let unsavedScores = $state<Record<string, number>>({});
+	let showUnsaved = $derived(!!currentLesson && currentLesson.id in unsavedScores);
+	function forgetUnsaved(lessonId: string) {
+		if (!(lessonId in unsavedScores)) return;
+		const { [lessonId]: _, ...rest } = unsavedScores;
+		unsavedScores = rest;
+	}
 
 	function retrySave() {
-		if (!unsavedResult) return;
-		const { lessonId, score } = unsavedResult;
-		unsavedResult = null;
+		const lessonId = currentLesson?.id;
+		if (!lessonId || !(lessonId in unsavedScores)) return;
+		const score = unsavedScores[lessonId];
+		forgetUnsaved(lessonId);
 		handleLessonComplete(score, lessonId);
 	}
 
 	async function handleLessonComplete(score: number, lessonId: string) {
 		if (lessonId !== currentLesson?.id) return;
 		const mine = nextAttempt(lessonId);
-		if (unsavedResult?.lessonId === lessonId) unsavedResult = null;
+		forgetUnsaved(lessonId);
 
 		justCompletedLessonId = lessonId;
 
@@ -181,7 +188,7 @@
 			const { [lessonId]: _, ...rest } = localUpdates;
 			localUpdates = rest;
 			if (justCompletedLessonId === lessonId) justCompletedLessonId = null;
-			unsavedResult = { lessonId, score };
+			unsavedScores = { ...unsavedScores, [lessonId]: score };
 		}
 	}
 
@@ -191,7 +198,7 @@
 
 	async function handleRetry() {
 		retryEpoch++;
-		unsavedResult = null;
+		forgetUnsaved(currentLesson.id);
 		justCompletedLessonId = null;
 		const lessonId = currentLesson.id;
 		nextAttempt(lessonId);
@@ -336,9 +343,35 @@
 			if (before?.isConnected && !before.closest('[inert]')) before.focus();
 		};
 	});
+
+	// aria-modal promises the rest of the page is out of reach; `inert` covers the
+	// runner, and this keeps Tab from walking out to the page around it (the
+	// breadcrumb, the browser's own controls) and back in behind the result.
+	function trapTab(event: KeyboardEvent) {
+		if (event.key !== 'Tab' || !resultDialog) return;
+		const focusable = [
+			...resultDialog.querySelectorAll<HTMLElement>(
+				'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+			)
+		];
+		if (!focusable.length) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		const inside = resultDialog.contains(document.activeElement);
+		if (event.shiftKey && (document.activeElement === first || !inside)) {
+			event.preventDefault();
+			last.focus();
+		} else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+			event.preventDefault();
+			first.focus();
+		}
+	}
 </script>
 
-<svelte:document onfullscreenchange={handleFullscreenChange} />
+<svelte:document
+	onfullscreenchange={handleFullscreenChange}
+	onkeydown={showResultOverlay ? trapTab : undefined}
+/>
 
 <div class="lesson-runner" class:fullscreen-active={isFullscreen} bind:this={lessonContainer}>
 	<!-- Portal target for dialogs/modals in fullscreen mode -->
@@ -397,7 +430,7 @@
 
 	<!-- One row for notices, however many are up: a second notice in its own row
 	     would push the lesson card past the bottom of the screen. -->
-	<div class="lesson-notices">
+	<div class="lesson-notices" inert={showResultOverlay}>
 		{#if showFullscreenBanner}
 			<div
 				class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"

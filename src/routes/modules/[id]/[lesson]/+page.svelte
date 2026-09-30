@@ -3,6 +3,7 @@
 	import LessonRunner from '$lib/components/lessons/LessonRunner.svelte';
 	import { ArrowLeft } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { rememberTitle } from '$lib/offlineLessons';
 
 	let { data } = $props();
 
@@ -34,6 +35,15 @@
 	let lessonTitle = $derived(
 		(shownLesson && messages[shownLesson.titleKey]?.()) || shownLesson?.lessonKey || ''
 	);
+	// Noted for the offline page, which may only have this lesson's data cached.
+	$effect(() => {
+		if (shownLesson) {
+			rememberTitle(
+				`/modules/${data.moduleId}/${encodeURIComponent(shownLesson.lessonKey)}`,
+				lessonTitle
+			);
+		}
+	});
 
 	function backToGrid() {
 		goto(`/modules/${data.moduleId}`);

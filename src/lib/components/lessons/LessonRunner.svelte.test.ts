@@ -736,3 +736,87 @@ test('in fullscreen the lesson can still be moved through', async () => {
 		delete (document as unknown as Record<string, unknown>).fullscreenElement;
 	}
 });
+
+describe('failed saves and the result dialog, reviewed', () => {
+	const twoClicks = [
+		{
+			...mockLessons[1],
+			id: 'lesson-click',
+			titleKey: 'Μάθημα 1',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		},
+		{
+			...mockLessons[1],
+			id: 'lesson-click-2',
+			lessonKey: 'click-two',
+			titleKey: 'Μάθημα 2',
+			config: { theme: 'default', targetCount: 1, timeLimit: 45 }
+		}
+	];
+	afterEach(() => vi.unstubAllGlobals());
+
+	// Two lessons failing to save, the first one late: each keeps its own retry.
+	test('a late failure of one lesson does not hide the failure of another', async () => {
+		let failFirst!: () => void;
+		const firstGate = new Promise<void>((resolve) => (failFirst = resolve));
+		let online = false;
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async (_url: string, init: { body: string }) => {
+				const { lessonId } = JSON.parse(init.body);
+				if (lessonId === 'lesson-click' && !online) await firstGate;
+				if (!online) throw new TypeError('Failed to fetch');
+				return { ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) };
+			})
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: twoClicks, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await expect.element(screen.getByRole('dialog')).toBeInTheDocument();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+
+		failFirst(); // lesson 1's save now fails, late
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+
+		await screen.getByRole('button', { name: 'Προηγούμενο', exact: true }).click();
+		await expect.element(title(screen, 'Μάθημα 1')).toBeInTheDocument();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκε/);
+		online = true;
+		await screen.getByRole('button', { name: /Αποθήκευση ξανά/ }).click();
+		await expect.element(screen.getByRole('dialog')).toBeInTheDocument();
+	});
+
+	test('Tab stays inside the result, even with the fullscreen hint showing', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => ({ progress: { completed: true, score: 100 } })
+			}))
+		);
+		const screen = render(
+			LessonRunner as never,
+			{ lessons: twoClicks, progress: {}, startIndex: 0, moduleId: 'module-1' } as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		const dialog = screen.getByRole('dialog');
+		await expect.element(dialog).toBeInTheDocument();
+		expect(document.querySelector('.lesson-notices')?.closest('[inert]')).not.toBeNull();
+
+		const { userEvent } = await import('vitest/browser');
+		for (let i = 0; i < 6; i++) {
+			await userEvent.keyboard(i % 2 ? '{Shift>}{Tab}{/Shift}' : '{Tab}');
+			expect(dialog.element().contains(document.activeElement)).toBe(true);
+		}
+		for (let i = 0; i < 4; i++) {
+			await userEvent.keyboard('{Tab}');
+			expect(dialog.element().contains(document.activeElement)).toBe(true);
+		}
+	});
+});
