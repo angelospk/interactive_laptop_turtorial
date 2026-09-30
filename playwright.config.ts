@@ -14,6 +14,9 @@ export default defineConfig({
 		? undefined
 		: {
 				command: 'npm run build && npm run preview',
-				port: 4173
+				port: 4173,
+				// The preview is a production build, which refuses to sign sessions
+				// without a secret. A throwaway one lets e2e run on any machine.
+				env: { SESSION_SECRET: process.env.SESSION_SECRET ?? 'e2e-only-session-secret-not-for-prod' }
 			}
 });
