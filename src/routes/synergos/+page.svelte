@@ -20,6 +20,7 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import TabletSmartphone from '@lucide/svelte/icons/tablet-smartphone';
 	import {
+		categoryTitle,
 		isModuleForDevice,
 		groupModulesByCategory,
 		getModuleCompletion,
@@ -160,7 +161,7 @@
 			{#each groupedModules as group (group.category?.id)}
 				<section class="break-inside-avoid">
 					<h2 class="mb-4 text-xl font-bold text-foreground sm:text-2xl">
-						{group.category?.title}
+						{group.category ? categoryTitle(group.category, m) : ''}
 					</h2>
 					<div class="space-y-3">
 						{#each group.modules as module (module.id)}

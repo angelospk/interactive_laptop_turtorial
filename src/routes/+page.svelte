@@ -14,6 +14,7 @@
 	import TabletSmartphone from '@lucide/svelte/icons/tablet-smartphone';
 	import { reveal } from '$lib/actions/reveal';
 	import {
+		categoryTitle,
 		groupModulesByCategory,
 		getModuleDevices,
 		modulesSpecificToDevice,
@@ -248,7 +249,7 @@
 				<div class="mb-5 flex flex-wrap items-center gap-3">
 					<h2 class="flex items-center gap-2 text-xl font-bold text-foreground sm:text-2xl">
 						<dm.icon class="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-						Για τη συσκευή σου · {dm.label}
+						{messages.for_your_device()} · {dm.label}
 					</h2>
 					<span class="h-px flex-1 bg-border"></span>
 					<Button
@@ -256,7 +257,7 @@
 						onclick={() => (changeDeviceOpen = true)}
 						class="h-11 rounded-full px-4 text-base text-muted-foreground hover:text-foreground"
 					>
-						Αλλαγή συσκευής
+						{messages.change_device()}
 					</Button>
 				</div>
 				{#if deviceModules.length}
@@ -281,7 +282,7 @@
 				<section data-reveal use:reveal>
 					<div class="mb-5 flex items-baseline gap-3">
 						<h2 class="text-xl font-bold text-foreground sm:text-2xl">
-							{group.category?.title}
+							{group.category ? categoryTitle(group.category, m) : ''}
 						</h2>
 						<span class="h-px flex-1 bg-border"></span>
 						<span class="text-xs font-medium text-muted-foreground tabular-nums">

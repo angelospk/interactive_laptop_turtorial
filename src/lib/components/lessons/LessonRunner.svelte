@@ -428,10 +428,8 @@
 				role="alert"
 				class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-900"
 			>
-				<span
-					>Το αποτέλεσμα δεν αποθηκεύτηκε. Ελέγξτε τη σύνδεση στο ίντερνετ και πατήστε ξανά.</span
-				>
-				<Button onclick={retrySave} class="min-h-12 px-5 text-base">Αποθήκευση ξανά</Button>
+				<span>{m.save_failed()}</span>
+				<Button onclick={retrySave} class="min-h-12 px-5 text-base">{m.save_retry()}</Button>
 			</div>
 		{/if}
 	</div>
