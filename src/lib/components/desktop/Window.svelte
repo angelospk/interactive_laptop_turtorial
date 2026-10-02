@@ -49,10 +49,6 @@
 		if (isMaximized) return;
 		isDragging = true;
 		// Calculate offset relative to the window's top-left corner
-		// We need to account for the parent container in a real scenario,
-		// but for now we assume the mouse event clientX/Y minus current x/y works
-		// if we are careful about the context.
-		// Better approach for a contained drag:
 		dragOffset.x = e.clientX - x;
 		dragOffset.y = e.clientY - y;
 

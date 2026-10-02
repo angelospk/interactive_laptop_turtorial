@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import type { UserSession } from '$lib/types';
 
 /**
@@ -116,4 +116,15 @@ export function verifyAdminCookie(cookie: string, secret: string): boolean {
 	} catch {
 		return false;
 	}
+}
+
+/**
+ * Constant-time password check. Both sides are hashed first so the comparison
+ * runs over equal-length buffers and leaks neither content nor length.
+ */
+export function passwordMatches(guess: unknown, expected: string): boolean {
+	if (typeof guess !== 'string' || guess.length === 0) return false;
+	const a = createHash('sha256').update(guess).digest();
+	const b = createHash('sha256').update(expected).digest();
+	return timingSafeEqual(a, b);
 }

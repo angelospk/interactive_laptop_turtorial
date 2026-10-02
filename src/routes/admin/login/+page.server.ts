@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { Actions, PageServerLoad } from './$types';
 import { ADMIN_PASSWORD } from '$env/static/private';
-import { signAdminCookie } from '$lib/server/session';
+import { signAdminCookie, passwordMatches } from '$lib/server/session';
 import { getSessionSecret } from '$lib/server/sessionSecret';
 
 const ADMIN_MAX_AGE = 60 * 60 * 24; // 1 day
@@ -23,7 +23,7 @@ export const actions: Actions = {
 			return fail(500, { error: 'Server configuration error' });
 		}
 
-		if (password !== ADMIN_PASSWORD) {
+		if (!passwordMatches(password, ADMIN_PASSWORD)) {
 			return fail(401, { error: 'Invalid password' });
 		}
 

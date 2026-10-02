@@ -3,7 +3,8 @@ import {
 	signSessionCookie,
 	verifySessionCookie,
 	signAdminCookie,
-	verifyAdminCookie
+	verifyAdminCookie,
+	passwordMatches
 } from './session';
 import type { UserSession } from '$lib/types';
 
@@ -106,5 +107,26 @@ describe('signAdminCookie / verifyAdminCookie', () => {
 	it('rejects malformed / empty values', () => {
 		expect(verifyAdminCookie('', SECRET)).toBe(false);
 		expect(verifyAdminCookie('a.b.c', SECRET)).toBe(false);
+	});
+});
+
+describe('passwordMatches', () => {
+	it('accepts the exact password', () => {
+		expect(passwordMatches('s3cret-Πάσσγουορντ', 's3cret-Πάσσγουορντ')).toBe(true);
+	});
+
+	it('rejects a wrong password of the same length', () => {
+		expect(passwordMatches('s3cret-x', 's3cret-y')).toBe(false);
+	});
+
+	it('rejects a prefix or a longer guess', () => {
+		expect(passwordMatches('s3cret', 's3cret-pass')).toBe(false);
+		expect(passwordMatches('s3cret-pass-extra', 's3cret-pass')).toBe(false);
+	});
+
+	it('rejects a missing or non-string guess', () => {
+		expect(passwordMatches(null, 'pass')).toBe(false);
+		expect(passwordMatches('', 'pass')).toBe(false);
+		expect(passwordMatches(new File([], 'pass'), 'pass')).toBe(false);
 	});
 });
