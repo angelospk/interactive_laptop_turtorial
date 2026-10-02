@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { lessons } from '$lib/db/schema';
+import { db, lessons } from '$lib/db/client';
 import { allLessons } from '$lib/db/seeds';
 import { eq } from 'drizzle-orm';
 import { requireAdmin } from '$lib/server/guards';
@@ -15,8 +15,6 @@ import { requireAdmin } from '$lib/server/guards';
 export const POST: RequestHandler = async ({ locals }) => {
 	// Admin authentication check
 	requireAdmin(locals);
-
-	const { db } = locals;
 
 	try {
 		let inserted = 0;

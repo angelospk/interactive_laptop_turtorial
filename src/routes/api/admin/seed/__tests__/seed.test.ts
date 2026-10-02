@@ -1,22 +1,36 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { POST } from '../+server';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { sql } from 'drizzle-orm';
 import { lessons } from '$lib/db/schema';
 import { allLessons } from '$lib/db/seeds';
 import { createTestDb, type TestDb } from '$lib/db/__tests__/testDb';
+
+// The endpoint reads the module-level `db` (locals.db is never set in production),
+// so point it at a fresh in-memory database per test.
+let currentDb: TestDb;
+vi.mock('$lib/db/client', async () => {
+	const schema = await import('$lib/db/schema');
+	return {
+		get db() {
+			return currentDb;
+		},
+		...schema
+	};
+});
+
+const { POST } = await import('../+server');
 
 describe('POST /api/admin/seed', () => {
 	let db: TestDb;
 
 	beforeEach(async () => {
 		db = await createTestDb();
+		currentDb = db;
 	});
 
 	it('should insert all lessons from seed data', async () => {
 		const mockEvent = {
 			locals: {
-				admin: true,
-				db
+				admin: true
 			}
 		} as unknown as Parameters<typeof POST>[0];
 
@@ -41,8 +55,7 @@ describe('POST /api/admin/seed', () => {
 
 		const mockEvent = {
 			locals: {
-				admin: true,
-				db
+				admin: true
 			}
 		} as unknown as Parameters<typeof POST>[0];
 
@@ -64,8 +77,7 @@ describe('POST /api/admin/seed', () => {
 	it('should return 403 if not admin', async () => {
 		const mockEvent = {
 			locals: {
-				admin: false,
-				db
+				admin: false
 			}
 		} as unknown as Parameters<typeof POST>[0];
 
@@ -80,8 +92,7 @@ describe('POST /api/admin/seed', () => {
 
 		const mockEvent = {
 			locals: {
-				admin: true,
-				db
+				admin: true
 			}
 		} as unknown as Parameters<typeof POST>[0];
 
