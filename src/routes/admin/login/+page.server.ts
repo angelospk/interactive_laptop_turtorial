@@ -4,6 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { ADMIN_PASSWORD } from '$env/static/private';
 import { signAdminCookie, passwordMatches } from '$lib/server/session';
 import { getSessionSecret } from '$lib/server/sessionSecret';
+import { registerLoginAttempt, clearLoginAttempts } from '$lib/server/loginThrottle';
 
 const ADMIN_MAX_AGE = 60 * 60 * 24; // 1 day
 
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, locals, getClientAddress }) => {
 		const data = await request.formData();
 		const password = data.get('password');
 
@@ -23,9 +24,22 @@ export const actions: Actions = {
 			return fail(500, { error: 'Server configuration error' });
 		}
 
+		// dev and prod share one database, so keep their counters apart.
+		const throttleKey = `${dev ? 'dev' : 'prod'}:${getClientAddress()}`;
+		const allowed = await registerLoginAttempt(
+			locals.db,
+			throttleKey,
+			Math.floor(Date.now() / 1000)
+		);
+		if (!allowed) {
+			return fail(429, { error: 'Too many attempts. Try again in 15 minutes.' });
+		}
+
 		if (!passwordMatches(password, ADMIN_PASSWORD)) {
 			return fail(401, { error: 'Invalid password' });
 		}
+
+		await clearLoginAttempts(locals.db, throttleKey);
 
 		// Set signed admin session cookie (HMAC — not a forgeable literal 'true')
 		cookies.set('admin_session', signAdminCookie(getSessionSecret(), ADMIN_MAX_AGE), {

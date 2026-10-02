@@ -93,6 +93,13 @@ export const lessonViews = sqliteTable('lesson_views', {
     unq: unique().on(table.userId, table.lessonId)
 }));
 
+// Admin login attempts - per-client counter for rate-limiting the admin password form
+export const adminLoginAttempts = sqliteTable('admin_login_attempts', {
+    key: text('key').primaryKey(), // '<env>:<client ip>'
+    attempts: integer('attempts').notNull(),
+    windowStart: integer('window_start').notNull() // unix seconds
+});
+
 // Types inferred from schema
 export type Module = typeof modules.$inferSelect;
 export type NewModule = typeof modules.$inferInsert;

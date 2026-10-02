@@ -64,6 +64,8 @@ Navigate to `http://localhost:5173` and login with any username (e.g., `user01`)
 Navigate to `http://localhost:5173/admin/login`
 Password: `admin123` (configurable in `.env`)
 
+After 5 attempts within 15 minutes from one IP, login is refused (429) until the window ends. The counter lives in the `admin_login_attempts` table; create it with `bun run scripts/create-admin-login-attempts.ts`.
+
 Features:
 
 - Enable/Disable lessons

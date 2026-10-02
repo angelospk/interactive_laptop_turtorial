@@ -70,6 +70,12 @@ CREATE TABLE lesson_views (
 	first_viewed_at INTEGER NOT NULL,
 	UNIQUE(user_id, lesson_id)
 );
+
+CREATE TABLE admin_login_attempts (
+	key TEXT PRIMARY KEY,
+	attempts INTEGER NOT NULL,
+	window_start INTEGER NOT NULL
+);
 `;
 
 export type TestDb = ReturnType<typeof drizzle<typeof schema>>;
