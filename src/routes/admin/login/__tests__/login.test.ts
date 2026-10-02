@@ -4,6 +4,19 @@ vi.mock('$env/static/private', () => ({ ADMIN_PASSWORD: 'correct-horse' }));
 vi.mock('$app/environment', () => ({ dev: true }));
 vi.mock('$lib/server/sessionSecret', () => ({ getSessionSecret: () => 'test-secret-0123456789' }));
 
+// The action reads the module-level `db` (locals.db is never set in production),
+// so point it at a fresh in-memory database per test.
+let currentDb: TestDb;
+vi.mock('$lib/db/client', async () => {
+	const schema = await import('$lib/db/schema');
+	return {
+		get db() {
+			return currentDb;
+		},
+		...schema
+	};
+});
+
 import { actions } from '../+page.server';
 import { createTestDb, type TestDb } from '$lib/db/__tests__/testDb';
 import { registerLoginAttempt, MAX_LOGIN_ATTEMPTS } from '$lib/server/loginThrottle';
@@ -20,7 +33,7 @@ function makeEvent(db: TestDb, password: string) {
 	const event = {
 		request: new Request('http://localhost/admin/login', { method: 'POST', body: form }),
 		cookies,
-		locals: { db },
+		locals: {},
 		getClientAddress: () => IP
 	} as unknown as Parameters<typeof actions.default>[0];
 	return { event, cookies };
@@ -42,6 +55,7 @@ describe('admin login action', () => {
 
 	beforeEach(async () => {
 		db = await createTestDb();
+		currentDb = db;
 	});
 
 	it('logs in with the right password', async () => {
