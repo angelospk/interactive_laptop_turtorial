@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolveContentUrl } from '$lib/content/contentUrl';
 	import { renderMarkdown, type TocEntry } from './renderMarkdown';
+	import ImageLightbox from './ImageLightbox.svelte';
 
 	interface Props {
 		mdPath: string;
@@ -13,6 +14,15 @@
 	let html = $state('');
 	let error = $state('');
 	let loading = $state(true);
+	let enlarged = $state<{ src: string; alt: string } | null>(null);
+
+	// The markdown is injected as HTML, so one listener on the article catches
+	// a click on any picture inside it.
+	function onArticleClick(e: MouseEvent) {
+		if (e.target instanceof HTMLImageElement) {
+			enlarged = { src: e.target.currentSrc || e.target.src, alt: e.target.alt };
+		}
+	}
 
 	$effect(() => {
 		const url = resolveContentUrl(mdPath);
@@ -47,8 +57,10 @@
 {:else if error}
 	<p class="text-red-500">Σφάλμα φόρτωσης περιεχομένου: {error}</p>
 {:else}
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 	<article
-		class="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-img:rounded-lg"
+		class="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-img:cursor-zoom-in prose-img:rounded-lg"
+		onclick={onArticleClick}
 	>
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html html}
@@ -62,4 +74,8 @@
 			>
 		</p>
 	{/if}
+{/if}
+
+{#if enlarged}
+	<ImageLightbox src={enlarged.src} alt={enlarged.alt} onclose={() => (enlarged = null)} />
 {/if}

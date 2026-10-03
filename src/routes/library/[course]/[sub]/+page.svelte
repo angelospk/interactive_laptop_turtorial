@@ -3,14 +3,13 @@
 	import { rememberTitle } from '$lib/offlineLessons';
 	import TextSizeToggle from '$lib/components/TextSizeToggle.svelte';
 	import MarkdownView from '$lib/components/content/MarkdownView.svelte';
-	import ContentToc from '$lib/components/content/ContentToc.svelte';
+	import TocSidebar from '$lib/components/content/TocSidebar.svelte';
 	import LessonNavBar from '$lib/components/content/LessonNavBar.svelte';
 	import ScrollToTop from '$lib/components/content/ScrollToTop.svelte';
 	import type { TocEntry } from '$lib/components/content/renderMarkdown';
 	import { Button } from '$lib/components/ui/button';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import List from '@lucide/svelte/icons/list';
 	let { data } = $props();
 
 	let toc = $state<TocEntry[]>([]);
@@ -115,14 +114,7 @@
 	<!-- desktop TOC (sticky sidebar) -->
 	{#if toc.length}
 		<aside class="hidden w-56 shrink-0 lg:block">
-			<div class="sticky top-20">
-				<p
-					class="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
-				>
-					<List class="h-4 w-4" /> Περιεχόμενα
-				</p>
-				<ContentToc {toc} />
-			</div>
+			<TocSidebar {toc} />
 		</aside>
 	{/if}
 </div>

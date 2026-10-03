@@ -7,6 +7,7 @@
 	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
 	import TaskView from '$lib/components/desktop/TaskView.svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
+	import InstructionText from '../InstructionText.svelte';
 	import { Card } from '$lib/components/ui/card';
 	import { Info } from 'lucide-svelte';
 
@@ -16,6 +17,11 @@
 	import { fillShortcutText, type LearnerDevice } from '$lib/lessons/shortcuts';
 	import { frontmostWindowId } from '$lib/components/desktop/frontmost';
 	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
+	import {
+		DESKTOP_APPS,
+		wrongAppHint,
+		type DesktopAppId
+	} from '$lib/components/desktop/desktopApps';
 
 	// Import Apps
 	import FileExplorerApp from '$lib/components/apps/FileExplorerApp.svelte';
@@ -40,6 +46,7 @@
 	type DesktopConfig = Record<string, unknown> & {
 		goal?: string;
 		instructions?: string;
+		targetAppId?: string;
 		initialApps?: (string | { appId: string; minimized?: boolean; maximized?: boolean })[];
 		initialPage?: string;
 		initialFiles?: ComponentProps<typeof FileExplorerApp>['initialFiles'];
@@ -50,16 +57,17 @@
 	const goal = config.goal || '';
 
 	// Define available apps
-	const availableApps = [
-		{ id: 'explorer', name: 'Εξερεύνηση', icon: Folder, component: FileExplorerApp },
-		{ id: 'browser', name: 'Browser', icon: Globe, component: BrowserApp },
-		{ id: 'email', name: 'Email', icon: Mail, component: EmailApp },
-		{ id: 'excel', name: 'Υπολογιστικά Φύλλα', icon: Grid3X3, component: SpreadsheetApp },
-		{ id: 'installer', name: 'Εγκατάσταση', icon: Download, component: InstallerApp },
-		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
-		{ id: 'word', name: 'Επεξεργασία Κειμένου', icon: FileText, component: WordProcessorApp },
-		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp }
-	];
+	const appParts = {
+		explorer: { icon: Folder, component: FileExplorerApp },
+		browser: { icon: Globe, component: BrowserApp },
+		email: { icon: Mail, component: EmailApp },
+		excel: { icon: Grid3X3, component: SpreadsheetApp },
+		installer: { icon: Download, component: InstallerApp },
+		settings: { icon: Settings, component: SettingsApp },
+		word: { icon: FileText, component: WordProcessorApp },
+		viber: { icon: Phone, component: VideoCallApp }
+	} satisfies Record<DesktopAppId, unknown>;
+	const availableApps = DESKTOP_APPS.map((app) => ({ ...app, ...appParts[app.id] }));
 
 	// Pinned Apps (Default set)
 	const pinnedAppIds = ['explorer', 'browser', 'email', 'settings'];
@@ -86,6 +94,13 @@
 	const device = $derived((page.data?.user?.preferredDevice ?? null) as LearnerDevice);
 	let showTaskView = $state(false);
 	let completed = $state(false);
+
+	// «Επαναφορά παραθύρου»: point at the hidden window's taskbar icon until it is back.
+	const highlightAppIds = $derived(
+		goal === 'restore-app' && !completed
+			? openApps.filter((a) => a.minimized && a.appId === config.targetAppId).map((a) => a.appId)
+			: []
+	);
 
 	// Derived Taskbar Apps: Pinned + Open but Unpinned
 	let taskbarApps = $derived.by(() => {
@@ -145,6 +160,8 @@
 				maximized: !!initialState?.maximized
 			});
 			checkGoal('open-app', { appId });
+			const hint = completed ? null : wrongAppHint(config, appId);
+			if (hint) toast.info(hint);
 		}
 		startMenuOpen = false;
 	}
@@ -239,8 +256,8 @@
 			<Card class="border-blue-200 bg-blue-50">
 				<div class="flex gap-3 p-4">
 					<Info class="h-5 w-5 shrink-0 text-blue-600" />
-					<div class="flex-1 text-sm whitespace-pre-line text-blue-900">
-						{fillShortcutText(config.instructions, device)}
+					<div class="flex-1 text-sm text-blue-900">
+						<InstructionText text={fillShortcutText(config.instructions, device)} />
 					</div>
 				</div>
 			</Card>
@@ -327,6 +344,7 @@
 			<Taskbar
 				apps={taskbarApps}
 				openAppIds={openApps.map((a) => a.appId)}
+				{highlightAppIds}
 				onAppClick={(id) => openApp(id)}
 				onStartClick={() => {
 					startMenuOpen = !startMenuOpen;
