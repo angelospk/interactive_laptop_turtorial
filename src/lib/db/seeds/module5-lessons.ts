@@ -5,6 +5,22 @@ import type { NewLesson } from '../schema';
  * Refactored with History and improved Tabs
  */
 export const module5Lessons: NewLesson[] = [
+	// «Οδηγός»: between the theory (readings, negative orderIndex) and the
+	// exercises; each step points at the exercises below (src/lib/guides/module5.ts).
+	{
+		id: 'module5-guide',
+		moduleId: 'module5',
+		lessonKey: 'guide',
+		titleKey: 'module5_guide_title',
+		descriptionKey: 'module5_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module5' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Opening Browser & New Tabs
 	{
 		id: 'module5-lesson1',

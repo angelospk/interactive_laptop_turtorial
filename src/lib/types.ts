@@ -33,6 +33,8 @@ export type UserLessonProgress = {
     completedAt?: Date;
     attempts: number;
     lastAttemptAt?: Date;
+    /** 'guide' = marked known in a guide («Το ξέρω»), not solved; no score. */
+    source?: 'guide' | null;
 };
 
 // Combined lesson info with user progress

@@ -53,7 +53,11 @@ export function nextStep(s: GuideState): GuideState {
 	if (next < s.guide.steps.length) return toStep(s, next);
 	const { known, total } = summary(s);
 	const outro = COMMON_CLIPS.outro;
-	return { ...s, phase: 'done', clip: known === total ? outro.all : known === 0 ? outro.none : outro.some };
+	return {
+		...s,
+		phase: 'done',
+		clip: known === total ? outro.all : known === 0 ? outro.none : outro.some
+	};
 }
 
 /** The current clip finished playing. */
@@ -61,7 +65,9 @@ export function clipEnded(s: GuideState): GuideState {
 	if (s.phase === 'intro') {
 		const clips = introClips(s.guide);
 		const i = s.introIndex + 1;
-		return i < clips.length ? { ...s, introIndex: i, clip: clips[i] } : { ...s, introIndex: i, clip: null };
+		return i < clips.length
+			? { ...s, introIndex: i, clip: clips[i] }
+			: { ...s, introIndex: i, clip: null };
 	}
 	if (s.phase === 'feedback') return nextStep(s);
 	return s;

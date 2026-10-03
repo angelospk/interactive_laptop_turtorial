@@ -509,7 +509,8 @@
 	{/if}
 
 	<!-- 1. Tab Bar (Chrome-like) -->
-	<div class="flex items-end gap-0.5 bg-[#dee1e6] px-2 pt-1.5">
+	<!-- data-guide: what a guide (src/lib/guides) can spotlight -->
+	<div class="flex items-end gap-0.5 bg-[#dee1e6] px-2 pt-1.5" data-guide="tabs">
 		{#each tabs as tab (tab.id)}
 			<div
 				class="group relative -mb-px flex max-w-[200px] cursor-pointer items-center gap-2 rounded-t-lg px-3 py-2 text-sm transition-colors select-none {activeTabId ===
@@ -552,6 +553,7 @@
 						? 'opacity-100'
 						: 'opacity-0 group-hover:opacity-100'}"
 					onclick={(e) => closeTab(tab.id, e)}
+					data-guide={activeTabId === tab.id ? 'close-tab' : undefined}
 					title="Κλείσιμο καρτέλας"
 					aria-label="Κλείσιμο καρτέλας"
 				>
@@ -562,6 +564,7 @@
 		<button
 			class="mb-1 ml-1 flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#cdd1d7]"
 			onclick={addTab}
+			data-guide="new-tab"
 			title="Νέα καρτέλα"
 			aria-label="Νέα καρτέλα"
 		>
@@ -571,7 +574,7 @@
 
 	<!-- 2. Toolbar (Address Bar) -->
 	<div class="flex items-center gap-1.5 bg-white px-2 py-1.5">
-		<div class="flex items-center">
+		<div class="flex items-center" data-guide="nav-buttons">
 			<button
 				class="rounded-full p-1.5 {canGoBack
 					? 'text-slate-600 hover:bg-slate-100'
@@ -600,7 +603,7 @@
 				<RefreshCw class="h-5 w-5 {refreshSpinning ? 'animate-spin' : ''}" />
 			</button>
 		</div>
-		<div class="relative flex-1">
+		<div class="relative flex-1" data-guide="address-bar">
 			<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
 				{#if activeTab.isSecure}
 					<Lock class="h-4 w-4 text-green-600" />
@@ -623,6 +626,7 @@
 			<button
 				class="absolute top-1/2 right-0 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full hover:bg-slate-200"
 				onclick={bookmarkSite}
+				data-guide="bookmark"
 				title="Προσθήκη στα Αγαπημένα"
 				aria-label="Προσθήκη στα Αγαπημένα"
 			>
@@ -634,7 +638,12 @@
 			</button>
 		</div>
 		<div class="flex items-center">
-			<button class="rounded-full p-2 hover:bg-slate-100" onclick={openHistory} title="Ιστορικό">
+			<button
+				class="rounded-full p-2 hover:bg-slate-100"
+				onclick={openHistory}
+				title="Ιστορικό"
+				data-guide="history"
+			>
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
 			{#if config.goal === 'zoom-page'}
@@ -709,7 +718,7 @@
 	{/if}
 
 	<!-- 3. Content Area -->
-	<div class="relative flex-1 overflow-y-auto bg-slate-50">
+	<div class="relative flex-1 overflow-y-auto bg-slate-50" data-guide="page">
 		{#if config.goal === 'download-file'}
 			<div
 				class="absolute right-4 bottom-4 z-10 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 shadow-md"
@@ -736,7 +745,7 @@
 						class="text-[#EA4335]">e</span
 					>
 				</h1>
-				<div class="relative w-full max-w-xl">
+				<div class="relative w-full max-w-xl" data-guide="search">
 					<Search class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
 					<input
 						type="text"

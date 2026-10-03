@@ -39,7 +39,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	for (const lessonId of lessonIds) {
 		const mine = and(eq(userProgress.userId, user.id), eq(userProgress.lessonId, lessonId));
 		if (answers[lessonId] === 'unknown') {
-			await db.delete(userProgress).where(and(mine, eq(userProgress.source, 'guide'))).run();
+			await db
+				.delete(userProgress)
+				.where(and(mine, eq(userProgress.source, 'guide')))
+				.run();
 			continue;
 		}
 		const existing = await db.select().from(userProgress).where(mine).get();

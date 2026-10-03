@@ -242,6 +242,7 @@ describe('Database Schema - Seed Data', () => {
 			'quiz',
 			'scam-spotter',
 			'reading',
+			'guide',
 			'mobile-tap',
 			'mobile-sim',
 			'mac-simulation',

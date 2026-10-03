@@ -13,7 +13,9 @@ describe('nextUnfinished', () => {
 	});
 
 	it('is null when everything after is done, even if something before is not', () => {
-		expect(nextUnfinished(lessons, { c: { completed: true }, d: { completed: true } }, 1)).toBeNull();
+		expect(
+			nextUnfinished(lessons, { c: { completed: true }, d: { completed: true } }, 1)
+		).toBeNull();
 	});
 
 	it('is null on the last lesson', () => {

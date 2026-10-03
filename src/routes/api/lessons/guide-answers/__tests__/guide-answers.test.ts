@@ -36,7 +36,7 @@ function call(body: unknown, user: { id: string } | null = { id: USER }) {
 	} as unknown as Parameters<typeof POST>[0]);
 }
 
-async function status(p: Promise<Response>) {
+async function status(p: Response | Promise<Response>) {
 	try {
 		return (await p).status;
 	} catch (e) {
@@ -73,11 +73,15 @@ describe('POST /api/lessons/guide-answers', () => {
 	it('rejects a body without answers, or a guideLessonId that is not a guide', async () => {
 		expect(await status(call({ guideLessonId: 'm5-guide' }))).toBe(400);
 		expect(await status(call({ guideLessonId: 'm5-a', answers: { 'm5-b': 'known' } }))).toBe(400);
-		expect(await status(call({ guideLessonId: 'm5-guide', answers: { 'm5-a': 'maybe' } }))).toBe(400);
+		expect(await status(call({ guideLessonId: 'm5-guide', answers: { 'm5-a': 'maybe' } }))).toBe(
+			400
+		);
 	});
 
 	it('rejects an exercise from another module', async () => {
-		expect(await status(call({ guideLessonId: 'm5-guide', answers: { 'm6-a': 'known' } }))).toBe(400);
+		expect(await status(call({ guideLessonId: 'm5-guide', answers: { 'm6-a': 'known' } }))).toBe(
+			400
+		);
 		expect(await row('m6-a')).toBeUndefined();
 	});
 

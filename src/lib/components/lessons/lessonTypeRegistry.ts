@@ -55,6 +55,9 @@ export const lessonTypeRegistry: Record<
 	// Goal-driven health services (άυλη συνταγογράφηση, MyHealth, ραντεβού) — Φάση 3
 	'health-simulation': () => import('./interactive/HealthSimLesson.svelte'),
 
+	// «Οδηγός»: spotlight tour of a module's simulation, between theory and practice
+	guide: () => import('./interactive/GuideLesson.svelte'),
+
 	// New Quiz Type
 	quiz: () => import('./interactive/QuizLesson.svelte'),
 	reading: () => import('./interactive/ReadingLesson.svelte'),
