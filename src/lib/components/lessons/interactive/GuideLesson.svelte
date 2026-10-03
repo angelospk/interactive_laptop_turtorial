@@ -47,6 +47,7 @@
 	let lastClip = $state<string | null>(null);
 	let unsaved = $state<Record<string, Answer>>({});
 	let finishing = $state(false);
+	let refreshFailed = $state(false);
 	let stage = $state<HTMLElement>();
 	/** Bumped to put the demo back as it started (see `ensureTarget`). */
 	let simEpoch = $state(0);
@@ -143,23 +144,30 @@
 	function respond(kind: Answer) {
 		if (!tour || tour.phase !== 'step') return;
 		const ids = tour.guide.steps[tour.stepIndex].lessonIds;
+		for (const id of ids) latest[id] = kind;
 		go(answer(tour, kind));
 		if (ids.length) save(Object.fromEntries(ids.map((id) => [id, kind])));
 	}
 
 	// Answers go out one after another, in the order given; a failed one is
-	// tried once more, then kept for the retry button at the end.
+	// tried once more, then kept for the retry at the end. Each request sends
+	// only answers that are still the learner's latest, so a retried old answer
+	// can never land after a newer one.
+	const latest: Record<string, Answer> = {};
 	let queue: Promise<unknown> = Promise.resolve();
 	function save(answers: Record<string, Answer>) {
 		queue = queue.then(async () => {
-			if ((await send(answers)) || (await send(answers))) {
-				// A newer answer that got through replaces an older one still waiting.
-				const rest = { ...unsaved };
-				for (const id of Object.keys(answers)) delete rest[id];
+			const current = Object.fromEntries(
+				Object.entries(answers).filter(([id, kind]) => latest[id] === kind)
+			);
+			if (Object.keys(current).length === 0) return;
+			const rest = { ...unsaved };
+			for (const id of Object.keys(answers)) delete rest[id];
+			if ((await send(current)) || (await send(current))) {
 				unsaved = rest;
 				return;
 			}
-			unsaved = { ...unsaved, ...answers };
+			unsaved = { ...rest, ...current };
 		});
 		return queue;
 	}
@@ -187,8 +195,12 @@
 	// page's progress is refreshed: Next must already see the new green lessons.
 	async function finish() {
 		finishing = true;
-		if (Object.keys(unsaved).length) retryUnsaved();
+		refreshFailed = false;
 		await queue;
+		if (Object.keys(unsaved).length) {
+			retryUnsaved();
+			await queue;
+		}
 		if (Object.keys(unsaved).length) {
 			finishing = false;
 			return;
@@ -196,7 +208,9 @@
 		try {
 			await invalidateAll();
 		} catch {
-			// Progress shows up on the next load anyway.
+			refreshFailed = true;
+			finishing = false;
+			return;
 		}
 		finishing = false;
 		audio.stop();
@@ -322,6 +336,11 @@
 						Δεν το ξέρω
 					</Button>
 				{:else if tour.phase === 'done'}
+					{#if refreshFailed}
+						<div class="w-full rounded-lg bg-amber-50 p-3 text-lg text-amber-900" role="alert">
+							Η πρόοδός σας αποθηκεύτηκε, αλλά η σελίδα δεν ανανεώθηκε. Πατήστε «Συνέχεια» ξανά.
+						</div>
+					{/if}
 					{#if Object.keys(unsaved).length}
 						<div class="w-full rounded-lg bg-amber-50 p-3 text-lg text-amber-900" role="alert">
 							Κάποιες απαντήσεις δεν αποθηκεύτηκαν. Ελέγξτε τη σύνδεση και πατήστε «Ξαναδοκιμάστε».

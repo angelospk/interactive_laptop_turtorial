@@ -131,6 +131,34 @@ describe('GuideLesson', () => {
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
 	});
 
+	test('a refresh that fails keeps the guide open instead of completing on old progress', async () => {
+		nav.invalidateAll.mockRejectedValueOnce(new Error('offline'));
+		const { screen, onComplete } = mount();
+		await runToEnd(screen);
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν ανανεώθηκε/);
+		expect(onComplete).not.toHaveBeenCalled();
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+	});
+
+	test('answers that failed are all sent, once, when the network is back', async () => {
+		const sent: Record<string, string>[] = [];
+		let online = false;
+		fetchMock.mockImplementation(async (_url: string, init: { body: string }) => {
+			if (online) sent.push(JSON.parse(init.body).answers);
+			return { ok: online, json: async () => ({}) };
+		});
+		const { screen, onComplete } = mount();
+		await runToEnd(screen);
+		online = true;
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalled());
+		const merged = Object.assign({}, ...sent);
+		expect(Object.values(merged).every((v) => v === 'known')).toBe(true);
+		expect(Object.keys(merged)).toHaveLength(10);
+	});
+
 	test('the start screen holds the keyboard: the demo behind it cannot be tabbed into', async () => {
 		const { screen } = mount();
 		await expect.element(screen.getByRole('button', { name: 'Ξεκινάμε' })).toHaveFocus();
