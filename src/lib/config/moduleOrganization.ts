@@ -283,7 +283,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{
 			id: 'more-daily',
 			title: 'Περισσότερα για κάθε μέρα',
-			lessonIds: ['android-viber-group']
+			lessonIds: ['android-viber-group', 'android-install-app']
 		}
 	],
 	iphone: [
@@ -329,7 +329,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		{
 			id: 'more-daily',
 			title: 'Περισσότερα για κάθε μέρα',
-			lessonIds: ['iphone-viber-group']
+			lessonIds: ['iphone-viber-group', 'iphone-install-app']
 		}
 	],
 	// Mac track (CURRICULUM_PLAN §5). «Τα βασικά του Mac» is the base path — its

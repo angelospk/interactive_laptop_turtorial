@@ -151,6 +151,16 @@
                   "module": "android",
                   "lesson": "update-app",
                   "label": "Ενημέρωση εφαρμογής (Android)"
+                },
+                {
+                  "module": "android",
+                  "lesson": "install-app",
+                  "label": "Εγκατάσταση εφαρμογής (Android)"
+                },
+                {
+                  "module": "iphone",
+                  "lesson": "install-app",
+                  "label": "Εγκατάσταση εφαρμογής (iPhone)"
                 }
               ]
             },

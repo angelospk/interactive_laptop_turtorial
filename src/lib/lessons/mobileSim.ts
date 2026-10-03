@@ -69,10 +69,22 @@ export interface MobileSimConfig {
 	targetHost?: string;
 	/** Toggle target for night-mode / find-device goals (default true = turn ON). */
 	targetOn?: boolean;
-	/** Apps listed in the store (update-app lesson). */
-	storeItems?: { id: string; label: string; icon: string; hasUpdate?: boolean }[];
+	/**
+	 * Apps listed in the store (update-app / install-app lessons). `installed:false`
+	 * items are only found by searching; `developer` is shown under the name.
+	 */
+	storeItems?: {
+		id: string;
+		label: string;
+		icon: string;
+		hasUpdate?: boolean;
+		installed?: boolean;
+		developer?: string;
+	}[];
 	/** Which store item must be updated. */
 	targetUpdateId?: string;
+	/** Which not-yet-installed store item must be installed. */
+	targetInstallId?: string;
 	/** Store name shown in the header (Play Store / App Store). */
 	storeName?: string;
 	/** Digital-assistant intent, e.g. 'alarm' | 'reminder' (assistant lesson). */
@@ -123,6 +135,7 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-night-mode': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-find-device': { requiresTargetAppId: true, targetKind: 'settings' },
 	'mobile-update-app': { requiresTargetAppId: true, targetKind: 'store' },
+	'mobile-install-app': { requiresTargetAppId: true, targetKind: 'store' },
 	'mobile-assistant-task': { requiresTargetAppId: true, targetKind: 'assistant' },
 	'mobile-spot-scam-sms': { requiresTargetAppId: true, targetKind: 'messages' },
 	'mobile-enter-2fa': { requiresTargetAppId: true, targetKind: 'browser' }
@@ -267,6 +280,16 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		const target = c.storeItems.find((s) => s.id === c.targetUpdateId);
 		if (!target?.hasUpdate) {
 			throw new Error(`store item "${c.targetUpdateId}" must have hasUpdate:true to be updatable`);
+		}
+	}
+	if (c.goal === 'mobile-install-app') {
+		const target = c.storeItems?.find((s) => s.id === c.targetInstallId);
+		if (!target)
+			throw new Error('mobile-install-app needs a targetInstallId present in storeItems');
+		if (target.installed !== false) {
+			throw new Error(
+				`store item "${c.targetInstallId}" must have installed:false to be installable`
+			);
 		}
 	}
 	if (c.goal === 'mobile-enter-2fa') {

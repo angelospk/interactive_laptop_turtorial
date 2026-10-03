@@ -184,3 +184,19 @@ describe('P7 — μπαίνω σε σύσκεψη από την πρόσκλησ
 		expect(linksOf(sub)).toContain('module11/join-meeting');
 	});
 });
+
+describe('P10 — εγκατάσταση εφαρμογής από το κατάστημα (esm001-c2-s5)', () => {
+	it.each(['android', 'iphone'])('%s: installs the official app among look-alikes', (mod) => {
+		const c = config(`${mod}-install-app`);
+		expect(c.goal).toBe('mobile-install-app');
+		const items = c.storeItems as { id: string; installed?: boolean }[];
+		expect(items.find((i) => i.id === c.targetInstallId)?.installed).toBe(false);
+		expect(items.filter((i) => i.installed === false).length).toBeGreaterThanOrEqual(2);
+	});
+
+	it('is linked from the app-management theory section', () => {
+		expect(linksOf('esm001-c2-s5')).toEqual(
+			expect.arrayContaining(['android/install-app', 'iphone/install-app'])
+		);
+	});
+});

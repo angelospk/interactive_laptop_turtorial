@@ -406,6 +406,39 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				successMessage: 'Μπράβο! Το μήνυμα πήγε σε όλη την ομάδα με μία αποστολή.',
 				hint: 'Στο Viber, η ομάδα φαίνεται σαν μια συνομιλία με το όνομά της. Πάτησε «Οικογένεια», όχι την Ελένη ή τον Γιώργο.'
 			}
+		},
+		{
+			n: 21,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'install-app',
+			config: {
+				goal: 'mobile-install-app',
+				prompt: `Ο εγγονός σας είπε να βάλετε στο κινητό το «Gov.gr Wallet», για την ψηφιακή ταυτότητα. Βρείτε το στο ${variant === 'ios' ? 'App Store' : 'Play Store'} και εγκαταστήστε το επίσημο.`,
+				targetAppId: 'store',
+				storeName: variant === 'ios' ? 'App Store' : 'Play Store',
+				targetInstallId: 'govwallet',
+				storeItems: [
+					{ id: 'viber', label: 'Viber', icon: '💜' },
+					{ id: 'weather', label: 'Καιρός', icon: '⛅' },
+					{
+						id: 'fake-wallet',
+						label: 'Wallet Ταυτότητα 2024',
+						icon: '💳',
+						installed: false,
+						developer: 'QuickApps Ltd'
+					},
+					{
+						id: 'govwallet',
+						label: 'Gov.gr Wallet',
+						icon: '🪪',
+						installed: false,
+						developer: 'Ελληνική Δημοκρατία'
+					}
+				],
+				successMessage:
+					'Μπράβο! Εγκατέστησες την επίσημη εφαρμογή — φτιαγμένη από την Ελληνική Δημοκρατία.',
+				hint: 'Γράψε «wallet» στην αναζήτηση του καταστήματος. Διάλεξε αυτή που από κάτω γράφει «Ελληνική Δημοκρατία».'
+			}
 		}
 	];
 

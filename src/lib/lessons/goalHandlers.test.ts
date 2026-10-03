@@ -1116,3 +1116,22 @@ describe('join-meeting', () => {
 		);
 	});
 });
+
+describe('mobile-install-app', () => {
+	const cfg = { targetInstallId: 'govwallet' };
+
+	it('passes when the target app is installed', () => {
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-installed', { appId: 'govwallet' }, cfg)
+		).toBe(true);
+	});
+
+	it('fails for another app, or for an update', () => {
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-installed', { appId: 'fake-wallet' }, cfg)
+		).toBe(false);
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-updated', { appId: 'govwallet' }, cfg)
+		).toBe(false);
+	});
+});

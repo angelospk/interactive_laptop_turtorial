@@ -106,6 +106,8 @@
 			miss('Προσοχή: αυτή η διεύθυνση δεν είναι το επίσημο gov.gr. Καλύτερα μην την ανοίξεις.');
 		} else if (action === 'mobile-app-updated') {
 			miss('Ενημέρωσες άλλη εφαρμογή. Ψάξε αυτή που ζητά το μάθημα.');
+		} else if (action === 'mobile-app-installed') {
+			miss('Δεν είναι η επίσημη εφαρμογή. Κοίτα ποιος την έχει φτιάξει (κάτω από το όνομα).');
 		} else if (action === 'mobile-assistant-command') {
 			miss('Ο βοηθός δεν το κατάλαβε καλά. Διάλεξε πιο ξεκάθαρη διατύπωση.');
 		} else if (action === 'mobile-sms-verdict') {

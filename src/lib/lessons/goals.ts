@@ -100,6 +100,7 @@ export const GOALS = {
 	'mobile-night-mode': { requiresAppId: false },
 	'mobile-find-device': { requiresAppId: false },
 	'mobile-update-app': { requiresAppId: false },
+	'mobile-install-app': { requiresAppId: false },
 	'mobile-assistant-task': { requiresAppId: false },
 	'mobile-spot-scam-sms': { requiresAppId: false },
 	'mobile-enter-2fa': { requiresAppId: false },

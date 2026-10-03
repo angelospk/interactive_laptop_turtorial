@@ -20,7 +20,9 @@
 	"Διαχείριση εφαρμογών": [
 		{ "module": "android", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (Android)" },
 		{ "module": "iphone", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (iPhone)" },
-		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" }
+		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" },
+		{ "module": "android", "lesson": "install-app", "label": "Εγκατάσταση εφαρμογής (Android)" },
+		{ "module": "iphone", "lesson": "install-app", "label": "Εγκατάσταση εφαρμογής (iPhone)" }
 	],
 	"Γρήγορες ρυθμίσεις και ειδοποιήσεις": [
 		{ "module": "android", "lesson": "connect-wifi", "label": "Σύνδεση σε Wi-Fi (Android)" },

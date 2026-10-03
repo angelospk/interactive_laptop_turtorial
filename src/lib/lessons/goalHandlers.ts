@@ -230,6 +230,9 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-update-app': (action, data, config) =>
 		action === 'mobile-app-updated' &&
 		(!config.targetUpdateId || data.appId === config.targetUpdateId),
+	'mobile-install-app': (action, data, config) =>
+		action === 'mobile-app-installed' &&
+		(!config.targetInstallId || data.appId === config.targetInstallId),
 
 	// Digital assistant: the learner picked the well-formed phrase for the intent.
 	'mobile-assistant-task': (action, data, config) =>
