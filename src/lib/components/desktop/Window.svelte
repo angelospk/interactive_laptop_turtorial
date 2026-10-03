@@ -69,6 +69,9 @@
 	}
 </script>
 
+<!-- Maximized stops at the taskbar (h-12 = 3rem) like the real thing: running
+     to the bottom put the end of every page, and the download lesson's "Λήψη"
+     button, behind it. -->
 {#if isOpen && !isMinimized}
 	<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
@@ -81,12 +84,13 @@
 			left: {isMaximized ? 0 : x}px;
 			top: {isMaximized ? 0 : y}px;
 			width: {isMaximized ? '100%' : `${initialWidth}px`};
-			height: {isMaximized ? '100%' : `${initialHeight}px`};
+			height: {isMaximized ? 'calc(100% - 3rem)' : `${initialHeight}px`};
 			z-index: {isMaximized ? 10 : 1};
 		"
 		onclick={(e) => e.stopPropagation()}
 		onmousedown={() => onFocus?.()}
 		role="application"
+		data-window
 	>
 		<!-- Title Bar -->
 		<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->

@@ -47,6 +47,7 @@
 <div
 	class="absolute right-0 bottom-0 left-0 z-50 flex h-12 items-center bg-slate-900/85 px-2 backdrop-blur-xl [font-family:Segoe_UI,system-ui,sans-serif]"
 	onclick={(e) => e.stopPropagation()}
+	data-taskbar
 >
 	<!-- Quick Settings Popup -->
 	<QuickSettings

@@ -61,6 +61,11 @@
 		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp }
 	];
 
+	// Windows open maximized: a 600x400 window in the corner of a big screen left
+	// a beginner squinting at a fraction of it. The one exception is the lesson
+	// about the maximize button itself, which needs a window that is not yet.
+	const openMaximized = goal !== 'maximize-app';
+
 	// Pinned Apps (Default set)
 	const pinnedAppIds = ['explorer', 'browser', 'email', 'settings'];
 
@@ -142,7 +147,7 @@
 				id: crypto.randomUUID(),
 				appId,
 				minimized: !!initialState?.minimized,
-				maximized: !!initialState?.maximized
+				maximized: initialState?.maximized ?? openMaximized
 			});
 			checkGoal('open-app', { appId });
 		}
@@ -234,115 +239,119 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	{#if config.instructions}
-		<div class="mb-4">
-			<Card class="border-blue-200 bg-blue-50">
-				<div class="flex gap-3 p-4">
-					<Info class="h-5 w-5 shrink-0 text-blue-600" />
-					<div class="flex-1 text-sm whitespace-pre-line text-blue-900">
-						{fillShortcutText(config.instructions, device)}
-					</div>
-				</div>
-			</Card>
-		</div>
-	{/if}
-	<div class="relative h-full w-full">
-		<!-- Desktop Environment -->
-		<Desktop class="h-[600px]">
-			<!-- Windows -->
-			{#each openApps as instance (instance.id)}
-				{@const appDef = availableApps.find((a) => a.id === instance.appId)}
-				{#if appDef && appDef.component}
-					<Window
-						title={appDef.name}
-						icon={appDef.icon}
-						isOpen={true}
-						isMinimized={instance.minimized}
-						isMaximized={instance.maximized}
-						onMinimize={() => toggleMinimize(instance.id)}
-						onMaximize={() => toggleMaximize(instance.id)}
-						onClose={() => closeApp(instance.id)}
-						onFocus={() => bringToFront(instance.id)}
-					>
-						<!-- Dynamic Component Rendering -->
-						<appDef.component
-							config={{
-								...config,
-								...(instance.appId === 'settings'
-									? { initialPage: instance.settingsPage ?? config.initialPage }
-									: {})
-							}}
-							onAction={handleAppAction}
-							{device}
-							active={instance.id === frontmostId}
-							initialFiles={config.initialFiles}
-							initialData={config.initialData}
-							emails={config.emails}
-						/>
-					</Window>
-				{:else}
-					<!-- Fallback/Placeholder Window -->
-					<Window
-						title={appDef?.name || 'App'}
-						icon={appDef?.icon}
-						isOpen={true}
-						isMinimized={instance.minimized}
-						isMaximized={instance.maximized}
-						onMinimize={() => toggleMinimize(instance.id)}
-						onMaximize={() => toggleMaximize(instance.id)}
-						onClose={() => closeApp(instance.id)}
-						onFocus={() => bringToFront(instance.id)}
-					>
-						<div class="flex h-full items-center justify-center bg-white">
-							<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
+	<!-- A column: the instruction keeps its own height and the simulated screen
+	     takes every pixel left, instead of a fixed 600px box. -->
+	<div class="flex h-full min-h-0 flex-col gap-3">
+		{#if config.instructions}
+			<div class="shrink-0">
+				<Card class="border-blue-200 bg-blue-50">
+					<div class="flex gap-3 p-4">
+						<Info class="h-5 w-5 shrink-0 text-blue-600" />
+						<div class="flex-1 text-sm whitespace-pre-line text-blue-900">
+							{fillShortcutText(config.instructions, device)}
 						</div>
-					</Window>
-				{/if}
-			{/each}
+					</div>
+				</Card>
+			</div>
+		{/if}
+		<div class="relative min-h-0 w-full flex-1">
+			<!-- Desktop Environment -->
+			<Desktop>
+				<!-- Windows -->
+				{#each openApps as instance (instance.id)}
+					{@const appDef = availableApps.find((a) => a.id === instance.appId)}
+					{#if appDef && appDef.component}
+						<Window
+							title={appDef.name}
+							icon={appDef.icon}
+							isOpen={true}
+							isMinimized={instance.minimized}
+							isMaximized={instance.maximized}
+							onMinimize={() => toggleMinimize(instance.id)}
+							onMaximize={() => toggleMaximize(instance.id)}
+							onClose={() => closeApp(instance.id)}
+							onFocus={() => bringToFront(instance.id)}
+						>
+							<!-- Dynamic Component Rendering -->
+							<appDef.component
+								config={{
+									...config,
+									...(instance.appId === 'settings'
+										? { initialPage: instance.settingsPage ?? config.initialPage }
+										: {})
+								}}
+								onAction={handleAppAction}
+								{device}
+								active={instance.id === frontmostId}
+								initialFiles={config.initialFiles}
+								initialData={config.initialData}
+								emails={config.emails}
+							/>
+						</Window>
+					{:else}
+						<!-- Fallback/Placeholder Window -->
+						<Window
+							title={appDef?.name || 'App'}
+							icon={appDef?.icon}
+							isOpen={true}
+							isMinimized={instance.minimized}
+							isMaximized={instance.maximized}
+							onMinimize={() => toggleMinimize(instance.id)}
+							onMaximize={() => toggleMaximize(instance.id)}
+							onClose={() => closeApp(instance.id)}
+							onFocus={() => bringToFront(instance.id)}
+						>
+							<div class="flex h-full items-center justify-center bg-white">
+								<p class="text-slate-400">Η εφαρμογή δεν είναι διαθέσιμη</p>
+							</div>
+						</Window>
+					{/if}
+				{/each}
 
-			<!-- Start Menu -->
-			<StartMenu
-				isOpen={startMenuOpen}
-				apps={availableApps}
-				onAppClick={openApp}
-				onClose={() => (startMenuOpen = false)}
-			/>
+				<!-- Start Menu -->
+				<StartMenu
+					isOpen={startMenuOpen}
+					apps={availableApps}
+					onAppClick={openApp}
+					onClose={() => (startMenuOpen = false)}
+				/>
 
-			<!-- Task View -->
-			<TaskView
-				isOpen={showTaskView}
-				{openApps}
-				{availableApps}
-				onClose={() => (showTaskView = false)}
-				onAppClick={(instanceId) => {
-					const app = openApps.find((a) => a.id === instanceId);
-					if (app && app.minimized) {
-						app.minimized = false;
-					}
-					bringToFront(instanceId);
-				}}
-			/>
+				<!-- Task View -->
+				<TaskView
+					isOpen={showTaskView}
+					{openApps}
+					{availableApps}
+					onClose={() => (showTaskView = false)}
+					onAppClick={(instanceId) => {
+						const app = openApps.find((a) => a.id === instanceId);
+						if (app && app.minimized) {
+							app.minimized = false;
+						}
+						bringToFront(instanceId);
+					}}
+				/>
 
-			<!-- Taskbar -->
-			<Taskbar
-				apps={taskbarApps}
-				openAppIds={openApps.map((a) => a.appId)}
-				onAppClick={(id) => openApp(id)}
-				onStartClick={() => {
-					startMenuOpen = !startMenuOpen;
-					if (startMenuOpen) {
-						checkGoal('open-start-menu');
-					}
-				}}
-				onQuickSettingsClick={() => checkGoal('open-quick-settings')}
-				onTaskViewClick={() => {
-					showTaskView = !showTaskView;
-					if (showTaskView) {
-						checkGoal('open-task-view');
-					}
-				}}
-				onOpenSettings={openSettingsToPage}
-			/>
-		</Desktop>
+				<!-- Taskbar -->
+				<Taskbar
+					apps={taskbarApps}
+					openAppIds={openApps.map((a) => a.appId)}
+					onAppClick={(id) => openApp(id)}
+					onStartClick={() => {
+						startMenuOpen = !startMenuOpen;
+						if (startMenuOpen) {
+							checkGoal('open-start-menu');
+						}
+					}}
+					onQuickSettingsClick={() => checkGoal('open-quick-settings')}
+					onTaskViewClick={() => {
+						showTaskView = !showTaskView;
+						if (showTaskView) {
+							checkGoal('open-task-view');
+						}
+					}}
+					onOpenSettings={openSettingsToPage}
+				/>
+			</Desktop>
+		</div>
 	</div>
 </LessonTemplate>
