@@ -22,6 +22,8 @@
 		}
 		const root = container;
 		const selector = `[data-guide="${target}"]`;
+		// Never frame the old element under the new target's name.
+		box = null;
 		let frame = requestAnimationFrame(function measure() {
 			const el = root.querySelector(selector) as HTMLElement | null;
 			const next = el ? relativeBox(el, root) : null;

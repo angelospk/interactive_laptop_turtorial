@@ -14,6 +14,20 @@ vi.mock('$lib/db/client', async () => {
 	};
 });
 
+// A guide whose steps cover m5-a and m5-b only.
+vi.mock('$lib/guides', () => ({
+	guides: {
+		module5: {
+			id: 'module5',
+			moduleId: 'module5',
+			steps: [
+				{ id: 'a', target: 'a', lessonIds: ['m5-a'] },
+				{ id: 'b', target: 'b', lessonIds: ['m5-b'] }
+			]
+		}
+	}
+}));
+
 const { POST } = await import('../+server');
 
 const USER = 'user-1';
@@ -61,6 +75,7 @@ describe('POST /api/lessons/guide-answers', () => {
 				lesson('m5-guide', 'module5', 'guide'),
 				lesson('m5-a', 'module5'),
 				lesson('m5-b', 'module5'),
+				lesson('m5-theory', 'module5', 'reading'),
 				lesson('m6-a', 'module6')
 			])
 			.run();
@@ -76,6 +91,52 @@ describe('POST /api/lessons/guide-answers', () => {
 		expect(await status(call({ guideLessonId: 'm5-guide', answers: { 'm5-a': 'maybe' } }))).toBe(
 			400
 		);
+	});
+
+	it('rejects a lesson that is not one of the guide’s steps, writing nothing', async () => {
+		const res = call({
+			guideLessonId: 'm5-guide',
+			answers: { 'm5-a': 'known', 'm5-theory': 'known' }
+		});
+		expect(await status(res)).toBe(400);
+		expect(await row('m5-a')).toBeUndefined();
+		expect(await row('m5-theory')).toBeUndefined();
+	});
+
+	it('a real completion that lands between the guide’s read and its write is kept', async () => {
+		// The row is solved for real, but any read of user_progress sees it as it
+		// was a moment earlier: unfinished. Only a write that checks the row
+		// itself, in the same statement, keeps the real result.
+		await currentDb
+			.insert(userProgress)
+			.values({
+				id: 'row-1',
+				userId: USER,
+				lessonId: 'm5-a',
+				completed: true,
+				score: 90,
+				stars: 3,
+				attempts: 1
+			})
+			.run();
+		const stale = { id: 'row-1', userId: USER, lessonId: 'm5-a', completed: false, attempts: 1 };
+		const realSelect = currentDb.select.bind(currentDb);
+		vi.spyOn(currentDb, 'select').mockImplementation(((...args: Parameters<typeof realSelect>) => {
+			const query = realSelect(...args);
+			return {
+				from(table: unknown) {
+					if (table !== userProgress) return query.from(table as typeof lessons);
+					const staleRows = Object.assign(Promise.resolve([stale]), {
+						get: async () => stale,
+						all: async () => [stale]
+					});
+					return { where: () => staleRows };
+				}
+			};
+		}) as never);
+		await call({ guideLessonId: 'm5-guide', answers: { 'm5-a': 'known' } });
+		vi.restoreAllMocks();
+		expect(await row('m5-a')).toMatchObject({ completed: true, score: 90, source: null });
 	});
 
 	it('rejects an exercise from another module', async () => {

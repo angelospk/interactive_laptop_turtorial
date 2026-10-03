@@ -3,6 +3,9 @@ import { render } from 'vitest-browser-svelte';
 import GuideLesson from './GuideLesson.svelte';
 
 // Every clip "ends" at once, so the tour runs at click speed.
+const nav = vi.hoisted(() => ({ invalidateAll: vi.fn(async () => {}) }));
+vi.mock('$app/navigation', () => nav);
+
 vi.mock('$lib/guides/audio', () => ({
 	readingMs: () => 0,
 	createGuideAudio: () => ({
@@ -93,19 +96,78 @@ describe('GuideLesson', () => {
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
 	});
 
-	test('answers that cannot be saved are named at the end, with a retry', async () => {
-		fetchMock.mockImplementation(async () => ({ ok: false, json: async () => ({}) }));
-		const { screen } = mount();
+	async function runToEnd(screen: Screen) {
 		await start(screen);
 		await screen.getByRole('button', { name: /Το ξέρω/ }).click();
 		for (let i = 2; i <= 11; i++) {
 			await expect.element(screen.getByText(`Βήμα ${i} από 11`)).toBeInTheDocument();
 			await screen.getByRole('button', { name: /Το ξέρω/ }).click();
 		}
+		await expect.element(screen.getByRole('heading', { name: /Ξέρατε/ })).toBeInTheDocument();
+	}
+
+	test('Συνέχεια refreshes progress before completing, so Next sees the new green lessons', async () => {
+		const { screen, onComplete } = mount();
+		await runToEnd(screen);
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalled());
+		expect(nav.invalidateAll).toHaveBeenCalled();
+		expect(nav.invalidateAll.mock.invocationCallOrder[0]).toBeLessThan(
+			onComplete.mock.invocationCallOrder[0]
+		);
+	});
+
+	test('answers that cannot be saved are named, and Συνέχεια waits until they are', async () => {
+		fetchMock.mockImplementation(async () => ({ ok: false, json: async () => ({}) }));
+		const { screen, onComplete } = mount();
+		await runToEnd(screen);
 		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκαν/);
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν αποθηκεύτηκαν/);
+		expect(onComplete).not.toHaveBeenCalled();
+
 		fetchMock.mockImplementation(async () => ({ ok: true, json: async () => ({}) }));
-		await screen.getByRole('button', { name: 'Ξαναδοκιμάστε' }).click();
-		await expect.element(screen.getByRole('alert')).not.toBeInTheDocument();
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+	});
+
+	test('the start screen holds the keyboard: the demo behind it cannot be tabbed into', async () => {
+		const { screen } = mount();
+		await expect.element(screen.getByRole('button', { name: 'Ξεκινάμε' })).toHaveFocus();
+		expect(document.querySelector('[data-guide="address-bar"]')?.closest('[inert]')).not.toBeNull();
+		await screen.getByRole('button', { name: 'Ξεκινάμε' }).click();
+		expect(document.querySelector('[data-guide="address-bar"]')?.closest('[inert]')).toBeNull();
+	});
+
+	test('the summary takes focus when the tour ends', async () => {
+		const { screen } = mount();
+		await runToEnd(screen);
+		await expect.element(screen.getByRole('heading', { name: /Ξέρατε/ })).toHaveFocus();
+	});
+
+	test('what the learner does in the demo stays put from one step to the next', async () => {
+		const { screen } = mount();
+		await start(screen);
+		await screen.getByText('Ειδήσεις', { exact: true }).click();
+		await screen.getByRole('button', { name: /Το ξέρω/ }).click();
+		await expect.element(screen.getByText('Βήμα 2 από 11')).toBeInTheDocument();
+		// Still on the news page: the step change did not reload the demo.
+		expect(document.querySelector('[data-guide="search"]')).toBeNull();
+	});
+
+	test('a step whose element the learner navigated away from brings the demo back', async () => {
+		const { screen } = mount();
+		await start(screen);
+		// Step 1: the learner opens the news tab, so the Google box of step 6 is gone.
+		await screen.getByText('Ειδήσεις', { exact: true }).click();
+		expect(document.querySelector('[data-guide="search"]')).toBeNull();
+		for (let i = 1; i <= 5; i++) {
+			await expect.element(screen.getByText(`Βήμα ${i} από 11`)).toBeInTheDocument();
+			await screen.getByRole('button', { name: /Το ξέρω/ }).click();
+		}
+		await expect.element(screen.getByText('Βήμα 6 από 11')).toBeInTheDocument();
+		await vi.waitFor(() => expect(spotlight()?.getAttribute('data-target')).toBe('search'));
+		expect(document.querySelector('[data-guide="search"]')).not.toBeNull();
 	});
 
 	test('the mute button is remembered', async () => {

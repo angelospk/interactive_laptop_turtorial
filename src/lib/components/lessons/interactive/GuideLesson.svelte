@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
 	import { Volume2, VolumeX, RotateCcw, LogOut } from '@lucide/svelte';
@@ -31,6 +33,9 @@
 	// A guide lesson never changes under the component (LessonRenderer keys it by id).
 	const lessonId = lesson.id;
 	const guide = guides[(lesson.config as { guideId?: string } | null)?.guideId ?? ''];
+	// Handed over once: BrowserApp resets its tabs whenever `config` is read anew,
+	// so passing `tour.guide.simConfig` would reset the demo on every step.
+	const simConfig = guide?.simConfig ?? {};
 
 	let tour = $state.raw<GuideState | null>(guide ? createGuide(guide) : null);
 	const startMuted = typeof localStorage !== 'undefined' && localStorage.getItem(MUTE_KEY) === '1';
@@ -43,6 +48,8 @@
 	let unsaved = $state<Record<string, Answer>>({});
 	let finishing = $state(false);
 	let stage = $state<HTMLElement>();
+	/** Bumped to put the demo back as it started (see `ensureTarget`). */
+	let simEpoch = $state(0);
 
 	const audio = createGuideAudio({ muted: startMuted });
 	const idle = createIdleWatcher({
@@ -57,7 +64,10 @@
 					: hintClip(tour.guide, step);
 			nudges++;
 			nudgeClip = id;
-			say(id, () => {});
+			// When the nudge is over, the step's own words come back (caption and «Ξανά»).
+			say(id, () => {
+				if (nudgeClip === id) nudgeClip = null;
+			});
 		}
 	});
 
@@ -92,10 +102,20 @@
 		if (next.phase === 'step' && (prev?.phase !== 'step' || prev.stepIndex !== next.stepIndex)) {
 			nudges = 0;
 			idle.reset();
+			ensureTarget(next.guide.steps[next.stepIndex].target);
 		} else if (next.phase !== 'step') {
 			idle.stop();
 		}
 	}
+
+	// The learner may have clicked away from what this step shows (another tab,
+	// another page). Rather than pointing at nothing, put the demo back.
+	async function ensureTarget(target: string) {
+		await tick();
+		if (stage && !stage.querySelector(`[data-guide="${target}"]`)) simEpoch++;
+	}
+
+	const focusOnMount = (el: HTMLElement) => el.focus();
 
 	let lastActivity = 0;
 	function activity() {
@@ -132,8 +152,13 @@
 	let queue: Promise<unknown> = Promise.resolve();
 	function save(answers: Record<string, Answer>) {
 		queue = queue.then(async () => {
-			if (await send(answers)) return;
-			if (await send(answers)) return;
+			if ((await send(answers)) || (await send(answers))) {
+				// A newer answer that got through replaces an older one still waiting.
+				const rest = { ...unsaved };
+				for (const id of Object.keys(answers)) delete rest[id];
+				unsaved = rest;
+				return;
+			}
 			unsaved = { ...unsaved, ...answers };
 		});
 		return queue;
@@ -158,9 +183,21 @@
 		save(pending);
 	}
 
+	// The guide counts as done only once every answer is stored, and after the
+	// page's progress is refreshed: Next must already see the new green lessons.
 	async function finish() {
 		finishing = true;
+		if (Object.keys(unsaved).length) retryUnsaved();
 		await queue;
+		if (Object.keys(unsaved).length) {
+			finishing = false;
+			return;
+		}
+		try {
+			await invalidateAll();
+		} catch {
+			// Progress shows up on the next load anyway.
+		}
 		finishing = false;
 		audio.stop();
 		onComplete(100);
@@ -209,7 +246,11 @@
 			bind:this={stage}
 			class="relative h-[min(50vh,520px)] min-h-[340px] overflow-hidden rounded-xl border-2 border-slate-300 shadow-sm"
 		>
-			<BrowserApp config={tour.guide.simConfig} onAction={activity} />
+			<div class="h-full" inert={tour.phase === 'start'}>
+				{#key simEpoch}
+					<BrowserApp config={simConfig} onAction={activity} />
+				{/key}
+			</div>
 			<GuideSpotlight container={stage} target={spotlight} />
 
 			{#if tour.phase === 'start'}
@@ -220,7 +261,11 @@
 							Θα σας δείξω ένα-ένα τα κουμπιά, με φωνή και γραμμένο κείμενο. Ανοίξτε τον ήχο του
 							υπολογιστή, αν θέλετε να με ακούτε.
 						</p>
-						<Button class="min-h-14 px-10 text-xl" onclick={() => tour && go(begin(tour))}>
+						<Button
+							class="min-h-14 px-10 text-xl"
+							onclick={() => tour && go(begin(tour))}
+							{@attach focusOnMount}
+						>
 							Ξεκινάμε
 						</Button>
 					</div>
@@ -240,7 +285,8 @@
 				<div class="flex gap-2">{@render soundControls()}</div>
 			</div>
 			{#if tour.phase === 'done'}
-				<h2 class="mb-2 text-2xl font-bold">
+				<!-- The answer buttons it replaces had the focus; it moves here, not to <body>. -->
+				<h2 class="mb-2 text-2xl font-bold" tabindex="-1" {@attach focusOnMount}>
 					Ξέρατε {result.known} από τα {result.total}
 				</h2>
 			{/if}
@@ -279,7 +325,12 @@
 					{#if Object.keys(unsaved).length}
 						<div class="w-full rounded-lg bg-amber-50 p-3 text-lg text-amber-900" role="alert">
 							Κάποιες απαντήσεις δεν αποθηκεύτηκαν. Ελέγξτε τη σύνδεση και πατήστε «Ξαναδοκιμάστε».
-							<Button variant="outline" class="ml-2 min-h-12" onclick={retryUnsaved}>
+							<Button
+								variant="outline"
+								class="ml-2 min-h-12"
+								onclick={retryUnsaved}
+								disabled={finishing}
+							>
 								Ξαναδοκιμάστε
 							</Button>
 						</div>

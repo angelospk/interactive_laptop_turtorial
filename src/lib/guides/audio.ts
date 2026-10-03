@@ -62,6 +62,8 @@ export function createGuideAudio(opts: {
 			el = audio;
 			audio.onended = clip.done;
 			audio.onerror = fallback;
+			// A download that stalls fires neither event; the guide must not hang on it.
+			timer = setTimeout(clip.done, readingMs(caption) * 2 + 5000);
 			audio.play().catch(() => {
 				if (el === audio) fallback();
 			});

@@ -2,7 +2,8 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/db/client';
 import { lessons, userProgress } from '$lib/db/schema';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { guides } from '$lib/guides';
 import { requireUser } from '$lib/server/guards';
 
 type Answer = 'known' | 'unknown';
@@ -26,15 +27,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const guide = await db.select().from(lessons).where(eq(lessons.id, body.guideLessonId)).get();
 	if (!guide || guide.lessonType !== 'guide') throw error(400, 'Not a guide lesson');
 
+	// Only the exercises this guide's steps stand for: not its theory, not the
+	// guide itself. All or nothing, so a bad request writes nothing.
+	const guideId = (guide.config as { guideId?: string } | null)?.guideId ?? '';
+	const allowed = new Set(guides[guideId]?.steps.flatMap((s) => s.lessonIds) ?? []);
 	const lessonIds = Object.keys(answers);
-	if (lessonIds.length === 0) return json({ success: true });
-
-	const targets = await db.select().from(lessons).where(inArray(lessons.id, lessonIds));
-	const sameModule = targets.filter((l) => l.moduleId === guide.moduleId);
-	if (sameModule.length !== lessonIds.length) {
-		throw error(400, "Every lesson must exist and belong to the guide's module");
+	if (lessonIds.some((id) => !allowed.has(id))) {
+		throw error(400, "Every lesson must be one of the guide's exercises");
 	}
 
+	// Each write decides on the row itself, in one statement: a real solve that
+	// lands between two requests is never overwritten or deleted.
 	const now = new Date();
 	for (const lessonId of lessonIds) {
 		const mine = and(eq(userProgress.userId, user.id), eq(userProgress.lessonId, lessonId));
@@ -45,20 +48,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				.run();
 			continue;
 		}
-		const existing = await db.select().from(userProgress).where(mine).get();
-		if (existing?.completed) continue;
-		if (existing) {
-			await db
-				.update(userProgress)
-				.set({ completed: true, completedAt: now, source: 'guide' })
-				.where(eq(userProgress.id, existing.id))
-				.run();
-		} else {
-			await db
-				.insert(userProgress)
-				.values({ userId: user.id, lessonId, completed: true, completedAt: now, source: 'guide' })
-				.run();
-		}
+		await db
+			.insert(userProgress)
+			.values({ userId: user.id, lessonId, completed: true, completedAt: now, source: 'guide' })
+			.onConflictDoNothing({ target: [userProgress.userId, userProgress.lessonId] })
+			.run();
+		await db
+			.update(userProgress)
+			.set({ completed: true, completedAt: now, source: 'guide' })
+			.where(and(mine, eq(userProgress.completed, false)))
+			.run();
 	}
 	return json({ success: true });
 };

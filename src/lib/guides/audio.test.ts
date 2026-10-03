@@ -99,3 +99,19 @@ describe('guide audio', () => {
 		expect(onEnd).toHaveBeenCalledTimes(1);
 	});
 });
+
+describe('guide audio that never finishes', () => {
+	beforeEach(() => vi.useFakeTimers());
+	afterEach(() => vi.useRealTimers());
+
+	it('a clip that neither ends nor fails still ends, after twice its reading time', () => {
+		const onEnd = vi.fn();
+		make().play('x', 'Ωραία!', onEnd);
+		vi.advanceTimersByTime(2 * 2500 + 4999);
+		expect(onEnd).not.toHaveBeenCalled();
+		vi.advanceTimersByTime(1);
+		expect(onEnd).toHaveBeenCalledTimes(1);
+		FakeAudio.last.onended?.();
+		expect(onEnd).toHaveBeenCalledTimes(1);
+	});
+});
