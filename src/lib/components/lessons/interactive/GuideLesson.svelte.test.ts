@@ -154,9 +154,33 @@ describe('GuideLesson', () => {
 		online = true;
 		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalled());
-		const merged = Object.assign({}, ...sent);
-		expect(Object.values(merged).every((v) => v === 'known')).toBe(true);
-		expect(Object.keys(merged)).toHaveLength(10);
+		const ids = sent.flatMap((answers) => Object.keys(answers));
+		expect(ids).toHaveLength(10);
+		expect(new Set(ids).size).toBe(10);
+		expect(sent.every((answers) => Object.values(answers).every((v) => v === 'known'))).toBe(true);
+	});
+
+	test('Συνέχεια waits for a save still in flight, and its retry, before completing', async () => {
+		let release!: (res: { ok: boolean; json: () => Promise<object> }) => void;
+		const saved: string[] = [];
+		fetchMock.mockImplementation(async (_url: string, init: { body: string }) => {
+			const ids = Object.keys(JSON.parse(init.body).answers);
+			// The last exercise's first attempt hangs, then fails.
+			if (ids.includes('module5-lesson10') && !release) {
+				return new Promise((resolve) => (release = resolve));
+			}
+			saved.push(...ids);
+			return { ok: true, json: async () => ({}) };
+		});
+		const { screen, onComplete } = mount();
+		await runToEnd(screen);
+		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
+		await vi.waitFor(() => expect(release).toBeDefined());
+		expect(onComplete).not.toHaveBeenCalled();
+		release({ ok: false, json: async () => ({}) });
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+		expect(saved.filter((id) => id === 'module5-lesson10')).toHaveLength(1);
+		expect(new Set(saved).size).toBe(10);
 	});
 
 	test('the start screen holds the keyboard: the demo behind it cannot be tabbed into', async () => {
