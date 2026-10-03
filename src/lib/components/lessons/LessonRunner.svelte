@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import LessonRenderer from './LessonRenderer.svelte';
+	import { nextUnfinished } from '$lib/lessons/nextUnfinished';
 	import * as m from '$lib/paraglide/messages.js';
 	import { Maximize2, Minimize2 } from 'lucide-svelte';
 
@@ -249,11 +250,31 @@
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
 			syncUrl();
-		} else if (nextModuleId) {
+		} else {
+			leaveModule();
+		}
+	}
+
+	function leaveModule() {
+		if (nextModuleId) {
 			goto(resolve('/modules/[id]', { id: nextModuleId }));
 		} else if (onExit) {
 			onExit();
 		}
+	}
+
+	// After a completion, Next skips what the learner already has (solved, or
+	// «Το ξέρω» in a guide). The navigation bar still steps one at a time.
+	let nextOpenIndex = $derived(nextUnfinished(lessons, mergedProgress, currentLessonIndex));
+
+	function nextUnfinishedLesson() {
+		justCompletedLessonId = null;
+		if (nextOpenIndex === null) {
+			leaveModule();
+			return;
+		}
+		currentLessonIndex = nextOpenIndex;
+		syncUrl();
 	}
 
 	function prevLesson() {
@@ -569,11 +590,11 @@
 						</Button>
 
 						{#if isSuccess}
-							{#if currentLessonIndex < lessons.length - 1}
+							{#if nextOpenIndex !== null}
 								<Button
 									size="lg"
 									data-primary
-									onclick={nextLesson}
+									onclick={nextUnfinishedLesson}
 									class="w-[200px] flex-1 gap-2 bg-green-600 py-6 text-lg text-white shadow-md hover:bg-green-700"
 								>
 									{getMessage('next_lesson') || 'Επόμενο Μάθημα'}
@@ -583,7 +604,7 @@
 								<Button
 									size="lg"
 									data-primary
-									onclick={nextLesson}
+									onclick={nextUnfinishedLesson}
 									class="w-[200px] flex-1 gap-2 bg-blue-600 py-6 text-lg text-white shadow-md hover:bg-blue-700"
 								>
 									Επόμενη Ενότητα

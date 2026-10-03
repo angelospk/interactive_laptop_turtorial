@@ -820,3 +820,64 @@ describe('failed saves and the result dialog, reviewed', () => {
 		}
 	});
 });
+
+describe('after a completion, Next goes to the next unfinished lesson', () => {
+	const three = [
+		{ ...mockLessons[1], id: 'l-click', titleKey: 'Μάθημα 1', config: { theme: 'default', targetCount: 1, timeLimit: 45 } },
+		{ ...mockLessons[1], id: 'l-known', titleKey: 'Μάθημα 2' },
+		{ ...mockLessons[1], id: 'l-open', titleKey: 'Μάθημα 3' }
+	];
+
+	beforeEach(() => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({ ok: true, json: async () => ({ progress: { completed: true, score: 100 } }) }))
+		);
+	});
+	afterEach(() => vi.unstubAllGlobals());
+
+	test('skips a lesson the learner already has', async () => {
+		const screen = render(
+			LessonRunner as never,
+			{
+				lessons: three,
+				progress: { 'l-known': { completed: true, source: 'guide' } },
+				startIndex: 0,
+				moduleId: 'module-1'
+			} as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await screen.getByRole('button', { name: /Επόμενο Μάθημα/ }).click();
+		await expect.element(title(screen, 'Μάθημα 3')).toBeInTheDocument();
+	});
+
+	test('offers the next module when everything after is done', async () => {
+		const screen = render(
+			LessonRunner as never,
+			{
+				lessons: three,
+				progress: { 'l-known': { completed: true }, 'l-open': { completed: true } },
+				startIndex: 0,
+				moduleId: 'module-1',
+				nextModuleId: 'module-2'
+			} as never
+		);
+		await screen.getByRole('button', { name: 'CLICK' }).click();
+		await expect.element(screen.getByRole('button', { name: /Επόμενη Ενότητα/ }).last()).toBeInTheDocument();
+		await expect.element(screen.getByRole('button', { name: /Επόμενο Μάθημα/ })).not.toBeInTheDocument();
+	});
+
+	test('the navigation bar still steps one lesson at a time', async () => {
+		const screen = render(
+			LessonRunner as never,
+			{
+				lessons: three,
+				progress: { 'l-known': { completed: true } },
+				startIndex: 0,
+				moduleId: 'module-1'
+			} as never
+		);
+		await screen.getByRole('button', { name: /Επόμενο/ }).first().click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+	});
+});
