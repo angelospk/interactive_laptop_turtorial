@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Phone, PhoneOff, Mic, MicOff, Video, User } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import { onDestroy } from 'svelte';
 	import { normalizeMeetingCode } from '$lib/lessons/goalHandlers';
 
 	let { config = {}, onAction } = $props<{
@@ -14,6 +15,9 @@
 	let muted = $state(false);
 	let callDuration = $state(0);
 	let durationInterval: ReturnType<typeof setInterval> | null = null;
+	onDestroy(() => {
+		if (durationInterval) clearInterval(durationInterval);
+	});
 
 	const contact = $derived(config.targetContact || 'Επαφή');
 

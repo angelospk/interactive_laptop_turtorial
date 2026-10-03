@@ -84,6 +84,8 @@
 	});
 
 	let pullStartY: number | null = null;
+	// A swipe already opened the panel; swallow the click that follows the pointerup.
+	let swiped = false;
 </script>
 
 <div
@@ -152,14 +154,21 @@
 			type="button"
 			aria-label="Γρήγορες ρυθμίσεις"
 			data-testid="mobile-statusbar"
-			onclick={onPullDown}
+			onclick={() => {
+				if (swiped) {
+					swiped = false;
+					return;
+				}
+				onPullDown?.();
+			}}
 			onpointerdown={(e) => {
 				// Capture so the release still reaches us after the finger slides down off the bar.
 				e.currentTarget.setPointerCapture(e.pointerId);
 				pullStartY = e.clientY;
 			}}
 			onpointerup={(e) => {
-				if (pullStartY !== null && e.clientY - pullStartY > 20) onPullDown?.();
+				swiped = pullStartY !== null && e.clientY - pullStartY > 20;
+				if (swiped) onPullDown?.();
 				pullStartY = null;
 			}}
 			class="flex w-full shrink-0 cursor-grab touch-none items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"

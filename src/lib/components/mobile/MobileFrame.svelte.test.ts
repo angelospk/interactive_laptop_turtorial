@@ -90,3 +90,23 @@ describe('MobileFrame', () => {
 		});
 	});
 });
+
+describe('MobileFrame pull-down handle', () => {
+	it('opens quick settings once for a downward swipe', async () => {
+		const onPullDown = vi.fn();
+		const screen = render(MobileFrame, { onPullDown } as never);
+		const bar = screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).element();
+		const opts = { bubbles: true, pointerId: 1, clientX: 50 };
+		bar.dispatchEvent(new PointerEvent('pointerdown', { ...opts, clientY: 5 }));
+		bar.dispatchEvent(new PointerEvent('pointerup', { ...opts, clientY: 80 }));
+		bar.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+		expect(onPullDown).toHaveBeenCalledOnce();
+	});
+
+	it('opens quick settings on a plain tap', async () => {
+		const onPullDown = vi.fn();
+		const screen = render(MobileFrame, { onPullDown } as never);
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		expect(onPullDown).toHaveBeenCalledOnce();
+	});
+});
