@@ -29,6 +29,16 @@
                   "module": "module9",
                   "lesson": "install-app",
                   "label": "Εγκατάσταση εφαρμογής"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "download-browser",
+                  "label": "Κατέβασε έναν browser"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "install-browser",
+                  "label": "Εγκατάστησε τον browser"
                 }
               ]
             },
@@ -229,6 +239,16 @@
                   "module": "module5",
                   "lesson": "new-tab",
                   "label": "Νέα καρτέλα"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "download-browser",
+                  "label": "Κατέβασε έναν browser"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "install-browser",
+                  "label": "Εγκατάστησε τον browser"
                 }
               ]
             },

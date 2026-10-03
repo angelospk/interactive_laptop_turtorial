@@ -44,3 +44,27 @@ describe('P1 — gov.gr: κάρτα ανεργίας & θυρίδα πολίτη
 		);
 	});
 });
+
+describe('P5 — κατεβάζω και εγκαθιστώ πρόγραμμα περιήγησης (esm001-c1-s2, esm002-c1-s3)', () => {
+	it('first downloads the browser installer from the web', () => {
+		const c = config('module9-lesson10');
+		expect(c.goal).toBe('download-file');
+		expect(c.initialApps).toEqual(['browser']);
+		expect(c.targetFilename).toMatch(/setup\.exe$/i);
+	});
+
+	it('then installs that same browser', () => {
+		const c = config('module9-lesson11');
+		expect(c.goal).toBe('install-app');
+		expect(c.appName).toBe('Google Chrome');
+		expect(byId.get('module9-lesson11')?.requiredLessonId).toBe('module9-lesson10');
+	});
+
+	it('is linked from both theory sections', () => {
+		for (const sub of ['esm001-c1-s2', 'esm002-c1-s3']) {
+			expect(linksOf(sub)).toEqual(
+				expect.arrayContaining(['module9/download-browser', 'module9/install-browser'])
+			);
+		}
+	});
+});

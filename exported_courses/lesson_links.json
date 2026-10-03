@@ -1,6 +1,8 @@
 {
 	"Ο Υπολογιστής": [
-		{ "module": "module9", "lesson": "install-app", "label": "Εγκατάσταση εφαρμογής" }
+		{ "module": "module9", "lesson": "install-app", "label": "Εγκατάσταση εφαρμογής" },
+		{ "module": "module9", "lesson": "download-browser", "label": "Κατέβασε έναν browser" },
+		{ "module": "module9", "lesson": "install-browser", "label": "Εγκατάστησε τον browser" }
 	],
 	"Περιήγηση στα Windows 11": [
 		{ "module": "module3", "lesson": "start-menu", "label": "Μενού Έναρξη" },
@@ -29,7 +31,9 @@
 	],
 	"Ιστοσελίδες και προγράμματα περιήγησης": [
 		{ "module": "module5", "lesson": "address-bar", "label": "Γράψε μια διεύθυνση" },
-		{ "module": "module5", "lesson": "new-tab", "label": "Νέα καρτέλα" }
+		{ "module": "module5", "lesson": "new-tab", "label": "Νέα καρτέλα" },
+		{ "module": "module9", "lesson": "download-browser", "label": "Κατέβασε έναν browser" },
+		{ "module": "module9", "lesson": "install-browser", "label": "Εγκατάστησε τον browser" }
 	],
 	"Λειτουργίες προγράμματος περιήγησης": [
 		{ "module": "module5", "lesson": "browser-history", "label": "Ιστορικό" },

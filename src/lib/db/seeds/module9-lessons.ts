@@ -183,5 +183,46 @@ export const module9Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module9-lesson8'
+	},
+
+	// Lessons 10–11 mirror the theory scenario (esm001-c1-s2, esm002-c1-s3):
+	// get a browser from its official site, then run the installer you downloaded.
+	{
+		id: 'module9-lesson10',
+		moduleId: 'module9',
+		lessonKey: 'download-browser',
+		titleKey: 'module9_lesson10_title',
+		descriptionKey: 'module9_lesson10_desc',
+		difficulty: 'intermediate',
+		orderIndex: 10,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'download-file',
+			initialApps: ['browser'],
+			targetFilename: 'ChromeSetup.exe',
+			instructions:
+				'Θέλετε το Google Chrome. Κατεβάζετε προγράμματα μόνο από την επίσημη σελίδα τους — εδώ σας προσφέρεται το αρχείο ChromeSetup.exe κάτω δεξιά. Πατήστε «Λήψη».'
+		},
+		enabled: true,
+		requiredLessonId: 'module9-lesson9'
+	},
+	{
+		id: 'module9-lesson11',
+		moduleId: 'module9',
+		lessonKey: 'install-browser',
+		titleKey: 'module9_lesson11_title',
+		descriptionKey: 'module9_lesson11_desc',
+		difficulty: 'intermediate',
+		orderIndex: 11,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'install-app',
+			initialApps: ['installer'],
+			appName: 'Google Chrome',
+			instructions:
+				'Το ChromeSetup.exe κατέβηκε και άνοιξε. Ακολουθήστε τα βήματα για να εγκαταστήσετε το Google Chrome.'
+		},
+		enabled: true,
+		requiredLessonId: 'module9-lesson10'
 	}
 ];
