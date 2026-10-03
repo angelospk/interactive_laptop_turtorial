@@ -248,4 +248,23 @@ describe('POST /api/lessons/complete', () => {
 			status: 400
 		});
 	});
+
+	it('a real completion replaces a «Το ξέρω» from a guide', async () => {
+		await db
+			.insert(userProgress)
+			.values({ userId: testUserId, lessonId: testLessonId, completed: true, source: 'guide' })
+			.run();
+		const mockEvent = {
+			request: { json: vi.fn().mockResolvedValue({ lessonId: testLessonId, score: 70 }) },
+			locals: { user: { id: testUserId, username: 'testuser' }, db }
+		} as unknown as Parameters<typeof POST>[0];
+
+		await POST(mockEvent);
+		const progress = await db
+			.select()
+			.from(userProgress)
+			.where(eq(userProgress.userId, testUserId))
+			.get();
+		expect(progress).toMatchObject({ completed: true, score: 70, source: null });
+	});
 });

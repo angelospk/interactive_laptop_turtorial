@@ -76,7 +76,10 @@ export const userProgress = sqliteTable('user_progress', {
     score: integer('score'), // 0-100
     stars: integer('stars'), // 1-3
     attempts: integer('attempts').notNull().default(0),
-    lastAttemptAt: integer('last_attempt_at', { mode: 'timestamp' })
+    lastAttemptAt: integer('last_attempt_at', { mode: 'timestamp' }),
+    // 'guide' = the learner said «Το ξέρω» in a guide instead of solving it (no score).
+    // null = solved for real. See docs/superpowers/specs/2026-10-04-guided-tour-design.md
+    source: text('source', { enum: ['guide'] })
 }, (table) => ({
     unq: unique().on(table.userId, table.lessonId)
 }));
