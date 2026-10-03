@@ -129,3 +129,16 @@ describe('P13 — το κινητό δεν φορτίζει (esm006-c1-s3)', () 
 		expect(linksOf('esm006-c1-s3')).toContain('module9/phone-not-charging');
 	});
 });
+
+describe('P6 — γράφω νέο email (eapsi001-c1-s3)', () => {
+	it('asks for a new email to a named recipient', () => {
+		const c = config('module6-lesson7');
+		expect(c.goal).toBe('send-email');
+		expect(c.targetRecipient).toMatch(/@/);
+		expect(String(c.instructions)).toContain(String(c.targetRecipient));
+	});
+
+	it('is linked from the email theory section', () => {
+		expect(linksOf('eapsi001-c1-s3')).toContain('module6/compose-email');
+	});
+});

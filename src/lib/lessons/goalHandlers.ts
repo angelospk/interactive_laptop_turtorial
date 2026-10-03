@@ -85,6 +85,13 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'attach-file': (action) => action === 'attach-file',
 	'email-attachment': (action) => action === 'attach-file',
 	'download-attachment': (action) => action === 'download-attachment',
+	'send-email': (action, data, config) => {
+		if (action !== 'send-email') return false;
+		if (typeof data.subject !== 'string' || !data.subject.trim()) return false;
+		const target = config.targetRecipient;
+		if (typeof target !== 'string' || !target) return true;
+		return typeof data.to === 'string' && data.to.trim().toLowerCase() === target.toLowerCase();
+	},
 
 	// ── Spreadsheet ────────────────────────────────────────────────────────
 	'update-cell': (action, data, config) => {

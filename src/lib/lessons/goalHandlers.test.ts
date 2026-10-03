@@ -983,3 +983,46 @@ describe('handler coverage', () => {
 		}
 	});
 });
+
+describe('send-email', () => {
+	const cfg = { targetRecipient: 'eleni@example.gr' };
+
+	it('passes when the email goes to the target recipient', () => {
+		expect(
+			checkGoalMatch(
+				'send-email',
+				'send-email',
+				{ to: 'eleni@example.gr', subject: 'Κυριακή' },
+				cfg
+			)
+		).toBe(true);
+	});
+
+	it('tolerates case and surrounding spaces in the address', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: ' Eleni@Example.GR ', subject: 'x' }, cfg)
+		).toBe(true);
+	});
+
+	it('fails for a different recipient', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: 'giorgos@example.gr', subject: 'x' }, cfg)
+		).toBe(false);
+	});
+
+	it('fails for an empty subject', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: 'eleni@example.gr', subject: '  ' }, cfg)
+		).toBe(false);
+	});
+
+	it('fails for a draft or any other action', () => {
+		expect(checkGoalMatch('send-email', 'save-draft', { to: 'eleni@example.gr' }, cfg)).toBe(false);
+	});
+
+	it('accepts any recipient when none is configured', () => {
+		expect(checkGoalMatch('send-email', 'send-email', { to: 'a@b.gr', subject: 'x' }, {})).toBe(
+			true
+		);
+	});
+});

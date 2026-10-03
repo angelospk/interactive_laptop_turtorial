@@ -498,6 +498,11 @@
                   "module": "module6",
                   "lesson": "email-attachments",
                   "label": "Συνημμένο αρχείο"
+                },
+                {
+                  "module": "module6",
+                  "lesson": "compose-email",
+                  "label": "Γράψε νέο email"
                 }
               ]
             },

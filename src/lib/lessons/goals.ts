@@ -51,6 +51,7 @@ export const GOALS = {
 	'attach-file': { requiresAppId: false },
 	'email-attachment': { requiresAppId: false },
 	'download-attachment': { requiresAppId: false },
+	'send-email': { requiresAppId: false },
 
 	// Spreadsheet
 	'update-cell': { requiresAppId: false },

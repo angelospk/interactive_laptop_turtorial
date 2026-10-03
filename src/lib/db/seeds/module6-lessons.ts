@@ -168,5 +168,27 @@ export const module6Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module6-lesson5'
+	},
+
+	// Lesson 7: Compose a new email to a named person (eapsi001-c1-s3)
+	{
+		id: 'module6-lesson7',
+		moduleId: 'module6',
+		lessonKey: 'compose-email',
+		titleKey: 'module6_lesson7_title',
+		descriptionKey: 'module6_lesson7_desc',
+		difficulty: 'intermediate',
+		orderIndex: 7,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'send-email',
+			fullscreen: true,
+			initialApps: ['email'],
+			targetRecipient: 'eleni.papadopoulou@example.gr',
+			instructions:
+				'Γράψτε ένα νέο email στην κόρη σας. Πατήστε «Σύνταξη», στο «Προς» γράψτε eleni.papadopoulou@example.gr, βάλτε θέμα (π.χ. «Τραπέζι την Κυριακή»), γράψτε δυο λόγια και πατήστε «Αποστολή».'
+		},
+		enabled: true,
+		requiredLessonId: 'module6-lesson6'
 	}
 ];

@@ -62,7 +62,8 @@
 	],
 	"Το ηλεκτρονικό ταχυδρομείο": [
 		{ "module": "module6", "lesson": "reply-email", "label": "Απάντηση σε email" },
-		{ "module": "module6", "lesson": "email-attachments", "label": "Συνημμένο αρχείο" }
+		{ "module": "module6", "lesson": "email-attachments", "label": "Συνημμένο αρχείο" },
+		{ "module": "module6", "lesson": "compose-email", "label": "Γράψε νέο email" }
 	],
 	"H εφαρμογή Viber": [
 		{ "module": "android", "lesson": "send-viber", "label": "Μήνυμα στο Viber (Android)" },
