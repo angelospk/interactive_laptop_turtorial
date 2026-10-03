@@ -7,6 +7,7 @@
 	let {
 		apps = [],
 		openAppIds = [],
+		highlightAppIds = [],
 		onAppClick,
 		onStartClick,
 		onOpenSettings,
@@ -15,6 +16,8 @@
 	} = $props<{
 		apps: { id: string; name: string; icon: typeof LucideIcon }[];
 		openAppIds: string[];
+		/** Apps the lesson points at, e.g. the minimised window to bring back. */
+		highlightAppIds?: string[];
 		onAppClick: (appId: string) => void;
 		onStartClick: () => void;
 		onOpenSettings: (page: string) => void;
@@ -95,12 +98,26 @@
 		<!-- Taskbar Items -->
 		{#each apps as app (app.id)}
 			{@const isOpen = openAppIds.includes(app.id)}
+			{@const highlighted = highlightAppIds.includes(app.id)}
 			<div class="group relative">
+				{#if highlighted}
+					<div
+						class="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-amber-400 px-3 py-1 text-sm font-semibold whitespace-nowrap text-slate-900 shadow-lg motion-safe:animate-bounce"
+					>
+						Πατήστε εδώ
+						<span
+							class="absolute top-full left-1/2 -translate-x-1/2 border-x-8 border-t-8 border-x-transparent border-t-amber-400"
+						></span>
+					</div>
+				{/if}
 				<Button
 					variant="ghost"
-					class={isOpen
+					data-highlight={highlighted ? 'true' : undefined}
+					class="{isOpen
 						? 'rounded-md bg-white/10 text-white hover:bg-white/20'
-						: 'rounded-md text-slate-300 hover:bg-white/10 hover:text-white'}
+						: 'rounded-md text-slate-300 hover:bg-white/10 hover:text-white'} {highlighted
+						? 'ring-2 ring-amber-400 motion-safe:animate-pulse'
+						: ''}"
 					onclick={() => {
 						showQuickSettings = false;
 						onAppClick(app.id);

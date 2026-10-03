@@ -17,7 +17,10 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'open-app',
-			initialApps: []
+			targetAppId: 'explorer',
+			initialApps: [],
+			instructions:
+				'Ανοίξτε την εφαρμογή «Εξερεύνηση»: πατήστε το εικονίδιο με τον φάκελο στη γραμμή εργασιών, κάτω στο κέντρο της οθόνης.'
 		},
 		enabled: true,
 		requiredLessonId: null
@@ -35,8 +38,10 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'minimize-app',
-			targetAppId: 'notepad',
-			initialApps: ['notepad']
+			targetAppId: 'word',
+			initialApps: ['word'],
+			instructions:
+				'Το Word είναι ανοιχτό. Πατήστε την παύλα «—» πάνω δεξιά στο παράθυρο του Word για να το κρύψετε κάτω στη γραμμή εργασιών.'
 		},
 		enabled: true,
 		requiredLessonId: 'module3-lesson1'
@@ -54,8 +59,10 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'restore-app',
-			targetAppId: 'notepad',
-			initialApps: [{ appId: 'notepad', minimized: true }]
+			targetAppId: 'word',
+			initialApps: [{ appId: 'word', minimized: true }],
+			instructions:
+				'Το παράθυρο του Word είναι κρυμμένο (ελαχιστοποιημένο). Πατήστε το εικονίδιο του Word που αναβοσβήνει στη γραμμή εργασιών, κάτω, για να εμφανιστεί ξανά.'
 		},
 		enabled: true,
 		requiredLessonId: 'module3-lesson2'
@@ -73,8 +80,10 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'maximize-app',
-			targetAppId: 'notepad',
-			initialApps: ['notepad']
+			targetAppId: 'word',
+			initialApps: ['word'],
+			instructions:
+				'Πατήστε το τετραγωνάκι «☐» πάνω δεξιά στο παράθυρο του Word για να γεμίσει όλη την οθόνη.'
 		},
 		enabled: true,
 		requiredLessonId: 'module3-lesson3'
@@ -92,8 +101,9 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'close-app',
-			targetAppId: 'notepad',
-			initialApps: ['notepad']
+			targetAppId: 'word',
+			initialApps: ['word'],
+			instructions: 'Πατήστε το «X» πάνω δεξιά στο παράθυρο του Word για να το κλείσετε.'
 		},
 		enabled: true,
 		requiredLessonId: 'module3-lesson4'
@@ -149,7 +159,7 @@ export const module3Lessons: NewLesson[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'open-task-view',
-			initialApps: ['notepad', 'browser'],
+			initialApps: ['word', 'browser'],
 			instructions:
 				'Πατήστε το κουμπί "Προβολή Εργασιών" (δίπλα στην αναζήτηση) για να δείτε όλα τα ανοιχτά παράθυρα.'
 		},

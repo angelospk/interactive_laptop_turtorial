@@ -13,7 +13,13 @@ export const module6Lessons: NewLesson[] = [
 		difficulty: 'beginner',
 		orderIndex: 1,
 		lessonType: 'desktop-simulation',
-		config: { goal: 'open-app', targetAppId: 'email', fullscreen: true },
+		config: {
+			goal: 'open-app',
+			targetAppId: 'email',
+			fullscreen: true,
+			instructions:
+				'Ανοίξτε το Email: πατήστε το εικονίδιο με το γράμμα (✉) στη γραμμή εργασιών, κάτω.'
+		},
 		enabled: true,
 		requiredLessonId: null
 	},
