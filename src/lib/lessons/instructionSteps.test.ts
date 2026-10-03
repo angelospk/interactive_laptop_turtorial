@@ -17,7 +17,9 @@ describe('parseInstructionSteps', () => {
 	});
 
 	it('keeps a lead-in sentence above the steps', () => {
-		expect(parseInstructionSteps('Ανοίξτε το Word:\n1. Πατήστε «Έναρξη».\n2. Πατήστε «Word».')).toEqual({
+		expect(
+			parseInstructionSteps('Ανοίξτε το Word:\n1. Πατήστε «Έναρξη».\n2. Πατήστε «Word».')
+		).toEqual({
 			intro: 'Ανοίξτε το Word:',
 			steps: ['Πατήστε «Έναρξη».', 'Πατήστε «Word».']
 		});

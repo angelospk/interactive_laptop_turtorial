@@ -19,7 +19,7 @@
 		type="button"
 		onclick={() => (open = !open)}
 		aria-expanded={open}
-		class="bg-muted/60 hover:bg-muted flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium"
+		class="flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 text-sm font-medium hover:bg-muted"
 	>
 		<List class="h-4 w-4" />
 		<span>Περιεχόμενα</span>
@@ -36,7 +36,7 @@
 			onclick={() => (open = false)}
 		></button>
 		<div
-			class="bg-popover text-popover-foreground absolute left-1/2 z-50 max-h-[60vh] w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 overflow-auto rounded-xl border p-3 shadow-lg {placement ===
+			class="absolute left-1/2 z-50 max-h-[60vh] w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 overflow-auto rounded-xl border bg-popover p-3 text-popover-foreground shadow-lg {placement ===
 			'below'
 				? 'top-full mt-2'
 				: 'bottom-full mb-2'}"

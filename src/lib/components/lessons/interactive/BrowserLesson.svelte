@@ -50,8 +50,10 @@
 	function pageFor(url: string): { type: PageType; title: string } {
 		if (url === 'home') return { type: 'home', title: 'Αρχική' };
 		if (url === 'history') return { type: 'history', title: 'Ιστορικό' };
-		if (url.includes('news') || url.includes('eidiseis')) return { type: 'news', title: 'Ειδήσεις' };
-		if (url.includes('weather') || url.includes('kairos')) return { type: 'weather', title: 'Καιρός' };
+		if (url.includes('news') || url.includes('eidiseis'))
+			return { type: 'news', title: 'Ειδήσεις' };
+		if (url.includes('weather') || url.includes('kairos'))
+			return { type: 'weather', title: 'Καιρός' };
 		if (url.includes('gov')) return { type: 'gov', title: 'Gov.gr' };
 		return { type: 'search', title: url };
 	}

@@ -27,13 +27,19 @@ describe('BrowserLesson — history', () => {
 			onBack: vi.fn()
 		});
 		await screen.getByRole('button', { name: 'Ιστορικό' }).click();
-		await screen.getByRole('list').getByRole('button', { name: /Ειδήσεις/ }).click();
+		await screen
+			.getByRole('list')
+			.getByRole('button', { name: /Ειδήσεις/ })
+			.click();
 		await expect.element(screen.getByRole('heading', { name: 'Ειδήσεις 24/7' })).toBeVisible();
 	});
 });
 
 describe('BrowserLesson — back and forward', () => {
-	const backForward = lesson({ goal: 'back-forward', initialHistory: ['home', 'news.gr', 'weather.gr'] });
+	const backForward = lesson({
+		goal: 'back-forward',
+		initialHistory: ['home', 'news.gr', 'weather.gr']
+	});
 
 	it('goes back a page and forward again, then completes', async () => {
 		const onComplete = vi.fn();
