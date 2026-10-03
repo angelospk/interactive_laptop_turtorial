@@ -103,3 +103,16 @@ describe('P2 — καλή συμπεριφορά στο διαδίκτυο (eaps
 		expect(linksOf('eapsi001-c4-s3')).toContain('module8/netiquette');
 	});
 });
+
+describe('P3 — «μπήκε κάποιος στον λογαριασμό μου» (esm005-c1-s4)', () => {
+	it('walks sign → first move → who to tell, one right answer each', () => {
+		expect(byId.get('module8-lesson13')?.lessonType).toBe('quiz');
+		const qs = quizQuestions('module8-lesson13');
+		expect(qs).toHaveLength(3);
+		for (const q of qs) expect(q.options.filter((o) => o.correct)).toHaveLength(1);
+	});
+
+	it('is linked from the breach-response theory section', () => {
+		expect(linksOf('esm005-c1-s4')).toContain('module8/breach-response');
+	});
+});

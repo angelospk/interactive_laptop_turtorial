@@ -1072,7 +1072,14 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module8",
+                  "lesson": "breach-response",
+                  "label": "Μπήκε κάποιος στον λογαριασμό μου;"
+                }
+              ]
             },
             {
               "id": "esm005-c1-s5",
