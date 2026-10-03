@@ -44,7 +44,8 @@ test.describe('every lesson type opens from a deep link', () => {
 			await page.goto(`/modules/${lesson}`);
 			await page.waitForLoadState('networkidle');
 			await expect(page).toHaveURL(`/modules/${lesson}`);
-			await expect(page.getByText(/Μάθημα \d+ από \d+/)).toBeVisible();
+			// Anchored: the slim strip above the lesson also names the lesson after the count.
+			await expect(page.getByText(/^Μάθημα \d+ από \d+$/)).toBeVisible();
 			expect(errors).toEqual([]);
 		});
 	}

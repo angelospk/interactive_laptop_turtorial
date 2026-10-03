@@ -74,11 +74,14 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	<div class="flex flex-col items-center gap-4 py-4">
+	<!-- The portal takes the height left over, not a fixed 560px. -->
+	<div class="flex h-full min-h-0 flex-col items-center gap-4 py-2">
 		<p class="max-w-xl text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
-		<div class="w-full max-w-3xl overflow-hidden rounded-xl border border-slate-200 shadow-sm">
-			<div class="h-[560px]">
+		<div
+			class="min-h-[30rem] w-full max-w-3xl flex-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm"
+		>
+			<div class="h-full">
 				<GovGrApp {config} onEvent={dispatch} {done} />
 			</div>
 		</div>

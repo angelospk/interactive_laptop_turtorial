@@ -1,13 +1,21 @@
 <script lang="ts">
-	import { onMount, tick, untrack } from 'svelte';
+	import { onMount, tick, untrack, type Snippet } from 'svelte';
 	import { invalidateAll, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent } from '$lib/components/ui/card';
 	import LessonRenderer from './LessonRenderer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { Maximize2, Minimize2 } from 'lucide-svelte';
+	import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-svelte';
+	import {
+		barReducer,
+		canScrollUp,
+		stuckDelayMs,
+		type BarEvent,
+		type BarState
+	} from '$lib/lessons/lessonBar';
+	import { fillShortcutText, type LearnerDevice } from '$lib/lessons/shortcuts';
 
 	// Shape of one lesson's progress: the stored row, or the optimistic update made here.
 	type LessonProgress = {
@@ -26,7 +34,8 @@
 		navigation = 0,
 		onExit,
 		onLessonChange,
-		nextModuleId = null
+		nextModuleId = null,
+		crumbs
 	} = $props<{
 		lessons: Lesson[];
 		progress: Record<string, LessonProgress>;
@@ -39,6 +48,8 @@
 		moduleId?: string | null;
 		nextModuleId?: string | null;
 		isLastModule?: boolean;
+		/** The way back (breadcrumb), shown at the start of the lesson bar. */
+		crumbs?: Snippet;
 	}>();
 
 	// `startIndex` is where the route params say we are; Next/Prev move from
@@ -61,6 +72,7 @@
 		// Arriving is not finishing: no result overlay comes along.
 		untrack(() => {
 			justCompletedLessonId = null;
+			arrive();
 		});
 		currentLessonIndex = incoming;
 	});
@@ -147,6 +159,7 @@
 		forgetUnsaved(lessonId);
 
 		justCompletedLessonId = lessonId;
+		finishedHere = true;
 
 		// Optimistically update UI immediately
 		localUpdates[lessonId] = {
@@ -211,6 +224,7 @@
 
 	async function handleRetry() {
 		retryEpoch++;
+		finishedHere = false;
 		forgetUnsaved(currentLesson.id);
 		justCompletedLessonId = null;
 		const lessonId = currentLesson.id;
@@ -248,6 +262,7 @@
 		justCompletedLessonId = null;
 		if (currentLessonIndex < lessons.length - 1) {
 			currentLessonIndex++;
+			arrive();
 			syncUrl();
 		} else if (nextModuleId) {
 			goto(resolve('/modules/[id]', { id: nextModuleId }));
@@ -260,6 +275,7 @@
 		justCompletedLessonId = null;
 		if (currentLessonIndex > 0) {
 			currentLessonIndex--;
+			arrive();
 			syncUrl();
 		}
 	}
@@ -320,6 +336,149 @@
 	}
 	// Arriving already in fullscreen fires no change event.
 	onMount(handleFullscreenChange);
+
+	// The lesson takes the whole screen. Title, instruction and the way to other
+	// lessons sit in a bar laid over its top edge — laid over, so showing and
+	// hiding it never resizes the simulation under the learner's hand. Rules for
+	// when it opens and closes live in lessonBar.ts.
+	let bar = $state<BarState>({ open: true, reason: 'arrival' });
+	// A failed save is announced in the bar, so it stays open while there is one.
+	let barOpen = $derived(bar.open || showUnsaved);
+	// On arrival the bar sits above the lesson instead of over it: laid over, it
+	// hid the top of the lesson, and whatever the learner had to press there.
+	let docked = $derived(bar.open && bar.reason === 'arrival');
+	let stuck = $derived(bar.open && bar.reason === 'stuck');
+	let helpOpen = $state(false);
+	let stuckRound = $state(0);
+	// Finished on this visit: no "Κόλλησες;" after that, even once the result is
+	// gone (a failed save takes it away). Cleared by arriving and by Retry.
+	let finishedHere = $state(false);
+	let barEl = $state<HTMLElement | null>(null);
+	let stageEl = $state<HTMLElement | null>(null);
+	let menuButton = $state<HTMLButtonElement | null>(null);
+
+	function send(event: BarEvent) {
+		bar = barReducer(bar, event);
+		if (!bar.open) helpOpen = false;
+	}
+
+	function arrive() {
+		send('arrive');
+		stuckRound = 0;
+		finishedHere = false;
+	}
+
+	async function openMenu() {
+		send('toggle');
+		await tick();
+		barEl?.querySelector<HTMLElement>('a[href], button:not([disabled])')?.focus();
+	}
+
+	async function hideBar() {
+		send('dismiss');
+		await tick();
+		menuButton?.focus();
+	}
+
+	function keepGoing() {
+		stuckRound++;
+		hideBar();
+	}
+
+	// "Κόλλησες;" after a while without finishing. Each "Συνεχίζω" doubles the
+	// wait: asked once is help, asked every 40 seconds is nagging.
+	$effect(() => {
+		const lesson = currentLesson;
+		void retryEpoch;
+		const round = stuckRound;
+		if (!lesson || showResultOverlay || finishedHere) return;
+		const delay = stuckDelayMs(lesson);
+		if (delay === null) return;
+		const timer = setTimeout(() => send('stuck'), delay * 2 ** round);
+		return () => clearTimeout(timer);
+	});
+
+	// Whatever the lesson says about what to do, in one place for "Βοήθεια".
+	const device = $derived((page.data?.user?.preferredDevice ?? null) as LearnerDevice);
+	let lessonTitle = $derived(currentLesson ? getMessage(currentLesson.titleKey) : '');
+	let lessonDescription = $derived(
+		currentLesson?.descriptionKey ? getMessage(currentLesson.descriptionKey) : ''
+	);
+	let helpLines = $derived.by(() => {
+		const config = (currentLesson?.config ?? {}) as Record<string, unknown>;
+		const steps = Array.isArray(config.tutorialSteps) ? config.tutorialSteps : [];
+		const lines = [lessonDescription, config.prompt, config.instructions, ...steps]
+			.filter((line): line is string => typeof line === 'string' && line.trim() !== '')
+			.map((line) => fillShortcutText(line, device));
+		return lines.length ? [...new Set(lines)] : [lessonTitle];
+	});
+
+	// The tip names the gesture this learner has: a mouse to move up, or a finger.
+	let hasMouse = $state(true);
+	onMount(() => {
+		hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+	});
+
+	// On pointerup, not pointerdown: an arrival bar sits above the lesson, so
+	// putting it away moves the lesson up — after the click, never under it.
+	function onStagePointerUp() {
+		send('stage-interact');
+	}
+
+	function onStageKeyDown(event: KeyboardEvent) {
+		if (event.key !== 'Tab') send('stage-interact');
+	}
+
+	// Scrolling up past the top of whatever is under the pointer means "show me".
+	function onStageWheel(event: WheelEvent) {
+		if (event.deltaY < 0 && stageEl && !canScrollUp(event.target, stageEl)) send('peek');
+	}
+
+	// On a touch screen: a downward swipe that starts near the top of the lesson.
+	let swipeFrom: number | null = null;
+	function onStageTouchStart(event: TouchEvent) {
+		const box = stageEl?.getBoundingClientRect();
+		const y = event.touches[0]?.clientY;
+		swipeFrom =
+			box && y !== undefined && y - box.top < box.height / 4 && !canScrollUp(event.target, stageEl!)
+				? y
+				: null;
+	}
+	function onStageTouchMove(event: TouchEvent) {
+		const y = event.touches[0]?.clientY;
+		if (swipeFrom !== null && y !== undefined && y - swipeFrom > 60) {
+			swipeFrom = null;
+			send('peek');
+		}
+	}
+
+	// The mouse at the very top of the screen. The page owns the viewport, so the
+	// top of the window is the top of the lesson.
+	function onWindowPointerMove(event: PointerEvent) {
+		if (event.pointerType === 'mouse' && event.clientY <= 8 && !bar.open && !showResultOverlay) {
+			send('peek');
+		}
+	}
+
+	// A peeked-at bar leaves when the mouse does, after a moment so that a
+	// wobbly hand passing the edge does not snap it shut.
+	let leaveTimer: ReturnType<typeof setTimeout> | undefined;
+	function onBarPointerLeave(event: PointerEvent) {
+		if (event.pointerType !== 'mouse') return;
+		clearTimeout(leaveTimer);
+		leaveTimer = setTimeout(() => send('leave'), 700);
+	}
+	function onBarPointerEnter() {
+		clearTimeout(leaveTimer);
+	}
+	$effect(() => () => clearTimeout(leaveTimer));
+
+	function onBarKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && bar.open) {
+			event.stopPropagation();
+			hideBar();
+		}
+	}
 
 	// Auto-scroll to lesson content when lesson changes
 	let lessonCard: HTMLElement;
@@ -390,107 +549,54 @@
 	onfullscreenchange={handleFullscreenChange}
 	onkeydown={showResultOverlay ? trapTab : undefined}
 />
+<svelte:window onpointermove={onWindowPointerMove} />
 
 <div class="lesson-runner" class:fullscreen-active={isFullscreen} bind:this={lessonContainer}>
 	<!-- Portal target for dialogs/modals in fullscreen mode -->
 	<div id="fullscreen-portal-target" class="fullscreen-portal-container"></div>
 
-	<!--
-		The whole row stays in fullscreen: hiding it left the learner with no visible
-		way out, and hiding Previous/Next left them with no familiar way on.
-	-->
-	<nav
-		class="lesson-nav"
-		inert={showResultOverlay}
-		aria-label={getMessage('lesson_nav_aria') || 'Πλοήγηση μαθήματος'}
-	>
-		<Button
-			variant="outline"
-			onclick={prevLesson}
-			disabled={currentLessonIndex === 0}
-			class="min-h-12 px-5 text-base"
-		>
-			{getMessage('nav_previous')}
-		</Button>
-		<div class="flex items-center gap-2">
-			<span class="text-base font-semibold text-slate-600" class:fullscreen-counter={isFullscreen}>
-				{getMessage('lesson_x_of_y', {
-					current: String(currentLessonIndex + 1),
-					total: String(lessons.length)
-				})}
-			</span>
-			<Button
-				variant={isFullscreen ? 'secondary' : 'ghost'}
-				onclick={toggleFullscreen}
-				aria-label={isFullscreen ? getMessage('fullscreen_exit') : getMessage('fullscreen_enter')}
-				class="min-h-12 min-w-12 gap-2 px-3"
+	<!-- A slim strip that stays when the bar is away: which lesson this is, and
+	     the button that brings the bar back. A strip, not a tab floating over the
+	     lesson, because a floating tab covered the instruction centred at the top
+	     of many lessons. The open bar is laid over it. -->
+	<div class="bar-strip" class:docked inert={barOpen || showResultOverlay}>
+		<span class="strip-title">
+			{getMessage('lesson_x_of_y', {
+				current: String(currentLessonIndex + 1),
+				total: String(lessons.length)
+			})} · {lessonTitle}
+		</span>
+		{#if !barOpen}
+			<button
+				bind:this={menuButton}
+				class="bar-handle"
+				aria-expanded="false"
+				aria-controls="lesson-bar"
+				onclick={openMenu}
 			>
-				{#if isFullscreen}
-					<Minimize2 class="h-5 w-5" />
-					<span class="text-base">{getMessage('fullscreen_exit')}</span>
-				{:else}
-					<Maximize2 class="h-5 w-5" />
-				{/if}
-			</Button>
-		</div>
-		<Button
-			onclick={nextLesson}
-			disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}
-			class="min-h-12 px-5 text-base"
-		>
-			{currentLessonIndex === lessons.length - 1
-				? nextModuleId
-					? 'Επόμενη Ενότητα'
-					: getMessage('nav_finish')
-				: getMessage('nav_next')}
-		</Button>
-	</nav>
-
-	<!-- One row for notices, however many are up: a second notice in its own row
-	     would push the lesson card past the bottom of the screen. -->
-	<div class="lesson-notices" inert={showResultOverlay}>
-		{#if showFullscreenBanner}
-			<div
-				class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
-			>
-				<div class="flex items-center gap-2">
-					<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
-					<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
-				</div>
-				<div class="flex shrink-0 items-center gap-2">
-					<Button
-						onclick={enterFullscreenFromBanner}
-						class="min-h-11 bg-blue-600 px-4 text-base text-white hover:bg-blue-700"
-					>
-						Πλήρης οθόνη
-					</Button>
-					<button
-						class="min-h-11 rounded-lg px-3 text-base font-medium text-blue-700 underline hover:text-blue-900 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none"
-						onclick={() => (dismissedForLessonId = currentLesson?.id ?? null)}
-					>
-						Όχι τώρα
-					</button>
-				</div>
-			</div>
-		{/if}
-
-		{#if showUnsaved}
-			<div
-				role="alert"
-				class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-900"
-			>
-				<span>{m.save_failed()}</span>
-				<Button onclick={retrySave} class="min-h-12 px-5 text-base">{m.save_retry()}</Button>
-			</div>
+				<ChevronDown class="h-5 w-5" aria-hidden="true" />
+				{m.lesson_menu_show()}
+			</button>
 		{/if}
 	</div>
 
-	<div class="lesson-card" inert={showResultOverlay} bind:this={lessonCard}>
-		<Card class="flex h-full min-h-0 flex-col overflow-hidden py-0">
+	<!-- Then the lesson, taking every pixel left. -->
+	<!-- Listens only to learn that the learner started; the lesson handles the input. -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="lesson-stage"
+		bind:this={stageEl}
+		onpointerup={onStagePointerUp}
+		onkeydown={onStageKeyDown}
+		onwheel={onStageWheel}
+		ontouchstart={onStageTouchStart}
+		ontouchmove={onStageTouchMove}
+	>
+		<div class="lesson-card" inert={showResultOverlay} bind:this={lessonCard}>
 			<!-- Scrolls when a lesson is taller than the screen (a short laptop, or the
 			     browser zoomed in). Lessons built on LessonTemplate scroll inside and
 			     never trigger it; a quiz, sized to its content, used to be cut off. -->
-			<CardContent class="min-h-0 flex-1 overflow-y-auto px-0 py-0">
+			<div class="lesson-scroller">
 				{#if isLocked}
 					<div class="flex h-64 items-center justify-center rounded-md bg-slate-100 text-slate-500">
 						<div class="text-center">
@@ -509,9 +615,159 @@
 						/>
 					{/key}
 				{/if}
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	</div>
+
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<section
+		id="lesson-bar"
+		aria-label={m.lesson_menu_show()}
+		class="lesson-bar"
+		class:open={barOpen}
+		class:docked
+		bind:this={barEl}
+		inert={!barOpen || showResultOverlay}
+		onpointerleave={onBarPointerLeave}
+		onpointerenter={onBarPointerEnter}
+		onkeydown={onBarKeyDown}
+	>
+		<div class="bar-top">
+			{@render crumbs?.()}
+			<!-- Not a heading: the lesson's own h1 stays in the page for screen readers. -->
+			<p class="bar-title">
+				<strong>{lessonTitle}</strong>
+				{#if lessonDescription}
+					<span class="bar-description">{lessonDescription}</span>
+				{/if}
+			</p>
+			<button class="bar-hide" onclick={hideBar}>
+				<ChevronUp class="h-5 w-5" aria-hidden="true" />
+				{m.lesson_menu_hide()}
+			</button>
+		</div>
+
+		<!--
+			The whole row stays in fullscreen: hiding it left the learner with no visible
+			way out, and hiding Previous/Next left them with no familiar way on.
+		-->
+		<nav class="lesson-nav" aria-label={getMessage('lesson_nav_aria') || 'Πλοήγηση μαθήματος'}>
+			<Button
+				variant="outline"
+				onclick={prevLesson}
+				disabled={currentLessonIndex === 0}
+				class="min-h-12 px-5 text-base"
+			>
+				{getMessage('nav_previous')}
+			</Button>
+			<div class="flex items-center gap-2">
+				<span class="text-base font-semibold text-slate-600">
+					{getMessage('lesson_x_of_y', {
+						current: String(currentLessonIndex + 1),
+						total: String(lessons.length)
+					})}
+				</span>
+				<Button
+					variant={isFullscreen ? 'secondary' : 'ghost'}
+					onclick={toggleFullscreen}
+					aria-label={isFullscreen ? getMessage('fullscreen_exit') : getMessage('fullscreen_enter')}
+					class="min-h-12 min-w-12 gap-2 px-3"
+				>
+					{#if isFullscreen}
+						<Minimize2 class="h-5 w-5" />
+						<span class="text-base">{getMessage('fullscreen_exit')}</span>
+					{:else}
+						<Maximize2 class="h-5 w-5" />
+					{/if}
+				</Button>
+			</div>
+			<Button
+				onclick={nextLesson}
+				disabled={currentLessonIndex === lessons.length - 1 && !nextModuleId && !onExit}
+				class="min-h-12 px-5 text-base"
+			>
+				{currentLessonIndex === lessons.length - 1
+					? nextModuleId
+						? 'Επόμενη Ενότητα'
+						: getMessage('nav_finish')
+					: getMessage('nav_next')}
+			</Button>
+		</nav>
+
+		<div class="lesson-notices">
+			{#if stuck}
+				<div
+					role="status"
+					class="flex flex-col gap-3 rounded-lg border-2 border-amber-400 bg-amber-50 px-4 py-3 text-base text-amber-950"
+				>
+					<p class="text-xl font-bold">{m.lesson_stuck_title()}</p>
+					<p>{m.lesson_stuck_body()}</p>
+					<div class="flex flex-wrap gap-3">
+						<Button
+							onclick={() => (helpOpen = true)}
+							aria-expanded={helpOpen}
+							class="min-h-12 px-5 text-base"
+						>
+							{m.lesson_stuck_help()}
+						</Button>
+						<Button variant="outline" onclick={handleBack} class="min-h-12 px-5 text-base">
+							{m.lesson_stuck_exit()}
+						</Button>
+						<Button variant="ghost" onclick={keepGoing} class="min-h-12 px-5 text-base underline">
+							{m.lesson_stuck_continue()}
+						</Button>
+					</div>
+					{#if helpOpen}
+						<div class="rounded-md bg-white px-4 py-3 text-slate-900">
+							<p class="font-semibold">{m.lesson_help_title()}</p>
+							<ul class="mt-1 list-disc ps-5">
+								{#each helpLines as line (line)}
+									<li class="whitespace-pre-line">{line}</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+					<p class="text-sm">{hasMouse ? m.lesson_bar_tip_mouse() : m.lesson_bar_tip_touch()}</p>
+				</div>
+			{/if}
+
+			<!-- One thing at a time for a learner who is already stuck. -->
+			{#if showFullscreenBanner && !stuck}
+				<div
+					class="fullscreen-banner flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow-sm"
+				>
+					<div class="flex items-center gap-2">
+						<Maximize2 class="h-4 w-4 shrink-0 text-blue-600" />
+						<span>Για καλύτερη εμπειρία, ανοίξτε σε <strong>πλήρη οθόνη</strong>.</span>
+					</div>
+					<div class="flex shrink-0 items-center gap-2">
+						<Button
+							onclick={enterFullscreenFromBanner}
+							class="min-h-11 bg-blue-600 px-4 text-base text-white hover:bg-blue-700"
+						>
+							Πλήρης οθόνη
+						</Button>
+						<button
+							class="min-h-11 rounded-lg px-3 text-base font-medium text-blue-700 underline hover:text-blue-900 focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:outline-none"
+							onclick={() => (dismissedForLessonId = currentLesson?.id ?? null)}
+						>
+							Όχι τώρα
+						</button>
+					</div>
+				</div>
+			{/if}
+
+			{#if showUnsaved}
+				<div
+					role="alert"
+					class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-900"
+				>
+					<span>{m.save_failed()}</span>
+					<Button onclick={retrySave} class="min-h-12 px-5 text-base">{m.save_retry()}</Button>
+				</div>
+			{/if}
+		</div>
+	</section>
 
 	{#if showResultOverlay}
 		{@const isSuccess = (mergedProgress[currentLesson.id]?.score ?? 100) >= 50}
@@ -608,22 +864,170 @@
 </div>
 
 <style>
-	/* Navigation row, optional fullscreen banner, then the lesson card taking the
-	   rest. The banner row is declared even when the banner is absent — with only
-	   two rows declared it landed in an implicit row and pushed the card past the
-	   bottom of the screen. `minmax(0, 1fr)` lets the card shrink; a plain `1fr`
-	   would let the lesson push the page taller and bring back the document
-	   scrollbar. */
+	/* The lesson fills the runner; the bar and its Menu tab float over its top
+	   edge. `min-block-size: 0` all the way down is what lets a long lesson
+	   scroll inside itself instead of making the page taller. */
 	.lesson-runner {
-		display: grid;
-		grid-template-rows: auto auto minmax(0, 1fr);
-		gap: 0.5rem;
+		position: relative;
+		display: flex;
+		flex-direction: column;
 		min-block-size: 0;
 		block-size: 100%;
 	}
 
+	/* `isolation` keeps the simulation's own z-indexes (taskbar, windows) under
+	   the bar instead of competing with it. */
+	.lesson-stage {
+		flex: 1;
+		min-block-size: 0;
+		display: flex;
+		flex-direction: column;
+		isolation: isolate;
+	}
+
+	.lesson-card {
+		flex: 1;
+		min-block-size: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.lesson-scroller {
+		flex: 1;
+		min-block-size: 0;
+		overflow-y: auto;
+	}
+
+	.lesson-bar {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-start: 0;
+		z-index: 20;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		max-block-size: 100%;
+		overflow-y: auto;
+		padding: 0.5rem 1rem 0.75rem;
+		background: var(--background, #fff);
+		color: var(--foreground, #0f172a);
+		border-block-end: 1px solid rgb(0 0 0 / 0.12);
+		box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+		transition:
+			transform 0.2s ease,
+			visibility 0s;
+	}
+
+	/* `visibility` waits for the slide to finish, then takes the bar out of
+	   reach entirely; `inert` already keeps the keyboard out. */
+	.lesson-bar:not(.open) {
+		transform: translateY(-100%);
+		visibility: hidden;
+		transition:
+			transform 0.2s ease,
+			visibility 0s linear 0.2s;
+	}
+
+	.bar-top {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 0.75rem;
+	}
+
+	.bar-title {
+		flex: 1 1 16rem;
+		min-inline-size: 0;
+		margin: 0;
+		font-size: 1.125rem;
+		line-height: 1.4;
+	}
+
+	.bar-description {
+		display: block;
+		font-size: 1rem;
+		color: var(--muted-foreground, #475569);
+	}
+
+	.bar-hide,
+	.bar-handle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		min-block-size: 44px;
+		padding-inline: 0.875rem;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.bar-hide {
+		border-radius: 0.5rem;
+		background: transparent;
+		color: inherit;
+	}
+
+	.bar-hide:hover {
+		background: color-mix(in oklab, currentColor 8%, transparent);
+	}
+
+	/* Docked: in the flow, first in line, and the strip makes way for it. */
+	.lesson-bar.docked {
+		position: relative;
+		order: -1;
+		flex: none;
+		max-block-size: 60%;
+		box-shadow: none;
+		/* Appears at once: a bar sliding in under a click sent the click to the
+		   lesson instead of the button it was aimed at. */
+		transition: none;
+	}
+
+	.bar-strip.docked {
+		display: none;
+	}
+
+	.bar-strip {
+		position: relative;
+		flex: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-block-size: 44px;
+		padding-inline: 1rem;
+		background: rgb(15 23 42);
+		color: #fff;
+	}
+
+	/* Context, not a control: on a narrow screen the button needs the room. */
+	.strip-title {
+		position: absolute;
+		inset-inline-start: 1rem;
+		max-inline-size: calc(50% - 7rem);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.9375rem;
+		color: rgb(255 255 255 / 0.85);
+	}
+
+	@media (max-width: 640px) {
+		.strip-title {
+			display: none;
+		}
+	}
+
+	.bar-handle {
+		border-radius: 9999px;
+		background: rgb(255 255 255 / 0.14);
+		color: #fff;
+	}
+
+	.bar-handle:hover {
+		background: rgb(255 255 255 / 0.24);
+	}
+
 	.lesson-nav {
-		grid-row: 1;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
@@ -636,56 +1040,35 @@
 	   saw nothing move at all. `!important` is what it takes to beat a utility
 	   that sets the same property; the alternative is editing the button every
 	   screen shares. */
-	.lesson-nav :global(button:focus-visible) {
+	.lesson-bar :global(button:focus-visible),
+	.lesson-bar :global(a:focus-visible),
+	.bar-handle:focus-visible {
 		outline: 3px solid #b45309 !important;
 		outline-offset: 3px;
 	}
 
-	/* On the fullscreen gradient the plain counter was unreadable. */
-	.fullscreen-counter {
-		border-radius: 9999px;
-		background: rgb(255 255 255 / 0.92);
-		padding: 0.25rem 0.75rem;
-	}
-
 	.lesson-notices {
-		grid-row: 2;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		min-block-size: 0;
 	}
 
-	.lesson-card {
-		/* Explicit row: without it the card was auto-placed into row 2 and the
-		   flexible row 3 stayed empty, so the lesson did not actually take the
-		   space the layout had reserved for it. */
-		grid-row: 3;
-		min-block-size: 0;
-		display: flex;
-		flex-direction: column;
+	.lesson-notices:empty {
+		display: none;
 	}
 
-	.lesson-card > :global(*) {
-		min-block-size: 0;
-		flex: 1;
+	@media (prefers-reduced-motion: reduce) {
+		.lesson-bar,
+		.lesson-bar:not(.open) {
+			transition: none;
+		}
 	}
 
 	.fullscreen-active {
 		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		inset: 0;
 		z-index: 50;
-		height: 100vh;
-		width: 100vw;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		padding: 0;
-		margin: 0;
-		/* Fullscreen keeps a slim row for the "leave fullscreen" control, and the
-		   notices row so a failed save is still announced. */
-		grid-template-rows: auto auto minmax(0, 1fr);
+		background: var(--background, #fff);
 	}
 
 	.fullscreen-active :global(.lesson-template) {
