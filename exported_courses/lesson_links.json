@@ -43,7 +43,10 @@
 	"Οργάνωση πληροφορίας": [
 		{ "module": "module5", "lesson": "bookmarks", "label": "Σελιδοδείκτες" }
 	],
-	"Μηχανές αναζήτησης": [{ "module": "module5", "lesson": "search-google", "label": "Αναζήτηση" }],
+	"Μηχανές αναζήτησης": [
+		{ "module": "module5", "lesson": "search-google", "label": "Αναζήτηση" },
+		{ "module": "module5", "lesson": "search-specific", "label": "Ψάξε τον καιρό" }
+	],
 	"Αναζήτηση πληροφοριών με Μεγάλα Γλωσσικά Μοντέλα": [
 		{ "module": "module13", "lesson": "how-to-ask", "label": "Ρώτα την ΤΝ" }
 	],

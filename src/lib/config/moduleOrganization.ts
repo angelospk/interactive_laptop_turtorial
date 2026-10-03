@@ -222,7 +222,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	// ο μαθητής βλέπει «τοίχο θεωρίας» πριν από κάθε άσκηση (audit A5).
 	module5: [
 		{ title: 'Θεωρία', count: 4 },
-		{ title: 'Εξάσκηση', count: 10 }
+		{ title: 'Εξάσκηση', count: 11 }
 	],
 	module8: [
 		{ title: 'Θεωρία', count: 7 },

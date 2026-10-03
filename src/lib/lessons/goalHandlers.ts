@@ -7,6 +7,11 @@ type GoalHandler = (
 	config: Record<string, unknown>
 ) => boolean;
 
+/** Lower-case and strip accents, so «Καιρός» and «καιρος» compare equal. */
+function foldGreek(text: string): string {
+	return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
 /**
  * One handler per GoalId.
  *
@@ -62,6 +67,13 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		data.url.includes(config.targetUrl),
 
 	search: (action) => action === 'search',
+	'search-query': (action, data, config) => {
+		if (action !== 'search' || typeof data.query !== 'string') return false;
+		const terms = config.targetQueryTerms;
+		if (!Array.isArray(terms) || terms.length === 0) return false;
+		const query = foldGreek(data.query);
+		return terms.every((term) => typeof term === 'string' && query.includes(foldGreek(term)));
+	},
 	'switch-tab': (action) => action === 'switch-tab' || action === 'switch-tabs',
 	'close-tab': (action) => action === 'close-tab',
 

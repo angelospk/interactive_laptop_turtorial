@@ -142,3 +142,18 @@ describe('P6 — γράφω νέο email (eapsi001-c1-s3)', () => {
 		expect(linksOf('eapsi001-c1-s3')).toContain('module6/compose-email');
 	});
 });
+
+describe('P8 — αναζήτηση συγκεκριμένης πληροφορίας (esm002-c2-s2)', () => {
+	it('runs on the goal-checked desktop browser with concrete terms', () => {
+		const lesson = byId.get('module5-lesson11');
+		expect(lesson?.lessonType).toBe('desktop-simulation');
+		const c = config('module5-lesson11');
+		expect(c.goal).toBe('search-query');
+		expect(c.initialApps).toEqual(['browser']);
+		expect((c.targetQueryTerms as string[]).length).toBeGreaterThanOrEqual(2);
+	});
+
+	it('is linked from the search-engines theory section', () => {
+		expect(linksOf('esm002-c2-s2')).toContain('module5/search-specific');
+	});
+});

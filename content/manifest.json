@@ -321,6 +321,11 @@
                   "module": "module5",
                   "lesson": "search-google",
                   "label": "Αναζήτηση"
+                },
+                {
+                  "module": "module5",
+                  "lesson": "search-specific",
+                  "label": "Ψάξε τον καιρό"
                 }
               ]
             },

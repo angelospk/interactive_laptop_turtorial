@@ -202,5 +202,26 @@ export const module5Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module5-lesson9'
+	},
+
+	// Lesson 11: Search for something specific (esm002-c2-s2)
+	{
+		id: 'module5-lesson11',
+		moduleId: 'module5',
+		lessonKey: 'search-specific',
+		titleKey: 'module5_lesson11_title',
+		descriptionKey: 'module5_lesson11_desc',
+		difficulty: 'beginner',
+		orderIndex: 11,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'search-query',
+			initialApps: ['browser'],
+			targetQueryTerms: ['καιρ', 'θεσσαλονικ'],
+			instructions:
+				'Αύριο πηγαίνετε στη Θεσσαλονίκη και θέλετε να ξέρετε αν θα βρέχει. Γράψτε στο Google λίγες λέξεις, π.χ. «καιρός Θεσσαλονίκη», και πατήστε Enter.'
+		},
+		enabled: true,
+		requiredLessonId: 'module5-lesson10'
 	}
 ];

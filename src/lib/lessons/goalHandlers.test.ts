@@ -1026,3 +1026,35 @@ describe('send-email', () => {
 		);
 	});
 });
+
+describe('search-query', () => {
+	// Stems, so «καιρός», «καιρο», «Καιρός» all count.
+	const cfg = { targetQueryTerms: ['καιρ', 'θεσσαλονικ'] };
+
+	it('passes when every term appears, ignoring case and accents', () => {
+		expect(
+			checkGoalMatch('search-query', 'search', { query: 'Καιρός Θεσσαλονίκη αύριο' }, cfg)
+		).toBe(true);
+	});
+
+	it('passes regardless of word order', () => {
+		expect(checkGoalMatch('search-query', 'search', { query: 'θεσσαλονικη καιρος' }, cfg)).toBe(
+			true
+		);
+	});
+
+	it('fails when a term is missing', () => {
+		expect(checkGoalMatch('search-query', 'search', { query: 'καιρός Αθήνα' }, cfg)).toBe(false);
+	});
+
+	it('fails for a non-search action', () => {
+		expect(checkGoalMatch('search-query', 'navigate', { query: 'καιρός θεσσαλονίκη' }, cfg)).toBe(
+			false
+		);
+	});
+
+	it('fails without a query or without configured terms', () => {
+		expect(checkGoalMatch('search-query', 'search', {}, cfg)).toBe(false);
+		expect(checkGoalMatch('search-query', 'search', { query: 'καιρός' }, {})).toBe(false);
+	});
+});

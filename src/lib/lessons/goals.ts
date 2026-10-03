@@ -34,6 +34,7 @@ export const GOALS = {
 	navigate: { requiresTargetUrl: false },
 	'navigate-site': { requiresTargetUrl: true },
 	search: { requiresAppId: false },
+	'search-query': { requiresAppId: false },
 	'switch-tab': { requiresAppId: false },
 	'close-tab': { requiresAppId: false },
 	bookmark: { requiresTargetSite: false },
