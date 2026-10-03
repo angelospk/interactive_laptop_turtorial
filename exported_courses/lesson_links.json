@@ -66,7 +66,9 @@
 	],
 	"H εφαρμογή Viber": [
 		{ "module": "android", "lesson": "send-viber", "label": "Μήνυμα στο Viber (Android)" },
-		{ "module": "module10", "lesson": "scam-spotter-viber", "label": "Απάτη ή Όχι; — Viber" }
+		{ "module": "module10", "lesson": "scam-spotter-viber", "label": "Απάτη ή Όχι; — Viber" },
+		{ "module": "android", "lesson": "viber-group", "label": "Μήνυμα σε ομάδα (Android)" },
+		{ "module": "iphone", "lesson": "viber-group", "label": "Μήνυμα σε ομάδα (iPhone)" }
 	],
 	"Η εφαρμογή Microsoft Teams": [
 		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },

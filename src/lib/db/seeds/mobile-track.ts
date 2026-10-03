@@ -380,6 +380,32 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				successMessage: 'Μπράβο! Χρησιμοποίησες σωστά τον κωδικό μιας χρήσης.',
 				hint: 'Πάτησε «Άνοιξε το SMS», δες τα 6 ψηφία και γράψ’ τα. Μην τα πεις ποτέ σε άλλον.'
 			}
+		},
+		// «Περισσότερα για κάθε μέρα» — σενάρια από τη θεωρία (docs/theory-exercise-mapping.md).
+		{
+			n: 20,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'viber-group',
+			config: {
+				goal: 'mobile-send-chat',
+				prompt:
+					'Την Κυριακή τρώτε όλοι μαζί. Γράψε στην ομάδα «Οικογένεια» του Viber ότι θα φέρεις το γλυκό — ένα μήνυμα, να το δουν όλοι.',
+				targetAppId: 'viber',
+				targetConversationId: 'family',
+				conversations: [
+					{
+						id: 'family',
+						name: 'Οικογένεια 👨‍👩‍👧 (ομάδα)',
+						messages: [
+							{ from: 'them' as const, text: 'Ελένη: Κυριακή στις 2 στο σπίτι μας!' },
+							{ from: 'them' as const, text: 'Γιώργος: Εγώ φέρνω το κρασί 🍷' }
+						]
+					},
+					...CONVERSATIONS
+				],
+				successMessage: 'Μπράβο! Το μήνυμα πήγε σε όλη την ομάδα με μία αποστολή.',
+				hint: 'Στο Viber, η ομάδα φαίνεται σαν μια συνομιλία με το όνομά της. Πάτησε «Οικογένεια», όχι την Ελένη ή τον Γιώργο.'
+			}
 		}
 	];
 

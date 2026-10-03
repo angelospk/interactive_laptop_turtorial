@@ -68,3 +68,22 @@ describe('P5 — κατεβάζω και εγκαθιστώ πρόγραμμα �
 		}
 	});
 });
+
+describe('P4 — μήνυμα στην ομάδα της οικογένειας στο Viber (eapsi001-c1-s5)', () => {
+	it.each(['android', 'iphone'])('%s: sends to the family group, not to a single person', (mod) => {
+		const c = config(`${mod}-viber-group`);
+		expect(c.goal).toBe('mobile-send-chat');
+		expect(c.targetAppId).toBe('viber');
+		const conversations = c.conversations as { id: string; name: string }[];
+		const target = conversations.find((t) => t.id === c.targetConversationId);
+		expect(target?.name).toMatch(/Οικογένεια/);
+		// The single family members are still there, so the learner must pick the group.
+		expect(conversations.length).toBeGreaterThanOrEqual(3);
+	});
+
+	it('is linked from the Viber theory section', () => {
+		expect(linksOf('eapsi001-c1-s5')).toEqual(
+			expect.arrayContaining(['android/viber-group', 'iphone/viber-group'])
+		);
+	});
+});
