@@ -116,7 +116,8 @@
 	],
 	"Κοινά προβλήματα κινητών συσκευών και πιθανές λύσεις": [
 		{ "module": "android", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (Android)" },
-		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" }
+		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" },
+		{ "module": "module9", "lesson": "phone-not-charging", "label": "Το κινητό δεν φορτίζει" }
 	],
 	"Απλοί τρόποι επίλυσης": [
 		{ "module": "module9", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής" }

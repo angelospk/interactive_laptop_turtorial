@@ -116,3 +116,16 @@ describe('P3 — «μπήκε κάποιος στον λογαριασμό μο�
 		expect(linksOf('esm005-c1-s4')).toContain('module8/breach-response');
 	});
 });
+
+describe('P13 — το κινητό δεν φορτίζει (esm006-c1-s3)', () => {
+	it('orders the checks: charger/cable → port → when to ask a technician', () => {
+		expect(byId.get('module9-lesson12')?.lessonType).toBe('quiz');
+		const qs = quizQuestions('module9-lesson12');
+		expect(qs).toHaveLength(3);
+		for (const q of qs) expect(q.options.filter((o) => o.correct)).toHaveLength(1);
+	});
+
+	it('is linked from the phone-problems theory section', () => {
+		expect(linksOf('esm006-c1-s3')).toContain('module9/phone-not-charging');
+	});
+});

@@ -1204,6 +1204,11 @@
                   "module": "android",
                   "lesson": "update-app",
                   "label": "Ενημέρωση εφαρμογής (Android)"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "phone-not-charging",
+                  "label": "Το κινητό δεν φορτίζει"
                 }
               ]
             },
