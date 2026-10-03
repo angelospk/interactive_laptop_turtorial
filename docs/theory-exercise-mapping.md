@@ -149,3 +149,12 @@ email, βιντεοκλήσεις, αναζήτηση, Ρυθμίσεις.
 - **`BrowserApp.classify()`** (`BrowserApp.svelte:195-220`) στέλνει οποιοδήποτε URL περιέχει `gov` στη μία ψεύτικη σελίδα gov και οποιοδήποτε περιέχει `bank` στη μία τράπεζα. Νέα sites όπως `efka.gov.gr` θέλουν κανόνα **πριν** από το `gov`.
 - Τα **`navigate-site` / `bookmark`** ταιριάζουν με substring (`goalHandlers.ts:58-76`).
 - Οι δηλώσεις κάλυψης στις ενότητες για Facebook/YouTube βασίζονται σε επικεφαλίδες. Πριν από οποιαδήποτε δουλειά εκεί χρειάζεται πιο προσεκτική ανάγνωση.
+
+## 5. Κατάσταση υλοποίησης (2026-10-04)
+
+Υλοποιήθηκαν όλα τα P0–P13 στο branch `spike/theory-exercise-mapping` (beads `5x0.1`–`5x0.14`).
+
+- **P0:** τα `lessonLinks` ζουν στο `exported_courses/lesson_links.json` και εφαρμόζονται με `python3 exported_courses/apply_lesson_links.py --apply`. Ένα contract test ελέγχει ότι κάθε link δείχνει σε μάθημα που υπάρχει.
+- **Νέα goals:** `send-email`, `search-query`, `toggle-accessibility`, `join-meeting`, `end-task`, `mobile-install-app`, `mobile-quick-toggle`.
+- **Νέο UI:** Διαχείριση εργασιών (δεξί κλικ στη γραμμή εργασιών), λειτουργία κωδικού σύσκεψης στο VideoCallApp, αναζήτηση και εγκατάσταση στο StoreApp, πάνελ γρήγορων ρυθμίσεων κινητού, διακόπτες προσβασιμότητας που λειτουργούν.
+- **Tests:** κάθε σενάριο έχει έλεγχο στο `src/lib/db/seeds/theory-mirror-lessons.test.ts`.
