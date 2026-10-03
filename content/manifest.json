@@ -181,6 +181,16 @@
                   "module": "android",
                   "lesson": "night-mode",
                   "label": "Νυχτερινή λειτουργία (Android)"
+                },
+                {
+                  "module": "android",
+                  "lesson": "quick-torch",
+                  "label": "Γρήγορες ρυθμίσεις: φακός (Android)"
+                },
+                {
+                  "module": "iphone",
+                  "lesson": "quick-torch",
+                  "label": "Γρήγορες ρυθμίσεις: φακός (iPhone)"
                 }
               ]
             },

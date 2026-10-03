@@ -102,6 +102,7 @@ export const GOALS = {
 	'mobile-find-device': { requiresAppId: false },
 	'mobile-update-app': { requiresAppId: false },
 	'mobile-install-app': { requiresAppId: false },
+	'mobile-quick-toggle': { requiresAppId: false },
 	'mobile-assistant-task': { requiresAppId: false },
 	'mobile-spot-scam-sms': { requiresAppId: false },
 	'mobile-enter-2fa': { requiresAppId: false },

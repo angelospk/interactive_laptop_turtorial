@@ -214,3 +214,17 @@ describe('P11 — κλείνω πρόγραμμα που κόλλησε (esm006-
 		expect(linksOf('esm006-c1-s5')).toContain('module9/end-task');
 	});
 });
+
+describe('P12 — γρήγορες ρυθμίσεις: ανάβω τον φακό (esm001-c2-s6)', () => {
+	it.each(['android', 'iphone'])('%s: turns the torch on from the pull-down panel', (mod) => {
+		const c = config(`${mod}-quick-torch`);
+		expect(c.goal).toBe('mobile-quick-toggle');
+		expect(c.targetTile).toBe('torch');
+	});
+
+	it('is linked from the quick-settings theory section', () => {
+		expect(linksOf('esm001-c2-s6')).toEqual(
+			expect.arrayContaining(['android/quick-torch', 'iphone/quick-torch'])
+		);
+	});
+});

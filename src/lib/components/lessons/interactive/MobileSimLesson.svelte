@@ -8,6 +8,7 @@
 	import MessagingApp from '$lib/components/mobile/apps/MessagingApp.svelte';
 	import MobileSettingsApp from '$lib/components/mobile/apps/MobileSettingsApp.svelte';
 	import RecentApps from '$lib/components/mobile/RecentApps.svelte';
+	import QuickSettingsPanel from '$lib/components/mobile/QuickSettingsPanel.svelte';
 	import CameraApp from '$lib/components/mobile/apps/CameraApp.svelte';
 	import StoreApp from '$lib/components/mobile/apps/StoreApp.svelte';
 	import AssistantApp from '$lib/components/mobile/apps/AssistantApp.svelte';
@@ -106,6 +107,8 @@
 			miss('Προσοχή: αυτή η διεύθυνση δεν είναι το επίσημο gov.gr. Καλύτερα μην την ανοίξεις.');
 		} else if (action === 'mobile-app-updated') {
 			miss('Ενημέρωσες άλλη εφαρμογή. Ψάξε αυτή που ζητά το μάθημα.');
+		} else if (action === 'mobile-quick-toggle') {
+			miss('Άλλο πλακίδιο. Διάβασε τα ονόματα και πάτησε αυτό που ζητάει το μάθημα.');
 		} else if (action === 'mobile-app-installed') {
 			miss('Δεν είναι η επίσημη εφαρμογή. Κοίτα ποιος την έχει φτιάξει (κάτω από το όνομα).');
 		} else if (action === 'mobile-assistant-command') {
@@ -139,6 +142,10 @@
 	// Recent-apps layer (force-close lesson): the learner opens recents and
 	// dismisses the frozen app card. The event carries the appId (by design).
 	const isForceCloseLesson = config.goal === 'mobile-force-close';
+
+	// Quick-settings pull-down (esm001-c2-s6): only in lessons that need it.
+	const isQuickToggleLesson = config.goal === 'mobile-quick-toggle';
+	let showQuickSettings = $state(false);
 	let showRecents = $state(false);
 
 	function dismissRecent(appId: string) {
@@ -162,8 +169,15 @@
 			onRecents={isForceCloseLesson && !done ? () => (showRecents = true) : undefined}
 			showSystemButtons={isScreenshotLesson}
 			onSystemChord={handleSystemChord}
+			onPullDown={isQuickToggleLesson && !done ? () => (showQuickSettings = true) : undefined}
 			class="my-2"
 		>
+			{#if showQuickSettings}
+				<QuickSettingsPanel
+					onToggle={(tile, on) => dispatch('mobile-quick-toggle', { tile, on })}
+					onClose={() => (showQuickSettings = false)}
+				/>
+			{/if}
 			{#if showRecents}
 				<RecentApps
 					apps={config.apps}

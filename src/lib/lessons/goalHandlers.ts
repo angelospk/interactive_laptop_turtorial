@@ -232,6 +232,10 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-update-app': (action, data, config) =>
 		action === 'mobile-app-updated' &&
 		(!config.targetUpdateId || data.appId === config.targetUpdateId),
+	'mobile-quick-toggle': (action, data, config) =>
+		action === 'mobile-quick-toggle' &&
+		data.tile === config.targetTile &&
+		data.on === (config.targetOn ?? true),
 	'mobile-install-app': (action, data, config) =>
 		action === 'mobile-app-installed' &&
 		(!config.targetInstallId || data.appId === config.targetInstallId),

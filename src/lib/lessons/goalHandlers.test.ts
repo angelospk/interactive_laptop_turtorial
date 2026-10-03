@@ -1148,3 +1148,47 @@ describe('end-task', () => {
 		expect(checkGoalMatch('end-task', 'close-app', { appId: 'word' }, cfg)).toBe(false);
 	});
 });
+
+describe('mobile-quick-toggle', () => {
+	it('passes when the target tile is switched on', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'torch', on: true },
+				{ targetTile: 'torch' }
+			)
+		).toBe(true);
+	});
+
+	it('honours targetOn:false (turn something off)', () => {
+		const cfg = { targetTile: 'airplane', targetOn: false };
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'airplane', on: false },
+				cfg
+			)
+		).toBe(true);
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'airplane', on: true },
+				cfg
+			)
+		).toBe(false);
+	});
+
+	it('fails for another tile', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'wifi', on: true },
+				{ targetTile: 'torch' }
+			)
+		).toBe(false);
+	});
+});

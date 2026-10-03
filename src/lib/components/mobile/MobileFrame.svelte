@@ -20,6 +20,7 @@
 		onRecents,
 		showSystemButtons = false,
 		onSystemChord,
+		onPullDown,
 		class: className
 	}: {
 		children?: Snippet;
@@ -43,6 +44,11 @@
 		 * chord means for the current platform.
 		 */
 		onSystemChord?: (chord: string) => void;
+		/**
+		 * When provided, the status bar becomes the «pull down» handle for quick
+		 * settings: a downward swipe or a plain tap (senior-friendly) opens them.
+		 */
+		onPullDown?: () => void;
 		class?: string;
 	} = $props();
 
@@ -76,6 +82,8 @@
 		'volume-up': 'Ένταση πάνω',
 		'volume-down': 'Ένταση κάτω'
 	});
+
+	let pullStartY: number | null = null;
 </script>
 
 <div
@@ -123,11 +131,8 @@
 		{@render bezelButton('power', 'right-0 top-[30%] h-16')}
 	{/if}
 
-	<!-- Status bar -->
-	<div
-		data-testid="mobile-statusbar"
-		class="flex shrink-0 items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"
-	>
+	<!-- Status bar (also the quick-settings pull-down handle when onPullDown is set) -->
+	{#snippet statusContent()}
 		<span class="tabular-nums">{time}</span>
 		{#if isIos}
 			<!-- iOS notch -->
@@ -141,7 +146,34 @@
 			<Wifi class="h-3.5 w-3.5" aria-hidden="true" />
 			<BatteryFull class="h-4 w-4" aria-hidden="true" />
 		</span>
-	</div>
+	{/snippet}
+	{#if onPullDown}
+		<button
+			type="button"
+			aria-label="Γρήγορες ρυθμίσεις"
+			data-testid="mobile-statusbar"
+			onclick={onPullDown}
+			onpointerdown={(e) => {
+				// Capture so the release still reaches us after the finger slides down off the bar.
+				e.currentTarget.setPointerCapture(e.pointerId);
+				pullStartY = e.clientY;
+			}}
+			onpointerup={(e) => {
+				if (pullStartY !== null && e.clientY - pullStartY > 20) onPullDown?.();
+				pullStartY = null;
+			}}
+			class="flex w-full shrink-0 cursor-grab touch-none items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"
+		>
+			{@render statusContent()}
+		</button>
+	{:else}
+		<div
+			data-testid="mobile-statusbar"
+			class="flex shrink-0 items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"
+		>
+			{@render statusContent()}
+		</div>
+	{/if}
 
 	<!-- Screen content -->
 	<div data-testid="mobile-screen" class="relative flex-1 overflow-y-auto bg-slate-50">

@@ -85,6 +85,8 @@ export interface MobileSimConfig {
 	targetUpdateId?: string;
 	/** Which not-yet-installed store item must be installed. */
 	targetInstallId?: string;
+	/** Quick-settings tile to toggle: wifi | bluetooth | torch | airplane. */
+	targetTile?: string;
 	/** Store name shown in the header (Play Store / App Store). */
 	storeName?: string;
 	/** Digital-assistant intent, e.g. 'alarm' | 'reminder' (assistant lesson). */
@@ -139,7 +141,7 @@ const GOAL_REQUIREMENTS: Partial<Record<string, GoalRequirement>> = {
 	'mobile-assistant-task': { requiresTargetAppId: true, targetKind: 'assistant' },
 	'mobile-spot-scam-sms': { requiresTargetAppId: true, targetKind: 'messages' },
 	'mobile-enter-2fa': { requiresTargetAppId: true, targetKind: 'browser' }
-	// 'mobile-screenshot' — system-control goal, no app on the home screen.
+	// 'mobile-screenshot', 'mobile-quick-toggle' — system-control goals, no app on the home screen.
 };
 
 /**
@@ -280,6 +282,11 @@ export function parseMobileSimConfig(raw: unknown): MobileSimConfig {
 		const target = c.storeItems.find((s) => s.id === c.targetUpdateId);
 		if (!target?.hasUpdate) {
 			throw new Error(`store item "${c.targetUpdateId}" must have hasUpdate:true to be updatable`);
+		}
+	}
+	if (c.goal === 'mobile-quick-toggle') {
+		if (!['wifi', 'bluetooth', 'torch', 'airplane'].includes(c.targetTile ?? '')) {
+			throw new Error(`mobile-quick-toggle needs a known targetTile (got "${c.targetTile}")`);
 		}
 	}
 	if (c.goal === 'mobile-install-app') {

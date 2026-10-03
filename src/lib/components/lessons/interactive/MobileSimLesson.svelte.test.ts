@@ -643,3 +643,41 @@ describe('MobileSimLesson — install an app from the store', () => {
 		expect(onComplete).not.toHaveBeenCalled();
 	});
 });
+
+describe('MobileSimLesson — quick settings panel', () => {
+	const torchLesson = mkLesson({
+		goal: 'mobile-quick-toggle',
+		prompt: 'Άναψε τον φακό από τις γρήγορες ρυθμίσεις.',
+		targetTile: 'torch',
+		successMessage: 'Μπράβο! Ο φακός άναψε.'
+	});
+
+	it('opens by pulling down from the status bar and completes on the torch tile', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: torchLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		await screen.getByRole('switch', { name: 'Φακός' }).click();
+		await expect.element(screen.getByText('Μπράβο! Ο φακός άναψε.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete on another tile', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: torchLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		await screen.getByRole('switch', { name: 'Λειτουργία πτήσης' }).click();
+		await expect.element(screen.getByText(/Άλλο πλακίδιο/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it('has no pull-down handle in lessons that do not use it', async () => {
+		const screen = render(MobileSimLesson, {
+			lesson: openLesson,
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
+		await expect
+			.element(screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }))
+			.not.toBeInTheDocument();
+	});
+});

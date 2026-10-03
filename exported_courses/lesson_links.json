@@ -26,7 +26,13 @@
 	],
 	"Γρήγορες ρυθμίσεις και ειδοποιήσεις": [
 		{ "module": "android", "lesson": "connect-wifi", "label": "Σύνδεση σε Wi-Fi (Android)" },
-		{ "module": "android", "lesson": "night-mode", "label": "Νυχτερινή λειτουργία (Android)" }
+		{ "module": "android", "lesson": "night-mode", "label": "Νυχτερινή λειτουργία (Android)" },
+		{
+			"module": "android",
+			"lesson": "quick-torch",
+			"label": "Γρήγορες ρυθμίσεις: φακός (Android)"
+		},
+		{ "module": "iphone", "lesson": "quick-torch", "label": "Γρήγορες ρυθμίσεις: φακός (iPhone)" }
 	],
 	"Ρυθμίσεις προσβασιμότητας κινητών συσκευών": [
 		{ "module": "android", "lesson": "font-size", "label": "Μεγαλύτερα γράμματα (Android)" },
