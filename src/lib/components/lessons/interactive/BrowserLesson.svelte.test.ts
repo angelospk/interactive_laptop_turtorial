@@ -66,3 +66,14 @@ describe('BrowserLesson — back and forward', () => {
 		await expect.element(screen.getByRole('button', { name: 'Πίσω', exact: true })).toBeDisabled();
 	});
 });
+
+describe('BrowserLesson — instructions', () => {
+	it('shows the lesson’s own instruction when it has one', async () => {
+		const screen = render(BrowserLesson, {
+			lesson: lesson({ goal: 'open-history', instructions: 'Πατήστε το ρολόι πάνω δεξιά.' }),
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
+		await expect.element(screen.getByText('Πατήστε το ρολόι πάνω δεξιά.')).toBeVisible();
+	});
+});

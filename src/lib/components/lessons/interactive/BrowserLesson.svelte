@@ -32,6 +32,7 @@
 		targetUrl?: string;
 		/** Pages already visited in the first tab, oldest first; the last one is shown. */
 		initialHistory?: string[];
+		instructions?: string;
 	} | null;
 	const action = config?.goal || config?.action || 'new-tab';
 	const goal = (isValidGoalId(action) ? action : 'new-tab') as GoalId;
@@ -227,7 +228,7 @@
 	<Card>
 		<CardHeader>
 			<CardDescription>
-				{instructions[action as keyof typeof instructions]}
+				{config?.instructions || instructions[action as keyof typeof instructions]}
 			</CardDescription>
 		</CardHeader>
 		<CardContent>
