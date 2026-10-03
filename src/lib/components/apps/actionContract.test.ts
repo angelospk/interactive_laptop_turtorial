@@ -88,6 +88,10 @@ const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 		dir: APPS_DIR,
 		actions: ['end-call', 'join-meeting', 'mute-call', 'start-videocall']
 	},
+	'TaskManagerApp.svelte': {
+		dir: APPS_DIR,
+		actions: ['end-task']
+	},
 	'WordProcessorApp.svelte': {
 		dir: APPS_DIR,
 		actions: [

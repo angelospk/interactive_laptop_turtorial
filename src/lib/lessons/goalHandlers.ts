@@ -133,6 +133,8 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'connect-bluetooth': (action) => action === 'connect-bluetooth',
 	'open-display-settings': (action) => action === 'open-display-settings',
 	'open-accessibility': (action) => action === 'open-accessibility',
+	'end-task': (action, data, config) =>
+		action === 'end-task' && (!config.targetTaskId || data.appId === config.targetTaskId),
 	'toggle-accessibility': (action, data, config) =>
 		action === 'toggle-accessibility' &&
 		data.on === true &&

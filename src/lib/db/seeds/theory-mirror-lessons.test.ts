@@ -200,3 +200,17 @@ describe('P10 — εγκατάσταση εφαρμογής από το κατά
 		);
 	});
 });
+
+describe('P11 — κλείνω πρόγραμμα που κόλλησε (esm006-c1-s5)', () => {
+	it('lists a not-responding program among running ones', () => {
+		const c = config('module9-lesson14');
+		expect(c.goal).toBe('end-task');
+		const apps = c.taskManagerApps as { id: string; status: string }[];
+		expect(apps.find((a) => a.id === c.targetTaskId)?.status).toBe('Δεν αποκρίνεται');
+		expect(apps.length).toBeGreaterThanOrEqual(3);
+	});
+
+	it('is linked from the troubleshooting-tools theory section', () => {
+		expect(linksOf('esm006-c1-s5')).toContain('module9/end-task');
+	});
+});

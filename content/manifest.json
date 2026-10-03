@@ -1277,7 +1277,14 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory+challenge"
+              "kind": "theory+challenge",
+              "lessonLinks": [
+                {
+                  "module": "module9",
+                  "lesson": "end-task",
+                  "label": "Διαχείριση εργασιών"
+                }
+              ]
             },
             {
               "id": "esm006-c1-s6",

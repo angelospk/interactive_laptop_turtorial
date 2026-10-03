@@ -70,6 +70,7 @@ export const GOALS = {
 	'open-accessibility': { requiresAppId: false },
 	'toggle-accessibility': { requiresAppId: false },
 	'open-sound-settings': { requiresAppId: false },
+	'end-task': { requiresAppId: false },
 
 	// Security / Online services
 	'identify-phishing': { requiresAppId: false },

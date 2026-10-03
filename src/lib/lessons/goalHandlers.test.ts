@@ -1135,3 +1135,16 @@ describe('mobile-install-app', () => {
 		).toBe(false);
 	});
 });
+
+describe('end-task', () => {
+	const cfg = { targetTaskId: 'word' };
+
+	it('passes when the frozen program is ended', () => {
+		expect(checkGoalMatch('end-task', 'end-task', { appId: 'word' }, cfg)).toBe(true);
+	});
+
+	it('fails for another program or for simply closing the window', () => {
+		expect(checkGoalMatch('end-task', 'end-task', { appId: 'browser' }, cfg)).toBe(false);
+		expect(checkGoalMatch('end-task', 'close-app', { appId: 'word' }, cfg)).toBe(false);
+	});
+});

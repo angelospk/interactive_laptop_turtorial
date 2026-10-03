@@ -26,6 +26,7 @@
 	import SettingsApp from '$lib/components/apps/SettingsApp.svelte';
 	import VideoCallApp from '$lib/components/apps/VideoCallApp.svelte';
 	import WordProcessorApp from '$lib/components/apps/WordProcessorApp.svelte';
+	import TaskManagerApp from '$lib/components/apps/TaskManagerApp.svelte';
 
 	// Icons
 	import {
@@ -37,7 +38,8 @@
 		Settings,
 		FileText,
 		Phone,
-		Video
+		Video,
+		Activity
 	} from 'lucide-svelte';
 
 	let { lesson, onComplete, onBack } = $props<{
@@ -69,7 +71,8 @@
 		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
 		{ id: 'word', name: 'Επεξεργασία Κειμένου', icon: FileText, component: WordProcessorApp },
 		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp },
-		{ id: 'meeting', name: 'Βιντεοσύσκεψη', icon: Video, component: VideoCallApp }
+		{ id: 'meeting', name: 'Βιντεοσύσκεψη', icon: Video, component: VideoCallApp },
+		{ id: 'taskmanager', name: 'Διαχείριση εργασιών', icon: Activity, component: TaskManagerApp }
 	];
 
 	// Pinned Apps (Default set)
@@ -236,6 +239,10 @@
 	}
 
 	function handleAppAction(action: string, data?: Record<string, unknown>) {
+		// Ending a task in Task Manager closes that program's window too.
+		if (action === 'end-task') {
+			openApps = openApps.filter((a) => a.appId !== data?.appId);
+		}
 		try {
 			checkGoal(action, data);
 		} catch (err) {
@@ -353,6 +360,7 @@
 					}
 				}}
 				onOpenSettings={openSettingsToPage}
+				onOpenTaskManager={() => openApp('taskmanager')}
 			/>
 		</Desktop>
 	</div>

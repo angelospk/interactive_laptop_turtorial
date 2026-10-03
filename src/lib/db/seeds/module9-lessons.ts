@@ -308,5 +308,31 @@ export const module9Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module9-lesson12'
+	},
+
+	// Lesson 14: end a frozen program from Task Manager (esm006-c1-s5)
+	{
+		id: 'module9-lesson14',
+		moduleId: 'module9',
+		lessonKey: 'end-task',
+		titleKey: 'module9_lesson14_title',
+		descriptionKey: 'module9_lesson14_desc',
+		difficulty: 'advanced',
+		orderIndex: 14,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'end-task',
+			initialApps: ['browser', 'word'],
+			targetTaskId: 'word',
+			taskManagerApps: [
+				{ id: 'word', name: 'Επεξεργασία Κειμένου', status: 'Δεν αποκρίνεται' },
+				{ id: 'browser', name: 'Browser', status: 'Εκτελείται' },
+				{ id: 'antivirus', name: 'Προστασία από ιούς', status: 'Εκτελείται' }
+			],
+			instructions:
+				'Η Επεξεργασία Κειμένου κόλλησε και δεν κλείνει με το Χ. Κάντε δεξί κλικ στη γραμμή εργασιών (κάτω), ανοίξτε τη «Διαχείριση εργασιών», επιλέξτε το πρόγραμμα που «Δεν αποκρίνεται» και πατήστε «Τερματισμός εργασίας».'
+		},
+		enabled: true,
+		requiredLessonId: 'module9-lesson13'
 	}
 ];
