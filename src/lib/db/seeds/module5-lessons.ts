@@ -135,11 +135,11 @@ export const module5Lessons: NewLesson[] = [
 		orderIndex: 7,
 		lessonType: 'browser',
 		config: {
-			goal: 'navigate',
-			targetUrl: 'history',
+			goal: 'open-history',
 			initialApps: ['browser'],
-			initialTabs: ['home', 'news', 'weather'],
-			instructions: 'Ανοίξτε το Ιστορικό περιήγησης πατώντας το εικονίδιο του ρολογιού.'
+			initialTabs: ['home', 'news.gr', 'weather.gr'],
+			instructions:
+				'Ανοίξτε το Ιστορικό: πατήστε το εικονίδιο με το ρολόι, πάνω δεξιά δίπλα στο αστέρι.'
 		},
 		enabled: true,
 		requiredLessonId: 'module5-lesson6'
@@ -202,5 +202,26 @@ export const module5Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module5-lesson9'
+	},
+
+	// Lesson 11: Back and Forward arrows
+	{
+		id: 'module5-lesson11',
+		moduleId: 'module5',
+		lessonKey: 'back-forward',
+		titleKey: 'module5_lesson11_title',
+		descriptionKey: 'module5_lesson11_desc',
+		difficulty: 'beginner',
+		orderIndex: 11,
+		lessonType: 'browser',
+		config: {
+			goal: 'back-forward',
+			initialApps: ['browser'],
+			initialHistory: ['home', 'news.gr', 'weather.gr'],
+			instructions:
+				'Πατήστε το βελάκι «Πίσω» (←) για να γυρίσετε στις Ειδήσεις και μετά το βελάκι «Μπροστά» (→) για να ξαναπάτε στον Καιρό.'
+		},
+		enabled: true,
+		requiredLessonId: 'module5-lesson10'
 	}
 ];

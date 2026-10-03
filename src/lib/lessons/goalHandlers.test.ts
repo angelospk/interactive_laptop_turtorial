@@ -983,3 +983,16 @@ describe('handler coverage', () => {
 		}
 	});
 });
+
+describe('browser history goals', () => {
+	it('open-history is met by opening the history page', () => {
+		expect(checkGoalMatch('open-history', 'open-history', {}, {})).toBe(true);
+		expect(checkGoalMatch('open-history', 'navigate', { url: 'news.gr' }, {})).toBe(false);
+	});
+
+	it('back-forward is met by going forward after going back', () => {
+		expect(checkGoalMatch('back-forward', 'forward', { afterBack: true }, {})).toBe(true);
+		expect(checkGoalMatch('back-forward', 'forward', { afterBack: false }, {})).toBe(false);
+		expect(checkGoalMatch('back-forward', 'back', {}, {})).toBe(false);
+	});
+});

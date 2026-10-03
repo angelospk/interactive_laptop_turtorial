@@ -64,6 +64,9 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	search: (action) => action === 'search',
 	'switch-tab': (action) => action === 'switch-tab' || action === 'switch-tabs',
 	'close-tab': (action) => action === 'close-tab',
+	'open-history': (action) => action === 'open-history',
+	// Forward only counts once the learner has gone back: that round trip is the lesson.
+	'back-forward': (action, data) => action === 'forward' && data.afterBack === true,
 
 	bookmark: (action, data, config) => {
 		if (action !== 'bookmark') return false;

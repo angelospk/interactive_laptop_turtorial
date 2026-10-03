@@ -3,8 +3,20 @@
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardDescription } from '$lib/components/ui/card';
-	import { Globe, Search, ArrowLeft, ArrowRight, RefreshCw, Plus, X, Star } from '@lucide/svelte';
+	import {
+		Globe,
+		Search,
+		ArrowLeft,
+		ArrowRight,
+		RefreshCw,
+		Plus,
+		X,
+		Star,
+		History
+	} from '@lucide/svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
+	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
+	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
@@ -18,38 +30,55 @@
 		initialTabs?: string[];
 		targetSite?: string;
 		targetUrl?: string;
+		/** Pages already visited in the first tab, oldest first; the last one is shown. */
+		initialHistory?: string[];
 	} | null;
 	const action = config?.goal || config?.action || 'new-tab';
+	const goal = (isValidGoalId(action) ? action : 'new-tab') as GoalId;
 
+	type PageType = 'home' | 'search' | 'news' | 'weather' | 'gov' | 'history';
 	type Tab = {
 		id: number;
 		title: string;
 		url: string;
-		type: 'home' | 'search' | 'news' | 'weather' | 'gov';
+		type: PageType;
+		// This tab's own Back/Forward list.
+		stack: string[];
+		stackIndex: number;
 	};
 
-	function buildInitialTabs(): Tab[] {
-		const initial: string[] = config?.initialTabs || [];
-		if (initial.length === 0) return [{ id: 1, title: 'Αρχική', url: 'home', type: 'home' }];
-		return initial.map((url, i) => {
-			let type: Tab['type'] = 'search';
-			let title = url;
-			if (url === 'home') {
-				type = 'home';
-				title = 'Αρχική';
-			} else if (url.includes('news')) {
-				type = 'news';
-				title = 'Ειδήσεις';
-			} else if (url.includes('weather')) {
-				type = 'weather';
-				title = 'Καιρός';
-			} else if (url.includes('gov')) {
-				type = 'gov';
-				title = 'Gov.gr';
-			}
-			return { id: i + 1, title, url, type };
-		});
+	function pageFor(url: string): { type: PageType; title: string } {
+		if (url === 'home') return { type: 'home', title: 'Αρχική' };
+		if (url === 'history') return { type: 'history', title: 'Ιστορικό' };
+		if (url.includes('news') || url.includes('eidiseis')) return { type: 'news', title: 'Ειδήσεις' };
+		if (url.includes('weather') || url.includes('kairos')) return { type: 'weather', title: 'Καιρός' };
+		if (url.includes('gov')) return { type: 'gov', title: 'Gov.gr' };
+		return { type: 'search', title: url };
 	}
+
+	function makeTab(id: number, stack: string[]): Tab {
+		const url = stack[stack.length - 1];
+		return { id, url, ...pageFor(url), stack, stackIndex: stack.length - 1 };
+	}
+
+	function buildInitialTabs(): Tab[] {
+		if (config?.initialHistory?.length) return [makeTab(1, [...config.initialHistory])];
+		const initial: string[] = config?.initialTabs || [];
+		if (initial.length === 0) return [makeTab(1, ['home'])];
+		return initial.map((url, i) => makeTab(i + 1, [url]));
+	}
+
+	// Pages visited in this lesson, newest first — what the history page lists.
+	type Visit = { url: string; title: string };
+	function initialVisits(): Visit[] {
+		const urls = config?.initialHistory ?? config?.initialTabs ?? [];
+		return urls
+			.filter((url) => url !== 'home' && url !== 'history')
+			.map((url) => ({ url, title: pageFor(url).title }))
+			.reverse();
+	}
+	let visits = $state<Visit[]>(initialVisits());
+	let wentBack = $state(false);
 
 	let tabs = $state<Tab[]>(buildInitialTabs());
 	let activeTabId = $state(1);
@@ -62,7 +91,7 @@
 
 	function addTab() {
 		const newId = Math.max(...tabs.map((t) => t.id)) + 1;
-		tabs.push({ id: newId, title: 'Νέα καρτέλα', url: '', type: 'search' });
+		tabs.push({ ...makeTab(newId, ['home']), title: 'Νέα καρτέλα' });
 		activeTabId = newId;
 		addressBarInput = '';
 		searchBarInput = '';
@@ -89,29 +118,44 @@
 		}
 	}
 
+	function showPage(tab: Tab, url: string) {
+		Object.assign(tab, { url, ...pageFor(url) });
+		addressBarInput = tab.type === 'home' || tab.type === 'history' ? '' : url;
+	}
+
 	function navigate(url: string) {
-		let type: Tab['type'] = 'search';
-		let title = url;
-
-		if (url.includes('news') || url.includes('eidiseis')) {
-			type = 'news';
-			title = 'Ειδήσεις';
-		} else if (url.includes('weather') || url.includes('kairos')) {
-			type = 'weather';
-			title = 'Καιρός';
-		} else if (url.includes('gov')) {
-			type = 'gov';
-			title = 'Gov.gr';
-		}
-
 		const tab = tabs.find((t) => t.id === activeTabId);
 		if (tab) {
-			tab.url = url;
-			tab.type = type;
-			tab.title = title;
+			tab.stack = [...tab.stack.slice(0, tab.stackIndex + 1), url];
+			tab.stackIndex = tab.stack.length - 1;
+			showPage(tab, url);
+			if (tab.type !== 'home' && tab.type !== 'history') {
+				visits = [{ url, title: tab.title }, ...visits.filter((v) => v.url !== url)];
+			}
 		}
 
 		if (action === 'navigate' && url.includes('.') && !completed) {
+			checkCompletion();
+		}
+		if (url === 'history' && !completed && checkGoalMatch(goal, 'open-history', {}, {})) {
+			checkCompletion();
+		}
+	}
+
+	function goBack() {
+		const tab = activeTab;
+		if (tab.stackIndex === 0) return;
+		tab.stackIndex -= 1;
+		showPage(tab, tab.stack[tab.stackIndex]);
+		wentBack = true;
+	}
+
+	function goForward() {
+		const tab = activeTab;
+		if (tab.stackIndex >= tab.stack.length - 1) return;
+		tab.stackIndex += 1;
+		showPage(tab, tab.stack[tab.stackIndex]);
+		if (!completed && checkGoalMatch(goal, 'forward', { afterBack: wentBack }, {})) {
 			checkCompletion();
 		}
 	}
@@ -129,7 +173,7 @@
 		activeTabId = id;
 		const tab = tabs.find((t) => t.id === id);
 		if (tab) {
-			addressBarInput = tab.url === 'home' ? '' : tab.url;
+			addressBarInput = tab.type === 'home' || tab.type === 'history' ? '' : tab.url;
 		}
 
 		if ((action === 'switch-tab' || action === 'switch-tabs') && tabs.length > 1 && !completed) {
@@ -169,7 +213,11 @@
 		'switch-tab': 'Άλλαξε καρτέλα κάνοντας κλικ σε μια άλλη καρτέλα από αυτή που είσαι.',
 		'switch-tabs': 'Άλλαξε καρτέλα κάνοντας κλικ σε μια άλλη καρτέλα από αυτή που είσαι.',
 		'close-tab': 'Κλείσε μια καρτέλα πατώντας το X δίπλα στο όνομά της.',
-		bookmark: `Πρόσθεσε στα Αγαπημένα το ${config?.targetSite || 'gov.gr'}.`
+		bookmark: `Πρόσθεσε στα Αγαπημένα το ${config?.targetSite || 'gov.gr'}.`,
+		'open-history':
+			'Άνοιξε το Ιστορικό: πάτησε το εικονίδιο με το ρολόι, πάνω δεξιά δίπλα στο αστέρι. Θα δεις τις σελίδες που επισκέφτηκες.',
+		'back-forward':
+			'Είσαι στη σελίδα «Καιρός». Πάτησε το βελάκι «Πίσω» (←), πάνω αριστερά, για να γυρίσεις στις «Ειδήσεις». Μετά πάτησε το βελάκι «Μπροστά» (→) για να ξαναπάς στον «Καιρό».'
 	};
 </script>
 
@@ -224,10 +272,26 @@
 
 				<!-- 2. Toolbar (Address Bar) -->
 				<div class="flex items-center gap-2 border-b border-slate-200 bg-white p-2">
-					<div class="flex gap-1 text-slate-400">
-						<ArrowLeft class="h-5 w-5" />
-						<ArrowRight class="h-5 w-5" />
-						<RefreshCw class="h-5 w-5" />
+					<div class="flex items-center gap-1 text-slate-600">
+						<button
+							class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent"
+							onclick={goBack}
+							disabled={activeTab.stackIndex === 0}
+							title="Πίσω"
+							aria-label="Πίσω"
+						>
+							<ArrowLeft class="h-5 w-5" />
+						</button>
+						<button
+							class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 disabled:text-slate-300 disabled:hover:bg-transparent"
+							onclick={goForward}
+							disabled={activeTab.stackIndex >= activeTab.stack.length - 1}
+							title="Μπροστά"
+							aria-label="Μπροστά"
+						>
+							<ArrowRight class="h-5 w-5" />
+						</button>
+						<RefreshCw class="h-5 w-5 text-slate-400" />
 					</div>
 					<div class="relative flex-1">
 						<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
@@ -258,6 +322,17 @@
 								? 'fill-yellow-400 text-yellow-400'
 								: 'text-slate-400'}"
 						/>
+					</button>
+					<button
+						class="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 {activeTab.type ===
+						'history'
+							? 'bg-slate-100'
+							: ''}"
+						onclick={() => navigate('history')}
+						title="Ιστορικό"
+						aria-label="Ιστορικό"
+					>
+						<History class="h-5 w-5 text-slate-600" />
 					</button>
 				</div>
 
@@ -330,6 +405,33 @@
 									<p class="text-sm text-slate-600">Είσοδος στις υπηρεσίες</p>
 								</div>
 							</div>
+						</div>
+					{:else if activeTab.type === 'history'}
+						<div class="mx-auto min-h-full max-w-3xl bg-white p-8">
+							<h1 class="mb-6 text-3xl font-bold text-slate-900">Ιστορικό</h1>
+							{#if visits.length}
+								<ul class="divide-y rounded-lg border">
+									{#each visits as visit (visit.url)}
+										<li>
+											<button
+												class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50"
+												onclick={() => navigate(visit.url)}
+											>
+												<Globe class="h-5 w-5 shrink-0 text-slate-400" />
+												<span class="font-medium text-slate-900">{visit.title}</span>
+												<span class="truncate text-sm text-slate-500">{visit.url}</span>
+											</button>
+										</li>
+									{/each}
+								</ul>
+							{:else}
+								<p class="text-slate-500">Δεν έχετε επισκεφτεί ακόμα καμία σελίδα.</p>
+							{/if}
+						</div>
+					{:else if activeTab.type === 'weather'}
+						<div class="mx-auto min-h-full max-w-3xl bg-white p-8 shadow-sm">
+							<h1 class="mb-4 text-3xl font-bold text-sky-700">Καιρός</h1>
+							<p class="text-lg text-slate-700">Αθήνα: ηλιοφάνεια, 24°C</p>
 						</div>
 					{:else}
 						<!-- Generic Page -->
