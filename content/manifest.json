@@ -23,7 +23,14 @@
               "mdPath": "md/esm001/c1/s2.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@5766ada1f0a44c3190f7e3544c70fe3a",
               "modules": [],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module9",
+                  "lesson": "install-app",
+                  "label": "Εγκατάσταση εφαρμογής"
+                }
+              ]
             },
             {
               "id": "esm001-c1-s3",
@@ -34,7 +41,24 @@
                 "module3",
                 "module1"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module3",
+                  "lesson": "start-menu",
+                  "label": "Μενού Έναρξη"
+                },
+                {
+                  "module": "module3",
+                  "lesson": "open-application",
+                  "label": "Άνοιγμα εφαρμογής"
+                },
+                {
+                  "module": "module4",
+                  "lesson": "create-folder",
+                  "label": "Νέος φάκελος"
+                }
+              ]
             },
             {
               "id": "esm001-c1-s4",
@@ -44,7 +68,14 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module9",
+                  "lesson": "accessibility-settings",
+                  "label": "Ρυθμίσεις προσβασιμότητας"
+                }
+              ]
             }
           ]
         },
@@ -89,7 +120,24 @@
               "mdPath": "md/esm001/c2/s5.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@2233c1d70d63434b9e09f0d35f216211",
               "modules": [],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "android",
+                  "lesson": "force-close",
+                  "label": "Κλείσιμο εφαρμογής (Android)"
+                },
+                {
+                  "module": "iphone",
+                  "lesson": "force-close",
+                  "label": "Κλείσιμο εφαρμογής (iPhone)"
+                },
+                {
+                  "module": "android",
+                  "lesson": "update-app",
+                  "label": "Ενημέρωση εφαρμογής (Android)"
+                }
+              ]
             },
             {
               "id": "esm001-c2-s6",
@@ -97,7 +145,19 @@
               "mdPath": "md/esm001/c2/s6.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@4cce03a7a07a47f791e1ce3655a18e57",
               "modules": [],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "android",
+                  "lesson": "connect-wifi",
+                  "label": "Σύνδεση σε Wi-Fi (Android)"
+                },
+                {
+                  "module": "android",
+                  "lesson": "night-mode",
+                  "label": "Νυχτερινή λειτουργία (Android)"
+                }
+              ]
             },
             {
               "id": "esm001-c2-s7",
@@ -105,7 +165,19 @@
               "mdPath": "md/esm001/c2/s7.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:EAPSI+esm001+2025_S2+type@sequential+block@ef1a29a413ef42e5abe66d7922ca22e1",
               "modules": [],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "android",
+                  "lesson": "font-size",
+                  "label": "Μεγαλύτερα γράμματα (Android)"
+                },
+                {
+                  "module": "iphone",
+                  "lesson": "font-size",
+                  "label": "Μεγαλύτερα γράμματα (iPhone)"
+                }
+              ]
             }
           ]
         }
@@ -146,7 +218,19 @@
               "modules": [
                 "module5"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module5",
+                  "lesson": "address-bar",
+                  "label": "Γράψε μια διεύθυνση"
+                },
+                {
+                  "module": "module5",
+                  "lesson": "new-tab",
+                  "label": "Νέα καρτέλα"
+                }
+              ]
             },
             {
               "id": "esm002-c1-s4",
@@ -156,7 +240,24 @@
               "modules": [
                 "module5"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module5",
+                  "lesson": "browser-history",
+                  "label": "Ιστορικό"
+                },
+                {
+                  "module": "module5",
+                  "lesson": "download-file",
+                  "label": "Λήψη αρχείου"
+                },
+                {
+                  "module": "module5",
+                  "lesson": "zoom-page",
+                  "label": "Μεγέθυνση σελίδας"
+                }
+              ]
             },
             {
               "id": "esm002-c1-s5",
@@ -164,7 +265,14 @@
               "mdPath": "md/esm002/c1/s5.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm002+2025_S2/jump_to/block-v1:EAPSI+esm002+2025_S2+type@sequential+block@ff2887f4f9844528b42cef5df580cdbf",
               "modules": [],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module5",
+                  "lesson": "bookmarks",
+                  "label": "Σελιδοδείκτες"
+                }
+              ]
             }
           ]
         },
@@ -187,7 +295,14 @@
               "modules": [
                 "module5"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module5",
+                  "lesson": "search-google",
+                  "label": "Αναζήτηση"
+                }
+              ]
             },
             {
               "id": "esm002-c2-s3",
@@ -197,7 +312,14 @@
               "modules": [
                 "module13"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module13",
+                  "lesson": "how-to-ask",
+                  "label": "Ρώτα την ΤΝ"
+                }
+              ]
             }
           ]
         },
@@ -230,7 +352,19 @@
               "modules": [
                 "module12"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "gov",
+                  "lesson": "gov-login",
+                  "label": "Σύνδεση στο gov.gr"
+                },
+                {
+                  "module": "gov",
+                  "lesson": "gov-find-family-cert",
+                  "label": "Βρες μια βεβαίωση"
+                }
+              ]
             },
             {
               "id": "esm002-c3-s4",
@@ -255,7 +389,14 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "module8",
+                  "lesson": "secure-site",
+                  "label": "Ασφαλής ιστότοπος"
+                }
+              ]
             },
             {
               "id": "esm002-c4-s3",
@@ -265,7 +406,19 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "bank",
+                  "lesson": "bank-secure-login",
+                  "label": "Σύνδεση στην τράπεζα"
+                },
+                {
+                  "module": "bank",
+                  "lesson": "bank-transfer",
+                  "label": "Μεταφορά χρημάτων"
+                }
+              ]
             }
           ]
         }
@@ -304,7 +457,19 @@
               "modules": [
                 "module6"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module6",
+                  "lesson": "reply-email",
+                  "label": "Απάντηση σε email"
+                },
+                {
+                  "module": "module6",
+                  "lesson": "email-attachments",
+                  "label": "Συνημμένο αρχείο"
+                }
+              ]
             },
             {
               "id": "eapsi001-c1-s4",
@@ -324,7 +489,19 @@
               "modules": [
                 "module11"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "android",
+                  "lesson": "send-viber",
+                  "label": "Μήνυμα στο Viber (Android)"
+                },
+                {
+                  "module": "module10",
+                  "lesson": "scam-spotter-viber",
+                  "label": "Απάτη ή Όχι; — Viber"
+                }
+              ]
             }
           ]
         },
@@ -400,7 +577,19 @@
               "modules": [
                 "module11"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module11",
+                  "lesson": "start-call",
+                  "label": "Ξεκίνα βιντεοκλήση"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "mute-unmute",
+                  "label": "Σίγαση μικροφώνου"
+                }
+              ]
             },
             {
               "id": "eapsi001-c3-s4",
@@ -410,7 +599,19 @@
               "modules": [
                 "module11"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module11",
+                  "lesson": "start-call",
+                  "label": "Ξεκίνα βιντεοκλήση"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "mute-unmute",
+                  "label": "Σίγαση μικροφώνου"
+                }
+              ]
             },
             {
               "id": "eapsi001-c3-s5",
@@ -420,7 +621,19 @@
               "modules": [
                 "module11"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module11",
+                  "lesson": "start-call",
+                  "label": "Ξεκίνα βιντεοκλήση"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "end-call",
+                  "label": "Τερματισμός κλήσης"
+                }
+              ]
             },
             {
               "id": "eapsi001-c3-s6",
@@ -430,7 +643,19 @@
               "modules": [
                 "word"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "word",
+                  "lesson": "type-title",
+                  "label": "Γράψε κείμενο"
+                },
+                {
+                  "module": "word",
+                  "lesson": "bold-title",
+                  "label": "Έντονα γράμματα"
+                }
+              ]
             },
             {
               "id": "eapsi001-c3-s7",
@@ -438,7 +663,19 @@
               "mdPath": "md/eapsi001/c3/s7.md",
               "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+eapsi001+2025_S2/jump_to/block-v1:EAPSI+eapsi001+2025_S2+type@sequential+block@4c02caddb39641f6a0e44889cbcaf6e5",
               "modules": [],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module4",
+                  "lesson": "create-folder",
+                  "label": "Νέος φάκελος"
+                },
+                {
+                  "module": "module4",
+                  "lesson": "drag-drop-files",
+                  "label": "Μετακίνηση αρχείου"
+                }
+              ]
             },
             {
               "id": "eapsi001-c3-s8",
@@ -469,7 +706,19 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "module8",
+                  "lesson": "privacy-settings",
+                  "label": "Ρυθμίσεις απορρήτου"
+                },
+                {
+                  "module": "module8",
+                  "lesson": "cookies-practice",
+                  "label": "Cookies"
+                }
+              ]
             },
             {
               "id": "eapsi001-c4-s3",
@@ -510,7 +759,19 @@
               "modules": [
                 "word"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "word",
+                  "lesson": "bold-title",
+                  "label": "Έντονα γράμματα"
+                },
+                {
+                  "module": "word",
+                  "lesson": "bullet-list",
+                  "label": "Λίστα με κουκκίδες"
+                }
+              ]
             },
             {
               "id": "esm004-c1-s3",
@@ -520,7 +781,19 @@
               "modules": [
                 "module7"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module7",
+                  "lesson": "enter-headers",
+                  "label": "Γράψε σε κελιά"
+                },
+                {
+                  "module": "module7",
+                  "lesson": "sum-formula",
+                  "label": "Άθροισμα"
+                }
+              ]
             },
             {
               "id": "esm004-c1-s4",
@@ -712,12 +985,12 @@
                 {
                   "module": "module10",
                   "lesson": "scam-spotter-email",
-                  "label": "Απάτη ή Όχι; (Email)"
+                  "label": "Απάτη ή Όχι; — Email"
                 },
                 {
                   "module": "module10",
                   "lesson": "scam-spotter-sms",
-                  "label": "Απάτη ή Όχι; (SMS)"
+                  "label": "Απάτη ή Όχι; — SMS"
                 }
               ]
             },
@@ -730,7 +1003,19 @@
                 "module8",
                 "module10"
               ],
-              "kind": "theory"
+              "kind": "theory",
+              "lessonLinks": [
+                {
+                  "module": "module8",
+                  "lesson": "strong-password",
+                  "label": "Ισχυρός κωδικός"
+                },
+                {
+                  "module": "android",
+                  "lesson": "two-factor",
+                  "label": "Κωδικός επιβεβαίωσης (Android)"
+                }
+              ]
             },
             {
               "id": "esm005-c1-s4",
@@ -832,7 +1117,19 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory+challenge"
+              "kind": "theory+challenge",
+              "lessonLinks": [
+                {
+                  "module": "module9",
+                  "lesson": "connect-wifi",
+                  "label": "Σύνδεση σε Wi-Fi"
+                },
+                {
+                  "module": "module9",
+                  "lesson": "add-printer",
+                  "label": "Προσθήκη εκτυπωτή"
+                }
+              ]
             },
             {
               "id": "esm006-c1-s3",
@@ -842,7 +1139,19 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory+challenge"
+              "kind": "theory+challenge",
+              "lessonLinks": [
+                {
+                  "module": "android",
+                  "lesson": "force-close",
+                  "label": "Κλείσιμο εφαρμογής (Android)"
+                },
+                {
+                  "module": "android",
+                  "lesson": "update-app",
+                  "label": "Ενημέρωση εφαρμογής (Android)"
+                }
+              ]
             },
             {
               "id": "esm006-c1-s4",
@@ -852,7 +1161,14 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory+challenge"
+              "kind": "theory+challenge",
+              "lessonLinks": [
+                {
+                  "module": "module9",
+                  "lesson": "update-app",
+                  "label": "Ενημέρωση εφαρμογής"
+                }
+              ]
             },
             {
               "id": "esm006-c1-s5",
@@ -872,7 +1188,14 @@
               "modules": [
                 "module9"
               ],
-              "kind": "theory+challenge"
+              "kind": "theory+challenge",
+              "lessonLinks": [
+                {
+                  "module": "module13",
+                  "lesson": "how-to-ask",
+                  "label": "Ρώτα την ΤΝ"
+                }
+              ]
             },
             {
               "id": "esm006-c1-s7",

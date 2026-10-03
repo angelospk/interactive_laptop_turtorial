@@ -65,12 +65,9 @@ SUBSECTION_OVERRIDES = {
 # Deep links from a library subsection to specific interactive lessons.
 # Keyed by subsection (seq) display name. Each entry: {module, lesson(=lessonKey), label}.
 # Optional — emitted as `lessonLinks` only when present (backwards-compatible).
-LESSON_LINKS = {
-    "Βασικές έννοιες της κυβερνοασφάλειας": [
-        {"module": "module10", "lesson": "scam-spotter-email", "label": "Απάτη ή Όχι; — Email"},
-        {"module": "module10", "lesson": "scam-spotter-sms", "label": "Απάτη ή Όχι; — SMS"},
-    ],
-}
+# Lives in lesson_links.json so apply_lesson_links.py can refresh the manifest
+# without a full rebuild (which needs the scrape _cache).
+LESSON_LINKS = json.load(open(os.path.join(HERE, "lesson_links.json"), encoding="utf-8"))
 
 
 def load_structures():

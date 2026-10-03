@@ -1,0 +1,119 @@
+{
+	"Ο Υπολογιστής": [
+		{ "module": "module9", "lesson": "install-app", "label": "Εγκατάσταση εφαρμογής" }
+	],
+	"Περιήγηση στα Windows 11": [
+		{ "module": "module3", "lesson": "start-menu", "label": "Μενού Έναρξη" },
+		{ "module": "module3", "lesson": "open-application", "label": "Άνοιγμα εφαρμογής" },
+		{ "module": "module4", "lesson": "create-folder", "label": "Νέος φάκελος" }
+	],
+	"Ρυθμίσεις προσβασιμότητας": [
+		{
+			"module": "module9",
+			"lesson": "accessibility-settings",
+			"label": "Ρυθμίσεις προσβασιμότητας"
+		}
+	],
+	"Διαχείριση εφαρμογών": [
+		{ "module": "android", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (Android)" },
+		{ "module": "iphone", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (iPhone)" },
+		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" }
+	],
+	"Γρήγορες ρυθμίσεις και ειδοποιήσεις": [
+		{ "module": "android", "lesson": "connect-wifi", "label": "Σύνδεση σε Wi-Fi (Android)" },
+		{ "module": "android", "lesson": "night-mode", "label": "Νυχτερινή λειτουργία (Android)" }
+	],
+	"Ρυθμίσεις προσβασιμότητας κινητών συσκευών": [
+		{ "module": "android", "lesson": "font-size", "label": "Μεγαλύτερα γράμματα (Android)" },
+		{ "module": "iphone", "lesson": "font-size", "label": "Μεγαλύτερα γράμματα (iPhone)" }
+	],
+	"Ιστοσελίδες και προγράμματα περιήγησης": [
+		{ "module": "module5", "lesson": "address-bar", "label": "Γράψε μια διεύθυνση" },
+		{ "module": "module5", "lesson": "new-tab", "label": "Νέα καρτέλα" }
+	],
+	"Λειτουργίες προγράμματος περιήγησης": [
+		{ "module": "module5", "lesson": "browser-history", "label": "Ιστορικό" },
+		{ "module": "module5", "lesson": "download-file", "label": "Λήψη αρχείου" },
+		{ "module": "module5", "lesson": "zoom-page", "label": "Μεγέθυνση σελίδας" }
+	],
+	"Οργάνωση πληροφορίας": [
+		{ "module": "module5", "lesson": "bookmarks", "label": "Σελιδοδείκτες" }
+	],
+	"Μηχανές αναζήτησης": [{ "module": "module5", "lesson": "search-google", "label": "Αναζήτηση" }],
+	"Αναζήτηση πληροφοριών με Μεγάλα Γλωσσικά Μοντέλα": [
+		{ "module": "module13", "lesson": "how-to-ask", "label": "Ρώτα την ΤΝ" }
+	],
+	"Χρήση διαδικτυακών υπηρεσιών του δημοσίου": [
+		{ "module": "gov", "lesson": "gov-login", "label": "Σύνδεση στο gov.gr" },
+		{ "module": "gov", "lesson": "gov-find-family-cert", "label": "Βρες μια βεβαίωση" }
+	],
+	"Ηλεκτρονικές αγορές": [
+		{ "module": "module8", "lesson": "secure-site", "label": "Ασφαλής ιστότοπος" }
+	],
+	"Τραπεζικές συναλλαγές": [
+		{ "module": "bank", "lesson": "bank-secure-login", "label": "Σύνδεση στην τράπεζα" },
+		{ "module": "bank", "lesson": "bank-transfer", "label": "Μεταφορά χρημάτων" }
+	],
+	"Το ηλεκτρονικό ταχυδρομείο": [
+		{ "module": "module6", "lesson": "reply-email", "label": "Απάντηση σε email" },
+		{ "module": "module6", "lesson": "email-attachments", "label": "Συνημμένο αρχείο" }
+	],
+	"H εφαρμογή Viber": [
+		{ "module": "android", "lesson": "send-viber", "label": "Μήνυμα στο Viber (Android)" },
+		{ "module": "module10", "lesson": "scam-spotter-viber", "label": "Απάτη ή Όχι; — Viber" }
+	],
+	"Η εφαρμογή Microsoft Teams": [
+		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
+		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" }
+	],
+	"Η εφαρμογή Google Meet": [
+		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
+		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" }
+	],
+	"Η εφαρμογή Zoom": [
+		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
+		{ "module": "module11", "lesson": "end-call", "label": "Τερματισμός κλήσης" }
+	],
+	"Η πλατφόρμα Google Docs": [
+		{ "module": "word", "lesson": "type-title", "label": "Γράψε κείμενο" },
+		{ "module": "word", "lesson": "bold-title", "label": "Έντονα γράμματα" }
+	],
+	"Η πλατφόρμα Google Drive": [
+		{ "module": "module4", "lesson": "create-folder", "label": "Νέος φάκελος" },
+		{ "module": "module4", "lesson": "drag-drop-files", "label": "Μετακίνηση αρχείου" }
+	],
+	"Προσωπικά δεδομένα": [
+		{ "module": "module8", "lesson": "privacy-settings", "label": "Ρυθμίσεις απορρήτου" },
+		{ "module": "module8", "lesson": "cookies-practice", "label": "Cookies" }
+	],
+	"Επεξεργαστής κειμένου": [
+		{ "module": "word", "lesson": "bold-title", "label": "Έντονα γράμματα" },
+		{ "module": "word", "lesson": "bullet-list", "label": "Λίστα με κουκκίδες" }
+	],
+	"Εφαρμογή υπολογιστικών φύλλων": [
+		{ "module": "module7", "lesson": "enter-headers", "label": "Γράψε σε κελιά" },
+		{ "module": "module7", "lesson": "sum-formula", "label": "Άθροισμα" }
+	],
+	"Βασικές έννοιες της κυβερνοασφάλειας": [
+		{ "module": "module10", "lesson": "scam-spotter-email", "label": "Απάτη ή Όχι; — Email" },
+		{ "module": "module10", "lesson": "scam-spotter-sms", "label": "Απάτη ή Όχι; — SMS" }
+	],
+	"Ασφαλής χρήση ψηφιακών τεχνολογιών": [
+		{ "module": "module8", "lesson": "strong-password", "label": "Ισχυρός κωδικός" },
+		{ "module": "android", "lesson": "two-factor", "label": "Κωδικός επιβεβαίωσης (Android)" }
+	],
+	"Κοινά προβλήματα υπολογιστή και πιθανές λύσεις": [
+		{ "module": "module9", "lesson": "connect-wifi", "label": "Σύνδεση σε Wi-Fi" },
+		{ "module": "module9", "lesson": "add-printer", "label": "Προσθήκη εκτυπωτή" }
+	],
+	"Κοινά προβλήματα κινητών συσκευών και πιθανές λύσεις": [
+		{ "module": "android", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (Android)" },
+		{ "module": "android", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής (Android)" }
+	],
+	"Απλοί τρόποι επίλυσης": [
+		{ "module": "module9", "lesson": "update-app", "label": "Ενημέρωση εφαρμογής" }
+	],
+	"Βοήθεια από το διαδίκτυο": [
+		{ "module": "module13", "lesson": "how-to-ask", "label": "Ρώτα την ΤΝ" }
+	]
+}
