@@ -768,7 +768,14 @@
               "modules": [
                 "module8"
               ],
-              "kind": "theory+quiz"
+              "kind": "theory+quiz",
+              "lessonLinks": [
+                {
+                  "module": "module8",
+                  "lesson": "netiquette",
+                  "label": "Καλή συμπεριφορά: κουίζ"
+                }
+              ]
             }
           ]
         }

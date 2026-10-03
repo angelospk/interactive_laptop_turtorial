@@ -232,5 +232,64 @@ export const module8Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson10'
+	},
+
+	// Lesson 12: Netiquette — everyday situations from the theory (eapsi001-c4-s3)
+	{
+		id: 'module8-lesson12',
+		moduleId: 'module8',
+		lessonKey: 'netiquette',
+		titleKey: 'module8_lesson12_title',
+		descriptionKey: 'module8_lesson12_desc',
+		difficulty: 'beginner',
+		orderIndex: 12,
+		lessonType: 'quiz',
+		config: {
+			questions: [
+				{
+					id: 'rude-comment',
+					text: 'Στην ομάδα της γειτονιάς στο Facebook κάποιος γράφει για εσάς ένα αγενές σχόλιο. Τι κάνετε;',
+					options: [
+						{ id: 'a', text: 'Του απαντώ αμέσως με το ίδιο ύφος, να μάθει', correct: false },
+						{
+							id: 'b',
+							text: 'Ηρεμώ, δεν μπαίνω σε καβγά· αν συνεχίσει, τον αναφέρω στους διαχειριστές',
+							correct: true
+						},
+						{ id: 'c', text: 'Ανεβάζω τα προσωπικά του στοιχεία για να τον εκθέσω', correct: false }
+					],
+					explanation:
+						'Πίσω από κάθε οθόνη υπάρχει άνθρωπος. Δεν απαντάμε στην επιθετικότητα με επιθετικότητα· η αναφορά στους διαχειριστές είναι ο σωστός δρόμος.'
+				},
+				{
+					id: 'capitals',
+					text: 'Θέλετε να ευχηθείτε στην ανιψιά σας για τα γενέθλιά της. Ποιο μήνυμα είναι πιο ευγενικό στο διαδίκτυο;',
+					options: [
+						{ id: 'a', text: 'ΧΡΟΝΙΑ ΠΟΛΛΑ!!! ΝΑ ΜΟΥ ΤΗΛΕΦΩΝΗΣΕΙΣ!!!', correct: false },
+						{
+							id: 'b',
+							text: 'Χρόνια πολλά, κορίτσι μου! Πάρε με όταν βρεις λίγο χρόνο 😊',
+							correct: true
+						},
+						{ id: 'c', text: 'χρ πλλ τλφνσ', correct: false }
+					],
+					explanation:
+						'Τα κεφαλαία στο διαδίκτυο διαβάζονται σαν φωνές, και οι πολλές συντομογραφίες δυσκολεύουν. Γράφουμε όπως θα μιλούσαμε από κοντά.'
+				},
+				{
+					id: 'group-photo',
+					text: 'Βγάλατε ωραία φωτογραφία με τις φίλες σας στο ΚΑΠΗ. Πριν την ανεβάσετε στο διαδίκτυο:',
+					options: [
+						{ id: 'a', text: 'Την ανεβάζω — αφού είμαι κι εγώ μέσα', correct: false },
+						{ id: 'b', text: 'Ρωτάω πρώτα αν συμφωνούν όσες φαίνονται', correct: true },
+						{ id: 'c', text: 'Την ανεβάζω και γράφω και τα ονόματα όλων', correct: false }
+					],
+					explanation:
+						'Η φωτογραφία κάποιου είναι προσωπικό του δεδομένο. Ζητάμε πάντα την άδεια όσων φαίνονται πριν τη δημοσιεύσουμε.'
+				}
+			]
+		},
+		enabled: true,
+		requiredLessonId: 'module8-lesson11'
 	}
 ];

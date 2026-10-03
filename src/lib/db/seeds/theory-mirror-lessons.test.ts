@@ -87,3 +87,19 @@ describe('P4 — μήνυμα στην ομάδα της οικογένειας 
 		);
 	});
 });
+
+type QuizConfig = { questions: { text: string; options: { correct?: boolean }[] }[] };
+const quizQuestions = (id: string) => (config(id) as unknown as QuizConfig).questions ?? [];
+
+describe('P2 — καλή συμπεριφορά στο διαδίκτυο (eapsi001-c4-s3)', () => {
+	it('is a multi-question quiz with exactly one right answer per question', () => {
+		expect(byId.get('module8-lesson12')?.lessonType).toBe('quiz');
+		const qs = quizQuestions('module8-lesson12');
+		expect(qs.length).toBeGreaterThanOrEqual(3);
+		for (const q of qs) expect(q.options.filter((o) => o.correct)).toHaveLength(1);
+	});
+
+	it('is linked from the netiquette theory section', () => {
+		expect(linksOf('eapsi001-c4-s3')).toContain('module8/netiquette');
+	});
+});
