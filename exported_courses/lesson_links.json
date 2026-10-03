@@ -14,7 +14,8 @@
 			"module": "module9",
 			"lesson": "accessibility-settings",
 			"label": "Ρυθμίσεις προσβασιμότητας"
-		}
+		},
+		{ "module": "module9", "lesson": "larger-text", "label": "Μεγαλύτερα γράμματα" }
 	],
 	"Διαχείριση εφαρμογών": [
 		{ "module": "android", "lesson": "force-close", "label": "Κλείσιμο εφαρμογής (Android)" },

@@ -128,6 +128,10 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'connect-bluetooth': (action) => action === 'connect-bluetooth',
 	'open-display-settings': (action) => action === 'open-display-settings',
 	'open-accessibility': (action) => action === 'open-accessibility',
+	'toggle-accessibility': (action, data, config) =>
+		action === 'toggle-accessibility' &&
+		data.on === true &&
+		(!config.targetSetting || data.setting === config.targetSetting),
 	'open-sound-settings': (action) => action === 'open-sound-settings',
 
 	// ── Security / Online services ─────────────────────────────────────────

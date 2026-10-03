@@ -1058,3 +1058,41 @@ describe('search-query', () => {
 		expect(checkGoalMatch('search-query', 'search', { query: 'καιρός' }, {})).toBe(false);
 	});
 });
+
+describe('toggle-accessibility', () => {
+	const cfg = { targetSetting: 'larger-text' };
+
+	it('passes when the target setting is switched on', () => {
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'larger-text', on: true },
+				cfg
+			)
+		).toBe(true);
+	});
+
+	it('fails when it is switched off, or another setting is used', () => {
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'larger-text', on: false },
+				cfg
+			)
+		).toBe(false);
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'high-contrast', on: true },
+				cfg
+			)
+		).toBe(false);
+	});
+
+	it('fails for merely opening the page', () => {
+		expect(checkGoalMatch('toggle-accessibility', 'open-accessibility', {}, cfg)).toBe(false);
+	});
+});

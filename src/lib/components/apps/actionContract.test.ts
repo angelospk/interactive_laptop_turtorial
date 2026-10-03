@@ -74,6 +74,7 @@ const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 			'open-bluetooth-settings',
 			'open-display-settings',
 			'open-sound-settings',
+			'toggle-accessibility',
 			'toggle-wifi',
 			'uninstall-app',
 			'update-app'

@@ -68,6 +68,7 @@ export const GOALS = {
 	'connect-bluetooth': { requiresAppId: false },
 	'open-display-settings': { requiresAppId: false },
 	'open-accessibility': { requiresAppId: false },
+	'toggle-accessibility': { requiresAppId: false },
 	'open-sound-settings': { requiresAppId: false },
 
 	// Security / Online services

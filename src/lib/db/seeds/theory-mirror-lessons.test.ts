@@ -157,3 +157,16 @@ describe('P8 — αναζήτηση συγκεκριμένης πληροφορ�
 		expect(linksOf('esm002-c2-s2')).toContain('module5/search-specific');
 	});
 });
+
+describe('P9 — μεγαλύτερο κείμενο στα Windows (esm001-c1-s4)', () => {
+	it('asks to switch on larger text from the accessibility settings', () => {
+		const c = config('module9-lesson13');
+		expect(c.goal).toBe('toggle-accessibility');
+		expect(c.targetSetting).toBe('larger-text');
+		expect(c.initialApps).toEqual(['settings']);
+	});
+
+	it('is linked from the desktop accessibility theory section', () => {
+		expect(linksOf('esm001-c1-s4')).toContain('module9/larger-text');
+	});
+});

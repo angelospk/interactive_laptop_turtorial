@@ -287,5 +287,26 @@ export const module9Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module9-lesson11'
+	},
+
+	// Lesson 13: switch on larger text (esm001-c1-s4)
+	{
+		id: 'module9-lesson13',
+		moduleId: 'module9',
+		lessonKey: 'larger-text',
+		titleKey: 'module9_lesson13_title',
+		descriptionKey: 'module9_lesson13_desc',
+		difficulty: 'beginner',
+		orderIndex: 13,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'toggle-accessibility',
+			initialApps: ['settings'],
+			targetSetting: 'larger-text',
+			instructions:
+				'Τα γράμματα στην οθόνη σας φαίνονται μικρά. Ανοίξτε την ενότητα «Προσβασιμότητα» στις Ρυθμίσεις και ανάψτε τον διακόπτη «Μεγαλύτερο κείμενο».'
+		},
+		enabled: true,
+		requiredLessonId: 'module9-lesson12'
 	}
 ];
