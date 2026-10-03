@@ -86,7 +86,7 @@ const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 	},
 	'VideoCallApp.svelte': {
 		dir: APPS_DIR,
-		actions: ['end-call', 'mute-call', 'start-videocall']
+		actions: ['end-call', 'join-meeting', 'mute-call', 'start-videocall']
 	},
 	'WordProcessorApp.svelte': {
 		dir: APPS_DIR,

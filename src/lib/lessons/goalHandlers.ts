@@ -12,6 +12,11 @@ function foldGreek(text: string): string {
 	return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 }
 
+/** Meeting codes are read out as «845 220 193» or «845-220-193» — compare digits/letters only. */
+export function normalizeMeetingCode(code: string): string {
+	return code.replace(/[^\p{L}\p{N}]/gu, '').toLowerCase();
+}
+
 /**
  * One handler per GoalId.
  *
@@ -150,6 +155,11 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'start-videocall': (action) => action === 'start-videocall',
 	'mute-call': (action) => action === 'mute-call',
 	'end-call': (action) => action === 'end-call',
+	'join-meeting': (action, data, config) => {
+		if (action !== 'join-meeting' || typeof data.code !== 'string') return false;
+		if (typeof config.meetingCode !== 'string' || !config.meetingCode) return false;
+		return normalizeMeetingCode(data.code) === normalizeMeetingCode(config.meetingCode);
+	},
 
 	// ── Mobile simulation ──────────────────────────────────────────────────
 	'mobile-open-app': (action, data, config) =>

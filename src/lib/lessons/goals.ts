@@ -82,6 +82,7 @@ export const GOALS = {
 	'start-videocall': { requiresAppId: false },
 	'mute-call': { requiresAppId: false },
 	'end-call': { requiresAppId: false },
+	'join-meeting': { requiresAppId: false },
 
 	// Mobile simulation (mobile-sim lessonType — namespaced with `mobile-` so
 	// desktop and mobile events can never satisfy each other)

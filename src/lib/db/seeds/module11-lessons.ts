@@ -128,5 +128,37 @@ export const module11Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module11-lesson5'
+	},
+
+	// Lesson 7: join a scheduled meeting from an emailed invitation (eapsi001-c3-s3..s5)
+	{
+		id: 'module11-lesson7',
+		moduleId: 'module11',
+		lessonKey: 'join-meeting',
+		titleKey: 'module11_lesson7_title',
+		descriptionKey: 'module11_lesson7_desc',
+		difficulty: 'intermediate',
+		orderIndex: 7,
+		lessonType: 'desktop-simulation',
+		config: {
+			goal: 'join-meeting',
+			initialApps: ['meeting', 'email'],
+			meetingCode: '845 220 193',
+			emails: [
+				{
+					id: 'invite',
+					sender: 'ΚΑΠΗ Δήμου <kapi@example.gr>',
+					subject: 'Πρόσκληση: Διαδικτυακή ομιλία για την υγεία, Πέμπτη 11:00',
+					body: 'Καλησπέρα σας! Την Πέμπτη στις 11:00 θα γίνει διαδικτυακή ομιλία με τη γιατρό του ΚΑΠΗ. Για να μπείτε, ανοίξτε την εφαρμογή βιντεοσύσκεψης και γράψτε τον κωδικό σύσκεψης: 845 220 193. Μπείτε λίγα λεπτά νωρίτερα.',
+					date: '09:15',
+					isRead: false,
+					isPhishing: false
+				}
+			],
+			instructions:
+				'Σας ήρθε πρόσκληση για διαδικτυακή ομιλία. Ανοίξτε το email από το ΚΑΠΗ, βρείτε τον κωδικό σύσκεψης, γράψτε τον στο παράθυρο «Βιντεοσύσκεψη» και πατήστε «Συμμετοχή».'
+		},
+		enabled: true,
+		requiredLessonId: 'module11-lesson6'
 	}
 ];

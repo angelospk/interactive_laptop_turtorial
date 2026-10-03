@@ -1096,3 +1096,23 @@ describe('toggle-accessibility', () => {
 		expect(checkGoalMatch('toggle-accessibility', 'open-accessibility', {}, cfg)).toBe(false);
 	});
 });
+
+describe('join-meeting', () => {
+	const cfg = { meetingCode: '845 220 193' };
+
+	it('passes with the right code, ignoring spaces and dashes', () => {
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845-220-193' }, cfg)).toBe(true);
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220193' }, cfg)).toBe(true);
+	});
+
+	it('fails with a wrong code or no configured code', () => {
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220194' }, cfg)).toBe(false);
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220193' }, {})).toBe(false);
+	});
+
+	it('fails for a plain call', () => {
+		expect(checkGoalMatch('join-meeting', 'start-videocall', { code: '845220193' }, cfg)).toBe(
+			false
+		);
+	});
+});

@@ -170,3 +170,17 @@ describe('P9 — μεγαλύτερο κείμενο στα Windows (esm001-c1-s
 		expect(linksOf('esm001-c1-s4')).toContain('module9/larger-text');
 	});
 });
+
+describe('P7 — μπαίνω σε σύσκεψη από την πρόσκληση (eapsi001-c3-s3..s5)', () => {
+	it('opens the inbox with the invitation and the meeting app', () => {
+		const c = config('module11-lesson7');
+		expect(c.goal).toBe('join-meeting');
+		expect(c.initialApps).toEqual(['meeting', 'email']);
+		const emails = c.emails as { body: string }[];
+		expect(emails.some((e) => e.body.includes(String(c.meetingCode)))).toBe(true);
+	});
+
+	it.each(['eapsi001-c3-s3', 'eapsi001-c3-s4', 'eapsi001-c3-s5'])('is linked from %s', (sub) => {
+		expect(linksOf(sub)).toContain('module11/join-meeting');
+	});
+});

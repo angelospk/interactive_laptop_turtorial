@@ -28,7 +28,17 @@
 	import WordProcessorApp from '$lib/components/apps/WordProcessorApp.svelte';
 
 	// Icons
-	import { Folder, Globe, Mail, Grid3X3, Download, Settings, FileText, Phone } from 'lucide-svelte';
+	import {
+		Folder,
+		Globe,
+		Mail,
+		Grid3X3,
+		Download,
+		Settings,
+		FileText,
+		Phone,
+		Video
+	} from 'lucide-svelte';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
@@ -58,7 +68,8 @@
 		{ id: 'installer', name: 'Εγκατάσταση', icon: Download, component: InstallerApp },
 		{ id: 'settings', name: 'Ρυθμίσεις', icon: Settings, component: SettingsApp },
 		{ id: 'word', name: 'Επεξεργασία Κειμένου', icon: FileText, component: WordProcessorApp },
-		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp }
+		{ id: 'viber', name: 'Viber', icon: Phone, component: VideoCallApp },
+		{ id: 'meeting', name: 'Βιντεοσύσκεψη', icon: Video, component: VideoCallApp }
 	];
 
 	// Pinned Apps (Default set)

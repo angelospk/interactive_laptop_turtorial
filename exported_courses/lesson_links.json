@@ -77,15 +77,18 @@
 	],
 	"Η εφαρμογή Microsoft Teams": [
 		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
-		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" }
+		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" },
+		{ "module": "module11", "lesson": "join-meeting", "label": "Μπες σε σύσκεψη με κωδικό" }
 	],
 	"Η εφαρμογή Google Meet": [
 		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
-		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" }
+		{ "module": "module11", "lesson": "mute-unmute", "label": "Σίγαση μικροφώνου" },
+		{ "module": "module11", "lesson": "join-meeting", "label": "Μπες σε σύσκεψη με κωδικό" }
 	],
 	"Η εφαρμογή Zoom": [
 		{ "module": "module11", "lesson": "start-call", "label": "Ξεκίνα βιντεοκλήση" },
-		{ "module": "module11", "lesson": "end-call", "label": "Τερματισμός κλήσης" }
+		{ "module": "module11", "lesson": "end-call", "label": "Τερματισμός κλήσης" },
+		{ "module": "module11", "lesson": "join-meeting", "label": "Μπες σε σύσκεψη με κωδικό" }
 	],
 	"Η πλατφόρμα Google Docs": [
 		{ "module": "word", "lesson": "type-title", "label": "Γράψε κείμενο" },

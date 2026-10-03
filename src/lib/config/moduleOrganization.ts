@@ -235,7 +235,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	],
 	module11: [
 		{ title: 'Θεωρία', count: 5 },
-		{ title: 'Εξάσκηση', count: 6 }
+		{ title: 'Εξάσκηση', count: 7 }
 	],
 	// Mobile tracks: id-based sections (grow across waves). «Βασικά» is the base
 	// path — its 7 lesson ids are the immutable original track (7/7 = «βασική

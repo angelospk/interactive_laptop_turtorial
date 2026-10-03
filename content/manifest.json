@@ -643,6 +643,11 @@
                   "module": "module11",
                   "lesson": "mute-unmute",
                   "label": "Σίγαση μικροφώνου"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "join-meeting",
+                  "label": "Μπες σε σύσκεψη με κωδικό"
                 }
               ]
             },
@@ -665,6 +670,11 @@
                   "module": "module11",
                   "lesson": "mute-unmute",
                   "label": "Σίγαση μικροφώνου"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "join-meeting",
+                  "label": "Μπες σε σύσκεψη με κωδικό"
                 }
               ]
             },
@@ -687,6 +697,11 @@
                   "module": "module11",
                   "lesson": "end-call",
                   "label": "Τερματισμός κλήσης"
+                },
+                {
+                  "module": "module11",
+                  "lesson": "join-meeting",
+                  "label": "Μπες σε σύσκεψη με κωδικό"
                 }
               ]
             },
