@@ -363,6 +363,16 @@
                   "module": "gov",
                   "lesson": "gov-find-family-cert",
                   "label": "Βρες μια βεβαίωση"
+                },
+                {
+                  "module": "gov",
+                  "lesson": "gov-find-unemployment-card",
+                  "label": "Κάρτα ανεργίας"
+                },
+                {
+                  "module": "gov",
+                  "lesson": "gov-find-citizen-mailbox",
+                  "label": "Θυρίδα πολίτη"
                 }
               ]
             },

@@ -45,7 +45,9 @@
 	],
 	"Χρήση διαδικτυακών υπηρεσιών του δημοσίου": [
 		{ "module": "gov", "lesson": "gov-login", "label": "Σύνδεση στο gov.gr" },
-		{ "module": "gov", "lesson": "gov-find-family-cert", "label": "Βρες μια βεβαίωση" }
+		{ "module": "gov", "lesson": "gov-find-family-cert", "label": "Βρες μια βεβαίωση" },
+		{ "module": "gov", "lesson": "gov-find-unemployment-card", "label": "Κάρτα ανεργίας" },
+		{ "module": "gov", "lesson": "gov-find-citizen-mailbox", "label": "Θυρίδα πολίτη" }
 	],
 	"Ηλεκτρονικές αγορές": [
 		{ "module": "module8", "lesson": "secure-site", "label": "Ασφαλής ιστότοπος" }

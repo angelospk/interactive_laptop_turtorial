@@ -354,6 +354,15 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'more',
 			title: 'Περισσότερα',
 			lessonIds: ['gov-find-birth-cert', 'gov-authorize']
+		},
+		{
+			id: 'everyday-services',
+			title: 'Καθημερινές υπηρεσίες',
+			lessonIds: [
+				'gov-find-unemployment-card',
+				'gov-download-unemployment-card',
+				'gov-find-citizen-mailbox'
+			]
 		}
 	],
 	// Health services track (Φάση 3).
