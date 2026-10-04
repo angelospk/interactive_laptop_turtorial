@@ -90,10 +90,10 @@ describe('GuideLesson', () => {
 		await expect
 			.element(screen.getByRole('heading', { name: 'Ξέρατε 1 από τα 11' }))
 			.toBeInTheDocument();
-		// The informational step (Πίσω/Μπροστά) has no exercise to save.
-		expect(fetchMock).toHaveBeenCalledTimes(10);
+		// Every step stands for at least one exercise (Αναζήτηση for two), so each saves once.
+		expect(fetchMock).toHaveBeenCalledTimes(11);
 		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
-		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100, expect.any(Array)));
 	});
 
 	async function runToEnd(screen: Screen) {
@@ -128,7 +128,7 @@ describe('GuideLesson', () => {
 
 		fetchMock.mockImplementation(async () => ({ ok: true, json: async () => ({}) }));
 		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
-		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100, expect.any(Array)));
 	});
 
 	test('a refresh that fails keeps the guide open instead of completing on old progress', async () => {
@@ -139,7 +139,7 @@ describe('GuideLesson', () => {
 		await expect.element(screen.getByRole('alert')).toHaveTextContent(/δεν ανανεώθηκε/);
 		expect(onComplete).not.toHaveBeenCalled();
 		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
-		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100, expect.any(Array)));
 	});
 
 	test('answers that failed are all sent, once, when the network is back', async () => {
@@ -155,8 +155,8 @@ describe('GuideLesson', () => {
 		await screen.getByRole('button', { name: 'Συνέχεια' }).click();
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalled());
 		const ids = sent.flatMap((answers) => Object.keys(answers));
-		expect(ids).toHaveLength(10);
-		expect(new Set(ids).size).toBe(10);
+		expect(ids).toHaveLength(12);
+		expect(new Set(ids).size).toBe(12);
 		expect(sent.every((answers) => Object.values(answers).every((v) => v === 'known'))).toBe(true);
 	});
 
@@ -178,9 +178,9 @@ describe('GuideLesson', () => {
 		await vi.waitFor(() => expect(release).toBeDefined());
 		expect(onComplete).not.toHaveBeenCalled();
 		release({ ok: false, json: async () => ({}) });
-		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100));
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100, expect.any(Array)));
 		expect(saved.filter((id) => id === 'module5-lesson10')).toHaveLength(1);
-		expect(new Set(saved).size).toBe(10);
+		expect(new Set(saved).size).toBe(12);
 	});
 
 	test('the start screen holds the keyboard: the demo behind it cannot be tabbed into', async () => {
@@ -220,6 +220,41 @@ describe('GuideLesson', () => {
 		await expect.element(screen.getByText('Βήμα 6 από 11')).toBeInTheDocument();
 		await vi.waitFor(() => expect(spotlight()?.getAttribute('data-target')).toBe('search'));
 		expect(document.querySelector('[data-guide="search"]')).not.toBeNull();
+	});
+
+	test('download, zoom and find each spotlight their own control, not the whole page', async () => {
+		const { screen } = mount();
+		await start(screen);
+		for (let i = 1; i <= 8; i++) {
+			await expect.element(screen.getByText(`Βήμα ${i} από 11`)).toBeInTheDocument();
+			await screen.getByRole('button', { name: /Το ξέρω/ }).click();
+		}
+		for (const [i, target] of [
+			[9, 'download'],
+			[10, 'zoom'],
+			[11, 'find']
+		] as const) {
+			await expect.element(screen.getByText(`Βήμα ${i} από 11`)).toBeInTheDocument();
+			await vi.waitFor(() => expect(spotlight()?.getAttribute('data-target')).toBe(target));
+			expect(document.querySelector(`[data-guide="${target}"]`)).not.toBeNull();
+			if (i < 11) await screen.getByRole('button', { name: /Το ξέρω/ }).click();
+		}
+	});
+
+	test('no idle help: nothing is timed to speak over a learner who waits', async () => {
+		const timers = vi.spyOn(window, 'setTimeout');
+		try {
+			const { screen } = mount();
+			await start(screen);
+			await expect.element(caption(screen)).toHaveTextContent(/καρτέλες/);
+			await screen.getByRole('button', { name: /Το ξέρω/ }).click();
+			await expect.element(screen.getByText('Βήμα 2 από 11')).toBeInTheDocument();
+			// The old watcher armed 30 s and 75 s nudges on every step.
+			const long = timers.mock.calls.filter(([, ms]) => (ms ?? 0) >= 30_000);
+			expect(long).toEqual([]);
+		} finally {
+			timers.mockRestore();
+		}
 	});
 
 	test('the mute button is remembered', async () => {

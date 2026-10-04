@@ -6,6 +6,7 @@
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
 	import LessonRenderer from './LessonRenderer.svelte';
+	import { practiceAfterCompletion, readPractice, savePractice } from '$lib/lessons/guidePractice';
 	import { nextUnfinished } from '$lib/lessons/nextUnfinished';
 	import * as m from '$lib/paraglide/messages.js';
 	import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-svelte';
@@ -34,6 +35,7 @@
 		startIndex = 0,
 		navigation = 0,
 		onExit,
+		moduleId,
 		onLessonChange,
 		nextModuleId = null,
 		crumbs
@@ -94,6 +96,27 @@
 	// it off stored progress meant walking into an already-finished lesson opened
 	// a full-screen "Μπράβο" over a lesson the learner had not played yet.
 	let justCompletedLessonId = $state<string | null>(null);
+	// A fresh guide answer may request practice of an exercise solved in an earlier session.
+	let practiceLessonIds = $state<string[]>([]);
+	let practiceLoadedFor = $state<string | null>(null);
+	const practiceStorageKey = $derived(
+		moduleId && page.data?.user?.id ? `guide-practice:${page.data.user.id}:${moduleId}` : null
+	);
+	$effect(() => {
+		const key = practiceStorageKey;
+		practiceLessonIds =
+			key && typeof sessionStorage !== 'undefined' ? readPractice(sessionStorage, key) : [];
+		practiceLoadedFor = key;
+	});
+	$effect(() => {
+		if (
+			practiceStorageKey &&
+			practiceLoadedFor === practiceStorageKey &&
+			typeof sessionStorage !== 'undefined'
+		) {
+			savePractice(sessionStorage, practiceStorageKey, practiceLessonIds);
+		}
+	});
 	let showResultOverlay = $derived(
 		!!currentLesson &&
 			justCompletedLessonId === currentLesson.id &&
@@ -154,8 +177,13 @@
 		handleLessonComplete(score, lessonId);
 	}
 
-	async function handleLessonComplete(score: number, lessonId: string) {
+	async function handleLessonComplete(
+		score: number,
+		lessonId: string,
+		guidePracticeIds?: string[]
+	) {
 		if (lessonId !== currentLesson?.id) return;
+		practiceLessonIds = practiceAfterCompletion(practiceLessonIds, currentLesson, guidePracticeIds);
 		const mine = nextAttempt(lessonId);
 		forgetUnsaved(lessonId);
 
@@ -280,7 +308,9 @@
 
 	// After a completion, Next skips what the learner already has (solved, or
 	// «Το ξέρω» in a guide). The navigation bar still steps one at a time.
-	let nextOpenIndex = $derived(nextUnfinished(lessons, mergedProgress, currentLessonIndex));
+	let nextOpenIndex = $derived(
+		nextUnfinished(lessons, mergedProgress, currentLessonIndex, practiceLessonIds)
+	);
 
 	function nextUnfinishedLesson() {
 		justCompletedLessonId = null;
@@ -632,7 +662,8 @@
 						{@const renderedLessonId = currentLesson.id}
 						<LessonRenderer
 							lesson={currentLesson}
-							onComplete={(score: number) => handleLessonComplete(score, renderedLessonId)}
+							onComplete={(score: number, practiceIds?: string[]) =>
+								handleLessonComplete(score, renderedLessonId, practiceIds)}
 							onBack={handleBack}
 						/>
 					{/key}

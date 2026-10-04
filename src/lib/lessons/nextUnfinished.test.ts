@@ -4,6 +4,15 @@ import { nextUnfinished } from './nextUnfinished';
 const lessons = ['a', 'b', 'c', 'd'].map((id) => ({ id }));
 
 describe('nextUnfinished', () => {
+	it('revisits an exercise declared unknown even when previously solved', () => {
+		const progress = { b: { completed: true }, c: { completed: true } };
+		expect(nextUnfinished(lessons, progress, 0, ['b'])).toBe(1);
+		expect(progress.b.completed).toBe(true);
+	});
+
+	it('continues to the next unknown exercise after practising an earlier one', () => {
+		expect(nextUnfinished(lessons, { c: { completed: true } }, 1, ['c'])).toBe(2);
+	});
 	it('skips what is already done', () => {
 		expect(nextUnfinished(lessons, { b: { completed: true } }, 0)).toBe(2);
 	});

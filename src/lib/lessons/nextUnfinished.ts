@@ -6,10 +6,11 @@
 export function nextUnfinished(
 	lessons: readonly { id: string }[],
 	progress: Record<string, { completed?: boolean } | undefined>,
-	from: number
+	from: number,
+	practiceLessonIds: readonly string[] = []
 ): number | null {
 	for (let i = from + 1; i < lessons.length; i++) {
-		if (!progress[lessons[i].id]?.completed) return i;
+		if (practiceLessonIds.includes(lessons[i].id) || !progress[lessons[i].id]?.completed) return i;
 	}
 	return null;
 }

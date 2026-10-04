@@ -4,7 +4,7 @@
 
 	interface Props {
 		lesson: Lesson;
-		onComplete: (score: number) => void;
+		onComplete: (score: number, practiceLessonIds?: string[]) => void;
 		onBack: () => void;
 	}
 

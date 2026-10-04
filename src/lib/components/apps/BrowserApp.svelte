@@ -39,6 +39,8 @@
 			initialTabs?: string[];
 			goal?: string;
 			targetFilename?: string;
+			/** A guide walks through every control at once: download, zoom and find all show. */
+			guideShowcase?: boolean;
 		};
 		onAction: (action: string, data?: Record<string, unknown>) => void;
 		/** Keyboard the learner chose; decides whether ⌘ or Ctrl is the shortcut key. */
@@ -432,7 +434,19 @@
 		toast.success('Λήψη ξεκίνησε!');
 	}
 
+	let showDownload = $derived(config.guideShowcase || config.goal === 'download-file');
+	let showZoom = $derived(config.guideShowcase || config.goal === 'zoom-page');
+	let showFind = $derived(config.guideShowcase || config.goal === 'find-on-page');
+
+	const ZOOM_STEPS = [0.5, 0.67, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+	let zoomIndex = $state(ZOOM_STEPS.indexOf(1));
+	let zoomLevel = $derived(ZOOM_STEPS[zoomIndex]);
+
 	function handleZoom(direction: 'in' | 'out') {
+		zoomIndex = Math.min(
+			ZOOM_STEPS.length - 1,
+			Math.max(0, zoomIndex + (direction === 'in' ? 1 : -1))
+		);
 		onAction('zoom-page', { direction });
 	}
 
@@ -444,17 +458,24 @@
 		if (!active) return;
 		const pressed = (action: string) =>
 			matchesShortcut(e, shortcutSteps([action], device)[0].keys, device);
-		if (config.goal === 'zoom-page' && (pressed('zoom-in') || pressed('zoom-out'))) {
+		if (showZoom && (pressed('zoom-in') || pressed('zoom-out'))) {
 			e.preventDefault();
 			handleZoom(pressed('zoom-in') ? 'in' : 'out');
-		} else if (config.goal === 'find-on-page' && pressed('find')) {
+		} else if (showFind && pressed('find')) {
 			e.preventDefault();
 			findInput?.focus();
 		}
 	}
 
+	let pageContent = $state<HTMLElement>();
+	/** How often the last searched word appears in the page; null before any search. */
+	let findMatches = $state<number | null>(null);
+
 	function handleFindOnPage() {
-		if (findBarInput.trim()) {
+		const term = findBarInput.trim().toLocaleLowerCase('el');
+		if (term) {
+			const text = (pageContent?.textContent ?? '').toLocaleLowerCase('el');
+			findMatches = text.split(term).length - 1;
 			onAction('find-on-page', { term: findBarInput });
 		}
 	}
@@ -646,23 +667,28 @@
 			>
 				<History class="h-5 w-5 text-slate-400" />
 			</button>
-			{#if config.goal === 'zoom-page'}
-				<button
-					class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
-					onclick={() => handleZoom('out')}
-					title="Σμίκρυνση"
-					aria-label="Σμίκρυνση"
-				>
-					<ZoomOut class="h-7 w-7 text-slate-700" />
-				</button>
-				<button
-					class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
-					onclick={() => handleZoom('in')}
-					title="Μεγέθυνση"
-					aria-label="Μεγέθυνση"
-				>
-					<ZoomIn class="h-7 w-7 text-slate-700" />
-				</button>
+			{#if showZoom}
+				<div class="flex items-center" data-guide="zoom">
+					<button
+						class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+						onclick={() => handleZoom('out')}
+						title="Σμίκρυνση"
+						aria-label="Σμίκρυνση"
+					>
+						<ZoomOut class="h-7 w-7 text-slate-700" />
+					</button>
+					<span class="w-12 text-center text-sm text-slate-600" data-testid="zoom-level"
+						>{Math.round(zoomLevel * 100)}%</span
+					>
+					<button
+						class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+						onclick={() => handleZoom('in')}
+						title="Μεγέθυνση"
+						aria-label="Μεγέθυνση"
+					>
+						<ZoomIn class="h-7 w-7 text-slate-700" />
+					</button>
+				</div>
 			{/if}
 			<!-- Visual-only three-dot menu -->
 			<div class="relative">
@@ -702,8 +728,8 @@
 	</div>
 
 	<!-- Find Bar -->
-	{#if config.goal === 'find-on-page'}
-		<div class="flex items-center gap-2 border-b bg-yellow-50 px-4 py-2">
+	{#if showFind}
+		<div class="flex items-center gap-2 border-b bg-yellow-50 px-4 py-2" data-guide="find">
 			<Search class="h-4 w-4 text-slate-400" />
 			<input
 				type="text"
@@ -711,17 +737,26 @@
 				placeholder="Αναζήτηση στη σελίδα..."
 				bind:this={findInput}
 				bind:value={findBarInput}
+				oninput={() => (findMatches = null)}
 				onkeydown={(e) => e.key === 'Enter' && handleFindOnPage()}
 			/>
+			{#if findMatches !== null}
+				<span class="text-sm text-slate-700" role="status">
+					{findMatches === 0
+						? 'Δεν βρέθηκε'
+						: `Βρέθηκε ${findMatches} ${findMatches === 1 ? 'φορά' : 'φορές'}`}
+				</span>
+			{/if}
 			<Button size="sm" onclick={handleFindOnPage}>Εύρεση</Button>
 		</div>
 	{/if}
 
 	<!-- 3. Content Area -->
 	<div class="relative flex-1 overflow-y-auto bg-slate-50" data-guide="page">
-		{#if config.goal === 'download-file'}
+		{#if showDownload}
 			<div
 				class="absolute right-4 bottom-4 z-10 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 shadow-md"
+				data-guide="download"
 			>
 				<Download class="h-5 w-5 text-blue-600" />
 				<span class="text-sm font-medium text-blue-900"
@@ -735,525 +770,533 @@
 				</button>
 			</div>
 		{/if}
-		{#if activeTab.type === 'home'}
-			<!-- Google Simulator -->
-			<div class="flex h-full flex-col items-center justify-center bg-white p-4">
-				<h1 class="mb-8 text-6xl font-medium tracking-tight">
-					<span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span
-						class="text-[#FBBC05]">o</span
-					><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span
-						class="text-[#EA4335]">e</span
-					>
-				</h1>
-				<div class="relative w-full max-w-xl" data-guide="search">
-					<Search class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
-					<input
-						type="text"
-						class="w-full rounded-full border border-slate-200 py-3 pr-12 pl-12 shadow-[0_1px_6px_rgba(32,33,36,0.18)] outline-none hover:shadow-[0_1px_8px_rgba(32,33,36,0.25)] focus:shadow-[0_1px_8px_rgba(32,33,36,0.25)]"
-						placeholder="Αναζήτηση στο Google"
-						bind:value={searchBarInput}
-						onkeydown={(e) => {
-							if (e.key === 'Enter') handleSearch();
-						}}
-					/>
-					<Mic class="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-[#4285F4]" />
-				</div>
-				<div class="mt-7 flex gap-3">
-					<Button
-						variant="secondary"
-						class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
-						onclick={handleSearch}>Αναζήτηση Google</Button
-					>
-					<Button
-						variant="ghost"
-						class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
-						>Αισθάνομαι τυχερός</Button
-					>
-				</div>
-			</div>
-		{:else if activeTab.type === 'search'}
-			<!-- Search Results Simulation -->
-			<div class="mx-auto min-h-full max-w-4xl bg-white p-6">
-				<div class="mb-3 flex items-center gap-4 border-b pb-4">
-					<div class="text-2xl font-medium">
+		<div class="h-full" style:zoom={zoomLevel} bind:this={pageContent}>
+			{#if activeTab.type === 'home'}
+				<!-- Google Simulator -->
+				<div class="flex h-full flex-col items-center justify-center bg-white p-4">
+					<h1 class="mb-8 text-6xl font-medium tracking-tight">
 						<span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span
 							class="text-[#FBBC05]">o</span
 						><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span
 							class="text-[#EA4335]">e</span
 						>
-					</div>
-					<div class="relative max-w-xl flex-1">
+					</h1>
+					<div class="relative w-full max-w-xl" data-guide="search">
+						<Search class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
 						<input
 							type="text"
-							class="w-full rounded-full border border-slate-200 py-2 pr-10 pl-4 shadow-[0_1px_6px_rgba(32,33,36,0.15)] outline-none"
-							value={searchBarInput.replace('search?q=', '') ||
-								addressBarInput.replace('search?q=', '')}
-							readonly
+							class="w-full rounded-full border border-slate-200 py-3 pr-12 pl-12 shadow-[0_1px_6px_rgba(32,33,36,0.18)] outline-none hover:shadow-[0_1px_8px_rgba(32,33,36,0.25)] focus:shadow-[0_1px_8px_rgba(32,33,36,0.25)]"
+							placeholder="Αναζήτηση στο Google"
+							bind:value={searchBarInput}
+							onkeydown={(e) => {
+								if (e.key === 'Enter') handleSearch();
+							}}
 						/>
-						<Search class="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-[#4285F4]" />
+						<Mic class="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-[#4285F4]" />
+					</div>
+					<div class="mt-7 flex gap-3">
+						<Button
+							variant="secondary"
+							class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
+							onclick={handleSearch}>Αναζήτηση Google</Button
+						>
+						<Button
+							variant="ghost"
+							class="rounded bg-[#f8f9fa] text-sm font-normal text-[#3c4043] hover:border hover:border-slate-200 hover:shadow-sm"
+							>Αισθάνομαι τυχερός</Button
+						>
 					</div>
 				</div>
-
-				<div class="mb-6 text-sm text-[#70757a]">
-					Περίπου 1.240.000 αποτελέσματα (0,42 δευτερόλεπτα)
-				</div>
-
-				<div class="space-y-8">
-					<!-- Fake Result 1 -->
-					<div
-						class="group max-w-2xl cursor-pointer"
-						onclick={() => navigate('https://www.wikipedia.org')}
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => e.key === 'Enter' && navigate('https://www.wikipedia.org')}
-					>
-						<div class="mb-1 text-sm text-[#202124]">
-							<span class="text-[#202124]">el.wikipedia.org</span><span class="text-[#5f6368]">
-								› wiki</span
+			{:else if activeTab.type === 'search'}
+				<!-- Search Results Simulation -->
+				<div class="mx-auto min-h-full max-w-4xl bg-white p-6">
+					<div class="mb-3 flex items-center gap-4 border-b pb-4">
+						<div class="text-2xl font-medium">
+							<span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span
+								class="text-[#FBBC05]">o</span
+							><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span
+								class="text-[#EA4335]">e</span
 							>
 						</div>
-						<div
-							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
-						>
-							{searchBarInput.replace('search?q=', '') || 'Αποτελέσματα'} - Βικιπαίδεια
-						</div>
-						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
-							Η Βικιπαίδεια είναι μια ελεύθερη, διαδικτυακή εγκυκλοπαίδεια που γράφεται και
-							συντηρείται από εθελοντές...
-						</div>
-					</div>
-
-					<!-- Fake Result 2 -->
-					<div
-						class="group max-w-2xl cursor-pointer"
-						onclick={() => navigate('news')}
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => e.key === 'Enter' && navigate('news')}
-					>
-						<div class="mb-1 text-sm text-[#202124]">
-							<span class="text-[#202124]">www.news247.gr</span><span class="text-[#5f6368]">
-								› eidiseis</span
-							>
-						</div>
-						<div
-							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
-						>
-							Ειδήσεις τώρα - Όλες οι εξελίξεις
-						</div>
-						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
-							Διαβάστε τις τελευταίες ειδήσεις από την Ελλάδα και τον κόσμο. Πολιτική, Οικονομία,
-							Κοινωνία...
-						</div>
-					</div>
-
-					<!-- Fake Result 3 -->
-					<div class="group max-w-2xl cursor-pointer">
-						<div class="mb-1 text-sm text-[#202124]">
-							<span class="text-[#202124]">www.example.com</span><span class="text-[#5f6368]">
-								› info</span
-							>
-						</div>
-						<div
-							class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
-						>
-							Πληροφορίες για {searchBarInput.replace('search?q=', '')}
-						</div>
-						<div class="mt-1 text-sm leading-normal text-[#4d5156]">
-							Βρείτε όλα όσα ψάχνετε εδώ. Γρήγορα και εύκολα αποτελέσματα για την αναζήτησή σας.
-						</div>
-					</div>
-				</div>
-			</div>
-		{:else if activeTab.type === 'news'}
-			<!-- News Site Simulator -->
-			<div class="mx-auto min-h-full max-w-3xl bg-white shadow-sm">
-				<!-- Masthead -->
-				<header class="border-b-4 border-red-600">
-					<div class="flex items-end justify-between px-8 pt-6 pb-3">
-						<h1 class="font-serif text-4xl font-black tracking-tight text-slate-900">
-							Ειδήσεις 24/7
-						</h1>
-						<p class="text-sm text-slate-500">
-							{new Date().toLocaleDateString('el-GR', {
-								weekday: 'long',
-								year: 'numeric',
-								month: 'long',
-								day: 'numeric'
-							})}
-						</p>
-					</div>
-					<nav class="flex gap-5 bg-red-600 px-8 py-2 text-sm font-medium text-white">
-						<span>Πολιτική</span>
-						<span>Οικονομία</span>
-						<span>Κοινωνία</span>
-						<span>Τεχνολογία</span>
-						<span>Αθλητικά</span>
-					</nav>
-				</header>
-				<div class="p-8">
-					<article class="space-y-4">
-						<div
-							class="mb-4 flex h-48 w-full items-center justify-center rounded-lg bg-gradient-to-br from-slate-200 to-slate-300"
-						>
-							<Newspaper class="h-10 w-10 text-slate-400" />
-						</div>
-						<h2 class="font-serif text-3xl leading-tight font-bold">
-							Νέα πλατφόρμα εκπαίδευσης για αρχάριους
-						</h2>
-						<p class="leading-relaxed text-slate-700">
-							Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την τεχνολογία.
-							Η πλατφόρμα προσφέρει μαθήματα για Windows, Internet, και Email με διαδραστικό τρόπο.
-						</p>
-						<p class="leading-relaxed text-slate-700">
-							Οι χρήστες μπορούν να μάθουν πώς να προστατεύονται από ηλεκτρονικές απάτες και πώς να
-							χρησιμοποιούν αποτελεσματικά τον υπολογιστή τους.
-						</p>
-					</article>
-					<!-- Secondary article cards -->
-					<div class="mt-8 grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-2">
-						<div class="overflow-hidden rounded-lg border border-slate-200">
-							<div class="flex h-28 items-center justify-center bg-slate-200">
-								<Newspaper class="h-6 w-6 text-slate-400" />
-							</div>
-							<div class="p-4">
-								<h3 class="font-serif text-lg leading-snug font-bold">
-									Ο καιρός το σαββατοκύριακο: Ηλιοφάνεια σε όλη τη χώρα
-								</h3>
-								<p class="mt-1 text-sm text-slate-500">πριν από 2 ώρες</p>
-							</div>
-						</div>
-						<div class="overflow-hidden rounded-lg border border-slate-200">
-							<div class="flex h-28 items-center justify-center bg-slate-200">
-								<Newspaper class="h-6 w-6 text-slate-400" />
-							</div>
-							<div class="p-4">
-								<h3 class="font-serif text-lg leading-snug font-bold">
-									Πώς να αναγνωρίσετε ένα ύποπτο email
-								</h3>
-								<p class="mt-1 text-sm text-slate-500">πριν από 5 ώρες</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		{:else if activeTab.type === 'gov'}
-			<!-- Gov.gr Simulator -->
-			<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
-				<header class="mb-8 border-b border-slate-200 pb-4">
-					<div class="flex items-center gap-3">
-						<span class="rounded bg-[#003476] px-2.5 py-1.5 text-2xl font-bold text-white">ΓΔ</span>
-						<h1 class="text-3xl font-bold text-[#003476] lowercase">Gov.gr</h1>
-					</div>
-					<p class="mt-2 text-slate-600">Ενιαία Ψηφιακή Πύλη της Δημόσιας Διοίκησης</p>
-				</header>
-
-				{#if govState === 'home'}
-					<div class="grid grid-cols-2 gap-6">
-						<div
-							class="cursor-pointer rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500"
-						>
-							<h3 class="mb-2 font-bold">Υπηρεσίες Πολιτών</h3>
-							<p class="text-sm text-slate-600">Βρείτε υπηρεσίες και πληροφορίες</p>
-						</div>
-						<div
-							class="cursor-pointer rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500"
-							onclick={openGovForm}
-							role="button"
-							tabindex="0"
-							onkeydown={(e) => e.key === 'Enter' && openGovForm()}
-						>
-							<h3 class="mb-2 font-bold">{t('gov_service_title')}</h3>
-							<p class="text-sm text-slate-600">Δημιουργία εγγράφου</p>
-						</div>
-					</div>
-				{:else if govState === 'form'}
-					<div class="mx-auto max-w-2xl rounded-lg border p-8">
-						<h2 class="mb-4 text-xl font-bold">{t('gov_service_title')}</h2>
-						<div class="space-y-4">
-							<div>
-								<label for="gov-name" class="mb-1 block text-sm font-medium"
-									>{t('gov_form_name')}</label
-								>
-								<input
-									id="gov-name"
-									type="text"
-									class="w-full rounded border p-2"
-									bind:value={govName}
-								/>
-							</div>
-							<div>
-								<label for="gov-afm" class="mb-1 block text-sm font-medium"
-									>{t('gov_form_afm')}</label
-								>
-								<input
-									id="gov-afm"
-									type="text"
-									class="w-full rounded border p-2"
-									bind:value={govAFM}
-								/>
-							</div>
-							<div>
-								<label for="gov-text" class="mb-1 block text-sm font-medium"
-									>{t('gov_form_text')}</label
-								>
-								<textarea
-									id="gov-text"
-									class="w-full rounded border p-2"
-									rows="3"
-									bind:value={govText}
-								></textarea>
-							</div>
-							<Button onclick={submitGovForm}>{t('gov_form_submit')}</Button>
-						</div>
-					</div>
-				{:else if govState === 'success'}
-					<div class="mx-auto max-w-xl rounded-lg bg-green-50 p-12 text-center">
-						<div class="mb-4 text-5xl">✅</div>
-						<h2 class="text-xl font-bold text-green-800">{t('gov_success')}</h2>
-						<Button variant="outline" class="mt-6" onclick={() => (govState = 'home')}
-							>Επιστροφή</Button
-						>
-					</div>
-				{/if}
-			</div>
-		{:else if activeTab.type === 'banking'}
-			<!-- Banking Simulator -->
-			<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
-				<header class="mb-8 flex items-center justify-between border-b-4 border-blue-800 pb-4">
-					<div>
-						<div class="flex items-center gap-3">
-							<span class="rounded bg-blue-800 p-2 text-white"><Landmark class="h-6 w-6" /></span>
-							<h1 class="text-3xl font-bold text-blue-900">National Bank</h1>
-						</div>
-						<p class="mt-2 text-slate-600">e-Banking</p>
-					</div>
-					{#if bankState !== 'login'}
-						<Button variant="ghost" onclick={() => (bankState = 'login')}>Αποσύνδεση</Button>
-					{/if}
-				</header>
-
-				{#if bankState === 'login'}
-					<div class="mx-auto max-w-sm rounded-lg border p-6 shadow-lg">
-						<h3 class="mb-4 text-lg font-bold">{t('bank_login_title')}</h3>
-						<div class="space-y-4">
+						<div class="relative max-w-xl flex-1">
 							<input
 								type="text"
-								placeholder="Username"
-								class="w-full rounded border p-2"
-								bind:value={bankUsername}
+								class="w-full rounded-full border border-slate-200 py-2 pr-10 pl-4 shadow-[0_1px_6px_rgba(32,33,36,0.15)] outline-none"
+								value={searchBarInput.replace('search?q=', '') ||
+									addressBarInput.replace('search?q=', '')}
+								readonly
 							/>
-							<div>
-								<input
-									type="password"
-									placeholder={t('bank_password_placeholder')}
-									class="w-full rounded border p-2"
-									bind:value={bankPassword}
-								/>
-								{#if bankPassword}
-									<div class="mt-2 text-xs">
-										{#if bankPasswordStrength === 'weak'}
-											<span class="text-red-500">{t('bank_password_weak')}</span>
-										{:else if bankPasswordStrength === 'strong'}
-											<span class="text-green-600">{t('bank_password_strong')}</span>
-										{/if}
-									</div>
-								{/if}
-							</div>
-							<Button class="w-full bg-blue-800 text-white hover:bg-blue-900" onclick={loginBank}
-								>Login</Button
-							>
-						</div>
-						<p class="mt-4 text-xs text-slate-500">Ποτέ μην δίνετε τον κωδικό σας τηλεφωνικά!</p>
-					</div>
-				{:else if bankState === 'dashboard'}
-					<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-						<!-- Sidebar -->
-						<div class="col-span-1 space-y-2">
-							<div class="rounded bg-slate-100 p-4">
-								<p class="text-sm text-slate-500">{t('bank_dashboard_welcome')}</p>
-								<p class="font-bold">{bankUsername || 'User'}</p>
-							</div>
-							<div class="rounded border border-blue-200 bg-blue-50 p-4">
-								<p class="text-sm text-blue-800">{t('bank_dashboard_balance')}</p>
-								<p class="text-2xl font-bold text-blue-900">€{bankBalance.toFixed(2)}</p>
-							</div>
-						</div>
-						<!-- Main Area -->
-						<div class="col-span-2 space-y-6">
-							<div class="rounded-lg border p-6">
-								<h3 class="mb-4 text-lg font-bold">{t('bank_transfer_menu')}</h3>
-								<div class="grid gap-4">
-									<div>
-										<label for="bank-recipient" class="mb-1 block text-sm"
-											>{t('bank_transfer_recipient')}</label
-										>
-										<input
-											id="bank-recipient"
-											type="text"
-											class="w-full rounded border p-2"
-											bind:value={bankRecipient}
-											placeholder="Μαρία Παπαδοπούλου"
-										/>
-									</div>
-									<div>
-										<label for="bank-iban" class="mb-1 block text-sm"
-											>{t('bank_transfer_iban')}</label
-										>
-										<input
-											id="bank-iban"
-											type="text"
-											class="w-full rounded border p-2"
-											bind:value={bankIBAN}
-											placeholder="GR1234..."
-										/>
-									</div>
-									<div>
-										<label for="bank-amount" class="mb-1 block text-sm"
-											>{t('bank_transfer_amount')}</label
-										>
-										<input
-											id="bank-amount"
-											type="number"
-											class="w-full rounded border p-2"
-											bind:value={bankTransferAmount}
-											placeholder="0.00"
-										/>
-									</div>
-									<Button class="bg-blue-800 text-white hover:bg-blue-900" onclick={transferMoney}>
-										{t('bank_transfer_button')}
-									</Button>
-								</div>
-							</div>
+							<Search class="absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-[#4285F4]" />
 						</div>
 					</div>
-				{:else if bankState === 'transfer_success'}
-					<div
-						class="mx-auto max-w-xl rounded-lg border border-green-200 bg-green-50 p-12 text-center"
-					>
-						<div class="mb-4 text-5xl">✅</div>
-						<h2 class="text-xl font-bold text-green-800">{t('bank_transfer_success')}</h2>
-						<p class="mt-2 text-green-700">
-							Μεταφέρατε €{bankTransferAmount} στον/ην {bankRecipient}.
-						</p>
-						<Button variant="outline" class="mt-6" onclick={() => (bankState = 'dashboard')}
-							>Επιστροφή</Button
-						>
+
+					<div class="mb-6 text-sm text-[#70757a]">
+						Περίπου 1.240.000 αποτελέσματα (0,42 δευτερόλεπτα)
 					</div>
-				{/if}
-			</div>
-		{:else if activeTab.type === 'history'}
-			<!-- History View -->
-			<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
-				<h2 class="mb-6 text-2xl font-bold">Ιστορικό</h2>
-				<div class="space-y-0 overflow-hidden rounded-lg border">
-					{#each history as item, i (i)}
+
+					<div class="space-y-8">
+						<!-- Fake Result 1 -->
 						<div
-							class="flex cursor-pointer items-center justify-between border-b p-4 last:border-0 hover:bg-slate-50"
-							onclick={() => navigate(item.url)}
+							class="group max-w-2xl cursor-pointer"
+							onclick={() => navigate('https://www.wikipedia.org')}
 							role="button"
 							tabindex="0"
-							onkeydown={(e) => e.key === 'Enter' && navigate(item.url)}
+							onkeydown={(e) => e.key === 'Enter' && navigate('https://www.wikipedia.org')}
 						>
-							<div class="flex items-center gap-3">
-								<Clock class="h-4 w-4 text-slate-400" />
-								<div>
-									<div class="font-medium text-blue-600">{item.title}</div>
-									<div class="text-xs text-slate-400">{item.url}</div>
-								</div>
-							</div>
-							<div class="text-xs text-slate-500">{item.time}</div>
-						</div>
-					{/each}
-					{#if history.length === 0}
-						<div class="p-8 text-center text-slate-500">Το ιστορικό είναι κενό</div>
-					{/if}
-				</div>
-				<div class="mt-4 text-right">
-					<Button
-						variant="outline"
-						size="sm"
-						onclick={() => {
-							history = [];
-							toast.success('Το ιστορικό διαγράφηκε');
-						}}
-					>
-						Διαγραφή ιστορικού
-					</Button>
-				</div>
-			</div>
-		{:else if config.goal === 'type-ai-question'}
-			<!-- AI Chat Simulation -->
-			<div class="flex h-full flex-col bg-white">
-				<header class="border-b bg-slate-800 px-6 py-4 text-white">
-					<h1 class="text-lg font-bold">🤖 AI Assistant</h1>
-					<p class="text-sm text-slate-300">Ρωτήστε οτιδήποτε</p>
-				</header>
-				<div class="flex-1 space-y-4 overflow-y-auto p-4">
-					{#each aiChatMessages as msg, i (i)}
-						<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
-							<div
-								class="max-w-xs rounded-2xl px-4 py-2 text-sm {msg.role === 'user'
-									? 'bg-blue-600 text-white'
-									: 'bg-slate-100 text-slate-900'}"
-							>
-								{msg.text}
-							</div>
-						</div>
-					{/each}
-				</div>
-				<div class="flex items-center gap-2 border-t p-4">
-					<input
-						type="text"
-						class="flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-						placeholder="Γράψτε την ερώτησή σας..."
-						bind:value={aiChatInput}
-						onkeydown={(e) => e.key === 'Enter' && handleAiQuestion()}
-					/>
-					<button
-						class="rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:opacity-50"
-						onclick={handleAiQuestion}
-					>
-						<Send class="h-4 w-4" />
-					</button>
-				</div>
-			</div>
-		{:else if activeTab.type === 'browser-settings'}
-			<!-- Browser Settings Page -->
-			<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
-				<h2 class="mb-6 text-2xl font-bold text-slate-900">Ρυθμίσεις</h2>
-				<div class="space-y-2">
-					{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i (section)}
-						<button
-							class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i ===
-							1
-								? 'border-blue-300 bg-blue-50'
-								: ''}"
-							onclick={() => i === 1 && handlePrivacySettings()}
-						>
-							<div class="flex items-center gap-3">
-								{#if i === 1}
-									<Shield class="h-4 w-4 text-blue-600" />
-								{:else}
-									<Globe class="h-4 w-4 text-slate-400" />
-								{/if}
-								<span class={i === 1 ? 'font-medium text-blue-700' : 'text-slate-700'}
-									>{section}</span
+							<div class="mb-1 text-sm text-[#202124]">
+								<span class="text-[#202124]">el.wikipedia.org</span><span class="text-[#5f6368]">
+									› wiki</span
 								>
 							</div>
-							<ArrowRight class="h-4 w-4 text-slate-400" />
+							<div
+								class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
+							>
+								{searchBarInput.replace('search?q=', '') || 'Αποτελέσματα'} - Βικιπαίδεια
+							</div>
+							<div class="mt-1 text-sm leading-normal text-[#4d5156]">
+								Η Βικιπαίδεια είναι μια ελεύθερη, διαδικτυακή εγκυκλοπαίδεια που γράφεται και
+								συντηρείται από εθελοντές...
+							</div>
+						</div>
+
+						<!-- Fake Result 2 -->
+						<div
+							class="group max-w-2xl cursor-pointer"
+							onclick={() => navigate('news')}
+							role="button"
+							tabindex="0"
+							onkeydown={(e) => e.key === 'Enter' && navigate('news')}
+						>
+							<div class="mb-1 text-sm text-[#202124]">
+								<span class="text-[#202124]">www.news247.gr</span><span class="text-[#5f6368]">
+									› eidiseis</span
+								>
+							</div>
+							<div
+								class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
+							>
+								Ειδήσεις τώρα - Όλες οι εξελίξεις
+							</div>
+							<div class="mt-1 text-sm leading-normal text-[#4d5156]">
+								Διαβάστε τις τελευταίες ειδήσεις από την Ελλάδα και τον κόσμο. Πολιτική, Οικονομία,
+								Κοινωνία...
+							</div>
+						</div>
+
+						<!-- Fake Result 3 -->
+						<div class="group max-w-2xl cursor-pointer">
+							<div class="mb-1 text-sm text-[#202124]">
+								<span class="text-[#202124]">www.example.com</span><span class="text-[#5f6368]">
+									› info</span
+								>
+							</div>
+							<div
+								class="text-[20px] leading-snug font-normal text-[#1a0dab] group-hover:underline visited:text-purple-900"
+							>
+								Πληροφορίες για {searchBarInput.replace('search?q=', '')}
+							</div>
+							<div class="mt-1 text-sm leading-normal text-[#4d5156]">
+								Βρείτε όλα όσα ψάχνετε εδώ. Γρήγορα και εύκολα αποτελέσματα για την αναζήτησή σας.
+							</div>
+						</div>
+					</div>
+				</div>
+			{:else if activeTab.type === 'news'}
+				<!-- News Site Simulator -->
+				<div class="mx-auto min-h-full max-w-3xl bg-white shadow-sm">
+					<!-- Masthead -->
+					<header class="border-b-4 border-red-600">
+						<div class="flex items-end justify-between px-8 pt-6 pb-3">
+							<h1 class="font-serif text-4xl font-black tracking-tight text-slate-900">
+								Ειδήσεις 24/7
+							</h1>
+							<p class="text-sm text-slate-500">
+								{new Date().toLocaleDateString('el-GR', {
+									weekday: 'long',
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								})}
+							</p>
+						</div>
+						<nav class="flex gap-5 bg-red-600 px-8 py-2 text-sm font-medium text-white">
+							<span>Πολιτική</span>
+							<span>Οικονομία</span>
+							<span>Κοινωνία</span>
+							<span>Τεχνολογία</span>
+							<span>Αθλητικά</span>
+						</nav>
+					</header>
+					<div class="p-8">
+						<article class="space-y-4">
+							<div
+								class="mb-4 flex h-48 w-full items-center justify-center rounded-lg bg-gradient-to-br from-slate-200 to-slate-300"
+							>
+								<Newspaper class="h-10 w-10 text-slate-400" />
+							</div>
+							<h2 class="font-serif text-3xl leading-tight font-bold">
+								Νέα πλατφόρμα εκπαίδευσης για αρχάριους
+							</h2>
+							<p class="leading-relaxed text-slate-700">
+								Μια νέα πρωτοποριακή εφαρμογή βοηθάει τους χρήστες να εξοικειωθούν με την
+								τεχνολογία. Η πλατφόρμα προσφέρει μαθήματα για Windows, Internet, και Email με
+								διαδραστικό τρόπο.
+							</p>
+							<p class="leading-relaxed text-slate-700">
+								Οι χρήστες μπορούν να μάθουν πώς να προστατεύονται από ηλεκτρονικές απάτες και πώς
+								να χρησιμοποιούν αποτελεσματικά τον υπολογιστή τους.
+							</p>
+						</article>
+						<!-- Secondary article cards -->
+						<div class="mt-8 grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-2">
+							<div class="overflow-hidden rounded-lg border border-slate-200">
+								<div class="flex h-28 items-center justify-center bg-slate-200">
+									<Newspaper class="h-6 w-6 text-slate-400" />
+								</div>
+								<div class="p-4">
+									<h3 class="font-serif text-lg leading-snug font-bold">
+										Ο καιρός το σαββατοκύριακο: Ηλιοφάνεια σε όλη τη χώρα
+									</h3>
+									<p class="mt-1 text-sm text-slate-500">πριν από 2 ώρες</p>
+								</div>
+							</div>
+							<div class="overflow-hidden rounded-lg border border-slate-200">
+								<div class="flex h-28 items-center justify-center bg-slate-200">
+									<Newspaper class="h-6 w-6 text-slate-400" />
+								</div>
+								<div class="p-4">
+									<h3 class="font-serif text-lg leading-snug font-bold">
+										Πώς να αναγνωρίσετε ένα ύποπτο email
+									</h3>
+									<p class="mt-1 text-sm text-slate-500">πριν από 5 ώρες</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{:else if activeTab.type === 'gov'}
+				<!-- Gov.gr Simulator -->
+				<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
+					<header class="mb-8 border-b border-slate-200 pb-4">
+						<div class="flex items-center gap-3">
+							<span class="rounded bg-[#003476] px-2.5 py-1.5 text-2xl font-bold text-white"
+								>ΓΔ</span
+							>
+							<h1 class="text-3xl font-bold text-[#003476] lowercase">Gov.gr</h1>
+						</div>
+						<p class="mt-2 text-slate-600">Ενιαία Ψηφιακή Πύλη της Δημόσιας Διοίκησης</p>
+					</header>
+
+					{#if govState === 'home'}
+						<div class="grid grid-cols-2 gap-6">
+							<div
+								class="cursor-pointer rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500"
+							>
+								<h3 class="mb-2 font-bold">Υπηρεσίες Πολιτών</h3>
+								<p class="text-sm text-slate-600">Βρείτε υπηρεσίες και πληροφορίες</p>
+							</div>
+							<div
+								class="cursor-pointer rounded-lg border-2 border-slate-200 p-6 hover:border-blue-500"
+								onclick={openGovForm}
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => e.key === 'Enter' && openGovForm()}
+							>
+								<h3 class="mb-2 font-bold">{t('gov_service_title')}</h3>
+								<p class="text-sm text-slate-600">Δημιουργία εγγράφου</p>
+							</div>
+						</div>
+					{:else if govState === 'form'}
+						<div class="mx-auto max-w-2xl rounded-lg border p-8">
+							<h2 class="mb-4 text-xl font-bold">{t('gov_service_title')}</h2>
+							<div class="space-y-4">
+								<div>
+									<label for="gov-name" class="mb-1 block text-sm font-medium"
+										>{t('gov_form_name')}</label
+									>
+									<input
+										id="gov-name"
+										type="text"
+										class="w-full rounded border p-2"
+										bind:value={govName}
+									/>
+								</div>
+								<div>
+									<label for="gov-afm" class="mb-1 block text-sm font-medium"
+										>{t('gov_form_afm')}</label
+									>
+									<input
+										id="gov-afm"
+										type="text"
+										class="w-full rounded border p-2"
+										bind:value={govAFM}
+									/>
+								</div>
+								<div>
+									<label for="gov-text" class="mb-1 block text-sm font-medium"
+										>{t('gov_form_text')}</label
+									>
+									<textarea
+										id="gov-text"
+										class="w-full rounded border p-2"
+										rows="3"
+										bind:value={govText}
+									></textarea>
+								</div>
+								<Button onclick={submitGovForm}>{t('gov_form_submit')}</Button>
+							</div>
+						</div>
+					{:else if govState === 'success'}
+						<div class="mx-auto max-w-xl rounded-lg bg-green-50 p-12 text-center">
+							<div class="mb-4 text-5xl">✅</div>
+							<h2 class="text-xl font-bold text-green-800">{t('gov_success')}</h2>
+							<Button variant="outline" class="mt-6" onclick={() => (govState = 'home')}
+								>Επιστροφή</Button
+							>
+						</div>
+					{/if}
+				</div>
+			{:else if activeTab.type === 'banking'}
+				<!-- Banking Simulator -->
+				<div class="mx-auto min-h-full max-w-4xl bg-white p-8">
+					<header class="mb-8 flex items-center justify-between border-b-4 border-blue-800 pb-4">
+						<div>
+							<div class="flex items-center gap-3">
+								<span class="rounded bg-blue-800 p-2 text-white"><Landmark class="h-6 w-6" /></span>
+								<h1 class="text-3xl font-bold text-blue-900">National Bank</h1>
+							</div>
+							<p class="mt-2 text-slate-600">e-Banking</p>
+						</div>
+						{#if bankState !== 'login'}
+							<Button variant="ghost" onclick={() => (bankState = 'login')}>Αποσύνδεση</Button>
+						{/if}
+					</header>
+
+					{#if bankState === 'login'}
+						<div class="mx-auto max-w-sm rounded-lg border p-6 shadow-lg">
+							<h3 class="mb-4 text-lg font-bold">{t('bank_login_title')}</h3>
+							<div class="space-y-4">
+								<input
+									type="text"
+									placeholder="Username"
+									class="w-full rounded border p-2"
+									bind:value={bankUsername}
+								/>
+								<div>
+									<input
+										type="password"
+										placeholder={t('bank_password_placeholder')}
+										class="w-full rounded border p-2"
+										bind:value={bankPassword}
+									/>
+									{#if bankPassword}
+										<div class="mt-2 text-xs">
+											{#if bankPasswordStrength === 'weak'}
+												<span class="text-red-500">{t('bank_password_weak')}</span>
+											{:else if bankPasswordStrength === 'strong'}
+												<span class="text-green-600">{t('bank_password_strong')}</span>
+											{/if}
+										</div>
+									{/if}
+								</div>
+								<Button class="w-full bg-blue-800 text-white hover:bg-blue-900" onclick={loginBank}
+									>Login</Button
+								>
+							</div>
+							<p class="mt-4 text-xs text-slate-500">Ποτέ μην δίνετε τον κωδικό σας τηλεφωνικά!</p>
+						</div>
+					{:else if bankState === 'dashboard'}
+						<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+							<!-- Sidebar -->
+							<div class="col-span-1 space-y-2">
+								<div class="rounded bg-slate-100 p-4">
+									<p class="text-sm text-slate-500">{t('bank_dashboard_welcome')}</p>
+									<p class="font-bold">{bankUsername || 'User'}</p>
+								</div>
+								<div class="rounded border border-blue-200 bg-blue-50 p-4">
+									<p class="text-sm text-blue-800">{t('bank_dashboard_balance')}</p>
+									<p class="text-2xl font-bold text-blue-900">€{bankBalance.toFixed(2)}</p>
+								</div>
+							</div>
+							<!-- Main Area -->
+							<div class="col-span-2 space-y-6">
+								<div class="rounded-lg border p-6">
+									<h3 class="mb-4 text-lg font-bold">{t('bank_transfer_menu')}</h3>
+									<div class="grid gap-4">
+										<div>
+											<label for="bank-recipient" class="mb-1 block text-sm"
+												>{t('bank_transfer_recipient')}</label
+											>
+											<input
+												id="bank-recipient"
+												type="text"
+												class="w-full rounded border p-2"
+												bind:value={bankRecipient}
+												placeholder="Μαρία Παπαδοπούλου"
+											/>
+										</div>
+										<div>
+											<label for="bank-iban" class="mb-1 block text-sm"
+												>{t('bank_transfer_iban')}</label
+											>
+											<input
+												id="bank-iban"
+												type="text"
+												class="w-full rounded border p-2"
+												bind:value={bankIBAN}
+												placeholder="GR1234..."
+											/>
+										</div>
+										<div>
+											<label for="bank-amount" class="mb-1 block text-sm"
+												>{t('bank_transfer_amount')}</label
+											>
+											<input
+												id="bank-amount"
+												type="number"
+												class="w-full rounded border p-2"
+												bind:value={bankTransferAmount}
+												placeholder="0.00"
+											/>
+										</div>
+										<Button
+											class="bg-blue-800 text-white hover:bg-blue-900"
+											onclick={transferMoney}
+										>
+											{t('bank_transfer_button')}
+										</Button>
+									</div>
+								</div>
+							</div>
+						</div>
+					{:else if bankState === 'transfer_success'}
+						<div
+							class="mx-auto max-w-xl rounded-lg border border-green-200 bg-green-50 p-12 text-center"
+						>
+							<div class="mb-4 text-5xl">✅</div>
+							<h2 class="text-xl font-bold text-green-800">{t('bank_transfer_success')}</h2>
+							<p class="mt-2 text-green-700">
+								Μεταφέρατε €{bankTransferAmount} στον/ην {bankRecipient}.
+							</p>
+							<Button variant="outline" class="mt-6" onclick={() => (bankState = 'dashboard')}
+								>Επιστροφή</Button
+							>
+						</div>
+					{/if}
+				</div>
+			{:else if activeTab.type === 'history'}
+				<!-- History View -->
+				<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
+					<h2 class="mb-6 text-2xl font-bold">Ιστορικό</h2>
+					<div class="space-y-0 overflow-hidden rounded-lg border">
+						{#each history as item, i (i)}
+							<div
+								class="flex cursor-pointer items-center justify-between border-b p-4 last:border-0 hover:bg-slate-50"
+								onclick={() => navigate(item.url)}
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => e.key === 'Enter' && navigate(item.url)}
+							>
+								<div class="flex items-center gap-3">
+									<Clock class="h-4 w-4 text-slate-400" />
+									<div>
+										<div class="font-medium text-blue-600">{item.title}</div>
+										<div class="text-xs text-slate-400">{item.url}</div>
+									</div>
+								</div>
+								<div class="text-xs text-slate-500">{item.time}</div>
+							</div>
+						{/each}
+						{#if history.length === 0}
+							<div class="p-8 text-center text-slate-500">Το ιστορικό είναι κενό</div>
+						{/if}
+					</div>
+					<div class="mt-4 text-right">
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => {
+								history = [];
+								toast.success('Το ιστορικό διαγράφηκε');
+							}}
+						>
+							Διαγραφή ιστορικού
+						</Button>
+					</div>
+				</div>
+			{:else if config.goal === 'type-ai-question'}
+				<!-- AI Chat Simulation -->
+				<div class="flex h-full flex-col bg-white">
+					<header class="border-b bg-slate-800 px-6 py-4 text-white">
+						<h1 class="text-lg font-bold">🤖 AI Assistant</h1>
+						<p class="text-sm text-slate-300">Ρωτήστε οτιδήποτε</p>
+					</header>
+					<div class="flex-1 space-y-4 overflow-y-auto p-4">
+						{#each aiChatMessages as msg, i (i)}
+							<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
+								<div
+									class="max-w-xs rounded-2xl px-4 py-2 text-sm {msg.role === 'user'
+										? 'bg-blue-600 text-white'
+										: 'bg-slate-100 text-slate-900'}"
+								>
+									{msg.text}
+								</div>
+							</div>
+						{/each}
+					</div>
+					<div class="flex items-center gap-2 border-t p-4">
+						<input
+							type="text"
+							class="flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+							placeholder="Γράψτε την ερώτησή σας..."
+							bind:value={aiChatInput}
+							onkeydown={(e) => e.key === 'Enter' && handleAiQuestion()}
+						/>
+						<button
+							class="rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:opacity-50"
+							onclick={handleAiQuestion}
+						>
+							<Send class="h-4 w-4" />
 						</button>
-					{/each}
+					</div>
 				</div>
-			</div>
-		{:else}
-			<!-- Generic Page -->
-			<div class="flex h-full items-center justify-center text-slate-400">
-				<div class="text-center">
-					<Globe class="mx-auto mb-4 h-16 w-16 opacity-20" />
-					<p>Φόρτωση σελίδας...</p>
+			{:else if activeTab.type === 'browser-settings'}
+				<!-- Browser Settings Page -->
+				<div class="mx-auto min-h-full max-w-2xl bg-white p-8">
+					<h2 class="mb-6 text-2xl font-bold text-slate-900">Ρυθμίσεις</h2>
+					<div class="space-y-2">
+						{#each ['Γενικά', 'Απόρρητο & Ασφάλεια', 'Εμφάνιση', 'Γλώσσα'] as section, i (section)}
+							<button
+								class="flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm hover:bg-slate-50 {i ===
+								1
+									? 'border-blue-300 bg-blue-50'
+									: ''}"
+								onclick={() => i === 1 && handlePrivacySettings()}
+							>
+								<div class="flex items-center gap-3">
+									{#if i === 1}
+										<Shield class="h-4 w-4 text-blue-600" />
+									{:else}
+										<Globe class="h-4 w-4 text-slate-400" />
+									{/if}
+									<span class={i === 1 ? 'font-medium text-blue-700' : 'text-slate-700'}
+										>{section}</span
+									>
+								</div>
+								<ArrowRight class="h-4 w-4 text-slate-400" />
+							</button>
+						{/each}
+					</div>
 				</div>
-			</div>
-		{/if}
+			{:else}
+				<!-- Generic Page -->
+				<div class="flex h-full items-center justify-center text-slate-400">
+					<div class="text-center">
+						<Globe class="mx-auto mb-4 h-16 w-16 opacity-20" />
+						<p>Φόρτωση σελίδας...</p>
+					</div>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>

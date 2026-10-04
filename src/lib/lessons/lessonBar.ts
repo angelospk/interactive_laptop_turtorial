@@ -50,7 +50,7 @@ type LessonLike = {
 };
 
 // Taking a long time is the exercise here, not a sign of being lost.
-const NEVER_ASK = new Set(['reading', 'quiz', 'typing', 'scam-spotter']);
+const NEVER_ASK = new Set(['guide', 'reading', 'quiz', 'typing', 'scam-spotter']);
 const SECONDS_BY_DIFFICULTY: Record<string, number> = {
 	beginner: 40,
 	intermediate: 60,
@@ -62,6 +62,7 @@ const SECONDS_BY_DIFFICULTY: Record<string, number> = {
  * for never. A lesson's `config.stuckAfterSeconds` wins; 0 turns it off.
  */
 export function stuckDelayMs(lesson: LessonLike): number | null {
+	if (lesson.lessonType === 'guide' || lesson.lessonType === 'reading') return null;
 	const own = (lesson.config as { stuckAfterSeconds?: unknown } | null | undefined)
 		?.stuckAfterSeconds;
 	if (typeof own === 'number' && Number.isFinite(own) && own >= 0) {

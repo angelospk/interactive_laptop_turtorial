@@ -3,6 +3,13 @@ import { barReducer, stuckDelayMs, type BarState } from './lessonBar';
 
 const closed: BarState = { open: false };
 
+test('guide and theory never show stuck help, even with a configured delay', () => {
+	for (const lessonType of ['guide', 'reading']) {
+		expect(stuckDelayMs({ lessonType, difficulty: 'beginner' })).toBeNull();
+		expect(stuckDelayMs({ lessonType, config: { stuckAfterSeconds: 1 } })).toBeNull();
+	}
+});
+
 describe('the lesson bar', () => {
 	test('a new lesson opens it, so the learner reads the title and the instruction', () => {
 		expect(barReducer(closed, 'arrive')).toEqual({ open: true, reason: 'arrival' });

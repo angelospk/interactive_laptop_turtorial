@@ -6,7 +6,7 @@
 	import { Volume2, VolumeX, RotateCcw, LogOut } from '@lucide/svelte';
 	import BrowserApp from '$lib/components/apps/BrowserApp.svelte';
 	import GuideSpotlight from '../GuideSpotlight.svelte';
-	import { guides, COMMON_CLIPS, hintClip } from '$lib/guides';
+	import { guides } from '$lib/guides';
 	import { allClips } from '$lib/guides/scripts';
 	import {
 		createGuide,
@@ -19,11 +19,11 @@
 		type GuideState
 	} from '$lib/guides/machine';
 	import { createGuideAudio } from '$lib/guides/audio';
-	import { createIdleWatcher } from '$lib/guides/idle';
+	import { guidePracticeLessonIds } from '$lib/guides/practice';
 
 	let { lesson, onComplete, onBack } = $props<{
 		lesson: Lesson;
-		onComplete: (score: number) => void;
+		onComplete: (score: number, practiceLessonIds?: string[]) => void;
 		onBack: () => void;
 	}>();
 
@@ -40,9 +40,6 @@
 	let tour = $state.raw<GuideState | null>(guide ? createGuide(guide) : null);
 	const startMuted = typeof localStorage !== 'undefined' && localStorage.getItem(MUTE_KEY) === '1';
 	let muted = $state(startMuted);
-	/** An idle nudge speaking over the current step; null = the guide's own clip. */
-	let nudgeClip = $state<string | null>(null);
-	let nudges = $state(0);
 	/** Last clip with words, so the caption does not go blank between clips. */
 	let lastClip = $state<string | null>(null);
 	let unsaved = $state<Record<string, Answer>>({});
@@ -53,38 +50,14 @@
 	let simEpoch = $state(0);
 
 	const audio = createGuideAudio({ muted: startMuted });
-	const idle = createIdleWatcher({
-		firstMs: 30_000,
-		secondMs: 75_000,
-		onNudge(level) {
-			if (!tour || tour.phase !== 'step') return;
-			const step = tour.guide.steps[tour.stepIndex];
-			const id =
-				level === 1
-					? COMMON_CLIPS.idle[nudges % COMMON_CLIPS.idle.length]
-					: hintClip(tour.guide, step);
-			nudges++;
-			nudgeClip = id;
-			// When the nudge is over, the step's own words come back (caption and «Ξανά»).
-			say(id, () => {
-				if (nudgeClip === id) nudgeClip = null;
-			});
-		}
-	});
 
-	$effect(() => () => {
-		audio.stop();
-		idle.stop();
-	});
+	$effect(() => () => audio.stop());
 
 	let step = $derived(tour && tour.phase !== 'start' ? tour.guide.steps[tour.stepIndex] : null);
-	let shownClip = $derived(nudgeClip ?? tour?.clip ?? lastClip);
+	let shownClip = $derived(tour?.clip ?? lastClip);
 	let caption = $derived(shownClip ? (clips.get(shownClip)?.caption ?? '') : '');
 	let spotlight = $derived(
 		tour && (tour.phase === 'step' || tour.phase === 'feedback') ? (step?.target ?? null) : null
-	);
-	let hinting = $derived(
-		nudgeClip !== null && step !== null && nudgeClip === hintClip(tour!.guide, step)
 	);
 	let result = $derived(tour ? summary(tour) : { known: 0, total: 0 });
 
@@ -93,19 +66,14 @@
 		audio.play(id, clips.get(id)?.caption ?? '', onEnd);
 	}
 
-	/** Every transition goes through here: it plays the new clip and arms the idle help. */
+	/** Every transition goes through here: it plays the new clip. No idle nudges: the learner sets the pace. */
 	function go(next: GuideState) {
 		const prev = tour;
 		if (next === prev) return;
 		tour = next;
-		nudgeClip = null;
 		if (next.clip && next.clip !== prev?.clip) say(next.clip, () => tour && go(clipEnded(tour)));
 		if (next.phase === 'step' && (prev?.phase !== 'step' || prev.stepIndex !== next.stepIndex)) {
-			nudges = 0;
-			idle.reset();
 			ensureTarget(next.guide.steps[next.stepIndex].target);
-		} else if (next.phase !== 'step') {
-			idle.stop();
 		}
 	}
 
@@ -117,15 +85,6 @@
 	}
 
 	const focusOnMount = (el: HTMLElement) => el.focus();
-
-	let lastActivity = 0;
-	function activity() {
-		if (tour?.phase !== 'step') return;
-		const now = Date.now();
-		if (now - lastActivity < 1000) return;
-		lastActivity = now;
-		idle.reset();
-	}
 
 	function toggleMute() {
 		muted = !muted;
@@ -214,17 +173,14 @@
 		}
 		finishing = false;
 		audio.stop();
-		onComplete(100);
+		onComplete(100, tour ? guidePracticeLessonIds(tour.guide, tour.answers) : []);
 	}
 
 	function exit() {
 		audio.stop();
-		idle.stop();
 		onBack();
 	}
 </script>
-
-<svelte:window onpointerdown={activity} onpointermove={activity} onkeydown={activity} />
 
 {#if !guide || !tour}
 	<div class="p-8 text-center" role="alert">
@@ -255,14 +211,16 @@
 		</Button>
 	{/snippet}
 
-	<div class="mx-auto flex w-full max-w-6xl flex-col gap-3 p-3">
+	<!-- Demo and card share the viewport under the lesson bar: the demo takes what
+	     the card leaves. On a very short screen the minimums win and the page scrolls. -->
+	<div class="mx-auto flex h-[calc(100dvh-5rem)] min-h-[560px] w-full max-w-6xl flex-col gap-3 p-3">
 		<div
 			bind:this={stage}
-			class="relative h-[min(50vh,520px)] min-h-[340px] overflow-hidden rounded-xl border-2 border-slate-300 shadow-sm"
+			class="relative min-h-[300px] flex-1 overflow-hidden rounded-xl border-2 border-slate-300 shadow-sm"
 		>
 			<div class="h-full" inert={tour.phase === 'start'}>
 				{#key simEpoch}
-					<BrowserApp config={simConfig} onAction={activity} />
+					<BrowserApp config={simConfig} onAction={() => {}} />
 				{/key}
 			</div>
 			<GuideSpotlight container={stage} target={spotlight} />
@@ -289,7 +247,9 @@
 
 		<!-- The card holds everything the learner needs, sound controls and the
 		     way out included, and stays on screen while the page scrolls. -->
-		<div class="sticky bottom-2 z-40 rounded-2xl border-2 border-brand/30 bg-white p-5 shadow-md">
+		<div
+			class="sticky bottom-2 z-40 shrink-0 rounded-2xl border-2 border-brand/30 bg-white p-4 shadow-md [@media(min-height:800px)]:p-5"
+		>
 			<div class="mb-2 flex flex-wrap items-center justify-between gap-2">
 				<p class="text-sm font-semibold text-muted-foreground">
 					{#if step && (tour.phase === 'step' || tour.phase === 'feedback')}
@@ -304,21 +264,22 @@
 					Ξέρατε {result.known} από τα {result.total}
 				</h2>
 			{/if}
-			<p class="text-xl leading-relaxed" aria-live="polite" data-testid="guide-caption">
+			<p
+				class="text-lg leading-relaxed [@media(min-height:800px)]:text-xl"
+				aria-live="polite"
+				data-testid="guide-caption"
+			>
 				{caption}
 			</p>
 
-			<div class="mt-5 flex flex-wrap items-center gap-3">
+			<div class="mt-4 flex flex-wrap items-center gap-3">
 				{#if tour.phase === 'intro'}
 					<Button class="min-h-14 px-10 text-xl" onclick={() => tour && go(proceed(tour))}>
 						Πάμε!
 					</Button>
 				{:else if tour.phase === 'step' || tour.phase === 'feedback'}
 					<Button
-						class={[
-							'min-h-14 flex-1 bg-green-600 px-8 text-xl text-white hover:bg-green-700',
-							hinting && 'motion-safe:animate-pulse'
-						]}
+						class="min-h-14 flex-1 bg-green-600 px-8 text-xl text-white hover:bg-green-700"
 						disabled={tour.phase !== 'step'}
 						onclick={() => respond('known')}
 					>
@@ -326,10 +287,7 @@
 					</Button>
 					<Button
 						variant="outline"
-						class={[
-							'min-h-14 flex-1 border-2 px-8 text-xl',
-							hinting && 'motion-safe:animate-pulse'
-						]}
+						class="min-h-14 flex-1 border-2 px-8 text-xl"
 						disabled={tour.phase !== 'step'}
 						onclick={() => respond('unknown')}
 					>
