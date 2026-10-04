@@ -49,6 +49,20 @@
 
 		<div class="flex items-center justify-between gap-2">
 			<div class="flex flex-wrap items-center gap-2">
+				{#if lesson.lessonType === 'guide'}
+					<span
+						class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"
+					>
+						🧭 Οδηγός
+					</span>
+				{/if}
+				{#if progress?.completed && progress.source === 'guide'}
+					<span
+						class="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-700"
+					>
+						Το ήξερες
+					</span>
+				{/if}
 				{#if lesson.lessonType === 'reading'}
 					<span
 						class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"

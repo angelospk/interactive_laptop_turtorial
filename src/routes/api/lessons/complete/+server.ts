@@ -56,7 +56,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					score,
 					stars,
 					attempts: existingProgress.attempts + 1,
-					lastAttemptAt: now
+					lastAttemptAt: now,
+					// Solved for real now, so no longer just «Το ξέρω» from a guide.
+					source: null
 				})
 				.where(eq(userProgress.id, existingProgress.id))
 				.returning()

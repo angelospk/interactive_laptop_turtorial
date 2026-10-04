@@ -60,6 +60,7 @@ CREATE TABLE user_progress (
 	stars INTEGER,
 	attempts INTEGER NOT NULL DEFAULT 0,
 	last_attempt_at INTEGER,
+	source TEXT,
 	UNIQUE(user_id, lesson_id)
 );
 

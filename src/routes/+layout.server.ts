@@ -23,7 +23,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
             string,
             Pick<
                 UserProgress,
-                'completed' | 'score' | 'stars' | 'attempts' | 'completedAt' | 'lastAttemptAt'
+                'completed' | 'score' | 'stars' | 'attempts' | 'completedAt' | 'lastAttemptAt' | 'source'
             >
         > = {};
         for (const item of progressData) {
@@ -33,7 +33,8 @@ export const load: LayoutServerLoad = async ({ locals }) => {
                 stars: item.stars,
                 attempts: item.attempts,
                 completedAt: item.completedAt,
-                lastAttemptAt: item.lastAttemptAt
+                lastAttemptAt: item.lastAttemptAt,
+                source: item.source
             };
         }
 
