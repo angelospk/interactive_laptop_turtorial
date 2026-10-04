@@ -38,7 +38,7 @@
 <!-- stops click from reaching the backdrop -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-	class="absolute right-2 bottom-14 z-50 w-80 rounded-xl border border-white/10 bg-[#2b2b2b]/95 p-4 [font-family:Segoe_UI,system-ui,sans-serif] text-white shadow-2xl backdrop-blur-xl"
+	class="absolute right-2 bottom-14 z-50 w-80 max-w-[calc(100%-1rem)] rounded-xl border border-white/10 bg-[#2b2b2b]/95 p-4 [font-family:Segoe_UI,system-ui,sans-serif] text-white shadow-2xl backdrop-blur-xl"
 	role="dialog"
 	aria-label="Ημερολόγιο"
 	tabindex="-1"

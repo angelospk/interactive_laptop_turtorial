@@ -12,13 +12,16 @@
 		LayoutGrid,
 		Search,
 		ChevronUp,
-		Bell
+		Bell,
+		Ellipsis
 	} from 'lucide-svelte';
 	import type { Icon as LucideIcon } from 'lucide-svelte';
 	import QuickSettings from './QuickSettings.svelte';
 	import CalendarFlyout from './CalendarFlyout.svelte';
 	import { osState } from '$lib/osState.svelte';
 	import { cn } from '$lib/utils';
+
+	type TaskbarApp = { id: string; name: string; icon: typeof LucideIcon };
 
 	/**
 	 * The Windows 11 taskbar: Start, Search and the pinned apps in the centre,
@@ -39,7 +42,7 @@
 		onAction,
 		wifiConfig
 	} = $props<{
-		apps: { id: string; name: string; icon: typeof LucideIcon }[];
+		apps: TaskbarApp[];
 		openAppIds: string[];
 		/** Apps the lesson points at, e.g. the minimised window to bring back. */
 		highlightAppIds?: string[];
@@ -59,14 +62,59 @@
 
 	let time = $state(new Date());
 	// One flyout at a time, like Windows: opening one closes the others.
-	let flyout = $state<null | 'quick' | 'calendar' | 'tray' | 'bell'>(null);
+	let flyout = $state<null | 'quick' | 'calendar' | 'tray' | 'bell' | 'overflow'>(null);
 	const showQuickSettings = $derived(flyout === 'quick');
+
+	// The simulator can be as narrow as a phone. Measure the bar so the apps
+	// never slide under the tray: centred while they fit beside it, left-aligned
+	// when they do not, and the rest behind «•••» as Windows 11 does.
+	let barWidth = $state(0);
+	let fixedWidth = $state(0); // Start, Search, Task View
+	let trayWidth = $state(0);
+	let startWidth = $state(0);
+	// 0 before the first measurement (SSR): render the full desktop layout.
+	const compact = $derived(barWidth > 0 && barWidth < 600);
+	const layout = $derived.by(() => {
+		if (!barWidth) return { centred: true, shown: apps, hidden: [] as TaskbarApp[], more: false };
+		// Sizes are in rem and «Μεγάλα γράμματα» enlarges them, so take the rem
+		// from the Start button (w-9 compact, w-12 otherwise).
+		const rem = startWidth ? startWidth / (compact ? 2.25 : 3) : 16;
+		const slot = (compact ? 2.375 : 3) * rem; // app button plus the gap before it
+		const more = (compact ? 2.375 : 2.5) * rem; // «•••» plus its gap
+		const edge = barWidth - 0.5 * rem - trayWidth - 0.5 * rem; // padding, tray, breathing gap
+		const width = fixedWidth + apps.length * slot;
+		if (0.5 * rem + width <= edge) {
+			const centred = barWidth / 2 + width / 2 <= edge;
+			return { centred, shown: apps, hidden: [] as TaskbarApp[], more: false };
+		}
+		// «•••» takes one place. The app the lesson points at always stays: when
+		// there is room for only one of them, it wins and the rest stay in Start.
+		const fit = Math.floor((edge - 0.5 * rem - fixedWidth - more) / slot);
+		const target = apps.filter((a: TaskbarApp) => highlightAppIds.includes(a.id));
+		const keep = new Set(
+			[...target, ...apps]
+				.map((a) => a.id)
+				.filter((id, i, ids) => ids.indexOf(id) === i)
+				.slice(0, Math.max(fit, Math.min(target.length, 1)))
+		);
+		return {
+			centred: false,
+			shown: apps.filter((a: TaskbarApp) => keep.has(a.id)),
+			hidden: apps.filter((a: TaskbarApp) => !keep.has(a.id)),
+			more: fit >= 1 || !target.length
+		};
+	});
 
 	$effect(() => {
 		const timer = setInterval(() => {
 			time = new Date();
 		}, 60000); // Update every minute
 		return () => clearInterval(timer);
+	});
+
+	// A wider screen can fit every app again; do not reopen «•••» on narrowing.
+	$effect(() => {
+		if (flyout === 'overflow' && !layout.more) flyout = null;
 	});
 
 	function toggleFlyout(which: NonNullable<typeof flyout>) {
@@ -76,6 +124,39 @@
 
 	function closeFlyouts() {
 		flyout = null;
+	}
+
+	// «•••» is a menu: focus moves into it, arrows walk it, Escape returns.
+	let moreButton = $state<HTMLButtonElement>();
+	function placeMenu(menu: HTMLElement) {
+		// Never taller than the desktop above the taskbar; long lists scroll.
+		const bar = menu.closest<HTMLElement>('[data-taskbar]');
+		if (bar) menu.style.maxHeight = `min(16rem, ${bar.offsetTop - 20}px)`;
+		menu.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+	}
+	function onMenuKeydown(e: KeyboardEvent) {
+		const items = [
+			...(e.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('[role="menuitem"]')
+		];
+		const i = items.indexOf(document.activeElement as HTMLElement);
+		const next =
+			e.key === 'ArrowDown'
+				? (i + 1) % items.length
+				: e.key === 'ArrowUp'
+					? (i - 1 + items.length) % items.length
+					: e.key === 'Home'
+						? 0
+						: e.key === 'End'
+							? items.length - 1
+							: -1;
+		if (next >= 0) {
+			e.preventDefault();
+			items[next].focus();
+		} else if (e.key === 'Escape' || e.key === 'Tab') {
+			if (e.key === 'Escape') e.preventDefault();
+			closeFlyouts();
+			moreButton?.focus();
+		}
 	}
 
 	// Tray glyphs follow the machine state: that is how a learner sees "the
@@ -107,6 +188,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
 	data-testid="taskbar"
+	bind:clientWidth={barWidth}
 	class="absolute right-0 bottom-0 left-0 z-50 flex h-12 items-center border-t border-white/10 bg-[#202020]/85 px-2 [font-family:Segoe_UI,system-ui,sans-serif] backdrop-blur-xl"
 	onclick={(e) => {
 		e.stopPropagation();
@@ -201,60 +283,81 @@
 	{/if}
 
 	<!-- Start & Apps (centered, Win11 style) -->
-	<div class="absolute left-1/2 flex -translate-x-1/2 items-center gap-1">
-		<button
-			type="button"
-			class="flex h-10 w-12 items-center justify-center rounded-md transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none"
-			onclick={() => {
-				closeFlyouts();
-				onStartClick();
-			}}
-			title="Έναρξη"
-			aria-label="Έναρξη"
-			data-start-button
+	<div
+		class={cn(
+			'flex items-center',
+			compact ? 'gap-0.5' : 'gap-1',
+			layout.centred && 'absolute left-1/2 -translate-x-1/2'
+		)}
+	>
+		<div
+			class={cn('flex items-center', compact ? 'gap-0.5' : 'gap-1')}
+			bind:clientWidth={fixedWidth}
 		>
-			<!-- Windows 11 logo: four equal squares -->
-			<svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
-				<rect x="2" y="2" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
-				<rect x="12.5" y="2" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
-				<rect x="2" y="12.5" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
-				<rect x="12.5" y="12.5" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
-			</svg>
-		</button>
-
-		<!-- Search pill: on Windows it opens Start with the search field focused -->
-		<button
-			type="button"
-			class="hidden h-10 items-center gap-2 rounded-full bg-white/90 pr-4 pl-3 text-sm text-slate-700 shadow-sm transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none sm:flex"
-			onclick={() => {
-				closeFlyouts();
-				onStartClick();
-			}}
-			aria-label="Αναζήτηση"
-			title="Αναζήτηση"
-		>
-			<Search class="h-4 w-4 text-slate-500" />
-			<span class="hidden md:inline">Αναζήτηση</span>
-		</button>
-
-		<!-- Task View Button -->
-		{#if onTaskViewClick}
 			<button
 				type="button"
-				class="flex h-10 w-11 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none"
+				class={cn(
+					'flex h-10 items-center justify-center rounded-md transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
+					compact ? 'w-9' : 'w-12'
+				)}
 				onclick={() => {
 					closeFlyouts();
-					onTaskViewClick();
+					onStartClick();
 				}}
-				title="Προβολή Εργασιών"
-				aria-label="Προβολή Εργασιών"
+				title="Έναρξη"
+				aria-label="Έναρξη"
+				data-start-button
+				bind:clientWidth={startWidth}
 			>
-				<LayoutGrid class="h-5 w-5" />
+				<!-- Windows 11 logo: four equal squares -->
+				<svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
+					<rect x="2" y="2" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
+					<rect x="12.5" y="2" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
+					<rect x="2" y="12.5" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
+					<rect x="12.5" y="12.5" width="9.5" height="9.5" rx="0.5" fill="#4cc2ff" />
+				</svg>
 			</button>
-		{/if}
+
+			<!-- Search pill: on Windows it opens Start with the search field focused -->
+			<button
+				type="button"
+				class={cn(
+					'h-10 items-center gap-2 rounded-full bg-white/90 pr-4 pl-3 text-sm text-slate-700 shadow-sm transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none',
+					compact ? 'hidden' : 'flex'
+				)}
+				onclick={() => {
+					closeFlyouts();
+					onStartClick();
+				}}
+				aria-label="Αναζήτηση"
+				title="Αναζήτηση"
+			>
+				<Search class="h-4 w-4 text-slate-500" />
+				<span class="hidden md:inline">Αναζήτηση</span>
+			</button>
+
+			<!-- Task View Button -->
+			{#if onTaskViewClick}
+				<button
+					type="button"
+					class={cn(
+						'flex h-10 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
+						compact ? 'w-9' : 'w-11'
+					)}
+					onclick={() => {
+						closeFlyouts();
+						onTaskViewClick();
+					}}
+					title="Προβολή Εργασιών"
+					aria-label="Προβολή Εργασιών"
+				>
+					<LayoutGrid class="h-5 w-5" />
+				</button>
+			{/if}
+		</div>
 
 		<!-- Taskbar Items -->
-		{#each apps as app (app.id)}
+		{#each layout.shown as app (app.id)}
 			{@const isOpen = openAppIds.includes(app.id)}
 			{@const highlighted = highlightAppIds.includes(app.id)}
 			<div class="group relative">
@@ -280,7 +383,8 @@
 					type="button"
 					data-highlight={highlighted ? 'true' : undefined}
 					class={cn(
-						'flex h-10 w-11 items-center justify-center rounded-md transition-all focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none active:scale-95',
+						'flex h-10 items-center justify-center rounded-md transition-all focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none active:scale-95',
+						compact ? 'w-9' : 'w-11',
 						isOpen
 							? 'bg-white/10 text-white hover:bg-white/20'
 							: 'text-slate-200 hover:bg-white/10 hover:text-white',
@@ -304,15 +408,61 @@
 				{/if}
 			</div>
 		{/each}
+
+		{#if layout.more}
+			<div class="relative">
+				<button
+					bind:this={moreButton}
+					type="button"
+					class={cn(
+						'flex h-10 w-9 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
+						flyout === 'overflow' && 'bg-white/10'
+					)}
+					onclick={() => toggleFlyout('overflow')}
+					aria-label="Εμφάνιση περισσότερων"
+					aria-haspopup="menu"
+					aria-expanded={flyout === 'overflow'}
+					title="Εμφάνιση περισσότερων"
+				>
+					<Ellipsis class="h-5 w-5" />
+				</button>
+				{#if flyout === 'overflow'}
+					<div
+						role="menu"
+						tabindex="-1"
+						aria-label="Περισσότερες εφαρμογές"
+						class="absolute bottom-full left-1/2 mb-3 w-56 -translate-x-1/2 overflow-y-auto rounded-lg border border-white/10 bg-[#2b2b2b]/95 p-1 text-sm text-white shadow-xl backdrop-blur-xl"
+						{@attach placeMenu}
+						onkeydown={onMenuKeydown}
+					>
+						{#each layout.hidden as app (app.id)}
+							<button
+								type="button"
+								role="menuitem"
+								class="flex w-full items-center gap-3 rounded px-3 py-2 text-left hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none"
+								onclick={() => {
+									closeFlyouts();
+									onAppClick(app.id);
+								}}
+							>
+								<app.icon class="h-5 w-5 shrink-0" />
+								<span class="truncate">{app.name}</span>
+							</button>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 
 	<!-- System Tray (right-aligned) -->
-	<div class="ml-auto flex h-full items-center gap-0.5 py-1">
+	<div class="ml-auto flex h-full shrink-0 items-center gap-0.5 py-1" bind:clientWidth={trayWidth}>
 		<button
 			type="button"
 			class={cn(
 				trayButton,
-				'hidden w-8 justify-center px-0 sm:flex',
+				'w-8 justify-center px-0',
+				compact ? 'hidden' : 'flex',
 				flyout === 'tray' && 'bg-white/10'
 			)}
 			onclick={() => toggleFlyout('tray')}
@@ -323,7 +473,7 @@
 		</button>
 		<button
 			type="button"
-			class={cn(trayButton, showQuickSettings && 'bg-white/10')}
+			class={cn(trayButton, compact && 'gap-1 px-1.5', showQuickSettings && 'bg-white/10')}
 			onclick={() => toggleFlyout('quick')}
 			aria-label="Γρήγορες ρυθμίσεις"
 			title={trayTitle}
@@ -351,13 +501,18 @@
 			<span class="tabular-nums">
 				{time.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' })}
 			</span>
-			<span class="tabular-nums">
+			<span class={cn('tabular-nums', compact && 'hidden')}>
 				{time.toLocaleDateString('el-GR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
 			</span>
 		</button>
 		<button
 			type="button"
-			class={cn(trayButton, 'w-9 justify-center px-0', flyout === 'bell' && 'bg-white/10')}
+			class={cn(
+				trayButton,
+				'w-9 justify-center px-0',
+				compact && 'hidden',
+				flyout === 'bell' && 'bg-white/10'
+			)}
 			onclick={() => toggleFlyout('bell')}
 			aria-label="Ειδοποιήσεις"
 			title="Ειδοποιήσεις"
