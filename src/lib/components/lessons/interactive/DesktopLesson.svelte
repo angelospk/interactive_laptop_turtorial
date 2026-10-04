@@ -276,13 +276,13 @@
 <LessonTemplate {lesson} {onBack}>
 	<!-- A column: the instruction keeps its own height and the simulated screen
 	     takes every pixel left, instead of a fixed 600px box. -->
-	<div class="flex h-full min-h-0 flex-col gap-3">
+	<div class="flex h-full min-h-0 flex-col gap-2">
 		{#if config.instructions}
 			<div class="shrink-0">
-				<Card class="border-blue-200 bg-blue-50">
-					<div class="flex gap-3 p-4">
-						<Info class="h-5 w-5 shrink-0 text-blue-600" />
-						<div class="flex-1 text-sm text-blue-900">
+				<Card class="rounded-lg border-blue-200 bg-blue-50 py-0">
+					<div class="flex items-start gap-2 px-3 py-2">
+						<Info class="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+						<div class="min-w-0 flex-1 text-sm text-blue-900">
 							<InstructionText text={fillShortcutText(config.instructions, device)} />
 						</div>
 					</div>
