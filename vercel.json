@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "__dolt_remote_info__": false
+    }
+  },
   "redirects": [
     { "source": "/kapi", "destination": "/kapi/", "permanent": false },
     { "source": "/mathima-:num.html", "destination": "/kapi/mathima-:num.html", "permanent": false }
