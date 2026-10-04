@@ -13,6 +13,7 @@ import {
 } from '$lib/config/moduleOrganization';
 import type { Lesson } from '$lib/db/schema';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
+import { DESKTOP_APPS } from '$lib/components/desktop/desktopApps';
 import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import { parseMacSimConfig } from '$lib/lessons/macSim';
 import { parseGovSimConfig } from '$lib/lessons/govSim';
@@ -371,5 +372,58 @@ describe('theory → practice links (content/manifest.json lessonLinks)', () => 
 	it('links a meaningful share of theory sections to practice', () => {
 		const linked = subsections.filter((s) => s.lessonLinks?.length);
 		expect(linked.length).toBeGreaterThanOrEqual(25);
+	});
+});
+
+// Every string inside a lesson config, however deeply nested.
+function configStrings(value: unknown): string[] {
+	if (typeof value === 'string') return [value];
+	if (Array.isArray(value)) return value.flatMap(configStrings);
+	if (value && typeof value === 'object') return Object.values(value).flatMap(configStrings);
+	return [];
+}
+
+// A learner once read «…μετονομάσετε\n2. Επιλέξτε…» on screen: an escaped
+// newline in the source survives as two literal characters.
+describe('instruction prose', () => {
+	it('never carries a literal backslash-n instead of a line break', () => {
+		const offenders = allLessons
+			.filter((lesson) => configStrings(lesson.config).some((s) => s.includes('\\n')))
+			.map((lesson) => lesson.id);
+		expect(offenders, `literal \\n in: ${offenders.join(', ')}`).toEqual([]);
+	});
+});
+
+// The Windows simulation can only open apps it knows. A lesson that names an
+// unknown app shows an empty window that, once minimised, has no taskbar icon
+// to bring it back (module3 «Επαναφορά» with the old 'notepad').
+describe('desktop-simulation playability', () => {
+	const desktopLessons = allLessons.filter((l) => l.lessonType === 'desktop-simulation');
+	const known = new Set<string>(DESKTOP_APPS.map((a) => a.id));
+	const appOf = (item: unknown) =>
+		typeof item === 'string' ? item : (item as { appId: string }).appId;
+
+	it('only opens and targets apps the simulation has', () => {
+		const unknown = desktopLessons.flatMap((lesson) => {
+			const config = (lesson.config ?? {}) as { initialApps?: unknown[]; targetAppId?: string };
+			const ids = [...(config.initialApps ?? []).map(appOf), config.targetAppId].filter(
+				(id): id is string => !!id
+			);
+			return ids.filter((id) => !known.has(id)).map((id) => `${lesson.id}: ${id}`);
+		});
+		expect(unknown).toEqual([]);
+	});
+
+	it('names the app to open in every window-goal lesson', () => {
+		const windowGoals = ['open-app', 'minimize-app', 'restore-app', 'maximize-app', 'close-app'];
+		const vague = desktopLessons
+			.filter((l) => windowGoals.includes((l.config as { goal?: string } | null)?.goal ?? ''))
+			.filter((l) => {
+				const config = l.config as { targetAppId?: string; instructions?: string };
+				const app = DESKTOP_APPS.find((a) => a.id === config.targetAppId);
+				return !app || !config.instructions?.includes(app.shortName);
+			})
+			.map((l) => l.id);
+		expect(vague, `instructions do not name the app in: ${vague.join(', ')}`).toEqual([]);
 	});
 });

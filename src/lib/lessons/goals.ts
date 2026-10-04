@@ -41,6 +41,8 @@ export const GOALS = {
 	'download-file': { requiresAppId: false },
 	'zoom-page': { requiresAppId: false },
 	'find-on-page': { requiresAppId: false },
+	'open-history': { requiresAppId: false },
+	'back-forward': { requiresAppId: false },
 	'open-privacy-settings': { requiresAppId: false },
 	'type-ai-question': { requiresAppId: false },
 

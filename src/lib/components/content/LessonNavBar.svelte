@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
-	import ContentToc from './ContentToc.svelte';
+	import TocMenu from './TocMenu.svelte';
 	import type { TocEntry } from './renderMarkdown';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import List from '@lucide/svelte/icons/list';
 
 	interface NavLink {
 		id: string;
@@ -66,34 +64,9 @@
 			</div>
 
 			<!-- TOC dropdown (center) -->
-			<div class="relative flex shrink-0 justify-center">
-				{#if toc.length}
-					<button
-						type="button"
-						onclick={() => (menuOpen = !menuOpen)}
-						aria-expanded={menuOpen}
-						class="bg-muted/60 hover:bg-muted flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium"
-					>
-						<List class="h-4 w-4" />
-						<span>Περιεχόμενα</span>
-						<ChevronDown class="h-4 w-4 transition-transform {menuOpen ? 'rotate-180' : ''}" />
-					</button>
-					{#if menuOpen}
-						<!-- click-away backdrop -->
-						<button
-							type="button"
-							class="fixed inset-0 z-40 cursor-default"
-							aria-label="Κλείσιμο περιεχομένων"
-							onclick={() => (menuOpen = false)}
-						></button>
-						<div
-							class="bg-popover text-popover-foreground absolute top-full left-1/2 z-50 mt-2 max-h-[60vh] w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 overflow-auto rounded-xl border p-3 shadow-lg"
-						>
-							<ContentToc {toc} onnavigate={() => (menuOpen = false)} />
-						</div>
-					{/if}
-				{/if}
-			</div>
+			{#if toc.length}
+				<TocMenu {toc} bind:open={menuOpen} />
+			{/if}
 
 			<!-- next lesson -->
 			<div class="flex flex-1 justify-end">

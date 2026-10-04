@@ -18,7 +18,9 @@ export const module4Lessons: NewLesson[] = [
 		config: {
 			goal: 'open-app',
 			targetAppId: 'explorer',
-			initialApps: []
+			initialApps: [],
+			instructions:
+				'Ανοίξτε την «Εξερεύνηση», το πρόγραμμα με τους φακέλους σας: πατήστε το εικονίδιο με τον φάκελο στη γραμμή εργασιών, κάτω.'
 		},
 		enabled: true,
 		requiredLessonId: null
@@ -124,7 +126,7 @@ export const module4Lessons: NewLesson[] = [
 			goal: 'rename-file',
 			initialApps: ['explorer'],
 			instructions:
-				'1. Κάντε δεξί κλικ στο αρχείο που θέλετε να μετονομάσετε\\n2. Επιλέξτε "Μετονομασία" από το μενού\\n3. Πληκτρολογήστε το νέο όνομα\\n4. Πατήστε Enter για να αποθηκεύσετε'
+				'Αλλάξτε το όνομα του αρχείου «Λίστα Ψώνια.txt» σε «Ψώνια Σαββάτου.txt».\n1. Κάντε δεξί κλικ στο αρχείο «Λίστα Ψώνια.txt».\n2. Επιλέξτε «Μετονομασία» από το μενού.\n3. Γράψτε το νέο όνομα: Ψώνια Σαββάτου.txt\n4. Πατήστε Enter για να το κρατήσετε.'
 		},
 		enabled: true,
 		requiredLessonId: 'module4-lesson5'

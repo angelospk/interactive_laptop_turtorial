@@ -18,7 +18,9 @@ const _wordLessons: Omit<NewLesson, 'orderIndex' | 'requiredLessonId'>[] = [
 		lessonType: 'desktop-simulation',
 		config: {
 			goal: 'open-app',
-			targetAppId: 'word'
+			targetAppId: 'word',
+			instructions:
+				'Ανοίξτε το Word:\n1. Πατήστε το κουμπί «Έναρξη» (τα τέσσερα μπλε τετράγωνα), κάτω στη γραμμή εργασιών.\n2. Στο μενού που ανοίγει, πατήστε «Word».'
 		},
 		enabled: true
 	},

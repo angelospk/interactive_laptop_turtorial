@@ -14,7 +14,12 @@ export const module7Lessons: NewLesson[] = [
 		difficulty: 'beginner',
 		orderIndex: 1,
 		lessonType: 'desktop-simulation',
-		config: { goal: 'open-app', targetAppId: 'excel' },
+		config: {
+			goal: 'open-app',
+			targetAppId: 'excel',
+			instructions:
+				'Ανοίξτε το Excel:\n1. Πατήστε το κουμπί «Έναρξη» (τα τέσσερα μπλε τετράγωνα), κάτω στη γραμμή εργασιών.\n2. Στο μενού που ανοίγει, πατήστε «Excel».'
+		},
 		enabled: true,
 		requiredLessonId: null
 	},
