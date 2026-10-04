@@ -67,70 +67,54 @@
 </script>
 
 <!--
-	The page owns the viewport: one auto-sized bar, then the lesson taking every
-	remaining pixel. Previously the chrome above the lesson ate 213px on a 1280x800
-	laptop and the document itself scrolled, so the button that starts the lesson
-	sat below the fold and learners assumed the lesson was broken.
+	The page owns the viewport and the lesson takes all of it. The breadcrumb and
+	lesson navigation live in a bar laid over the lesson that hides once the
+	learner starts. Previously that chrome sat above the lesson and ate ~240px of
+	a laptop screen, leaving the simulation small inside a purple margin.
 -->
 <svelte:head>
 	<title>{lessonTitle} — {m.app_title()}</title>
 </svelte:head>
 
 <div class="lesson-page">
-	<div class="lesson-bar">
-		<!-- Breadcrumb doubles as the way back; a separate "back" button was a
-		     third row saying the same thing. -->
-		<nav aria-label={m.breadcrumb_aria()} class="flex min-w-0 items-center gap-1 text-base">
-			<a class="crumb-link" href={resolve('/')}>{m.nav_home()}</a>
-			<span aria-hidden="true" class="text-muted-foreground">›</span>
-			<a class="crumb-link crumb-current" href={resolve('/modules/[id]', { id: data.moduleId })}>
-				<ArrowLeft class="h-5 w-5 shrink-0" aria-hidden="true" />
-				<span class="truncate">{m.breadcrumb_lessons()}</span>
-			</a>
-		</nav>
-	</div>
-
-	<div class="lesson-stage">
-		{#if moduleLessons.length > 0}
-			<LessonRunner
-				lessons={moduleLessons}
-				{progress}
-				{startIndex}
-				{navigation}
-				moduleId={data.moduleId}
-				onLessonChange={handleLessonChange}
-				onExit={backToGrid}
-				nextModuleId={data.nextModuleId}
-				isLastModule={data.isLastModule}
-			/>
-		{/if}
-	</div>
+	{#if moduleLessons.length > 0}
+		<LessonRunner
+			lessons={moduleLessons}
+			{progress}
+			{startIndex}
+			{navigation}
+			moduleId={data.moduleId}
+			onLessonChange={handleLessonChange}
+			onExit={backToGrid}
+			nextModuleId={data.nextModuleId}
+			isLastModule={data.isLastModule}
+		>
+			{#snippet crumbs()}
+				<!-- Breadcrumb doubles as the way back; a separate "back" button was a
+				     third row saying the same thing. -->
+				<nav aria-label={m.breadcrumb_aria()} class="flex min-w-0 items-center gap-1 text-base">
+					<a class="crumb-link" href={resolve('/')}>{m.nav_home()}</a>
+					<span aria-hidden="true" class="text-muted-foreground">›</span>
+					<a
+						class="crumb-link crumb-current"
+						href={resolve('/modules/[id]', { id: data.moduleId })}
+					>
+						<ArrowLeft class="h-5 w-5 shrink-0" aria-hidden="true" />
+						<span class="truncate">{m.breadcrumb_lessons()}</span>
+					</a>
+				</nav>
+			{/snippet}
+		</LessonRunner>
+	{/if}
 </div>
 
 <style>
-	/* Viewport-owned layout: `auto` for the bar, `minmax(0, 1fr)` for the lesson.
-	   `minmax(0, …)` (not `1fr`) is what lets the lesson shrink instead of pushing
-	   the document taller, and every descendant keeps `min-height: 0` so the
-	   scroll happens inside the lesson content, never on the page. */
+	/* Viewport-owned layout: the runner gets exactly the screen. Every
+	   descendant keeps `min-height: 0` so the scroll happens inside the lesson
+	   content, never on the page. */
 	.lesson-page {
 		block-size: 100svh;
 		block-size: 100dvh;
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		gap: 0.5rem;
-		padding: 0.5rem 1rem 1rem;
-	}
-
-	.lesson-bar {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.75rem;
-		min-block-size: 0;
-	}
-
-	.lesson-stage {
-		min-block-size: 0;
 		display: flex;
 		flex-direction: column;
 	}

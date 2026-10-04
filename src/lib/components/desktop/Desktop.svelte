@@ -15,10 +15,11 @@
 
 <div
 	class={cn(
-		"relative h-[600px] w-full overflow-hidden rounded-lg border-4 border-slate-800 bg-cover bg-center shadow-2xl select-none",
+		"relative h-full min-h-[22rem] w-full overflow-hidden rounded-lg border-4 border-slate-800 bg-cover bg-center shadow-2xl select-none",
 		className
 	)}
 	style="background-image: url('{backgroundUrl}')"
+	data-desktop
 >
 	{@render children?.()}
 </div>

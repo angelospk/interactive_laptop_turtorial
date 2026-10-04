@@ -719,7 +719,7 @@
 					>{config.targetFilename || 'document.pdf'}</span
 				>
 				<button
-					class="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+					class="min-h-11 rounded-md bg-blue-600 px-5 text-base font-semibold text-white hover:bg-blue-700"
 					onclick={handleDownload}
 				>
 					Λήψη

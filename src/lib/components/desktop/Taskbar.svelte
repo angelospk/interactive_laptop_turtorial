@@ -64,6 +64,7 @@
 		e.preventDefault();
 		menuOpen = true;
 	}}
+	data-taskbar
 >
 	{#if menuOpen}
 		<div

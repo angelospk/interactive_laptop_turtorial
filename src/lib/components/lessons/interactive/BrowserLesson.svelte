@@ -225,16 +225,17 @@
 </script>
 
 <LessonTemplate {lesson} {onBack}>
-	<Card>
+	<!-- The simulated browser takes the height left over, not a fixed 500px. -->
+	<Card class="h-full min-h-0">
 		<CardHeader>
 			<CardDescription>
 				{config?.instructions || instructions[action as keyof typeof instructions]}
 			</CardDescription>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="flex min-h-0 flex-1 flex-col">
 			<!-- Browser Simulator -->
 			<div
-				class="flex h-[500px] w-full flex-col overflow-hidden rounded-lg border border-slate-300 bg-white shadow-xl"
+				class="flex min-h-[28rem] w-full flex-1 flex-col overflow-hidden rounded-lg border border-slate-300 bg-white shadow-xl"
 			>
 				<!-- 1. Tab Bar -->
 				<div class="flex items-end gap-1 border-b border-slate-300 bg-slate-100 px-2 pt-2">

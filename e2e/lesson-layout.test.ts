@@ -117,3 +117,55 @@ test.describe('keyboard users can see where they are', () => {
 		}
 	});
 });
+
+// The simulation is the lesson: on a 1280x720 laptop it used to get a 600px box
+// inside ~240px of chrome and a purple margin. Now a slim strip is all that
+// stays above it once the learner starts.
+test.describe('the simulation takes the screen', () => {
+	test.use({ viewport: { width: 1280, height: 720 } });
+
+	test('a Windows lesson fills the screen once the learner starts', async ({ page }) => {
+		await login(page, `full_${Date.now()}_a`);
+		await openLesson(page, 'module6', 'open-email');
+		await page.locator('[data-desktop]').click({ position: { x: 300, y: 300 } });
+		await expect(page.getByRole('button', { name: /Μενού μαθήματος/ })).toBeVisible();
+
+		const desktop = (await page.locator('[data-desktop]').boundingBox())!;
+		expect(desktop.height).toBeGreaterThanOrEqual(720 * 0.85);
+		await expect(page.locator('[data-taskbar]')).toBeInViewport({ ratio: 1 });
+		expect(await fitsWithoutScrolling(page)).toBe(true);
+	});
+
+	test('the download button is above the taskbar, not behind it', async ({ page }) => {
+		await login(page, `full_${Date.now()}_b`);
+		await openLesson(page, 'module5', 'download-file');
+		const button = (await page.getByRole('button', { name: 'Λήψη' }).boundingBox())!;
+		const taskbar = (await page.locator('[data-taskbar]').boundingBox())!;
+		expect(button.y + button.height).toBeLessThanOrEqual(taskbar.y);
+	});
+
+	test('moving the mouse to the top brings the bar back', async ({ page }) => {
+		await login(page, `full_${Date.now()}_c`);
+		await openLesson(page, 'module6', 'open-email');
+		await page.locator('[data-desktop]').click({ position: { x: 300, y: 300 } });
+		const next = page.getByRole('button', { name: 'Επόμενο', exact: true });
+		await expect(next).toBeHidden();
+		await page.mouse.move(640, 300);
+		await page.mouse.move(640, 2);
+		await expect(next).toBeVisible();
+	});
+});
+
+test.describe('the lesson bar on a phone', () => {
+	test.use({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
+
+	test('the Menu button opens the bar with a tap', async ({ page }) => {
+		await login(page, `full_${Date.now()}_d`);
+		await openLesson(page, 'module1', 'hover-balloons');
+		await page.locator('.lesson-card').tap({ position: { x: 10, y: 10 } });
+		const menu = page.getByRole('button', { name: /Μενού μαθήματος/ });
+		await expect(menu).toBeVisible();
+		await menu.tap();
+		await expect(page.getByRole('button', { name: 'Επόμενο', exact: true })).toBeVisible();
+	});
+});

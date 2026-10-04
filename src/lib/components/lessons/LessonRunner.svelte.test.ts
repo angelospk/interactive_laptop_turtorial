@@ -820,3 +820,161 @@ describe('failed saves and the result dialog, reviewed', () => {
 		}
 	});
 });
+
+// The lesson takes the whole screen; title, instruction and the way to other
+// lessons live in a bar over its top edge that gets out of the way once the
+// learner starts, and comes back when they reach for it or get stuck.
+describe('the bar over the lesson', () => {
+	beforeEach(() => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => ({ ok: true, json: async () => ({ progress: { completed: true } }) }))
+		);
+	});
+	afterEach(() => vi.unstubAllGlobals());
+
+	// A hidden bar is inert, so role queries do not find its buttons at all: out
+	// of the way for the mouse, the keyboard and a screen reader alike.
+	const next = (screen: Screen) => screen.getByRole('button', { name: 'Επόμενο', exact: true });
+	const menu = (screen: Screen) => screen.getByRole('button', { name: /Μενού μαθήματος/ });
+	const stage = () => document.querySelector('.lesson-card') as HTMLElement;
+	const press = (el: Element, init: PointerEventInit = {}) =>
+		el.dispatchEvent(
+			new PointerEvent('pointerup', { bubbles: true, pointerType: 'mouse', ...init })
+		);
+
+	test('is open when a lesson starts, so the learner sees what to do', async () => {
+		const screen = mount();
+		await expect.element(next(screen)).toBeVisible();
+		await expect.element(menu(screen)).not.toBeInTheDocument();
+	});
+
+	// Laid over the lesson it hid whatever sat at the top, and a learner pressing
+	// there pressed the bar instead.
+	test('on arrival it sits above the lesson, covering none of it', async () => {
+		mount();
+		await vi.waitFor(() => expect(document.querySelector('.lesson-bar.open')).not.toBeNull());
+		const bar = document.querySelector('.lesson-bar')!.getBoundingClientRect();
+		const lesson = stage().getBoundingClientRect();
+		expect(lesson.top).toBeGreaterThanOrEqual(bar.bottom - 1);
+	});
+
+	test('gets out of the way once the learner starts, leaving a Menu button', async () => {
+		const screen = mount();
+		await expect.element(next(screen)).toBeVisible();
+		press(stage());
+		await expect.element(menu(screen)).toBeVisible();
+		await expect.element(next(screen)).not.toBeInTheDocument();
+	});
+
+	test('the Menu button brings it back, and it can be hidden again', async () => {
+		const screen = mount();
+		press(stage());
+		await menu(screen).click();
+		await expect.element(next(screen)).toBeVisible();
+		await screen.getByRole('button', { name: /Απόκρυψη/ }).click();
+		await expect.element(next(screen)).not.toBeInTheDocument();
+		await expect.element(menu(screen)).toBeVisible();
+	});
+
+	test('moving the mouse to the top of the screen shows it', async () => {
+		const screen = mount();
+		press(stage());
+		await expect.element(next(screen)).not.toBeInTheDocument();
+		window.dispatchEvent(
+			new PointerEvent('pointermove', { clientX: 300, clientY: 2, pointerType: 'mouse' })
+		);
+		await expect.element(next(screen)).toBeVisible();
+	});
+
+	test('scrolling up over the lesson shows it when there is nothing to scroll', async () => {
+		const screen = mount();
+		press(stage());
+		await expect.element(next(screen)).not.toBeInTheDocument();
+		stage().dispatchEvent(new WheelEvent('wheel', { bubbles: true, deltaY: -120 }));
+		await expect.element(next(screen)).toBeVisible();
+	});
+
+	test('a hidden bar is out of the keyboard and screen reader path', async () => {
+		const screen = mount();
+		press(stage());
+		await expect.element(menu(screen)).toBeVisible();
+		expect(document.querySelector('.lesson-bar')?.closest('[inert]')).not.toBeNull();
+	});
+
+	test('moving to another lesson opens it again with the new title', async () => {
+		const screen = mount();
+		await next(screen).click();
+		await expect.element(title(screen, 'Μάθημα 2')).toBeInTheDocument();
+		await expect.element(next(screen)).toBeVisible();
+	});
+
+	describe('a learner who is stuck', () => {
+		const stuckLessons = [
+			{
+				...mockLessons[0],
+				descriptionKey: 'Περάστε το ποντίκι πάνω από τα μπαλόνια',
+				config: { ...mockLessons[0].config, stuckAfterSeconds: 0.4 }
+			},
+			mockLessons[1]
+		];
+
+		test('is asked "Κόλλησες;" with help, a way out, and how to find the bar', async () => {
+			const onExit = vi.fn();
+			const screen = mount({ lessons: stuckLessons, onExit });
+			press(stage());
+			await expect.element(next(screen)).not.toBeInTheDocument();
+
+			const banner = screen.getByRole('status').filter({ hasText: 'Κόλλησες;' });
+			await expect.element(banner).toBeVisible();
+			await expect.element(next(screen)).toBeVisible();
+			await expect.element(banner.getByText(/πάνω μέρος της οθόνης/)).toBeVisible();
+
+			await banner.getByRole('button', { name: 'Βοήθεια' }).click();
+			await expect
+				.element(screen.getByText('Περάστε το ποντίκι πάνω από τα μπαλόνια').last())
+				.toBeVisible();
+
+			await banner.getByRole('button', { name: 'Έξοδος' }).click();
+			expect(onExit).toHaveBeenCalledOnce();
+		});
+
+		test('can say "Συνεχίζω" and carry on', async () => {
+			const screen = mount({ lessons: stuckLessons });
+			const banner = screen.getByRole('status').filter({ hasText: 'Κόλλησες;' });
+			await expect.element(banner).toBeVisible();
+			await banner.getByRole('button', { name: 'Συνεχίζω' }).click();
+			await expect.element(banner).not.toBeInTheDocument();
+			await expect.element(menu(screen)).toBeVisible();
+		});
+
+		test('is not asked after finishing, even when the save failed', async () => {
+			vi.stubGlobal(
+				'fetch',
+				vi.fn(async () => ({ ok: false, json: async () => ({}) }))
+			);
+			const screen = mount({
+				lessons: [
+					{
+						...mockLessons[0],
+						id: 'click-done',
+						lessonType: 'click',
+						config: { theme: 'default', targetCount: 1, stuckAfterSeconds: 3 }
+					},
+					mockLessons[1]
+				]
+			});
+			await screen.getByRole('button', { name: 'CLICK' }).click();
+			await expect.element(screen.getByRole('alert')).toBeInTheDocument();
+			await new Promise((resolve) => setTimeout(resolve, 3500));
+			await expect.element(screen.getByText('Κόλλησες;')).not.toBeInTheDocument();
+		});
+
+		test('is not asked before the lesson time is up', async () => {
+			const screen = mount();
+			press(stage());
+			await new Promise((resolve) => setTimeout(resolve, 800));
+			await expect.element(screen.getByText('Κόλλησες;')).not.toBeInTheDocument();
+		});
+	});
+});

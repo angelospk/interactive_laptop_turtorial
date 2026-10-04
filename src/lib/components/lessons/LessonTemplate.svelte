@@ -52,6 +52,10 @@
 		row saying the same thing (breadcrumb, page back button, this one) and cost
 		a line of the lesson's own height. The breadcrumb above the lesson is the
 		single way back now.
+
+		Title and description are shown in the lesson bar over the lesson; here they
+		stay only for screen readers, so the page keeps its h1 and the lesson keeps
+		the height.
 	-->
 	<header class="lesson-header">
 		<h1 class="lesson-title">{title}</h1>
@@ -83,39 +87,20 @@
 		flex-direction: column;
 		height: 100%;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		border-radius: 12px;
 		overflow: hidden;
 	}
 
-	/* Fullscreen-specific styling */
-	:global(:fullscreen) .lesson-template {
-		border-radius: 0;
-		height: 100vh;
-	}
-
+	/* Visually hidden, still read out. */
 	.lesson-header {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		padding: 0.75rem 1.25rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		column-gap: 0.75rem;
-		row-gap: 0.25rem;
-	}
-
-	/* Compact header in fullscreen */
-	:global(:fullscreen) .lesson-header {
-		padding: 0.5rem 1.5rem;
-	}
-
-	:global(:fullscreen) .lesson-title {
-		font-size: 1.25rem;
-	}
-
-	:global(:fullscreen) .lesson-description {
-		font-size: 0.9rem;
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.lesson-title {
@@ -160,16 +145,8 @@
 	.lesson-content {
 		flex: 1;
 		min-block-size: 0;
-		padding: 1rem 1.25rem;
+		padding: 0.5rem;
 		overflow-y: auto;
 		overscroll-behavior: contain;
-	}
-
-	/* Ensure content fills and scrolls in fullscreen */
-	:global(:fullscreen) .lesson-content {
-		padding: 1rem;
-		flex: 1;
-		overflow-y: auto;
-		min-height: 0;
 	}
 </style>
