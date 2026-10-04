@@ -11,6 +11,7 @@
 	import MacSettingsApp from '$lib/components/mac/apps/MacSettingsApp.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMacSimConfig, type MacSimApp } from '$lib/lessons/macSim';
+	import { MacState } from '$lib/components/mac/macState.svelte';
 
 	/**
 	 * Goal-driven Mac simulation (mac counterpart of MobileSimLesson,
@@ -34,6 +35,13 @@
 	const goalConfig = config as unknown as Record<string, unknown>;
 	const targetApp = config.apps.find((a) => a.id === config.targetAppId) ?? null;
 	const finderApp = config.apps.find((a) => a.alwaysRunning) ?? null;
+	const settingsApp = config.apps.find((a) => a.kind === 'settings') ?? null;
+
+	// One owner for the simulated machine (Wi-Fi, brightness, Finder folder,
+	// Settings pane…): the menu bar, Control Center, Finder and System Settings
+	// all read and write this instance, so nothing resets when the frontmost app
+	// changes. A fresh instance per lesson mount = a clean machine per lesson.
+	const machine = new MacState();
 
 	// Initial state: every app closed & not running, except always-running apps
 	// (Finder) and any explicit initialRunningAppIds.
@@ -48,6 +56,8 @@
 		Object.fromEntries(config.apps.map((a) => [a.id, 'closed' as const]))
 	);
 	let activeAppId = $state<string | null>(null);
+	// Green traffic light: zoomed per app; reset when the window closes or the app quits.
+	let zoomed = $state<Record<string, boolean>>({});
 	let showSpotlight = $state(false);
 
 	let wrongTaps = $state(0);
@@ -112,7 +122,10 @@
 			miss(
 				'Έκλεισες μόνο το παράθυρο, το πρόγραμμα τρέχει ακόμα (δες την τελίτσα στο Dock). Χρησιμοποίησε το μενού «Τερματισμός».'
 			);
-		} else if (action === 'mac-window-control-used') {
+		} else if (
+			action === 'mac-window-control-used' &&
+			(config.goal === 'mac-close-window' || config.goal === 'mac-quit-app')
+		) {
 			miss('Αυτό το κουμπί δεν κλείνει το παράθυρο. Το κόκκινο (αριστερά) είναι το κλείσιμο.');
 		} else if (action === 'mac-app-quit') {
 			miss('Τερμάτισες άλλο πρόγραμμα. Δοκίμασε ξανά.');
@@ -137,6 +150,7 @@
 	function closeWindow(appId: string) {
 		if (done) return;
 		windowState[appId] = 'closed';
+		zoomed[appId] = false;
 		if (activeAppId === appId) activeAppId = nextActive(appId);
 		dispatch('mac-window-closed', { appId });
 	}
@@ -150,14 +164,24 @@
 
 	function zoomWindow(appId: string) {
 		if (done) return;
-		// Cosmetic on this simulator — the window stays open & focused.
+		// The window really grows to fill the screen (and back) — it stays open & focused.
+		zoomed[appId] = !zoomed[appId];
 		dispatch('mac-window-control-used', { appId, control: 'zoom' });
+	}
+
+	/** Apple menu → «Ρυθμίσεις συστήματος…»: opens the Settings app without a launch event (not a Dock/Spotlight launch). */
+	function openSettingsFromMenu() {
+		if (done || !settingsApp) return;
+		running[settingsApp.id] = true;
+		windowState[settingsApp.id] = 'open';
+		activeAppId = settingsApp.id;
 	}
 
 	function quitApp(appId: string) {
 		if (done) return;
 		running[appId] = false;
 		windowState[appId] = 'closed';
+		zoomed[appId] = false;
 		if (activeAppId === appId) activeAppId = nextActive(appId);
 		dispatch('mac-app-quit', { appId });
 	}
@@ -201,12 +225,18 @@
 	<div class="flex h-full min-h-0 flex-col items-center gap-3 py-2">
 		<p class="max-w-xl text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
-		<MacDesktop class="max-w-3xl flex-1">
+		<MacDesktop
+			class="max-w-3xl flex-1"
+			brightness={machine.brightness}
+			dark={machine.appearance === 'dark'}
+		>
 			<MacMenuBar
 				activeLabel={appLabel(activeAppId ?? finderApp?.id ?? null)}
 				{canQuit}
+				{machine}
 				onQuit={quitActive}
 				onSpotlight={() => (showSpotlight = true)}
+				onOpenSettings={settingsApp ? openSettingsFromMenu : undefined}
 				disabled={done}
 			/>
 
@@ -214,21 +244,25 @@
 				<MacWindow
 					title={frontApp.label}
 					icon={frontApp.icon}
+					zoomed={Boolean(zoomed[frontApp.id])}
 					onClose={() => closeWindow(frontApp.id)}
 					onMinimize={() => minimizeWindow(frontApp.id)}
 					onZoom={() => zoomWindow(frontApp.id)}
 				>
 					{#if frontApp.kind === 'finder'}
-						<FinderMacApp folders={config.folders ?? []} onEvent={dispatch} />
+						<FinderMacApp folders={config.folders ?? []} {machine} onEvent={dispatch} />
 					{:else if frontApp.kind === 'settings'}
-						<MacSettingsApp onEvent={dispatch} />
+						<MacSettingsApp onEvent={dispatch} {machine} />
 					{:else}
 						<div
 							class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-neutral-500"
 						>
 							<span class="text-5xl" aria-hidden="true">{frontApp.icon}</span>
 							<p class="text-lg font-semibold text-neutral-800">{frontApp.label}</p>
-							<p class="text-sm">Αυτό το πρόγραμμα είναι απλώς ανοιχτό για την άσκηση.</p>
+							<p class="text-sm">
+								Αυτό το πρόγραμμα είναι απλώς ανοιχτό για την άσκηση. Δοκίμασε τα τρία κουμπάκια
+								πάνω αριστερά ή το μενού με το όνομά του.
+							</p>
 						</div>
 					{/if}
 				</MacWindow>

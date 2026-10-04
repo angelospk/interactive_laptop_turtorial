@@ -6,6 +6,7 @@
 	import Window from '$lib/components/desktop/Window.svelte';
 	import StartMenu from '$lib/components/desktop/StartMenu.svelte';
 	import TaskView from '$lib/components/desktop/TaskView.svelte';
+	import DesktopIcons from '$lib/components/desktop/DesktopIcons.svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import InstructionText from '../InstructionText.svelte';
 	import { Card } from '$lib/components/ui/card';
@@ -16,6 +17,7 @@
 	import { page } from '$app/state';
 	import { fillShortcutText, type LearnerDevice } from '$lib/lessons/shortcuts';
 	import { frontmostWindowId } from '$lib/components/desktop/frontmost';
+	import { osState } from '$lib/osState.svelte';
 	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
 	import {
 		DESKTOP_APPS,
@@ -68,6 +70,11 @@
 	const config = (lesson.config as DesktopConfig | null) || {};
 	const goal = config.goal || '';
 
+	// The machine state (Wi-Fi, volume, brightness…) is shared by the taskbar
+	// tray, Quick Settings and the Settings app. Every lesson starts from the
+	// same clean machine, whatever the previous lesson toggled.
+	osState.reset();
+
 	// Define available apps
 	const appParts = {
 		explorer: { icon: Folder, component: FileExplorerApp },
@@ -90,6 +97,10 @@
 
 	// Pinned Apps (Default set)
 	const pinnedAppIds = ['explorer', 'browser', 'email', 'settings'];
+	// Shortcuts on the wallpaper: the everyday apps, the way a home PC has them.
+	const desktopIconApps = availableApps.filter((a) =>
+		['browser', 'email', 'word', 'excel'].includes(a.id)
+	);
 
 	// State
 	// `settingsPage` is per instance: a deep link must be able to say "this
@@ -229,6 +240,16 @@
 		}
 	}
 
+	/** Task View / taskbar path back to a hidden window: same `restore-app` event as the caption button. */
+	function restoreApp(instanceId: string) {
+		const app = openApps.find((a) => a.id === instanceId);
+		if (app?.minimized) {
+			app.minimized = false;
+			checkGoal('restore-app', { appId: app.appId });
+		}
+		bringToFront(instanceId);
+	}
+
 	function bringToFront(instanceId: string) {
 		const index = openApps.findIndex((a) => a.id === instanceId);
 		if (index !== -1 && index !== openApps.length - 1) {
@@ -291,7 +312,13 @@
 		{/if}
 		<div class="relative min-h-0 w-full flex-1">
 			<!-- Desktop Environment -->
-			<Desktop>
+			<Desktop
+				onBackgroundClick={() => {
+					startMenuOpen = false;
+				}}
+			>
+				<DesktopIcons apps={desktopIconApps} onOpen={(id) => openApp(id)} disabled={completed} />
+
 				<!-- Windows -->
 				{#each openApps as instance (instance.id)}
 					{@const appDef = availableApps.find((a) => a.id === instance.appId)}
@@ -357,13 +384,8 @@
 					{openApps}
 					{availableApps}
 					onClose={() => (showTaskView = false)}
-					onAppClick={(instanceId) => {
-						const app = openApps.find((a) => a.id === instanceId);
-						if (app && app.minimized) {
-							app.minimized = false;
-						}
-						bringToFront(instanceId);
-					}}
+					onCloseApp={(instanceId) => closeApp(instanceId)}
+					onAppClick={restoreApp}
 				/>
 
 				<!-- Taskbar -->
@@ -387,6 +409,11 @@
 					}}
 					onOpenSettings={openSettingsToPage}
 					onOpenTaskManager={() => openApp('taskmanager')}
+					onAction={handleAppAction}
+					wifiConfig={{
+						targetSsid: config.targetSsid as string | undefined,
+						requiredPassword: config.requiredPassword as string | undefined
+					}}
 				/>
 			</Desktop>
 		</div>

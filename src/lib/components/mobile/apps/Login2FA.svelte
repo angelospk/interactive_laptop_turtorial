@@ -13,12 +13,14 @@
 		onEvent,
 		url,
 		code,
-		serviceName = 'Τράπεζα'
+		serviceName = 'Τράπεζα',
+		variant = 'android'
 	}: {
 		onEvent: (action: string, data?: Record<string, unknown>) => void;
 		url: string;
 		code: string;
 		serviceName?: string;
+		variant?: 'android' | 'ios';
 	} = $props();
 
 	let smsRevealed = $state(false);
@@ -40,14 +42,18 @@
 	}
 </script>
 
-<MobileBrowser url={url || 'https://—'}>
+<MobileBrowser url={url || 'https://—'} {variant}>
 	{#if !code}
 		<!-- Scenery: browser opened outside a 2FA lesson. -->
 		<div
 			class="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-slate-500"
 		>
-			<p class="text-base font-semibold text-slate-700">Περιηγητής</p>
-			<p class="text-sm">Γράψε μια διεύθυνση για να ανοίξεις μια ιστοσελίδα.</p>
+			<p class="text-base font-semibold text-slate-700">
+				{variant === 'ios' ? 'Safari' : 'Chrome'}
+			</p>
+			<p class="text-sm">
+				Εδώ ανοίγουν οι ιστοσελίδες. Σε αυτό το μάθημα δεν χρειάζεται ο περιηγητής.
+			</p>
 		</div>
 	{:else}
 		<div class="space-y-4 p-5">

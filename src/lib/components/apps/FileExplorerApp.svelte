@@ -22,10 +22,7 @@
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
 
-	let {
-		initialFiles = [],
-		onAction
-	} = $props<{
+	let { initialFiles = [], onAction } = $props<{
 		initialFiles?: FileSystemItem[];
 		config?: Record<string, unknown>;
 		onAction: (action: string, data?: Record<string, unknown>) => void;
@@ -73,7 +70,36 @@
 
 	onMount(updatePortalTarget);
 
-	let currentItems = $derived(items.filter((i) => i.parentId === currentFolderId));
+	// The search box filters what is on screen (name contains, accent-insensitive),
+	// the way the real Explorer narrows the folder you are in.
+	let searchQuery = $state('');
+	const fold = (t: string) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+	let currentItems = $derived(
+		items.filter(
+			(i) =>
+				i.parentId === currentFolderId &&
+				(!searchQuery.trim() || fold(i.name).includes(fold(searchQuery.trim())))
+		)
+	);
+
+	// Navigation pane: the usual Quick-access folders. Those that exist in this
+	// lesson's file system open; the others explain themselves in the status bar.
+	let paneNotice = $state('');
+	const QUICK_ACCESS = [
+		{ name: 'Επιφάνεια εργασίας', icon: Monitor, color: 'text-sky-600' },
+		{ name: 'Λήψεις', icon: Download, color: 'text-emerald-600' },
+		{ name: 'Έγγραφα', icon: FileText, color: 'text-blue-500' },
+		{ name: 'Εικόνες', icon: ImageIcon, color: 'text-purple-500' }
+	];
+	function openQuickAccess(name: string) {
+		const folder = items.find((i) => i.type === 'folder' && i.name === name);
+		if (folder) {
+			paneNotice = '';
+			navigate(folder.id);
+		} else {
+			paneNotice = `Ο φάκελος «${name}» είναι άδειος σε αυτή την άσκηση.`;
+		}
+	}
 	let currentPath = $derived(getPath(currentFolderId));
 
 	function getPath(folderId: string): { id: string; name: string }[] {
@@ -95,6 +121,7 @@
 	function navigate(folderId: string) {
 		currentFolderId = folderId;
 		selectedItemId = null;
+		searchQuery = '';
 		onAction('navigate', { folderId });
 	}
 
@@ -126,7 +153,9 @@
 			onAction('create-folder', { name: newItemName });
 			newItemName = '';
 			// Reset guard after reactivity settles
-			setTimeout(() => { folderJustCreated = false; }, 100);
+			setTimeout(() => {
+				folderJustCreated = false;
+			}, 100);
 		}
 	}
 
@@ -316,171 +345,212 @@
 				</button>
 			{/each}
 		</div>
-		<!-- Decorative search box (visual only) -->
-		<div class="flex h-8 w-40 shrink-0 items-center gap-1.5 rounded-md border bg-white px-2">
+		<!-- Search box: filters the current folder -->
+		<div
+			class="flex h-8 w-44 shrink-0 items-center gap-1.5 rounded-md border bg-white px-2 focus-within:ring-2 focus-within:ring-blue-500"
+		>
 			<Search class="h-3.5 w-3.5 shrink-0 text-slate-400" />
 			<input
 				class="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
-				placeholder="Αναζήτηση"
-				readonly
-				tabindex="-1"
+				placeholder="Αναζήτηση στον φάκελο"
+				aria-label="Αναζήτηση στον φάκελο"
+				bind:value={searchQuery}
 			/>
 		</div>
 	</div>
 
 	<!-- Content Area with decorative navigation pane -->
 	<div class="flex min-h-0 flex-1">
-		<!-- Navigation pane (decorative only) -->
-		<aside class="hidden w-36 shrink-0 border-r bg-slate-50/70 px-1.5 py-2 sm:block" aria-hidden="true">
-			<div class="space-y-0.5 text-sm text-slate-600">
-				<div class="flex items-center gap-2 rounded-md px-2 py-1"><Monitor class="h-4 w-4 shrink-0 text-sky-600" /> <span class="truncate">Επιφάνεια εργασίας</span></div>
-				<div class="flex items-center gap-2 rounded-md px-2 py-1"><Download class="h-4 w-4 shrink-0 text-emerald-600" /> <span class="truncate">Λήψεις</span></div>
-				<div class="flex items-center gap-2 rounded-md px-2 py-1"><FileText class="h-4 w-4 shrink-0 text-blue-500" /> <span class="truncate">Έγγραφα</span></div>
-				<div class="flex items-center gap-2 rounded-md px-2 py-1"><ImageIcon class="h-4 w-4 shrink-0 text-purple-500" /> <span class="truncate">Εικόνες</span></div>
+		<!-- Navigation pane: Quick access, like Windows 11 -->
+		<nav
+			class="hidden w-40 shrink-0 border-r bg-slate-50/70 px-1.5 py-2 sm:block"
+			aria-label="Γρήγορη πρόσβαση"
+		>
+			<p class="px-2 pb-1 text-[11px] font-semibold tracking-wide text-slate-400">
+				Γρήγορη πρόσβαση
+			</p>
+			<div class="space-y-0.5 text-sm text-slate-700">
+				<button
+					type="button"
+					class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-slate-200/70 {currentFolderId ===
+					'root'
+						? 'bg-slate-200/70'
+						: ''}"
+					onclick={() => navigate('root')}
+					aria-label="Γρήγορη πρόσβαση: Υπολογιστής"
+				>
+					<Home class="h-4 w-4 shrink-0 text-slate-500" /> <span class="truncate">Υπολογιστής</span>
+				</button>
+				{#each QUICK_ACCESS as entry (entry.name)}
+					{@const folder = items.find((i) => i.type === 'folder' && i.name === entry.name)}
+					<button
+						type="button"
+						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-slate-200/70 {folder &&
+						folder.id === currentFolderId
+							? 'bg-slate-200/70'
+							: ''}"
+						onclick={() => openQuickAccess(entry.name)}
+						aria-label={`Γρήγορη πρόσβαση: ${entry.name}`}
+					>
+						<entry.icon class="h-4 w-4 shrink-0 {entry.color}" />
+						<span class="truncate">{entry.name}</span>
+					</button>
+				{/each}
 			</div>
-		</aside>
+		</nav>
 
 		<ContextMenu.Root>
-		<ContextMenu.Trigger class="flex-1 overflow-y-auto p-4">
-			<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				class="grid h-full grid-cols-4 content-start gap-4"
-				ondragover={(e) => e.preventDefault()}
-				ondrop={(e) => handleDrop(e, currentFolderId)}
-			>
-				{#each currentItems as item (item.id)}
-					<ContextMenu.Root>
-						<ContextMenu.Trigger>
-							<div
-								class="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-transparent p-3 transition-colors hover:bg-slate-100"
-								class:bg-blue-100={selectedItemId === item.id}
-								class:border-blue-300={selectedItemId === item.id}
-								role="button"
-								tabindex="0"
-								onkeydown={(e) => {
-									if (e.key !== 'Enter' && e.key !== ' ') return;
-									e.preventDefault();
-									selectedItemId = item.id;
-									onAction('select-file', { id: item.id });
-									if (e.key === 'Enter' && item.type === 'folder') navigate(item.id);
-								}}
-								onclick={(e) => {
-									e.stopPropagation();
-									selectedItemId = item.id;
-									onAction('select-file', { id: item.id });
-								}}
-								ondblclick={() => {
-									if (item.type === 'folder') navigate(item.id);
-								}}
-								draggable="true"
-								ondragstart={(e) => handleDragStart(e, item.id)}
-								ondragover={(e) => {
-									if (item.type === 'folder') e.preventDefault();
-								}}
-								ondrop={(e) => {
-									if (item.type === 'folder') {
+			<ContextMenu.Trigger class="flex-1 overflow-y-auto p-4">
+				<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					class="grid h-full grid-cols-4 content-start gap-4"
+					ondragover={(e) => e.preventDefault()}
+					ondrop={(e) => handleDrop(e, currentFolderId)}
+				>
+					{#each currentItems as item (item.id)}
+						<ContextMenu.Root>
+							<ContextMenu.Trigger>
+								<div
+									class="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-transparent p-3 transition-colors hover:bg-slate-100"
+									class:bg-blue-100={selectedItemId === item.id}
+									class:border-blue-300={selectedItemId === item.id}
+									role="button"
+									tabindex="0"
+									onkeydown={(e) => {
+										if (e.key !== 'Enter' && e.key !== ' ') return;
+										e.preventDefault();
+										selectedItemId = item.id;
+										onAction('select-file', { id: item.id });
+										if (e.key === 'Enter' && item.type === 'folder') navigate(item.id);
+									}}
+									onclick={(e) => {
 										e.stopPropagation();
-										handleDrop(e, item.id);
-									}
-								}}
-							>
-								{#if item.type === 'folder'}
-									<Folder class="h-12 w-12 fill-amber-400 text-amber-500" />
-								{:else if item.type === 'image'}
-									<ImageIcon class="h-12 w-12 text-purple-500" />
-								{:else}
-									<FileText class="h-12 w-12 text-blue-500" />
-								{/if}
-								<span
-									class="line-clamp-2 text-center text-sm leading-tight break-all text-slate-700"
+										selectedItemId = item.id;
+										onAction('select-file', { id: item.id });
+									}}
+									ondblclick={() => {
+										if (item.type === 'folder') navigate(item.id);
+									}}
+									draggable="true"
+									ondragstart={(e) => handleDragStart(e, item.id)}
+									ondragover={(e) => {
+										if (item.type === 'folder') e.preventDefault();
+									}}
+									ondrop={(e) => {
+										if (item.type === 'folder') {
+											e.stopPropagation();
+											handleDrop(e, item.id);
+										}
+									}}
 								>
-									{item.name}
-								</span>
-								<span class="text-[10px] leading-none text-slate-400">Τροποποιήθηκε: 5/6/2026</span>
-							</div>
-						</ContextMenu.Trigger>
-						<ContextMenu.Content>
-							<ContextMenu.Item
-								onclick={() => {
-									selectedItemId = item.id;
-									if (item.type === 'folder') navigate(item.id);
-								}}
-							>
-								<Folder class="mr-2 h-4 w-4" /> Άνοιγμα
-							</ContextMenu.Item>
-							<ContextMenu.Separator />
-							<ContextMenu.Item
-								onclick={() => {
-									selectedItemId = item.id;
-									copyItem(true);
-								}}
-							>
-								<Scissors class="mr-2 h-4 w-4" /> Αποκοπή
-							</ContextMenu.Item>
-							<ContextMenu.Item
-								onclick={() => {
-									selectedItemId = item.id;
-									copyItem(false);
-								}}
-							>
-								<Copy class="mr-2 h-4 w-4" /> Αντιγραφή
-							</ContextMenu.Item>
-							<ContextMenu.Separator />
-							<ContextMenu.Item
-								onclick={() => {
-									selectedItemId = item.id;
-									isRenaming = true;
-									newItemName = item.name;
-								}}
-							>
-								<Edit class="mr-2 h-4 w-4" /> Μετονομασία
-							</ContextMenu.Item>
-							<ContextMenu.Item
-								class="text-red-600"
-								onclick={() => {
-									selectedItemId = item.id;
-									deleteItem();
-								}}
-							>
-								<Trash2 class="mr-2 h-4 w-4" /> Διαγραφή
-							</ContextMenu.Item>
-						</ContextMenu.Content>
-					</ContextMenu.Root>
-				{/each}
+									{#if item.type === 'folder'}
+										<Folder class="h-12 w-12 fill-amber-400 text-amber-500" />
+									{:else if item.type === 'image'}
+										<ImageIcon class="h-12 w-12 text-purple-500" />
+									{:else}
+										<FileText class="h-12 w-12 text-blue-500" />
+									{/if}
+									<span
+										class="line-clamp-2 text-center text-sm leading-tight break-all text-slate-700"
+									>
+										{item.name}
+									</span>
+									<span class="text-[10px] leading-none text-slate-400"
+										>Τροποποιήθηκε: 5/6/2026</span
+									>
+								</div>
+							</ContextMenu.Trigger>
+							<ContextMenu.Content>
+								<ContextMenu.Item
+									onclick={() => {
+										selectedItemId = item.id;
+										if (item.type === 'folder') navigate(item.id);
+									}}
+								>
+									<Folder class="mr-2 h-4 w-4" /> Άνοιγμα
+								</ContextMenu.Item>
+								<ContextMenu.Separator />
+								<ContextMenu.Item
+									onclick={() => {
+										selectedItemId = item.id;
+										copyItem(true);
+									}}
+								>
+									<Scissors class="mr-2 h-4 w-4" /> Αποκοπή
+								</ContextMenu.Item>
+								<ContextMenu.Item
+									onclick={() => {
+										selectedItemId = item.id;
+										copyItem(false);
+									}}
+								>
+									<Copy class="mr-2 h-4 w-4" /> Αντιγραφή
+								</ContextMenu.Item>
+								<ContextMenu.Separator />
+								<ContextMenu.Item
+									onclick={() => {
+										selectedItemId = item.id;
+										isRenaming = true;
+										newItemName = item.name;
+									}}
+								>
+									<Edit class="mr-2 h-4 w-4" /> Μετονομασία
+								</ContextMenu.Item>
+								<ContextMenu.Item
+									class="text-red-600"
+									onclick={() => {
+										selectedItemId = item.id;
+										deleteItem();
+									}}
+								>
+									<Trash2 class="mr-2 h-4 w-4" /> Διαγραφή
+								</ContextMenu.Item>
+							</ContextMenu.Content>
+						</ContextMenu.Root>
+					{/each}
 
-				<!-- Empty State -->
-				{#if currentItems.length === 0}
-					<div class="col-span-4 flex flex-col items-center justify-center py-12 text-slate-400">
-						<Folder class="mb-4 h-16 w-16 opacity-20" />
-						<p>Ο φάκελος είναι άδειος</p>
-					</div>
-				{/if}
-			</div>
-		</ContextMenu.Trigger>
-		<ContextMenu.Content>
-			<ContextMenu.Item
-				onclick={() => {
-					if (!folderJustCreated) {
-						isCreatingFolder = true;
-						newItemName = '';
-					}
-				}}
-			>
-				<Folder class="mr-2 h-4 w-4" /> Νέος Φάκελος
-			</ContextMenu.Item>
-			<ContextMenu.Item onclick={pasteItem} disabled={!clipboard}>
-				<ClipboardPaste class="mr-2 h-4 w-4" /> Επικόλληση
-			</ContextMenu.Item>
-		</ContextMenu.Content>
+					<!-- Empty State -->
+					{#if currentItems.length === 0}
+						<div class="col-span-4 flex flex-col items-center justify-center py-12 text-slate-400">
+							<Folder class="mb-4 h-16 w-16 opacity-20" />
+							<p>
+								{searchQuery.trim()
+									? `Δεν βρέθηκε τίποτα για «${searchQuery.trim()}»`
+									: 'Ο φάκελος είναι άδειος'}
+							</p>
+						</div>
+					{/if}
+				</div>
+			</ContextMenu.Trigger>
+			<ContextMenu.Content>
+				<ContextMenu.Item
+					onclick={() => {
+						if (!folderJustCreated) {
+							isCreatingFolder = true;
+							newItemName = '';
+						}
+					}}
+				>
+					<Folder class="mr-2 h-4 w-4" /> Νέος Φάκελος
+				</ContextMenu.Item>
+				<ContextMenu.Item onclick={pasteItem} disabled={!clipboard}>
+					<ClipboardPaste class="mr-2 h-4 w-4" /> Επικόλληση
+				</ContextMenu.Item>
+			</ContextMenu.Content>
 		</ContextMenu.Root>
 	</div>
 
 	<!-- Status Bar (display only) -->
-	<div class="flex shrink-0 items-center gap-3 border-t bg-slate-50 px-3 py-1 text-xs text-slate-500">
+	<div
+		class="flex shrink-0 items-center gap-3 border-t bg-slate-50 px-3 py-1 text-xs text-slate-500"
+	>
 		<span>{currentItems.length} {currentItems.length === 1 ? 'στοιχείο' : 'στοιχεία'}</span>
 		{#if selectedItemId}
 			<span class="border-l border-slate-300 pl-3">1 επιλεγμένο στοιχείο</span>
+		{/if}
+		{#if paneNotice}
+			<span class="ml-auto text-slate-600" role="status">{paneNotice}</span>
 		{/if}
 	</div>
 

@@ -3,6 +3,7 @@
 	import { onDestroy } from 'svelte';
 	import LessonTemplate from '../LessonTemplate.svelte';
 	import MobileFrame from '$lib/components/mobile/MobileFrame.svelte';
+	import MobileHomeScreen from '$lib/components/mobile/MobileHomeScreen.svelte';
 
 	interface App {
 		id: string;
@@ -30,6 +31,24 @@
 	const apps = config.apps ?? [];
 	const target = $derived(apps.find((a) => a.id === config.targetAppId));
 	const variant = config.variant ?? 'android';
+	// The same home screen the goal-driven lessons use, so lesson 1 looks like
+	// lessons 2+. Tile colours per well-known app id (the mobile-tap config has none).
+	const TILE_COLOR: Record<string, string> = {
+		phone: 'bg-green-500',
+		messages: 'bg-blue-500',
+		viber: 'bg-purple-500',
+		camera: 'bg-slate-600',
+		photos: 'bg-amber-400',
+		settings: 'bg-slate-400',
+		store: 'bg-sky-500',
+		browser: 'bg-blue-400',
+		facetime: 'bg-emerald-500'
+	};
+	const homeApps = apps.map((a) => ({ ...a, color: TILE_COLOR[a.id] ?? 'bg-white/90' }));
+	const dockAppIds = apps
+		.filter((a) => a.id !== config.targetAppId)
+		.slice(0, 3)
+		.map((a) => a.id);
 
 	let wrongTaps = $state(0);
 	let showHint = $state(false);
@@ -71,24 +90,17 @@
 		<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
 		<MobileFrame {variant} class="my-2">
-			<div class="grid grid-cols-3 gap-4 p-5">
-				{#each apps as app (app.id)}
-					{@const isTarget = app.id === config.targetAppId}
-					<button
-						type="button"
-						onclick={() => tap(app)}
-						disabled={done}
-						aria-label={`Άνοιγμα ${app.label}`}
-						class="flex min-h-[84px] flex-col items-center justify-center gap-1 rounded-2xl p-2 transition focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none disabled:opacity-60"
-						class:ring-4={showHint && isTarget}
-						class:ring-emerald-400={showHint && isTarget}
-						class:animate-pulse={showHint && isTarget}
-					>
-						<span class="text-4xl leading-none" aria-hidden="true">{app.icon}</span>
-						<span class="text-center text-xs font-medium text-slate-800">{app.label}</span>
-					</button>
-				{/each}
-			</div>
+			<MobileHomeScreen
+				{variant}
+				apps={homeApps}
+				{dockAppIds}
+				onOpenApp={(id) => {
+					const app = apps.find((a) => a.id === id);
+					if (app) tap(app);
+				}}
+				highlightAppId={showHint && !done ? config.targetAppId : null}
+				disabled={done}
+			/>
 		</MobileFrame>
 
 		<!-- Calm, non-blocking feedback (aria-live so it is announced) -->

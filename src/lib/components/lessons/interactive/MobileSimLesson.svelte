@@ -15,6 +15,7 @@
 	import Login2FA from '$lib/components/mobile/apps/Login2FA.svelte';
 	import { checkGoalMatch } from '$lib/lessons/goalHandlers';
 	import { parseMobileSimConfig, mobilePlatformCapabilities } from '$lib/lessons/mobileSim';
+	import { PhoneState } from '$lib/components/mobile/phoneState.svelte';
 
 	/**
 	 * Goal-driven phone simulation (mobile counterpart of DesktopLesson,
@@ -33,6 +34,13 @@
 	const config = parseMobileSimConfig(lesson.config);
 	const goalConfig = config as unknown as Record<string, unknown>;
 	const targetApp = config.apps.find((a) => a.id === config.targetAppId);
+	const variant = config.variant === 'ios' ? 'ios' : 'android';
+
+	// One owner for the simulated phone (Wi-Fi, torch, brightness, font size…):
+	// the frame's status bar, the quick-settings panel and the Settings app all
+	// read and write this instance, so a toggle survives closing a panel or
+	// switching apps. Fresh per lesson mount = a clean phone per lesson.
+	const phone = new PhoneState();
 
 	let currentAppId: string | null = $state(null);
 	const currentApp = $derived(config.apps.find((a) => a.id === currentAppId) ?? null);
@@ -164,7 +172,8 @@
 		<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
 		<MobileFrame
-			variant={config.variant === 'ios' ? 'ios' : 'android'}
+			{variant}
+			{phone}
 			onHome={goHome}
 			onRecents={isForceCloseLesson && !done ? () => (showRecents = true) : undefined}
 			showSystemButtons={isScreenshotLesson}
@@ -174,6 +183,8 @@
 		>
 			{#if showQuickSettings}
 				<QuickSettingsPanel
+					{variant}
+					{phone}
 					onToggle={(tile, on) => dispatch('mobile-quick-toggle', { tile, on })}
 					onClose={() => (showQuickSettings = false)}
 				/>
@@ -189,7 +200,7 @@
 			{/if}
 			{#if currentApp === null}
 				<MobileHomeScreen
-					variant={config.variant === 'ios' ? 'ios' : 'android'}
+					{variant}
 					apps={config.apps}
 					dockAppIds={config.dockAppIds ?? []}
 					onOpenApp={(appId) => dispatch('mobile-app-opened', { appId })}
@@ -197,10 +208,11 @@
 					disabled={done}
 				/>
 			{:else if currentApp.kind === 'phone'}
-				<PhoneApp onEvent={dispatch} contacts={config.contacts ?? []} />
+				<PhoneApp onEvent={dispatch} contacts={config.contacts ?? []} {variant} />
 			{:else if currentApp.kind === 'messages' || currentApp.kind === 'viber'}
 				<MessagingApp
 					onEvent={dispatch}
+					{variant}
 					conversations={config.conversations ?? []}
 					channel={currentApp.kind === 'viber' ? 'viber' : 'sms'}
 					title={currentApp.label}
@@ -209,16 +221,23 @@
 						: null}
 				/>
 			{:else if currentApp.kind === 'settings'}
-				<MobileSettingsApp onEvent={dispatch} wifiNetworks={config.wifiNetworks ?? []} />
+				<MobileSettingsApp
+					onEvent={dispatch}
+					wifiNetworks={config.wifiNetworks ?? []}
+					{variant}
+					{phone}
+				/>
 			{:else if currentApp.kind === 'camera'}
 				<CameraApp
 					onEvent={dispatch}
+					{variant}
 					qrUrl={config.qrUrl ?? ''}
 					targetHost={config.targetHost ?? ''}
 				/>
 			{:else if currentApp.kind === 'store'}
 				<StoreApp
 					onEvent={dispatch}
+					{variant}
 					items={config.storeItems ?? []}
 					storeName={config.storeName ?? 'Κατάστημα εφαρμογών'}
 				/>
@@ -233,6 +252,7 @@
 			{:else if currentApp.kind === 'browser'}
 				<Login2FA
 					onEvent={dispatch}
+					{variant}
 					url={config.loginUrl ?? ''}
 					code={config.twofaCode ?? ''}
 					serviceName={config.serviceName ?? undefined}

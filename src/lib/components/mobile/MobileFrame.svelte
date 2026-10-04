@@ -2,20 +2,28 @@
 	import { cn } from '$lib/utils';
 	import { onDestroy, type Snippet } from 'svelte';
 	import Wifi from '@lucide/svelte/icons/wifi';
+	import Plane from '@lucide/svelte/icons/plane';
 	import SignalHigh from '@lucide/svelte/icons/signal-high';
-	import BatteryFull from '@lucide/svelte/icons/battery-full';
+	import Flashlight from '@lucide/svelte/icons/flashlight';
+	import type { PhoneState } from './phoneState.svelte';
 
 	/**
 	 * Phone-screen simulation frame — the mobile counterpart of Desktop.svelte.
 	 * Wraps interactive mobile-lesson content in a realistic phone bezel so
 	 * Android/iPhone lessons can be practised the same way desktop ones are
-	 * (ROADMAP Φάση 2.5). Presentational only: the status bar / home indicator
-	 * are decorative chrome; lesson content renders inside {children}.
+	 * (ROADMAP Φάση 2.5). Android: status bar with the time on the left and the
+	 * signal/Wi-Fi/battery cluster on the right, a gesture pill at the bottom.
+	 * iPhone: Dynamic Island, bold time left, icons right, home indicator.
+	 *
+	 * The chrome is presentational, except that when the lesson hands over its
+	 * `phone` state the status bar reflects it (Wi-Fi off, airplane mode, torch,
+	 * battery) and the screen dims with the brightness slider.
 	 */
 	let {
 		children,
 		variant = 'android',
 		time = '9:41',
+		phone,
 		onHome,
 		onRecents,
 		showSystemButtons = false,
@@ -28,6 +36,8 @@
 		variant?: 'android' | 'ios';
 		/** Status-bar clock text. */
 		time?: string;
+		/** Host-owned phone state; the status bar and the dim layer read it. */
+		phone?: PhoneState;
 		/**
 		 * When provided, the home indicator becomes a real "go home" button
 		 * (used by goal-driven simulations); otherwise it stays decorative.
@@ -86,6 +96,14 @@
 	let pullStartY: number | null = null;
 	// A swipe already opened the panel; swallow the click that follows the pointerup.
 	let swiped = false;
+
+	// Status bar truth from the phone state (defaults: everything on, battery full).
+	const wifiOn = $derived(phone ? phone.wifiOn : true);
+	const airplane = $derived(phone ? phone.airplaneMode : false);
+	const torch = $derived(phone ? phone.torchOn : false);
+	const battery = $derived(phone ? phone.batteryPercent : 100);
+	const dim = $derived(phone ? Math.min(0.75, (100 - phone.brightness) / 100) : 0);
+	const pullLabel = $derived(isIos ? 'Κέντρο ελέγχου' : 'Γρήγορες ρυθμίσεις');
 </script>
 
 <div
@@ -93,9 +111,13 @@
 	data-variant={variant}
 	class={cn(
 		'relative mx-auto flex aspect-[9/19.5] w-full max-w-[22rem] flex-col overflow-hidden bg-white shadow-2xl select-none',
-		// iOS has more rounded corners; Android is slightly squarer.
-		isIos ? 'rounded-[2.75rem] border-[10px]' : 'rounded-[2rem] border-8',
-		'border-slate-900',
+		// iOS has more rounded corners and a thin titanium-like rim; Android is slightly squarer.
+		isIos
+			? 'rounded-[2.75rem] border-[10px] border-[#2b2b2e] ring-1 ring-[#6b6b70]'
+			: 'rounded-[2rem] border-8 border-[#111216] ring-1 ring-[#3a3b40]',
+		isIos
+			? '[font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif]'
+			: '[font-family:Roboto,system-ui,sans-serif]',
 		className
 	)}
 	role="group"
@@ -135,24 +157,55 @@
 
 	<!-- Status bar (also the quick-settings pull-down handle when onPullDown is set) -->
 	{#snippet statusContent()}
-		<span class="tabular-nums">{time}</span>
+		<span
+			class={cn('tabular-nums', isIos ? 'pl-2 text-[15px] font-semibold' : 'text-xs font-medium')}
+			>{time}</span
+		>
 		{#if isIos}
-			<!-- iOS notch -->
+			<!-- Dynamic Island -->
 			<span
 				aria-hidden="true"
-				class="absolute top-0 left-1/2 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-slate-900"
+				class="absolute top-1.5 left-1/2 h-[26px] w-[7.25rem] -translate-x-1/2 rounded-full bg-black"
 			></span>
 		{/if}
-		<span class="flex items-center gap-1.5">
-			<SignalHigh class="h-3.5 w-3.5" aria-hidden="true" />
-			<Wifi class="h-3.5 w-3.5" aria-hidden="true" />
-			<BatteryFull class="h-4 w-4" aria-hidden="true" />
+		<span class="flex items-center gap-1.5" data-testid="mobile-status-icons">
+			{#if torch}
+				<Flashlight class="h-3.5 w-3.5 text-amber-500" aria-hidden="true" data-status="torch" />
+			{/if}
+			{#if airplane}
+				<Plane class="h-3.5 w-3.5" aria-hidden="true" data-status="airplane" />
+			{:else}
+				<SignalHigh class="h-3.5 w-3.5" aria-hidden="true" />
+				{#if wifiOn}
+					<Wifi class="h-3.5 w-3.5" aria-hidden="true" data-status="wifi" />
+				{/if}
+			{/if}
+			{#if !isIos}
+				<span class="text-[11px] tabular-nums" aria-hidden="true">{battery}%</span>
+			{/if}
+			<!-- Battery glyph: level proportional -->
+			<span
+				class={cn(
+					'relative inline-block rounded-[3px] border border-current',
+					isIos ? 'h-[12px] w-[25px]' : 'h-[11px] w-[20px]'
+				)}
+				aria-label={`Μπαταρία ${battery}%`}
+				role="img"
+			>
+				<span
+					class={cn(
+						'absolute inset-y-[1px] left-[1px] rounded-[1px]',
+						battery < 20 ? 'bg-red-500' : 'bg-current'
+					)}
+					style:width={`${Math.max(2, Math.round((isIos ? 21 : 16) * (battery / 100)))}px`}
+				></span>
+			</span>
 		</span>
 	{/snippet}
 	{#if onPullDown}
 		<button
 			type="button"
-			aria-label="Γρήγορες ρυθμίσεις"
+			aria-label={pullLabel}
 			data-testid="mobile-statusbar"
 			onclick={() => {
 				if (swiped) {
@@ -171,26 +224,38 @@
 				if (swiped) onPullDown?.();
 				pullStartY = null;
 			}}
-			class="flex w-full shrink-0 cursor-grab touch-none items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"
+			class={cn(
+				'relative z-10 flex w-full shrink-0 cursor-grab touch-none items-center justify-between bg-transparent px-5 text-slate-900',
+				isIos ? 'h-11 pt-1' : 'h-8'
+			)}
+			title={isIos
+				? 'Σύρε προς τα κάτω για το Κέντρο ελέγχου'
+				: 'Σύρε προς τα κάτω για τις γρήγορες ρυθμίσεις'}
 		>
 			{@render statusContent()}
 		</button>
 	{:else}
 		<div
 			data-testid="mobile-statusbar"
-			class="flex shrink-0 items-center justify-between bg-white px-5 pt-2 pb-1 text-xs font-semibold text-slate-900"
+			class={cn(
+				'relative z-10 flex shrink-0 items-center justify-between bg-transparent px-5 text-slate-900',
+				isIos ? 'h-11 pt-1' : 'h-8'
+			)}
 		>
 			{@render statusContent()}
 		</div>
 	{/if}
 
-	<!-- Screen content -->
-	<div data-testid="mobile-screen" class="relative flex-1 overflow-y-auto bg-slate-50">
+	<!-- Screen content. -mt pulls it under the status bar so wallpapers run edge to edge. -->
+	<div
+		data-testid="mobile-screen"
+		class={cn('relative flex-1 overflow-y-auto bg-slate-50', isIos ? '-mt-11 pt-11' : '-mt-8 pt-8')}
+	>
 		{@render children?.()}
 	</div>
 
 	<!-- Home indicator (iOS bar) / gesture pill (Android) -->
-	<div class="relative flex shrink-0 items-center justify-center bg-white py-2">
+	<div class="relative z-10 flex h-8 shrink-0 items-center justify-center bg-white">
 		{#if onRecents}
 			<button
 				type="button"
@@ -199,7 +264,10 @@
 				aria-label="Πρόσφατες εφαρμογές"
 				class="absolute right-2 flex h-11 w-11 items-center justify-center rounded-md focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
 			>
-				<span aria-hidden="true" class="h-6 w-6 rounded-md border-2 border-slate-500"></span>
+				<span
+					aria-hidden="true"
+					class="h-5 w-5 rounded-[3px] border-2 border-slate-700/80 bg-white/40"
+				></span>
 			</button>
 		{/if}
 		{#if onHome}
@@ -211,14 +279,24 @@
 			>
 				<span
 					data-testid="mobile-home-indicator"
-					class={cn('rounded-full bg-slate-900/80', isIos ? 'h-1 w-32' : 'h-1 w-24')}
+					class={cn('rounded-full bg-slate-900/80', isIos ? 'h-[5px] w-32' : 'h-1 w-24')}
 				></span>
 			</button>
 		{:else}
 			<span
 				data-testid="mobile-home-indicator"
-				class={cn('rounded-full bg-slate-900/80', isIos ? 'h-1 w-32' : 'h-1 w-24')}
+				class={cn('rounded-full bg-slate-900/80', isIos ? 'h-[5px] w-32' : 'h-1 w-24')}
 			></span>
 		{/if}
 	</div>
+
+	<!-- Brightness: dims everything inside the bezel, never blocks taps. -->
+	{#if dim > 0}
+		<div
+			class="pointer-events-none absolute inset-0 z-40 bg-black"
+			style:opacity={dim}
+			data-brightness-dim
+			aria-hidden="true"
+		></div>
+	{/if}
 </div>

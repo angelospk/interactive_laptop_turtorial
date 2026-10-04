@@ -35,6 +35,20 @@ export interface MacSimFolder {
 	name: string;
 	/** Emoji/glyph shown next to the folder in Finder. */
 	icon?: string;
+	/**
+	 * What Finder lists inside the folder. Omitted → sensible defaults for the
+	 * folder name (Έγγραφα, Λήψεις…); an explicit `[]` → an empty folder.
+	 */
+	items?: MacSimFolderItem[];
+}
+
+export interface MacSimFolderItem {
+	name: string;
+	kind: 'folder' | 'document' | 'image' | 'pdf' | 'sheet' | 'archive';
+	/** Shown in the "Date modified" column, free text (e.g. «Χθες, 18:40»). */
+	modified?: string;
+	/** Shown in the "Size" column (folders show «--»). */
+	size?: string;
 }
 
 export interface MacSimConfig {
@@ -84,6 +98,14 @@ const MAC_GOAL_REQUIREMENTS: Partial<Record<string, MacGoalRequirement>> = {
 };
 
 const SUPPORTED_SIZES = ['small', 'medium', 'large'];
+const FOLDER_ITEM_KINDS: MacSimFolderItem['kind'][] = [
+	'folder',
+	'document',
+	'image',
+	'pdf',
+	'sheet',
+	'archive'
+];
 const ALLOWED_KINDS: MacSimAppKind[] = ['finder', 'settings', 'browser', 'notes', 'placeholder'];
 const ALLOWED_SETTINGS = ['text', 'pointer'];
 
@@ -179,6 +201,16 @@ export function parseMacSimConfig(raw: unknown): MacSimConfig {
 		for (const f of c.folders) {
 			if (typeof f?.id !== 'string' || typeof f.name !== 'string')
 				throw new Error(`folders entries need string id/name (got ${JSON.stringify(f)})`);
+			if (f.items !== undefined) {
+				if (!Array.isArray(f.items)) throw new Error(`folder "${f.id}" items must be an array`);
+				for (const it of f.items) {
+					if (typeof it?.name !== 'string' || !FOLDER_ITEM_KINDS.includes(it.kind)) {
+						throw new Error(
+							`folder "${f.id}" items need a name and a kind (${FOLDER_ITEM_KINDS.join('|')})`
+						);
+					}
+				}
+			}
 			if (folderIds.has(f.id)) throw new Error(`duplicate folder id "${f.id}"`);
 			folderIds.add(f.id);
 		}

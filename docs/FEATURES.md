@@ -3,6 +3,23 @@
 Το πλήρες κατάλογο λειτουργιών τον κρατά το `README.md` (ενότητα «Features»). Εδώ
 μπαίνουν οι λειτουργίες με περισσότερες λεπτομέρειες απ' όσες χωράνε σε μια γραμμή.
 
+## Τέσσερις προσομοιωτές (Windows · macOS · Android · iPhone)
+
+Πλήρης περιγραφή, συμβόλαια events, οδηγίες σύνδεσης νέων controls με μαθήματα
+και ροές επαλήθευσης: `docs/SIMULATORS.md`. Σύντομα:
+
+- Ένας ιδιοκτήτης κατάστασης ανά OS (`osState` singleton με `reset()` ανά μάθημα,
+  `MacState` / `PhoneState` ανά lesson instance) — Wi-Fi/φωτεινότητα/φακός κ.λπ.
+  φαίνονται σε tray, status bar, Control Center και Settings ταυτόχρονα.
+- Κάθε ορατό κουμπί είτε αλλάζει αυτή την κατάσταση, είτε εκπέμπει το υπάρχον
+  event του goal, είτε εξηγεί inline (`role="status"`) ότι δεν χρειάζεται.
+- Windows: Win11 Start/αναζήτηση/Task View με thumbnails, Quick Settings με
+  λίστα δικτύων + κωδικό, ημερολόγιο, εικονίδια επιφάνειας (διπλό κλικ).
+- Mac: Apple/App/File… μενού, Wi-Fi popover, Κέντρο ελέγχου, Finder με
+  λίστα/εικονίδια/αναζήτηση/ιστορικό, System Settings με sidebar, zoom παραθύρου.
+- Κινητά: `variant` σε κάθε component — Google Phone/Messages/Chrome vs iOS
+  Phone/Messages/Safari, Android QS vs iOS Control Center, Dynamic Island.
+
 ## Οδηγός (guided tour)
 
 Τύπος μαθήματος `guide`, ανάμεσα σε «Θεωρία» και «Εξάσκηση» κάθε module. Πρώτος
