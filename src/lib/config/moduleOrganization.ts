@@ -222,20 +222,20 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	// ο μαθητής βλέπει «τοίχο θεωρίας» πριν από κάθε άσκηση (audit A5).
 	module5: [
 		{ title: 'Θεωρία', count: 4 },
-		{ title: 'Εξάσκηση', count: 10 }
+		{ title: 'Εξάσκηση', count: 11 }
 	],
 	module8: [
 		{ title: 'Θεωρία', count: 7 },
 		{ title: 'Ασφαλής περιήγηση', count: 5 },
-		{ title: 'Συναλλαγές & προστασία λογαριασμού', count: 6 }
+		{ title: 'Συναλλαγές & προστασία λογαριασμού', count: 8 }
 	],
 	module9: [
 		{ title: 'Θεωρία', count: 7 },
-		{ title: 'Εξάσκηση', count: 9 }
+		{ title: 'Εξάσκηση', count: 14 }
 	],
 	module11: [
 		{ title: 'Θεωρία', count: 5 },
-		{ title: 'Εξάσκηση', count: 6 }
+		{ title: 'Εξάσκηση', count: 7 }
 	],
 	// Mobile tracks: id-based sections (grow across waves). «Βασικά» is the base
 	// path — its 7 lesson ids are the immutable original track (7/7 = «βασική
@@ -279,6 +279,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'smart-safety',
 			title: 'Έξυπνα & ασφάλεια',
 			lessonIds: ['android-scam-sms', 'android-two-factor']
+		},
+		{
+			id: 'more-daily',
+			title: 'Περισσότερα για κάθε μέρα',
+			lessonIds: ['android-viber-group', 'android-install-app', 'android-quick-torch']
 		}
 	],
 	iphone: [
@@ -320,6 +325,11 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'smart-safety',
 			title: 'Έξυπνα & ασφάλεια',
 			lessonIds: ['iphone-scam-sms', 'iphone-two-factor']
+		},
+		{
+			id: 'more-daily',
+			title: 'Περισσότερα για κάθε μέρα',
+			lessonIds: ['iphone-viber-group', 'iphone-install-app', 'iphone-quick-torch']
 		}
 	],
 	// Mac track (CURRICULUM_PLAN §5). «Τα βασικά του Mac» is the base path — its
@@ -354,6 +364,15 @@ export const moduleSections: Record<string, LessonSection[]> = {
 			id: 'more',
 			title: 'Περισσότερα',
 			lessonIds: ['gov-find-birth-cert', 'gov-authorize']
+		},
+		{
+			id: 'everyday-services',
+			title: 'Καθημερινές υπηρεσίες',
+			lessonIds: [
+				'gov-find-unemployment-card',
+				'gov-download-unemployment-card',
+				'gov-find-citizen-mailbox'
+			]
 		}
 	],
 	// Health services track (Φάση 3).

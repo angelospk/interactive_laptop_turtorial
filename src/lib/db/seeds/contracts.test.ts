@@ -20,6 +20,8 @@ import { parseHealthSimConfig } from '$lib/lessons/healthSim';
 import { parsePrimitiveGameConfig, isPrimitiveLessonType } from '$lib/lessons/gameConfig';
 import el from '../../../../messages/el.json';
 import en from '../../../../messages/en.json';
+import theoryManifest from '../../../../content/manifest.json';
+import type { Manifest } from '$lib/content/manifest';
 
 const locales = { el, en } as const;
 
@@ -348,5 +350,26 @@ describe('shortcut prose', () => {
 			].map((match) => `${lesson.id}: ${match[0]}`)
 		);
 		expect(unfilled).toEqual([]);
+	});
+});
+
+describe('theory → practice links (content/manifest.json lessonLinks)', () => {
+	const subsections = (theoryManifest as Manifest).courses.flatMap((c) =>
+		c.chapters.flatMap((ch) => ch.subsections)
+	);
+	const lessonByModuleKey = new Set(allLessons.map((l) => `${l.moduleId}/${l.lessonKey}`));
+
+	it('points every lessonLink at a seeded (module, lessonKey)', () => {
+		const broken = subsections.flatMap((s) =>
+			(s.lessonLinks ?? [])
+				.filter((link) => !lessonByModuleKey.has(`${link.module}/${link.lesson}`))
+				.map((link) => `${s.id} → ${link.module}/${link.lesson}`)
+		);
+		expect(broken).toEqual([]);
+	});
+
+	it('links a meaningful share of theory sections to practice', () => {
+		const linked = subsections.filter((s) => s.lessonLinks?.length);
+		expect(linked.length).toBeGreaterThanOrEqual(25);
 	});
 });

@@ -34,6 +34,7 @@ export const GOALS = {
 	navigate: { requiresTargetUrl: false },
 	'navigate-site': { requiresTargetUrl: true },
 	search: { requiresAppId: false },
+	'search-query': { requiresAppId: false },
 	'switch-tab': { requiresAppId: false },
 	'close-tab': { requiresAppId: false },
 	bookmark: { requiresTargetSite: false },
@@ -51,6 +52,7 @@ export const GOALS = {
 	'attach-file': { requiresAppId: false },
 	'email-attachment': { requiresAppId: false },
 	'download-attachment': { requiresAppId: false },
+	'send-email': { requiresAppId: false },
 
 	// Spreadsheet
 	'update-cell': { requiresAppId: false },
@@ -66,7 +68,9 @@ export const GOALS = {
 	'connect-bluetooth': { requiresAppId: false },
 	'open-display-settings': { requiresAppId: false },
 	'open-accessibility': { requiresAppId: false },
+	'toggle-accessibility': { requiresAppId: false },
 	'open-sound-settings': { requiresAppId: false },
+	'end-task': { requiresAppId: false },
 
 	// Security / Online services
 	'identify-phishing': { requiresAppId: false },
@@ -79,6 +83,7 @@ export const GOALS = {
 	'start-videocall': { requiresAppId: false },
 	'mute-call': { requiresAppId: false },
 	'end-call': { requiresAppId: false },
+	'join-meeting': { requiresAppId: false },
 
 	// Mobile simulation (mobile-sim lessonType — namespaced with `mobile-` so
 	// desktop and mobile events can never satisfy each other)
@@ -96,6 +101,8 @@ export const GOALS = {
 	'mobile-night-mode': { requiresAppId: false },
 	'mobile-find-device': { requiresAppId: false },
 	'mobile-update-app': { requiresAppId: false },
+	'mobile-install-app': { requiresAppId: false },
+	'mobile-quick-toggle': { requiresAppId: false },
 	'mobile-assistant-task': { requiresAppId: false },
 	'mobile-spot-scam-sms': { requiresAppId: false },
 	'mobile-enter-2fa': { requiresAppId: false },

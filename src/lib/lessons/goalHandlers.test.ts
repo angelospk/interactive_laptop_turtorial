@@ -983,3 +983,212 @@ describe('handler coverage', () => {
 		}
 	});
 });
+
+describe('send-email', () => {
+	const cfg = { targetRecipient: 'eleni@example.gr' };
+
+	it('passes when the email goes to the target recipient', () => {
+		expect(
+			checkGoalMatch(
+				'send-email',
+				'send-email',
+				{ to: 'eleni@example.gr', subject: 'Κυριακή' },
+				cfg
+			)
+		).toBe(true);
+	});
+
+	it('tolerates case and surrounding spaces in the address', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: ' Eleni@Example.GR ', subject: 'x' }, cfg)
+		).toBe(true);
+	});
+
+	it('fails for a different recipient', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: 'giorgos@example.gr', subject: 'x' }, cfg)
+		).toBe(false);
+	});
+
+	it('fails for an empty subject', () => {
+		expect(
+			checkGoalMatch('send-email', 'send-email', { to: 'eleni@example.gr', subject: '  ' }, cfg)
+		).toBe(false);
+	});
+
+	it('fails for a draft or any other action', () => {
+		expect(checkGoalMatch('send-email', 'save-draft', { to: 'eleni@example.gr' }, cfg)).toBe(false);
+	});
+
+	it('accepts any recipient when none is configured', () => {
+		expect(checkGoalMatch('send-email', 'send-email', { to: 'a@b.gr', subject: 'x' }, {})).toBe(
+			true
+		);
+	});
+});
+
+describe('search-query', () => {
+	// Stems, so «καιρός», «καιρο», «Καιρός» all count.
+	const cfg = { targetQueryTerms: ['καιρ', 'θεσσαλονικ'] };
+
+	it('passes when every term appears, ignoring case and accents', () => {
+		expect(
+			checkGoalMatch('search-query', 'search', { query: 'Καιρός Θεσσαλονίκη αύριο' }, cfg)
+		).toBe(true);
+	});
+
+	it('passes regardless of word order', () => {
+		expect(checkGoalMatch('search-query', 'search', { query: 'θεσσαλονικη καιρος' }, cfg)).toBe(
+			true
+		);
+	});
+
+	it('fails when a term is missing', () => {
+		expect(checkGoalMatch('search-query', 'search', { query: 'καιρός Αθήνα' }, cfg)).toBe(false);
+	});
+
+	it('fails for a non-search action', () => {
+		expect(checkGoalMatch('search-query', 'navigate', { query: 'καιρός θεσσαλονίκη' }, cfg)).toBe(
+			false
+		);
+	});
+
+	it('fails without a query or without configured terms', () => {
+		expect(checkGoalMatch('search-query', 'search', {}, cfg)).toBe(false);
+		expect(checkGoalMatch('search-query', 'search', { query: 'καιρός' }, {})).toBe(false);
+	});
+});
+
+describe('toggle-accessibility', () => {
+	const cfg = { targetSetting: 'larger-text' };
+
+	it('passes when the target setting is switched on', () => {
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'larger-text', on: true },
+				cfg
+			)
+		).toBe(true);
+	});
+
+	it('fails when it is switched off, or another setting is used', () => {
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'larger-text', on: false },
+				cfg
+			)
+		).toBe(false);
+		expect(
+			checkGoalMatch(
+				'toggle-accessibility',
+				'toggle-accessibility',
+				{ setting: 'high-contrast', on: true },
+				cfg
+			)
+		).toBe(false);
+	});
+
+	it('fails for merely opening the page', () => {
+		expect(checkGoalMatch('toggle-accessibility', 'open-accessibility', {}, cfg)).toBe(false);
+	});
+});
+
+describe('join-meeting', () => {
+	const cfg = { meetingCode: '845 220 193' };
+
+	it('passes with the right code, ignoring spaces and dashes', () => {
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845-220-193' }, cfg)).toBe(true);
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220193' }, cfg)).toBe(true);
+	});
+
+	it('fails with a wrong code or no configured code', () => {
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220194' }, cfg)).toBe(false);
+		expect(checkGoalMatch('join-meeting', 'join-meeting', { code: '845220193' }, {})).toBe(false);
+	});
+
+	it('fails for a plain call', () => {
+		expect(checkGoalMatch('join-meeting', 'start-videocall', { code: '845220193' }, cfg)).toBe(
+			false
+		);
+	});
+});
+
+describe('mobile-install-app', () => {
+	const cfg = { targetInstallId: 'govwallet' };
+
+	it('passes when the target app is installed', () => {
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-installed', { appId: 'govwallet' }, cfg)
+		).toBe(true);
+	});
+
+	it('fails for another app, or for an update', () => {
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-installed', { appId: 'fake-wallet' }, cfg)
+		).toBe(false);
+		expect(
+			checkGoalMatch('mobile-install-app', 'mobile-app-updated', { appId: 'govwallet' }, cfg)
+		).toBe(false);
+	});
+});
+
+describe('end-task', () => {
+	const cfg = { targetTaskId: 'word' };
+
+	it('passes when the frozen program is ended', () => {
+		expect(checkGoalMatch('end-task', 'end-task', { appId: 'word' }, cfg)).toBe(true);
+	});
+
+	it('fails for another program or for simply closing the window', () => {
+		expect(checkGoalMatch('end-task', 'end-task', { appId: 'browser' }, cfg)).toBe(false);
+		expect(checkGoalMatch('end-task', 'close-app', { appId: 'word' }, cfg)).toBe(false);
+	});
+});
+
+describe('mobile-quick-toggle', () => {
+	it('passes when the target tile is switched on', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'torch', on: true },
+				{ targetTile: 'torch' }
+			)
+		).toBe(true);
+	});
+
+	it('honours targetOn:false (turn something off)', () => {
+		const cfg = { targetTile: 'airplane', targetOn: false };
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'airplane', on: false },
+				cfg
+			)
+		).toBe(true);
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'airplane', on: true },
+				cfg
+			)
+		).toBe(false);
+	});
+
+	it('fails for another tile', () => {
+		expect(
+			checkGoalMatch(
+				'mobile-quick-toggle',
+				'mobile-quick-toggle',
+				{ tile: 'wifi', on: true },
+				{ targetTile: 'torch' }
+			)
+		).toBe(false);
+	});
+});

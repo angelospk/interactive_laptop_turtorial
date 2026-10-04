@@ -74,6 +74,7 @@ const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 			'open-bluetooth-settings',
 			'open-display-settings',
 			'open-sound-settings',
+			'toggle-accessibility',
 			'toggle-wifi',
 			'uninstall-app',
 			'update-app'
@@ -85,7 +86,11 @@ const LOCKED_ACTIONS: Record<string, { dir: string; actions: string[] }> = {
 	},
 	'VideoCallApp.svelte': {
 		dir: APPS_DIR,
-		actions: ['end-call', 'mute-call', 'start-videocall']
+		actions: ['end-call', 'join-meeting', 'mute-call', 'start-videocall']
+	},
+	'TaskManagerApp.svelte': {
+		dir: APPS_DIR,
+		actions: ['end-task']
 	},
 	'WordProcessorApp.svelte': {
 		dir: APPS_DIR,

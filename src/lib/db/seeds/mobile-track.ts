@@ -380,6 +380,78 @@ export function buildMobileTrackLessons(variant: MobileVariant): NewLesson[] {
 				successMessage: 'Μπράβο! Χρησιμοποίησες σωστά τον κωδικό μιας χρήσης.',
 				hint: 'Πάτησε «Άνοιξε το SMS», δες τα 6 ψηφία και γράψ’ τα. Μην τα πεις ποτέ σε άλλον.'
 			}
+		},
+		// «Περισσότερα για κάθε μέρα» — σενάρια από τη θεωρία (docs/theory-exercise-mapping.md).
+		{
+			n: 20,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'viber-group',
+			config: {
+				goal: 'mobile-send-chat',
+				prompt:
+					'Την Κυριακή τρώτε όλοι μαζί. Γράψε στην ομάδα «Οικογένεια» του Viber ότι θα φέρεις το γλυκό — ένα μήνυμα, να το δουν όλοι.',
+				targetAppId: 'viber',
+				targetConversationId: 'family',
+				conversations: [
+					{
+						id: 'family',
+						name: 'Οικογένεια 👨‍👩‍👧 (ομάδα)',
+						messages: [
+							{ from: 'them' as const, text: 'Ελένη: Κυριακή στις 2 στο σπίτι μας!' },
+							{ from: 'them' as const, text: 'Γιώργος: Εγώ φέρνω το κρασί 🍷' }
+						]
+					},
+					...CONVERSATIONS
+				],
+				successMessage: 'Μπράβο! Το μήνυμα πήγε σε όλη την ομάδα με μία αποστολή.',
+				hint: 'Στο Viber, η ομάδα φαίνεται σαν μια συνομιλία με το όνομά της. Πάτησε «Οικογένεια», όχι την Ελένη ή τον Γιώργο.'
+			}
+		},
+		{
+			n: 21,
+			difficulty: 'intermediate' as const,
+			lessonKey: 'install-app',
+			config: {
+				goal: 'mobile-install-app',
+				prompt: `Ο εγγονός σας είπε να βάλετε στο κινητό το «Gov.gr Wallet», για την ψηφιακή ταυτότητα. Βρείτε το στο ${variant === 'ios' ? 'App Store' : 'Play Store'} και εγκαταστήστε το επίσημο.`,
+				targetAppId: 'store',
+				storeName: variant === 'ios' ? 'App Store' : 'Play Store',
+				targetInstallId: 'govwallet',
+				storeItems: [
+					{ id: 'viber', label: 'Viber', icon: '💜' },
+					{ id: 'weather', label: 'Καιρός', icon: '⛅' },
+					{
+						id: 'fake-wallet',
+						label: 'Wallet Ταυτότητα 2024',
+						icon: '💳',
+						installed: false,
+						developer: 'QuickApps Ltd'
+					},
+					{
+						id: 'govwallet',
+						label: 'Gov.gr Wallet',
+						icon: '🪪',
+						installed: false,
+						developer: 'Ελληνική Δημοκρατία'
+					}
+				],
+				successMessage:
+					'Μπράβο! Εγκατέστησες την επίσημη εφαρμογή — φτιαγμένη από την Ελληνική Δημοκρατία.',
+				hint: 'Γράψε «wallet» στην αναζήτηση του καταστήματος. Διάλεξε αυτή που από κάτω γράφει «Ελληνική Δημοκρατία».'
+			}
+		},
+		{
+			n: 22,
+			lessonKey: 'quick-torch',
+			config: {
+				goal: 'mobile-quick-toggle',
+				prompt:
+					'Κόπηκε το ρεύμα και ψάχνετε την κλειδαριά. Σύρετε το δάχτυλο από την πάνω άκρη της οθόνης προς τα κάτω (ή πατήστε τη γραμμή με την ώρα) και ανάψτε τον «Φακό».',
+				targetTile: 'torch',
+				successMessage:
+					'Μπράβο! Ο φακός άναψε. Από εκεί ανοίγετε γρήγορα και το Wi-Fi ή το Bluetooth.',
+				hint: 'Η γραμμή με την ώρα και την μπαταρία, πάνω-πάνω, ανοίγει τις γρήγορες ρυθμίσεις. Ο φακός έχει εικονίδιο 🔦.'
+			}
 		}
 	];
 

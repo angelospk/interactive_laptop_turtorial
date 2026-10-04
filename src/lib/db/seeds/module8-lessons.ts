@@ -232,5 +232,139 @@ export const module8Lessons: NewLesson[] = [
 		},
 		enabled: true,
 		requiredLessonId: 'module8-lesson10'
+	},
+
+	// Lesson 12: Netiquette — everyday situations from the theory (eapsi001-c4-s3)
+	{
+		id: 'module8-lesson12',
+		moduleId: 'module8',
+		lessonKey: 'netiquette',
+		titleKey: 'module8_lesson12_title',
+		descriptionKey: 'module8_lesson12_desc',
+		difficulty: 'beginner',
+		orderIndex: 12,
+		lessonType: 'quiz',
+		config: {
+			questions: [
+				{
+					id: 'rude-comment',
+					text: 'Στην ομάδα της γειτονιάς στο Facebook κάποιος γράφει για εσάς ένα αγενές σχόλιο. Τι κάνετε;',
+					options: [
+						{ id: 'a', text: 'Του απαντώ αμέσως με το ίδιο ύφος, να μάθει', correct: false },
+						{
+							id: 'b',
+							text: 'Ηρεμώ, δεν μπαίνω σε καβγά· αν συνεχίσει, τον αναφέρω στους διαχειριστές',
+							correct: true
+						},
+						{ id: 'c', text: 'Ανεβάζω τα προσωπικά του στοιχεία για να τον εκθέσω', correct: false }
+					],
+					explanation:
+						'Πίσω από κάθε οθόνη υπάρχει άνθρωπος. Δεν απαντάμε στην επιθετικότητα με επιθετικότητα· η αναφορά στους διαχειριστές είναι ο σωστός δρόμος.'
+				},
+				{
+					id: 'capitals',
+					text: 'Θέλετε να ευχηθείτε στην ανιψιά σας για τα γενέθλιά της. Ποιο μήνυμα είναι πιο ευγενικό στο διαδίκτυο;',
+					options: [
+						{ id: 'a', text: 'ΧΡΟΝΙΑ ΠΟΛΛΑ!!! ΝΑ ΜΟΥ ΤΗΛΕΦΩΝΗΣΕΙΣ!!!', correct: false },
+						{
+							id: 'b',
+							text: 'Χρόνια πολλά, κορίτσι μου! Πάρε με όταν βρεις λίγο χρόνο 😊',
+							correct: true
+						},
+						{ id: 'c', text: 'χρ πλλ τλφνσ', correct: false }
+					],
+					explanation:
+						'Τα κεφαλαία στο διαδίκτυο διαβάζονται σαν φωνές, και οι πολλές συντομογραφίες δυσκολεύουν. Γράφουμε όπως θα μιλούσαμε από κοντά.'
+				},
+				{
+					id: 'group-photo',
+					text: 'Βγάλατε ωραία φωτογραφία με τις φίλες σας στο ΚΑΠΗ. Πριν την ανεβάσετε στο διαδίκτυο:',
+					options: [
+						{ id: 'a', text: 'Την ανεβάζω — αφού είμαι κι εγώ μέσα', correct: false },
+						{ id: 'b', text: 'Ρωτάω πρώτα αν συμφωνούν όσες φαίνονται', correct: true },
+						{ id: 'c', text: 'Την ανεβάζω και γράφω και τα ονόματα όλων', correct: false }
+					],
+					explanation:
+						'Η φωτογραφία κάποιου είναι προσωπικό του δεδομένο. Ζητάμε πάντα την άδεια όσων φαίνονται πριν τη δημοσιεύσουμε.'
+				}
+			]
+		},
+		enabled: true,
+		requiredLessonId: 'module8-lesson11'
+	},
+
+	// Lesson 13: Breach response — sign → first move → who to tell (esm005-c1-s4)
+	{
+		id: 'module8-lesson13',
+		moduleId: 'module8',
+		lessonKey: 'breach-response',
+		titleKey: 'module8_lesson13_title',
+		descriptionKey: 'module8_lesson13_desc',
+		difficulty: 'intermediate',
+		orderIndex: 13,
+		lessonType: 'quiz',
+		config: {
+			questions: [
+				{
+					id: 'sign',
+					text: 'Ποιο από αυτά δείχνει ότι κάποιος μπορεί να μπήκε στον λογαριασμό σας στο email;',
+					options: [
+						{ id: 'a', text: 'Ήρθε ένα newsletter από το σούπερ μάρκετ', correct: false },
+						{
+							id: 'b',
+							text: 'Ο ανιψιός σας ρωτά γιατί του στείλατε μήνυμα που ζητά χρήματα — ενώ δεν του γράψατε',
+							correct: true
+						},
+						{ id: 'c', text: 'Ξεχάσατε τον κωδικό και τον αλλάξατε μόνοι σας', correct: false }
+					],
+					explanation:
+						'Μηνύματα που δεν στείλατε, συνδέσεις από άγνωστο μέρος και αλλαγές ρυθμίσεων που δεν κάνατε είναι σημάδια ότι κάποιος άλλος μπήκε στον λογαριασμό.'
+				},
+				{
+					id: 'first-move',
+					text: 'Είστε σχεδόν σίγουροι ότι μπήκαν στον λογαριασμό σας από τον υπολογιστή. Τι κάνετε πρώτα;',
+					options: [
+						{
+							id: 'a',
+							text: 'Αποσυνδέω τον υπολογιστή από το ίντερνετ και αλλάζω τον κωδικό από άλλη συσκευή, π.χ. το κινητό',
+							correct: true
+						},
+						{
+							id: 'b',
+							text: 'Περιμένω μερικές μέρες μήπως σταματήσει από μόνο του',
+							correct: false
+						},
+						{
+							id: 'c',
+							text: 'Γράφω τον νέο κωδικό σε μήνυμα στον εαυτό μου, για να μην τον ξεχάσω',
+							correct: false
+						}
+					],
+					explanation:
+						'Πρώτα κόβουμε τη σύνδεση, ώστε να μη γίνει περισσότερη ζημιά. Τον κωδικό τον αλλάζουμε από συσκευή που εμπιστευόμαστε και, όπου γίνεται, ανοίγουμε τον κωδικό επιβεβαίωσης με SMS (2FA).'
+				},
+				{
+					id: 'who-to-tell',
+					text: 'Στον ίδιο λογαριασμό είχατε αποθηκεύσει τα στοιχεία της κάρτας σας. Ποιον ειδοποιείτε αμέσως;',
+					options: [
+						{ id: 'a', text: 'Κανέναν — ντρέπομαι που μου συνέβη', correct: false },
+						{
+							id: 'b',
+							text: 'Την τράπεζα, στο τηλέφωνο που γράφει η κάρτα, και μετά την αστυνομία (Δίωξη Ηλεκτρονικού Εγκλήματος)',
+							correct: true
+						},
+						{
+							id: 'c',
+							text: 'Όποιον αριθμό βρω πρώτο σε διαφήμιση για «ανάκτηση λογαριασμών»',
+							correct: false
+						}
+					],
+					explanation:
+						'Αν εκτέθηκαν οικονομικά στοιχεία, η τράπεζα μπλοκάρει την κάρτα. Το περιστατικό το δηλώνουμε στις αρχές. Δεν ντρεπόμαστε — συμβαίνει σε πολλούς.'
+				}
+			]
+		},
+		enabled: true,
+		requiredLessonId: 'module8-lesson12'
 	}
 ];

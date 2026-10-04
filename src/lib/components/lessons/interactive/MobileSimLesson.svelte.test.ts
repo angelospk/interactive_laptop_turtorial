@@ -40,7 +40,11 @@ const dialLesson = {
 
 describe('MobileSimLesson — home screen', () => {
 	it('renders every app as a labelled button on the home screen', async () => {
-		const screen = render(MobileSimLesson, { lesson: openLesson, onComplete: vi.fn(), onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: openLesson,
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
 		await expect.element(screen.getByRole('button', { name: 'Άνοιγμα Viber' })).toBeInTheDocument();
 		await expect
 			.element(screen.getByRole('button', { name: 'Άνοιγμα Τηλέφωνο' }))
@@ -92,7 +96,11 @@ describe('MobileSimLesson — dialer flow', () => {
 	});
 
 	it('can return to the home screen from inside an app', async () => {
-		const screen = render(MobileSimLesson, { lesson: dialLesson, onComplete: vi.fn(), onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: dialLesson,
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
 		await screen.getByRole('button', { name: 'Άνοιγμα Ρυθμίσεις' }).click();
 		await screen.getByRole('button', { name: 'Αρχική οθόνη' }).click();
 		await expect.element(screen.getByRole('button', { name: 'Άνοιγμα Viber' })).toBeInTheDocument();
@@ -208,7 +216,11 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 
 	it('opens recents and completes when the frozen app is dismissed', async () => {
 		const onComplete = vi.fn();
-		const screen = render(MobileSimLesson, { lesson: forceCloseLesson, onComplete, onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: forceCloseLesson,
+			onComplete,
+			onBack: vi.fn()
+		});
 		await screen.getByRole('button', { name: 'Πρόσφατες εφαρμογές' }).click();
 		await expect.element(screen.getByTestId('recent-apps')).toBeInTheDocument();
 		await screen.getByRole('button', { name: 'Κλείσιμο Ρυθμίσεις' }).click();
@@ -220,7 +232,11 @@ describe('MobileSimLesson — force close (recent apps)', () => {
 
 	it('does not complete when a different app is closed', async () => {
 		const onComplete = vi.fn();
-		const screen = render(MobileSimLesson, { lesson: forceCloseLesson, onComplete, onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: forceCloseLesson,
+			onComplete,
+			onBack: vi.fn()
+		});
 		await screen.getByRole('button', { name: 'Πρόσφατες εφαρμογές' }).click();
 		await screen.getByRole('button', { name: 'Κλείσιμο Viber' }).click();
 		await expect.element(screen.getByText(/Έκλεισες άλλη εφαρμογή/)).toBeInTheDocument();
@@ -237,7 +253,11 @@ describe('MobileSimLesson — suspicious SMS verdict', () => {
 		targetConversationId: 'unknown',
 		smsIsScam: true,
 		conversations: [
-			{ id: 'unknown', name: 'Άγνωστος αριθμός', messages: [{ from: 'them', text: 'Πληρώστε εδώ: http://x.info' }] }
+			{
+				id: 'unknown',
+				name: 'Άγνωστος αριθμός',
+				messages: [{ from: 'them', text: 'Πληρώστε εδώ: http://x.info' }]
+			}
 		],
 		successMessage: 'Μπράβο! Το αναγνώρισες ως ύποπτο.'
 	});
@@ -314,7 +334,11 @@ describe('MobileSimLesson — digital assistant (phrase chips)', () => {
 
 	it('completes when the well-formed phrase is chosen', async () => {
 		const onComplete = vi.fn();
-		const screen = render(MobileSimLesson, { lesson: assistantLesson, onComplete, onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: assistantLesson,
+			onComplete,
+			onBack: vi.fn()
+		});
 		await screen.getByRole('button', { name: 'Άνοιγμα Ψηφιακός βοηθός' }).click();
 		await screen.getByRole('button', { name: '«Βάλε ξυπνητήρι για τις 7 το πρωί»' }).click();
 		await expect.element(screen.getByText('Μπράβο! Έδωσες ξεκάθαρη εντολή.')).toBeInTheDocument();
@@ -323,7 +347,11 @@ describe('MobileSimLesson — digital assistant (phrase chips)', () => {
 
 	it('does not complete on a vague phrase and nudges to rephrase', async () => {
 		const onComplete = vi.fn();
-		const screen = render(MobileSimLesson, { lesson: assistantLesson, onComplete, onBack: vi.fn() });
+		const screen = render(MobileSimLesson, {
+			lesson: assistantLesson,
+			onComplete,
+			onBack: vi.fn()
+		});
 		await screen.getByRole('button', { name: 'Άνοιγμα Ψηφιακός βοηθός' }).click();
 		await screen.getByRole('button', { name: '«Ξυπνητήρι»' }).click();
 		await expect.element(screen.getByText(/δεν το κατάλαβε/)).toBeInTheDocument();
@@ -393,7 +421,9 @@ describe('MobileSimLesson — QR scan + link check', () => {
 		await screen.getByRole('button', { name: 'Άνοιγμα Κάμερα' }).click();
 		await screen.getByRole('button', { name: 'Σάρωση κωδικού' }).click();
 		await screen.getByRole('button', { name: 'Άνοιγμα συνδέσμου' }).click();
-		await expect.element(screen.getByText('Μπράβο! Άνοιξες τον επίσημο σύνδεσμο.')).toBeInTheDocument();
+		await expect
+			.element(screen.getByText('Μπράβο! Άνοιξες τον επίσημο σύνδεσμο.'))
+			.toBeInTheDocument();
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
 	});
 
@@ -544,5 +574,110 @@ describe('MobileSimLesson — settings flows', () => {
 		await expect.element(screen.getByText('Μπράβο! Συνδέθηκες στο Wi-Fi.')).toBeInTheDocument();
 		// Wrong network first → gentle penalty score (80), never a fail.
 		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(80), { timeout: 2000 });
+	});
+});
+
+describe('MobileSimLesson — install an app from the store', () => {
+	const installLesson = mkLesson({
+		goal: 'mobile-install-app',
+		prompt: 'Εγκατάστησε το Gov.gr Wallet.',
+		apps: [{ id: 'store', label: 'Play Store', icon: '🛍️', kind: 'store' }],
+		targetAppId: 'store',
+		storeName: 'Play Store',
+		targetInstallId: 'govwallet',
+		storeItems: [
+			{ id: 'viber', label: 'Viber', icon: '💜' },
+			{
+				id: 'govwallet',
+				label: 'Gov.gr Wallet',
+				icon: '🪪',
+				installed: false,
+				developer: 'Ελληνική Δημοκρατία'
+			},
+			{
+				id: 'fake-wallet',
+				label: 'Wallet Ταυτότητα 2024',
+				icon: '💳',
+				installed: false,
+				developer: 'QuickApps Ltd'
+			}
+		],
+		successMessage: 'Μπράβο! Εγκατέστησες το Gov.gr Wallet.'
+	});
+
+	it('hides apps you do not have until you search for them', async () => {
+		const screen = render(MobileSimLesson, {
+			lesson: installLesson,
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
+		await screen.getByRole('button', { name: 'Άνοιγμα Play Store' }).click();
+		await expect.element(screen.getByText('Viber')).toBeInTheDocument();
+		expect(screen.getByTestId('store-app').element().textContent).not.toContain('Gov.gr Wallet');
+		await screen.getByLabelText('Αναζήτηση εφαρμογών').fill('wallet');
+		await expect
+			.element(screen.getByTestId('store-app').getByText('Gov.gr Wallet', { exact: true }))
+			.toBeInTheDocument();
+		await expect.element(screen.getByText('Ελληνική Δημοκρατία')).toBeInTheDocument();
+	});
+
+	it('completes when the official app is installed', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: installLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Play Store' }).click();
+		await screen.getByLabelText('Αναζήτηση εφαρμογών').fill('gov');
+		await screen.getByRole('button', { name: 'Εγκατάσταση Gov.gr Wallet' }).click();
+		await expect
+			.element(screen.getByText('Μπράβο! Εγκατέστησες το Gov.gr Wallet.'))
+			.toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('warns when a look-alike app is installed instead', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: installLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Άνοιγμα Play Store' }).click();
+		await screen.getByLabelText('Αναζήτηση εφαρμογών').fill('wallet');
+		await screen.getByRole('button', { name: 'Εγκατάσταση Wallet Ταυτότητα 2024' }).click();
+		await expect.element(screen.getByText(/Δεν είναι η επίσημη/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+});
+
+describe('MobileSimLesson — quick settings panel', () => {
+	const torchLesson = mkLesson({
+		goal: 'mobile-quick-toggle',
+		prompt: 'Άναψε τον φακό από τις γρήγορες ρυθμίσεις.',
+		targetTile: 'torch',
+		successMessage: 'Μπράβο! Ο φακός άναψε.'
+	});
+
+	it('opens by pulling down from the status bar and completes on the torch tile', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: torchLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		await screen.getByRole('switch', { name: 'Φακός' }).click();
+		await expect.element(screen.getByText('Μπράβο! Ο φακός άναψε.')).toBeInTheDocument();
+		await vi.waitFor(() => expect(onComplete).toHaveBeenCalledWith(100), { timeout: 2000 });
+	});
+
+	it('does not complete on another tile', async () => {
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, { lesson: torchLesson, onComplete, onBack: vi.fn() });
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		await screen.getByRole('switch', { name: 'Λειτουργία πτήσης' }).click();
+		await expect.element(screen.getByText(/Άλλο πλακίδιο/)).toBeInTheDocument();
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it('has no pull-down handle in lessons that do not use it', async () => {
+		const screen = render(MobileSimLesson, {
+			lesson: openLesson,
+			onComplete: vi.fn(),
+			onBack: vi.fn()
+		});
+		await expect
+			.element(screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }))
+			.not.toBeInTheDocument();
 	});
 });

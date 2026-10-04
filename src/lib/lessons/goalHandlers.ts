@@ -7,6 +7,16 @@ type GoalHandler = (
 	config: Record<string, unknown>
 ) => boolean;
 
+/** Lower-case and strip accents, so «Καιρός» and «καιρος» compare equal. */
+function foldGreek(text: string): string {
+	return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
+/** Meeting codes are read out as «845 220 193» or «845-220-193» — compare digits/letters only. */
+export function normalizeMeetingCode(code: string): string {
+	return code.replace(/[^\p{L}\p{N}]/gu, '').toLowerCase();
+}
+
 /**
  * One handler per GoalId.
  *
@@ -62,6 +72,13 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 		data.url.includes(config.targetUrl),
 
 	search: (action) => action === 'search',
+	'search-query': (action, data, config) => {
+		if (action !== 'search' || typeof data.query !== 'string') return false;
+		const terms = config.targetQueryTerms;
+		if (!Array.isArray(terms) || terms.length === 0) return false;
+		const query = foldGreek(data.query);
+		return terms.every((term) => typeof term === 'string' && query.includes(foldGreek(term)));
+	},
 	'switch-tab': (action) => action === 'switch-tab' || action === 'switch-tabs',
 	'close-tab': (action) => action === 'close-tab',
 
@@ -85,6 +102,13 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'attach-file': (action) => action === 'attach-file',
 	'email-attachment': (action) => action === 'attach-file',
 	'download-attachment': (action) => action === 'download-attachment',
+	'send-email': (action, data, config) => {
+		if (action !== 'send-email') return false;
+		if (typeof data.subject !== 'string' || !data.subject.trim()) return false;
+		const target = config.targetRecipient;
+		if (typeof target !== 'string' || !target) return true;
+		return typeof data.to === 'string' && data.to.trim().toLowerCase() === target.toLowerCase();
+	},
 
 	// ── Spreadsheet ────────────────────────────────────────────────────────
 	'update-cell': (action, data, config) => {
@@ -109,6 +133,12 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'connect-bluetooth': (action) => action === 'connect-bluetooth',
 	'open-display-settings': (action) => action === 'open-display-settings',
 	'open-accessibility': (action) => action === 'open-accessibility',
+	'end-task': (action, data, config) =>
+		action === 'end-task' && (!config.targetTaskId || data.appId === config.targetTaskId),
+	'toggle-accessibility': (action, data, config) =>
+		action === 'toggle-accessibility' &&
+		data.on === true &&
+		(!config.targetSetting || data.setting === config.targetSetting),
 	'open-sound-settings': (action) => action === 'open-sound-settings',
 
 	// ── Security / Online services ─────────────────────────────────────────
@@ -127,6 +157,11 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'start-videocall': (action) => action === 'start-videocall',
 	'mute-call': (action) => action === 'mute-call',
 	'end-call': (action) => action === 'end-call',
+	'join-meeting': (action, data, config) => {
+		if (action !== 'join-meeting' || typeof data.code !== 'string') return false;
+		if (typeof config.meetingCode !== 'string' || !config.meetingCode) return false;
+		return normalizeMeetingCode(data.code) === normalizeMeetingCode(config.meetingCode);
+	},
 
 	// ── Mobile simulation ──────────────────────────────────────────────────
 	'mobile-open-app': (action, data, config) =>
@@ -197,6 +232,13 @@ const goalHandlers: Record<GoalId, GoalHandler> = {
 	'mobile-update-app': (action, data, config) =>
 		action === 'mobile-app-updated' &&
 		(!config.targetUpdateId || data.appId === config.targetUpdateId),
+	'mobile-quick-toggle': (action, data, config) =>
+		action === 'mobile-quick-toggle' &&
+		data.tile === config.targetTile &&
+		data.on === (config.targetOn ?? true),
+	'mobile-install-app': (action, data, config) =>
+		action === 'mobile-app-installed' &&
+		(!config.targetInstallId || data.appId === config.targetInstallId),
 
 	// Digital assistant: the learner picked the well-formed phrase for the intent.
 	'mobile-assistant-task': (action, data, config) =>

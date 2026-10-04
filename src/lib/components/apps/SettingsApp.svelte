@@ -44,6 +44,18 @@
 	let printerConnected = $state(false);
 	let darkMode = $state(false);
 
+	const accessibilitySettings = [
+		{ id: 'larger-text', label: 'Μεγαλύτερο κείμενο' },
+		{ id: 'high-contrast', label: 'Υψηλή αντίθεση' },
+		{ id: 'screen-reader', label: 'Αναγνώστης οθόνης' }
+	];
+	let accessibilityOn = $state<Record<string, boolean>>({});
+
+	function toggleAccessibility(setting: string, on: boolean) {
+		accessibilityOn[setting] = on;
+		onAction('toggle-accessibility', { setting, on });
+	}
+
 	// Mock Installed Apps
 	let installedApps = $state([
 		{ id: 'chrome', name: 'Google Chrome', size: '450 MB', version: '120.0.3' },
@@ -441,11 +453,20 @@
 		{:else if activeSection === 'accessibility'}
 			<div class="space-y-6">
 				<h3 class="text-xl font-semibold">Προσβασιμότητα</h3>
-				<div class="space-y-4 rounded-lg border bg-white p-4">
-					{#each [['Μεγαλύτερο κείμενο', false], ['Υψηλή αντίθεση', false], ['Αναγνώστης οθόνης', false]] as [label] (label)}
+				<div
+					data-testid="accessibility-panel"
+					class="space-y-4 rounded-lg border p-4 {accessibilityOn['larger-text']
+						? 'text-lg'
+						: ''} {accessibilityOn['high-contrast'] ? 'bg-black text-white' : 'bg-white'}"
+				>
+					{#each accessibilitySettings as s (s.id)}
 						<div class="flex items-center justify-between py-1">
-							<span class="text-sm font-medium">{label}</span>
-							<Switch checked={false} onCheckedChange={() => {}} />
+							<span id="a11y-{s.id}" class="font-medium">{s.label}</span>
+							<Switch
+								aria-labelledby="a11y-{s.id}"
+								checked={accessibilityOn[s.id] ?? false}
+								onCheckedChange={(v) => toggleAccessibility(s.id, v)}
+							/>
 						</div>
 					{/each}
 				</div>

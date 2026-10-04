@@ -30,3 +30,36 @@ describe('SettingsApp deep link', () => {
 			.toBeInTheDocument();
 	});
 });
+
+describe('SettingsApp accessibility switches', () => {
+	it('turns a setting on, reports it, and makes the text larger', async () => {
+		const onAction = vi.fn();
+		const screen = render(SettingsApp, {
+			config: { initialPage: 'accessibility' },
+			onAction
+		} as never);
+		const larger = screen.getByRole('switch', { name: 'Μεγαλύτερο κείμενο' });
+		await larger.click();
+		await expect.element(larger).toBeChecked();
+		expect(onAction).toHaveBeenCalledWith('toggle-accessibility', {
+			setting: 'larger-text',
+			on: true
+		});
+		await expect.element(screen.getByTestId('accessibility-panel')).toHaveClass(/text-lg/);
+	});
+
+	it('reports switching a setting back off', async () => {
+		const onAction = vi.fn();
+		const screen = render(SettingsApp, {
+			config: { initialPage: 'accessibility' },
+			onAction
+		} as never);
+		const contrast = screen.getByRole('switch', { name: 'Υψηλή αντίθεση' });
+		await contrast.click();
+		await contrast.click();
+		expect(onAction).toHaveBeenLastCalledWith('toggle-accessibility', {
+			setting: 'high-contrast',
+			on: false
+		});
+	});
+});
