@@ -31,6 +31,17 @@ describe('Windows Quick Settings ↔ tray ↔ desktop', () => {
 		expect(osState.wifiEnabled).toBe(false);
 	});
 
+	it('Escape closes Quick Settings', async () => {
+		const screen = render(Taskbar, taskbarProps);
+		const press = () =>
+			window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+		await screen.getByRole('button', { name: 'Γρήγορες ρυθμίσεις' }).click();
+		const wifi = screen.getByRole('switch', { name: 'Wi-Fi' });
+		await expect.element(wifi).toBeVisible();
+		press();
+		await expect.element(wifi).not.toBeInTheDocument();
+	});
+
 	it('connects to a network from the Wi-Fi list and tells the lesson', async () => {
 		const onAction = vi.fn();
 		const screen = render(Taskbar, { ...taskbarProps, onAction });

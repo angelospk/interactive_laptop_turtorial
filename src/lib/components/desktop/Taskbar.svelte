@@ -126,6 +126,11 @@
 		flyout = null;
 	}
 
+	// Escape closes any open flyout, as Start and Task View already do.
+	function onWindowKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && flyout) closeFlyouts();
+	}
+
 	// «•••» is a menu: focus moves into it, arrows walk it, Escape returns.
 	let moreButton = $state<HTMLButtonElement>();
 	function placeMenu(menu: HTMLElement) {
@@ -183,6 +188,8 @@
 	const trayButton =
 		'flex h-10 items-center gap-1.5 rounded-md px-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70';
 </script>
+
+<svelte:window onkeydown={onWindowKeydown} />
 
 <!-- stops click from reaching the backdrop -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
