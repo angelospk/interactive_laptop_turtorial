@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import BrowserApp from './BrowserApp.svelte';
 import type { LearnerDevice } from '$lib/lessons/shortcuts';
+// Real styles, so the toolbar test measures the real layout.
+import '../../../routes/layout.css';
 
 /**
  * The zoom and find lessons told the learner to press "Ctrl+" but only reacted
@@ -134,4 +136,23 @@ describe('BrowserApp guide showcase', () => {
 		expect(press({ key: 'f', ctrlKey: true }).defaultPrevented).toBe(true);
 		screen.unmount();
 	});
+});
+
+// On a 390px phone the toolbar is ~366px wide and the zoom-in button stuck out
+// past its right edge, cut off.
+describe('BrowserApp toolbar on a narrow screen', () => {
+	for (const width of [340, 366, 1000]) {
+		it(`keeps the zoom-in button inside a ${width}px browser`, async () => {
+			const { screen } = mount('zoom-page', 'windows');
+			screen.container.style.cssText = `width: ${width}px;`;
+			const root = screen.container;
+			const zoomIn = screen.getByRole('button', { name: 'Μεγέθυνση' }).element();
+			const address = root.querySelector<HTMLElement>('[data-guide="address-bar"]')!;
+			await expect
+				.poll(() => zoomIn.getBoundingClientRect().right)
+				.toBeLessThanOrEqual(root.getBoundingClientRect().right);
+			// The address bar stays usable: wide enough to read a short address.
+			expect(address.getBoundingClientRect().width).toBeGreaterThanOrEqual(200);
+		});
+	}
 });

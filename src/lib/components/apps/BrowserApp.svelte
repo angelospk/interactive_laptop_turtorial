@@ -593,126 +593,129 @@
 		</button>
 	</div>
 
-	<!-- 2. Toolbar (Address Bar) -->
-	<div class="flex items-center gap-1.5 bg-white px-2 py-1.5">
-		<div class="flex items-center" data-guide="nav-buttons">
-			<button
-				class="rounded-full p-1.5 {canGoBack
-					? 'text-slate-600 hover:bg-slate-100'
-					: 'cursor-default text-slate-300'}"
-				onclick={goBack}
-				disabled={!canGoBack}
-				title="Πίσω"
-			>
-				<ArrowLeft class="h-5 w-5" />
-			</button>
-			<button
-				class="rounded-full p-1.5 {canGoForward
-					? 'text-slate-600 hover:bg-slate-100'
-					: 'cursor-default text-slate-300'}"
-				onclick={goForward}
-				disabled={!canGoForward}
-				title="Μπροστά"
-			>
-				<ArrowRight class="h-5 w-5" />
-			</button>
-			<button
-				class="rounded-full p-1.5 text-slate-600 hover:bg-slate-100"
-				onclick={handleRefresh}
-				title="Ανανέωση"
-			>
-				<RefreshCw class="h-5 w-5 {refreshSpinning ? 'animate-spin' : ''}" />
-			</button>
-		</div>
-		<div class="relative flex-1" data-guide="address-bar">
-			<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
-				{#if activeTab.isSecure}
-					<Lock class="h-4 w-4 text-green-600" />
-				{:else}
-					<ShieldAlert class="h-4 w-4 text-red-500" />
-				{/if}
+	<!-- 2. Toolbar (Address Bar). On a phone-narrow browser the address bar
+	     takes its own row, so the buttons beside it are never cut off. -->
+	<div class="@container">
+		<div class="flex flex-wrap items-center gap-1.5 bg-white px-2 py-1.5">
+			<div class="flex items-center" data-guide="nav-buttons">
+				<button
+					class="rounded-full p-1.5 {canGoBack
+						? 'text-slate-600 hover:bg-slate-100'
+						: 'cursor-default text-slate-300'}"
+					onclick={goBack}
+					disabled={!canGoBack}
+					title="Πίσω"
+				>
+					<ArrowLeft class="h-5 w-5" />
+				</button>
+				<button
+					class="rounded-full p-1.5 {canGoForward
+						? 'text-slate-600 hover:bg-slate-100'
+						: 'cursor-default text-slate-300'}"
+					onclick={goForward}
+					disabled={!canGoForward}
+					title="Μπροστά"
+				>
+					<ArrowRight class="h-5 w-5" />
+				</button>
+				<button
+					class="rounded-full p-1.5 text-slate-600 hover:bg-slate-100"
+					onclick={handleRefresh}
+					title="Ανανέωση"
+				>
+					<RefreshCw class="h-5 w-5 {refreshSpinning ? 'animate-spin' : ''}" />
+				</button>
 			</div>
-			<input
-				type="text"
-				class="w-full rounded-full bg-slate-100 py-3 pr-12 pl-9 text-sm outline-none hover:bg-slate-200/70 focus:bg-white focus:shadow-md focus:ring-2 {activeTab.isSecure
-					? 'focus:ring-green-500'
-					: 'focus:ring-red-500'}"
-				placeholder="Πληκτρολογήστε μια διεύθυνση Web"
-				bind:value={addressBarInput}
-				onkeydown={(e) => {
-					if (e.key === 'Enter') navigate(addressBarInput);
-				}}
-			/>
-			<!-- Chrome-style bookmark star inside the address bar -->
-			<button
-				class="absolute top-1/2 right-0 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full hover:bg-slate-200"
-				onclick={bookmarkSite}
-				data-guide="bookmark"
-				title="Προσθήκη στα Αγαπημένα"
-				aria-label="Προσθήκη στα Αγαπημένα"
-			>
-				<Star
-					class="h-4 w-4 {bookmarkedSites.includes(activeTab.url)
-						? 'fill-yellow-400 text-yellow-400'
-						: 'text-slate-400'}"
-				/>
-			</button>
-		</div>
-		<div class="flex items-center">
-			<button
-				class="rounded-full p-2 hover:bg-slate-100"
-				onclick={openHistory}
-				title="Ιστορικό"
-				data-guide="history"
-			>
-				<History class="h-5 w-5 text-slate-400" />
-			</button>
-			{#if showZoom}
-				<div class="flex items-center" data-guide="zoom">
-					<button
-						class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
-						onclick={() => handleZoom('out')}
-						title="Σμίκρυνση"
-						aria-label="Σμίκρυνση"
-					>
-						<ZoomOut class="h-7 w-7 text-slate-700" />
-					</button>
-					<span class="w-12 text-center text-sm text-slate-600" data-testid="zoom-level"
-						>{Math.round(zoomLevel * 100)}%</span
-					>
-					<button
-						class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
-						onclick={() => handleZoom('in')}
-						title="Μεγέθυνση"
-						aria-label="Μεγέθυνση"
-					>
-						<ZoomIn class="h-7 w-7 text-slate-700" />
-					</button>
+			<div class="relative flex-1 @max-md:order-last @max-md:basis-full" data-guide="address-bar">
+				<div class="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">
+					{#if activeTab.isSecure}
+						<Lock class="h-4 w-4 text-green-600" />
+					{:else}
+						<ShieldAlert class="h-4 w-4 text-red-500" />
+					{/if}
 				</div>
-			{/if}
-			<!-- Visual-only three-dot menu -->
-			<div class="relative">
+				<input
+					type="text"
+					class="w-full rounded-full bg-slate-100 py-3 pr-12 pl-9 text-sm outline-none hover:bg-slate-200/70 focus:bg-white focus:shadow-md focus:ring-2 {activeTab.isSecure
+						? 'focus:ring-green-500'
+						: 'focus:ring-red-500'}"
+					placeholder="Πληκτρολογήστε μια διεύθυνση Web"
+					bind:value={addressBarInput}
+					onkeydown={(e) => {
+						if (e.key === 'Enter') navigate(addressBarInput);
+					}}
+				/>
+				<!-- Chrome-style bookmark star inside the address bar -->
+				<button
+					class="absolute top-1/2 right-0 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full hover:bg-slate-200"
+					onclick={bookmarkSite}
+					data-guide="bookmark"
+					title="Προσθήκη στα Αγαπημένα"
+					aria-label="Προσθήκη στα Αγαπημένα"
+				>
+					<Star
+						class="h-4 w-4 {bookmarkedSites.includes(activeTab.url)
+							? 'fill-yellow-400 text-yellow-400'
+							: 'text-slate-400'}"
+					/>
+				</button>
+			</div>
+			<div class="ml-auto flex items-center">
 				<button
 					class="rounded-full p-2 hover:bg-slate-100"
-					onclick={() => (showMoreMenu = !showMoreMenu)}
-					title="Μενού"
+					onclick={openHistory}
+					title="Ιστορικό"
+					data-guide="history"
 				>
-					<MoreVertical class="h-5 w-5 text-slate-400" />
+					<History class="h-5 w-5 text-slate-400" />
 				</button>
-				{#if showMoreMenu}
-					<div
-						class="absolute top-full right-0 z-40 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
-					>
-						{#each ['Νέα καρτέλα', 'Ιστορικό', 'Λήψεις', 'Αγαπημένα', 'Ρυθμίσεις'] as item (item)}
-							<button
-								class="block w-full cursor-default px-4 py-1.5 text-left text-sm text-slate-400"
-								disabled
-							>
-								{item}
-							</button>
-						{/each}
+				{#if showZoom}
+					<div class="flex items-center" data-guide="zoom">
+						<button
+							class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+							onclick={() => handleZoom('out')}
+							title="Σμίκρυνση"
+							aria-label="Σμίκρυνση"
+						>
+							<ZoomOut class="h-7 w-7 text-slate-700" />
+						</button>
+						<span class="w-12 text-center text-sm text-slate-600" data-testid="zoom-level"
+							>{Math.round(zoomLevel * 100)}%</span
+						>
+						<button
+							class="flex h-12 w-12 items-center justify-center rounded-full hover:bg-slate-100"
+							onclick={() => handleZoom('in')}
+							title="Μεγέθυνση"
+							aria-label="Μεγέθυνση"
+						>
+							<ZoomIn class="h-7 w-7 text-slate-700" />
+						</button>
 					</div>
 				{/if}
+				<!-- Visual-only three-dot menu -->
+				<div class="relative">
+					<button
+						class="rounded-full p-2 hover:bg-slate-100"
+						onclick={() => (showMoreMenu = !showMoreMenu)}
+						title="Μενού"
+					>
+						<MoreVertical class="h-5 w-5 text-slate-400" />
+					</button>
+					{#if showMoreMenu}
+						<div
+							class="absolute top-full right-0 z-40 mt-1 w-44 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+						>
+							{#each ['Νέα καρτέλα', 'Ιστορικό', 'Λήψεις', 'Αγαπημένα', 'Ρυθμίσεις'] as item (item)}
+								<button
+									class="block w-full cursor-default px-4 py-1.5 text-left text-sm text-slate-400"
+									disabled
+								>
+									{item}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
