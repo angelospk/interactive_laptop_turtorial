@@ -438,6 +438,8 @@
 	"module4_guide_desc": "Open File Explorer, make a folder and tidy files, step by step with a voice.",
 	"module6_guide_title": "Guide: Email",
 	"module6_guide_desc": "Open email, read, reply and send a message, step by step with a voice.",
+	"word_guide_title": "Guide: Word Processor",
+	"word_guide_desc": "Write, format and save a document, step by step with a voice.",
 	"module5_guide_title": "Guide: meet the browser",
 	"module5_guide_desc": "A narrated walk around the browser's buttons. Skip whatever you already know.",
 	"module5_lesson1_title": "1. New Browser Tab",

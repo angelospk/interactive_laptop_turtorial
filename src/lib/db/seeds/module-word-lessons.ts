@@ -174,4 +174,20 @@ const _wordLessons: Omit<NewLesson, 'orderIndex' | 'requiredLessonId'>[] = [
 	}
 ];
 
-export const wordLessons = autoOrder(_wordLessons);
+// «Οδηγός»: ο επεξεργαστής κειμένου βήμα-βήμα, πριν τις ασκήσεις. Outside
+// autoOrder: it comes first (orderIndex 0) and locks nothing.
+const wordGuide: NewLesson = {
+	id: 'word-guide',
+	moduleId: 'word',
+	lessonKey: 'guide',
+	titleKey: 'word_guide_title',
+	descriptionKey: 'word_guide_desc',
+	difficulty: 'beginner',
+	orderIndex: 0,
+	lessonType: 'guide',
+	config: { guideId: 'word' },
+	enabled: true,
+	requiredLessonId: null
+};
+
+export const wordLessons = [wordGuide, ...autoOrder(_wordLessons)];

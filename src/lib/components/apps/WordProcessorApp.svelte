@@ -151,6 +151,7 @@
 			class="flex h-6 w-6 items-center justify-center rounded-sm text-white hover:bg-white/20"
 			onclick={handleSave}
 			title="Αποθήκευση"
+			data-guide="word-save"
 			aria-label="Αποθήκευση"
 		>
 			<Save class="h-3.5 w-3.5" />
@@ -178,6 +179,7 @@
 					value={fontSize}
 					onchange={(e) => handleFontSize(e.currentTarget.value)}
 					title="Μέγεθος γραμματοσειράς"
+					data-guide="word-font-size"
 					aria-label="Μέγεθος γραμματοσειράς"
 				>
 					{#each fontSizes as size (size)}
@@ -190,6 +192,7 @@
 					onmousedown={keepSelection}
 					onclick={handleBold}
 					title="Έντονα (Bold)"
+					data-guide="word-bold"
 					aria-label="Έντονα (Bold)"
 					aria-pressed={isBoldActive}
 				>
@@ -201,6 +204,7 @@
 					onmousedown={keepSelection}
 					onclick={handleItalic}
 					title="Πλάγια (Italic)"
+					data-guide="word-italic"
 					aria-label="Πλάγια (Italic)"
 					aria-pressed={isItalicActive}
 				>
@@ -212,6 +216,7 @@
 					onmousedown={keepSelection}
 					onclick={handleUnderline}
 					title="Υπογράμμιση (Underline)"
+					data-guide="word-underline"
 					aria-label="Υπογράμμιση (Underline)"
 					aria-pressed={isUnderlineActive}
 				>
@@ -243,6 +248,7 @@
 					onmousedown={keepSelection}
 					onclick={() => handleAlign('center')}
 					title="Κέντρο"
+					data-guide="word-align-center"
 					aria-label="Κέντρο"
 					aria-pressed={currentAlign === 'center'}
 				>
@@ -265,6 +271,7 @@
 					onmousedown={keepSelection}
 					onclick={handleBulletList}
 					title="Λίστα με κουκίδες"
+					data-guide="word-bullets"
 					aria-label="Λίστα με κουκίδες"
 					aria-pressed={isBulletActive}
 				>
@@ -282,6 +289,7 @@
 			style="font-size: {fontSize}px; min-height: 600px; aspect-ratio: 210 / 297; font-family: Calibri, 'Segoe UI', Candara, Arial, sans-serif;"
 			contenteditable="true"
 			data-word-editor
+			data-guide="word-editor"
 			oninput={handleInput}
 			role="textbox"
 			aria-multiline="true"
