@@ -402,6 +402,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	],
 	// e-banking track (Φάση 3).
 	bank: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['bank-guide'] },
 		{
 			id: 'core',
 			title: 'Ασφαλής τραπεζική',

@@ -108,6 +108,9 @@
 				} else if (url.includes('gov')) {
 					type = 'gov';
 					title = 'Gov.gr';
+				} else if (url.includes('bank')) {
+					type = 'banking';
+					title = 'e-Banking';
 				} else if (url.includes('search') || url.includes('google')) {
 					type = 'search';
 					title = 'Google';
@@ -298,7 +301,8 @@
 		}
 
 		startLoading();
-		onAction('navigate', { url, isSecure });
+		// `page` tells a guide which page opened, whatever the learner typed.
+		onAction('navigate', { url, isSecure, page: type });
 	}
 
 	// Back/Forward: cosmetic only. Deliberately NEVER call onAction (no false lesson completions)
@@ -1112,8 +1116,10 @@
 										</div>
 									{/if}
 								</div>
-								<Button class="w-full bg-blue-800 text-white hover:bg-blue-900" onclick={loginBank}
-									>Login</Button
+								<Button
+									data-guide="bank-login"
+									class="w-full bg-blue-800 text-white hover:bg-blue-900"
+									onclick={loginBank}>Login</Button
 								>
 							</div>
 							<p class="mt-4 text-xs text-slate-500">Ποτέ μην δίνετε τον κωδικό σας τηλεφωνικά!</p>
@@ -1173,6 +1179,7 @@
 											/>
 										</div>
 										<Button
+											data-guide="bank-transfer"
 											class="bg-blue-800 text-white hover:bg-blue-900"
 											onclick={transferMoney}
 										>

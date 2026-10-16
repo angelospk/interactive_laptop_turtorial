@@ -187,3 +187,26 @@ describe('BrowserApp AI assistant page', () => {
 		await expect.element(screen.getByPlaceholder('Γράψτε την ερώτησή σας...')).toBeVisible();
 	});
 });
+
+describe('BrowserApp bank page', () => {
+	it('opens the bank login for a mybank.gr tab', async () => {
+		render(BrowserApp, { config: { initialTabs: ['mybank.gr'] }, onAction: vi.fn() } as never);
+		await vi.waitFor(() =>
+			expect(document.querySelector('[data-guide="bank-login"]')).not.toBeNull()
+		);
+	});
+
+	it('says which page the address opened, so a guide can wait for the bank', async () => {
+		const onAction = vi.fn();
+		const screen = render(BrowserApp, { config: {}, onAction } as never);
+		const bar = screen.getByPlaceholder('Πληκτρολογήστε μια διεύθυνση Web');
+		await bar.fill('mybank.gr');
+		(bar.element() as HTMLInputElement).dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+		);
+		expect(onAction).toHaveBeenCalledWith(
+			'navigate',
+			expect.objectContaining({ page: 'banking', isSecure: true })
+		);
+	});
+});

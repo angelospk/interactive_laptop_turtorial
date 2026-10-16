@@ -22,6 +22,21 @@ import type { NewLesson } from '../schema';
  * (each lesson requires the previous one) so a learner walks it end to end.
  */
 export const bankLessons: NewLesson[] = [
+	// «Οδηγός»: η τράπεζα online βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'bank-guide',
+		moduleId: 'bank',
+		lessonKey: 'guide',
+		titleKey: 'bank_guide_title',
+		descriptionKey: 'bank_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'bank' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// 1. Concept: how do I know a bank page is safe? (padlock + https)
 	{
 		id: 'bank-padlock-quiz',
