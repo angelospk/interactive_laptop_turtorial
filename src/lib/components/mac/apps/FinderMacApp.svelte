@@ -166,6 +166,7 @@
 				{#each folders as folder (folder.id)}
 					<button
 						type="button"
+						data-guide={`finder-${folder.id}`}
 						class={cn(
 							'flex min-h-9 w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-black/5 focus-visible:ring-2 focus-visible:ring-[#0a60ff] focus-visible:outline-none',
 							openFolderId === folder.id && 'bg-neutral-300/70 font-medium hover:bg-neutral-300/70'

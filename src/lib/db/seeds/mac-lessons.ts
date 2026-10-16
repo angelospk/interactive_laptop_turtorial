@@ -33,6 +33,22 @@ const FOLDERS: MacSimFolder[] = [
 	{ id: 'pictures', name: 'Εικόνες', icon: '🖼️' }
 ];
 
+/**
+ * The whole Mac for the mac guide: every app, the Dock and Finder's folders.
+ * The guide embeds the desktop, so the goal only satisfies the config parser
+ * and never scores anything.
+ */
+export function macGuideConfig() {
+	return parseMacSimConfig({
+		goal: 'mac-open-from-dock',
+		prompt: 'Εξερεύνησε το Mac.',
+		targetAppId: 'safari',
+		apps: APPS,
+		dockAppIds: DOCK,
+		folders: FOLDERS
+	});
+}
+
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 interface SimDef {
@@ -145,6 +161,21 @@ function simLesson(def: SimDef, prevLessonId: string): NewLesson {
 }
 
 export const macLessons: NewLesson[] = [
+	// «Οδηγός»: το Mac βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'mac-guide',
+		moduleId: 'mac',
+		lessonKey: 'guide',
+		titleKey: 'mac_guide_title',
+		descriptionKey: 'mac_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'mac' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// 1 — reading intro (τι αλλάζει από τα Windows). Body served as static markdown.
 	{
 		id: 'mac-intro',

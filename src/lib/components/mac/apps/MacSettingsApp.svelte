@@ -115,6 +115,7 @@
 				<li>
 					<button
 						type="button"
+						data-guide={`settings-pane-${pane.id}`}
 						class={cn(
 							'flex min-h-8 w-full items-center gap-2 rounded-md px-2 py-1 text-left hover:bg-black/5 focus-visible:ring-2 focus-visible:ring-[#0a60ff] focus-visible:outline-none',
 							machine.settingsSection === pane.id && 'bg-[#0a60ff] text-white hover:bg-[#0a60ff]'
@@ -158,6 +159,7 @@
 						{#each SIZES as size (size.id)}
 							<button
 								type="button"
+								data-guide={`text-size-${size.id}`}
 								class={row}
 								aria-pressed={machine.textSize === size.id}
 								onclick={() => pick(size.id)}

@@ -343,6 +343,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	// Mac track (CURRICULUM_PLAN §5). «Τα βασικά του Mac» is the base path — its
 	// four lessons (γνωριμία + άνοιγμα + κλείσιμο ≠ τερματισμός) are the core.
 	mac: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['mac-guide'] },
 		{
 			id: 'basics',
 			title: 'Τα βασικά του Mac',

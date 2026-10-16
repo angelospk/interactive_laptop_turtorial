@@ -59,6 +59,7 @@
 		<div class="flex items-center">
 			<button
 				type="button"
+				data-guide="mac-close"
 				aria-label="Κλείσιμο παραθύρου"
 				title="Κλείσιμο παραθύρου (το πρόγραμμα μένει ανοιχτό)"
 				class={light}
@@ -77,6 +78,7 @@
 			</button>
 			<button
 				type="button"
+				data-guide="mac-minimize"
 				aria-label="Ελαχιστοποίηση παραθύρου"
 				title="Ελαχιστοποίηση (το παράθυρο κρύβεται στο Dock)"
 				class={light}
@@ -95,6 +97,7 @@
 			</button>
 			<button
 				type="button"
+				data-guide="mac-zoom"
 				aria-label={zoomed ? 'Επαναφορά μεγέθους παραθύρου' : 'Μεγιστοποίηση παραθύρου'}
 				title={zoomed ? 'Επαναφορά μεγέθους' : 'Μεγιστοποίηση'}
 				class={light}

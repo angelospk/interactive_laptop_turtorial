@@ -37,6 +37,7 @@
 		className
 	)}
 	data-mac-desktop
+	data-guide="mac-desktop"
 >
 	<!-- Sonoma-style wallpaper: soft colour fields with two light blooms -->
 	<div

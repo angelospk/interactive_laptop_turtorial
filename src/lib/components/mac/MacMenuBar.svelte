@@ -110,6 +110,7 @@
 			<button
 				type="button"
 				{disabled}
+				data-guide="mac-apple-menu"
 				class={cn(barButton, 'px-2.5 text-base leading-none', open === 'apple' && 'bg-white/25')}
 				aria-label="Μενού Apple"
 				aria-haspopup="menu"
@@ -194,6 +195,7 @@
 			<button
 				type="button"
 				{disabled}
+				data-guide="mac-app-menu"
 				class={cn(barButton, 'font-bold', open === 'app' && 'bg-white/25')}
 				aria-haspopup="menu"
 				aria-expanded={open === 'app'}
@@ -223,7 +225,14 @@
 						<span>Ρυθμίσεις…</span><span class="text-xs opacity-60">⌘,</span>
 					</button>
 					<div class="my-1 h-px bg-black/10"></div>
-					<button type="button" role="menuitem" disabled={!canQuit} class={menuItem} onclick={quit}>
+					<button
+						type="button"
+						role="menuitem"
+						data-guide="mac-quit"
+						disabled={!canQuit}
+						class={menuItem}
+						onclick={quit}
+					>
 						<span>Τερματισμός «{activeLabel}»</span>
 						<span class="text-xs opacity-60" aria-hidden="true">⌘Q</span>
 					</button>
@@ -373,6 +382,7 @@
 		<!-- Spotlight -->
 		<button
 			type="button"
+			data-guide="mac-spotlight"
 			{disabled}
 			aria-label="Spotlight αναζήτηση"
 			title="Spotlight (αναζήτηση)"

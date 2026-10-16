@@ -27,9 +27,12 @@
 		lesson: Lesson;
 		onComplete: (score: number) => void;
 		onBack: () => void;
+		/** Inside a guide: report every event, never score or complete. */
+		embedded?: boolean;
+		onEvent?: (action: string, data: Record<string, unknown>) => void;
 	}
 
-	let { lesson, onComplete, onBack }: Props = $props();
+	let { lesson, onComplete, onBack, embedded = false, onEvent }: Props = $props();
 
 	const config = parseMacSimConfig(lesson.config);
 	const goalConfig = config as unknown as Record<string, unknown>;
@@ -106,6 +109,8 @@
 	/** Single entry point for every semantic event the simulation emits. */
 	function dispatch(action: string, data: Record<string, unknown> = {}) {
 		if (done) return;
+		onEvent?.(action, data);
+		if (embedded) return;
 		if (checkGoalMatch(config.goal, action, data, goalConfig)) {
 			succeed();
 			return;
@@ -221,84 +226,92 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<LessonTemplate {lesson} {onBack}>
-	<div class="flex h-full min-h-0 flex-col items-center gap-3 py-2">
-		<p class="max-w-xl text-center text-lg font-semibold text-foreground">{config.prompt}</p>
+{#if embedded}
+	<div class="h-full bg-slate-100 p-2">{@render desktop('')}</div>
+{:else}
+	<LessonTemplate {lesson} {onBack}>
+		<div class="flex h-full min-h-0 flex-col items-center gap-3 py-2">
+			<p class="max-w-xl text-center text-lg font-semibold text-foreground">{config.prompt}</p>
 
-		<MacDesktop
-			class="max-w-3xl flex-1"
-			brightness={machine.brightness}
-			dark={machine.appearance === 'dark'}
-		>
-			<MacMenuBar
-				activeLabel={appLabel(activeAppId ?? finderApp?.id ?? null)}
-				{canQuit}
-				{machine}
-				onQuit={quitActive}
-				onSpotlight={() => (showSpotlight = true)}
-				onOpenSettings={settingsApp ? openSettingsFromMenu : undefined}
-				disabled={done}
-			/>
+			{@render desktop('max-w-3xl flex-1')}
 
-			{#if frontApp}
-				<MacWindow
-					title={frontApp.label}
-					icon={frontApp.icon}
-					zoomed={Boolean(zoomed[frontApp.id])}
-					onClose={() => closeWindow(frontApp.id)}
-					onMinimize={() => minimizeWindow(frontApp.id)}
-					onZoom={() => zoomWindow(frontApp.id)}
-				>
-					{#if frontApp.kind === 'finder'}
-						<FinderMacApp folders={config.folders ?? []} {machine} onEvent={dispatch} />
-					{:else if frontApp.kind === 'settings'}
-						<MacSettingsApp onEvent={dispatch} {machine} />
-					{:else}
-						<div
-							class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-neutral-500"
-						>
-							<span class="text-5xl" aria-hidden="true">{frontApp.icon}</span>
-							<p class="text-lg font-semibold text-neutral-800">{frontApp.label}</p>
-							<p class="text-sm">
-								Αυτό το πρόγραμμα είναι απλώς ανοιχτό για την άσκηση. Δοκίμασε τα τρία κουμπάκια
-								πάνω αριστερά ή το μενού με το όνομά του.
-							</p>
-						</div>
-					{/if}
-				</MacWindow>
+			<p
+				class="min-h-[1.75rem] max-w-xl text-center text-base font-medium"
+				class:text-emerald-600={done}
+				class:text-amber-700={!done && feedback}
+				role="status"
+				aria-live="polite"
+			>
+				{feedback}
+			</p>
+
+			{#if showHint && !done && config.hint}
+				<p class="max-w-xl text-center text-sm text-muted-foreground">{config.hint}</p>
 			{/if}
+		</div>
+	</LessonTemplate>
+{/if}
 
-			<MacDock
-				apps={config.apps}
-				dockAppIds={config.dockAppIds}
-				{runningAppIds}
-				highlightAppId={highlightDockAppId}
-				disabled={done}
-				onOpen={(id) => openApp(id, 'dock')}
-			/>
+{#snippet desktop(desktopClass: string)}
+	<MacDesktop
+		class={desktopClass}
+		brightness={machine.brightness}
+		dark={machine.appearance === 'dark'}
+	>
+		<MacMenuBar
+			activeLabel={appLabel(activeAppId ?? finderApp?.id ?? null)}
+			{canQuit}
+			{machine}
+			onQuit={quitActive}
+			onSpotlight={() => (showSpotlight = true)}
+			onOpenSettings={settingsApp ? openSettingsFromMenu : undefined}
+			disabled={done}
+		/>
 
-			{#if showSpotlight}
-				<MacSpotlight
-					apps={config.apps}
-					seed={config.spotlightQuery ?? ''}
-					onLaunch={launchFromSpotlight}
-					onClose={() => (showSpotlight = false)}
-				/>
-			{/if}
-		</MacDesktop>
-
-		<p
-			class="min-h-[1.75rem] max-w-xl text-center text-base font-medium"
-			class:text-emerald-600={done}
-			class:text-amber-700={!done && feedback}
-			role="status"
-			aria-live="polite"
-		>
-			{feedback}
-		</p>
-
-		{#if showHint && !done && config.hint}
-			<p class="max-w-xl text-center text-sm text-muted-foreground">{config.hint}</p>
+		{#if frontApp}
+			<MacWindow
+				title={frontApp.label}
+				icon={frontApp.icon}
+				zoomed={Boolean(zoomed[frontApp.id])}
+				onClose={() => closeWindow(frontApp.id)}
+				onMinimize={() => minimizeWindow(frontApp.id)}
+				onZoom={() => zoomWindow(frontApp.id)}
+			>
+				{#if frontApp.kind === 'finder'}
+					<FinderMacApp folders={config.folders ?? []} {machine} onEvent={dispatch} />
+				{:else if frontApp.kind === 'settings'}
+					<MacSettingsApp onEvent={dispatch} {machine} />
+				{:else}
+					<div
+						class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-neutral-500"
+					>
+						<span class="text-5xl" aria-hidden="true">{frontApp.icon}</span>
+						<p class="text-lg font-semibold text-neutral-800">{frontApp.label}</p>
+						<p class="text-sm">
+							Αυτό το πρόγραμμα είναι απλώς ανοιχτό για την άσκηση. Δοκίμασε τα τρία κουμπάκια πάνω
+							αριστερά ή το μενού με το όνομά του.
+						</p>
+					</div>
+				{/if}
+			</MacWindow>
 		{/if}
-	</div>
-</LessonTemplate>
+
+		<MacDock
+			apps={config.apps}
+			dockAppIds={config.dockAppIds}
+			{runningAppIds}
+			highlightAppId={highlightDockAppId}
+			disabled={done}
+			onOpen={(id) => openApp(id, 'dock')}
+		/>
+
+		{#if showSpotlight}
+			<MacSpotlight
+				apps={config.apps}
+				seed={config.spotlightQuery ?? ''}
+				onLaunch={launchFromSpotlight}
+				onClose={() => (showSpotlight = false)}
+			/>
+		{/if}
+	</MacDesktop>
+{/snippet}

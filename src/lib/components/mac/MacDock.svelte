@@ -72,6 +72,7 @@
 				</span>
 				<button
 					type="button"
+					data-guide={`dock-${app.id}`}
 					{disabled}
 					aria-label={running ? `${app.label} (ανοιχτό)` : app.label}
 					title={app.label}

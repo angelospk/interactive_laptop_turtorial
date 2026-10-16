@@ -13,6 +13,7 @@ import { module11Guide } from './module11';
 import { module12Guide } from './module12';
 import { module13Guide } from './module13';
 import { androidGuide, iphoneGuide } from './mobile';
+import { macGuide } from './mac';
 import { module5Guide } from './module5';
 
 /** guideId (the guide lesson's `config.guideId`) → definition. */
@@ -32,6 +33,7 @@ export const guides: Record<string, GuideDefinition> = {
 	[module13Guide.id]: module13Guide,
 	[androidGuide.id]: androidGuide,
 	[iphoneGuide.id]: iphoneGuide,
+	[macGuide.id]: macGuide,
 	[module5Guide.id]: module5Guide
 };
 
