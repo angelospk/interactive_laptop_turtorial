@@ -272,7 +272,7 @@
 			<!-- isolate: the demo's own z-indexes (taskbar, windows) stay under the spotlight. -->
 			<div class="isolate h-full" inert={tour.phase === 'start'}>
 				{#key simEpoch}
-					<GuideSim sim={guide.sim} config={simConfig} onEvent={onSimEvent} />
+					<GuideSim sim={guide.sim} config={simConfig} target={step?.target} onEvent={onSimEvent} />
 				{/key}
 			</div>
 			<GuideSpotlight container={stage} target={spotlight} />

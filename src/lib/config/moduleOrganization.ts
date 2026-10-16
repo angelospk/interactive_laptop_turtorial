@@ -363,6 +363,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	],
 	// gov.gr track (Φάση 3). Base = σύνδεση + εύρεση + λήψη βεβαίωσης.
 	gov: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['gov-guide'] },
 		{
 			id: 'get-certificate',
 			title: 'Βρες τη βεβαίωσή σου',

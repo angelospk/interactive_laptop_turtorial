@@ -83,7 +83,44 @@ const everydayServices = [
 	}
 ];
 
+/**
+ * Everything the gov guide shows: the TaxisNet codes, the services (with two
+ * everyday ones) and the certificate. The guide picks the screen per step.
+ */
+export function govGuideConfig() {
+	return {
+		goal: 'gov-login',
+		prompt: 'Εξερευνήστε το gov.gr.',
+		demoUsername: 'kaph2024',
+		demoPassword: '123456',
+		services: [
+			...govServices,
+			...everydayServices.filter((s) => ['unemployment-card', 'citizen-mailbox'].includes(s.id))
+		],
+		certificate: {
+			title: 'Βεβαίωση οικογενειακής κατάστασης',
+			authority: 'Δήμος Αθηναίων',
+			filename: 'vevaiosi-oikogeneiakis.pdf'
+		}
+	};
+}
+
 export const govLessons: NewLesson[] = [
+	// «Οδηγός»: το gov.gr βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'gov-guide',
+		moduleId: 'gov',
+		lessonKey: 'guide',
+		titleKey: 'gov_guide_title',
+		descriptionKey: 'gov_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'gov' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1 — TaxisNet login
 	{
 		id: 'gov-login',

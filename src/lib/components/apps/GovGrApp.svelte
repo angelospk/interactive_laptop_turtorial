@@ -76,7 +76,10 @@
 
 <div class="flex h-full w-full flex-col overflow-y-auto bg-slate-50">
 	<!-- gov.gr header (shared visual language with the browser sim) -->
-	<header class="flex items-center gap-3 border-b-4 border-[#003476] bg-white px-6 py-4">
+	<header
+		data-guide="gov-header"
+		class="flex items-center gap-3 border-b-4 border-[#003476] bg-white px-6 py-4"
+	>
 		<span class="rounded bg-[#003476] px-2.5 py-1.5 text-xl font-bold text-white">ΓΔ</span>
 		<div>
 			<h1 class="text-2xl font-bold text-[#003476] lowercase">gov.gr</h1>
@@ -137,6 +140,7 @@
 
 					<Button
 						class="w-full bg-[#003476] py-6 text-lg text-white hover:bg-[#00285c]"
+						data-guide="gov-login-button"
 						disabled={done}
 						onclick={submitLogin}
 					>
@@ -160,6 +164,7 @@
 					{#each config.services ?? [] as service (service.id)}
 						<button
 							class="flex items-start gap-4 rounded-xl border-2 border-slate-200 bg-white p-5 text-left transition-colors hover:border-[#003476] hover:bg-blue-50 focus:border-[#003476] focus:ring-2 focus:ring-blue-200 focus:outline-none disabled:opacity-60"
+							data-guide={`gov-service-${service.id}`}
 							disabled={done}
 							onclick={() => selectService(service.id)}
 						>
@@ -206,6 +211,7 @@
 
 				<Button
 					class="flex w-full items-center justify-center gap-2 bg-[#003476] py-6 text-lg text-white hover:bg-[#00285c]"
+					data-guide="gov-download"
 					disabled={done}
 					onclick={downloadCertificate}
 				>
@@ -263,6 +269,7 @@
 
 					<Button
 						class="w-full bg-[#003476] py-6 text-lg text-white hover:bg-[#00285c]"
+						data-guide="gov-authorize"
 						disabled={done}
 						onclick={submitAuthorization}
 					>

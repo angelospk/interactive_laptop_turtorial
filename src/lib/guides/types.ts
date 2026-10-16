@@ -1,5 +1,12 @@
 /** Which simulation a guide opens; `GuideLesson` maps each to a component. */
-export type GuideSim = 'browser' | 'desktop' | 'mouse-pad' | 'keyboard-pad' | 'phone' | 'mac';
+export type GuideSim =
+	| 'browser'
+	| 'desktop'
+	| 'mouse-pad'
+	| 'keyboard-pad'
+	| 'phone'
+	| 'mac'
+	| 'gov';
 
 /** What a simulation reports when the learner does something in it. */
 export interface GuideEvent {
