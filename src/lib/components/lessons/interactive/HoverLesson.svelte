@@ -320,12 +320,17 @@
 		gap: 1rem;
 	}
 
+	/* On the same white card as the HUD: dark text straight on the purple
+	   gradient read poorly. */
 	.play-instructions {
 		text-align: center;
 		font-size: 1.05rem;
 		font-weight: 600;
 		color: #1f2937;
-		margin: 0 0 0.5rem;
+		margin: 0;
+		padding: 0.75rem 1rem;
+		background: rgba(255, 255, 255, 0.95);
+		border-radius: 8px;
 	}
 
 	.hud {
