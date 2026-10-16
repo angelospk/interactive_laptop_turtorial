@@ -55,6 +55,7 @@
 		onComplete,
 		onBack,
 		embedded = false,
+		guideTarget = null,
 		onEvent
 	} = $props<{
 		lesson: Lesson;
@@ -62,6 +63,8 @@
 		onBack: () => void;
 		/** Inside a guide: no lesson frame around the desktop, only the desktop. */
 		embedded?: boolean;
+		/** The guide step's target: a taskbar icon it points at never hides in «•••». */
+		guideTarget?: string | null;
 		/** Every action the learner takes, before any goal check (the guide listens). */
 		onEvent?: (action: string, data: Record<string, unknown>) => void;
 	}>();
@@ -140,6 +143,10 @@
 		goal === 'restore-app' && !completed
 			? openApps.filter((a) => a.minimized && a.appId === config.targetAppId).map((a) => a.appId)
 			: []
+	);
+
+	const keepAppIds = $derived(
+		guideTarget?.startsWith('taskbar-') ? [guideTarget.slice('taskbar-'.length)] : []
 	);
 
 	// Derived Taskbar Apps: Pinned + Open but Unpinned
@@ -413,6 +420,7 @@
 					apps={taskbarApps}
 					openAppIds={openApps.map((a) => a.appId)}
 					{highlightAppIds}
+					{keepAppIds}
 					onAppClick={(id) => openApp(id)}
 					onStartClick={() => {
 						startMenuOpen = !startMenuOpen;

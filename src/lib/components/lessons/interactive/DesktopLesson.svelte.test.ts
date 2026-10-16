@@ -69,3 +69,44 @@ describe('the simulated Windows screen', () => {
 		expect(win.width).toBeLessThan(desktop.width - 100);
 	});
 });
+
+// A guide step that points at a taskbar icon: on a narrow screen the icon must
+// not hide in «•••», or the guide has nothing to light up.
+describe('the desktop inside a guide, on a narrow screen', () => {
+	const shown = (target: string) => {
+		const el = document.querySelector(`[data-guide="${target}"]`);
+		return !!el && el.getBoundingClientRect().width > 0;
+	};
+
+	function mountGuide(guideTarget: string | null) {
+		const target = document.body.appendChild(document.createElement('div'));
+		target.style.cssText = 'width:360px;height:600px;display:flex;flex-direction:column';
+		const lesson = {
+			id: 'guide-desktop-simulation',
+			lessonType: 'desktop-simulation',
+			config: { initialApps: [] }
+		} as unknown as Lesson;
+		return render(
+			DesktopLesson as never,
+			{
+				target,
+				props: { lesson, embedded: true, guideTarget, onComplete: vi.fn(), onBack: vi.fn() }
+			} as never
+		);
+	}
+
+	test('keeps the taskbar icon the step points at out of «•••»', async () => {
+		mountGuide('taskbar-settings');
+		await vi.waitFor(() => expect(shown('taskbar-settings')).toBe(true));
+		// The guide's own spotlight points at it: no second «Πατήστε εδώ» bubble.
+		expect(document.querySelector('[data-highlight]')).toBeNull();
+	});
+
+	test('without a target the narrow taskbar still overflows (the case above is real)', async () => {
+		mountGuide(null);
+		await vi.waitFor(() =>
+			expect(document.querySelector('[aria-label*="Περισσότερες"], [aria-expanded]')).not.toBeNull()
+		);
+		await vi.waitFor(() => expect(shown('taskbar-settings')).toBe(false));
+	});
+});

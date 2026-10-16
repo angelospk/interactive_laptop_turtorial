@@ -48,6 +48,7 @@
 	<DesktopLesson
 		lesson={asLesson('desktop-simulation')}
 		embedded
+		guideTarget={target}
 		onEvent={report}
 		onComplete={noop}
 		onBack={noop}

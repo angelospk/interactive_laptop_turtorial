@@ -33,6 +33,7 @@
 		apps = [],
 		openAppIds = [],
 		highlightAppIds = [],
+		keepAppIds = [],
 		onAppClick,
 		onStartClick,
 		onOpenSettings,
@@ -46,6 +47,8 @@
 		openAppIds: string[];
 		/** Apps the lesson points at, e.g. the minimised window to bring back. */
 		highlightAppIds?: string[];
+		/** Apps that must stay out of «•••», with no «Πατήστε εδώ» (a guide lights them up itself). */
+		keepAppIds?: string[];
 		onAppClick: (appId: string) => void;
 		onStartClick: () => void;
 		onOpenSettings: (page: string) => void;
@@ -90,7 +93,11 @@
 		// «•••» takes one place. The app the lesson points at always stays: when
 		// there is room for only one of them, it wins and the rest stay in Start.
 		const fit = Math.floor((edge - 0.5 * rem - fixedWidth - more) / slot);
-		const target = apps.filter((a: TaskbarApp) => highlightAppIds.includes(a.id));
+		// The lesson's own highlight first, then what a guide keeps.
+		const target = [
+			...apps.filter((a: TaskbarApp) => highlightAppIds.includes(a.id)),
+			...apps.filter((a: TaskbarApp) => keepAppIds.includes(a.id))
+		];
 		const keep = new Set(
 			[...target, ...apps]
 				.map((a) => a.id)
