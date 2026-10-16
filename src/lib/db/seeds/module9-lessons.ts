@@ -5,6 +5,21 @@ import type { NewLesson } from '../schema';
  * Added Uninstall Lesson
  */
 export const module9Lessons: NewLesson[] = [
+	// «Οδηγός»: οι Ρυθμίσεις βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module9-guide',
+		moduleId: 'module9',
+		lessonKey: 'guide',
+		titleKey: 'module9_guide_title',
+		descriptionKey: 'module9_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module9' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'module9-lesson1',
 		moduleId: 'module9',

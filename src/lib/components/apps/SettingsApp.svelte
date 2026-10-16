@@ -170,6 +170,7 @@
 		</div>
 		<nav class="space-y-1">
 			<button
+				data-guide="settings-system"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'system'
 					? 'bg-blue-50 text-blue-700'
@@ -179,6 +180,7 @@
 				<Monitor class="h-4 w-4" /> Σύστημα
 			</button>
 			<button
+				data-guide="settings-network"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'network'
 					? 'bg-blue-50 text-blue-700'
@@ -188,6 +190,7 @@
 				<Globe class="h-4 w-4" /> Δίκτυο & Internet
 			</button>
 			<button
+				data-guide="settings-devices"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'devices'
 					? 'bg-blue-50 text-blue-700'
@@ -197,6 +200,7 @@
 				<Printer class="h-4 w-4" /> Συσκευές
 			</button>
 			<button
+				data-guide="settings-apps"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'apps'
 					? 'bg-blue-50 text-blue-700'
@@ -206,6 +210,7 @@
 				<AppWindow class="h-4 w-4" /> Εφαρμογές
 			</button>
 			<button
+				data-guide="settings-bluetooth"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'bluetooth'
 					? 'bg-blue-50 text-blue-700'
@@ -218,6 +223,7 @@
 				<Bluetooth class="h-4 w-4" /> Bluetooth
 			</button>
 			<button
+				data-guide="settings-display"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'display'
 					? 'bg-blue-50 text-blue-700'
@@ -230,6 +236,7 @@
 				<MonitorIcon class="h-4 w-4" /> Οθόνη
 			</button>
 			<button
+				data-guide="settings-accessibility"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'accessibility'
 					? 'bg-blue-50 text-blue-700'
@@ -242,6 +249,7 @@
 				<Accessibility class="h-4 w-4" /> Προσβασιμότητα
 			</button>
 			<button
+				data-guide="settings-sound"
 				class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {activeSection ===
 				'sound'
 					? 'bg-blue-50 text-blue-700'
