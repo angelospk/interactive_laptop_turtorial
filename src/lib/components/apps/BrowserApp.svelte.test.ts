@@ -177,6 +177,14 @@ describe('BrowserApp AI assistant page', () => {
 		});
 	});
 
+	it('opens the AI chat for a gemini.google.com tab, not a Google search', async () => {
+		const screen = render(BrowserApp, {
+			config: { initialTabs: ['gemini.google.com'] },
+			onAction: vi.fn()
+		} as never);
+		await expect.element(screen.getByPlaceholder('Γράψτε την ερώτησή σας...')).toBeVisible();
+	});
+
 	it('opens the AI chat when the learner types chatgpt.com in the address bar', async () => {
 		const screen = render(BrowserApp, { config: {}, onAction: vi.fn() } as never);
 		const bar = screen.getByPlaceholder('Πληκτρολογήστε μια διεύθυνση Web');

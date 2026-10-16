@@ -16,7 +16,7 @@ export const module12Guide: GuideDefinition = {
 			id: 'open',
 			target: 'address-bar',
 			lessonIds: [],
-			task: { type: 'navigate', where: { isSecure: true } }
+			task: { type: 'navigate', where: { page: 'gov' } }
 		},
 		{ id: 'find', target: 'page', lessonIds: ['module12-lesson1'] },
 		{ id: 'declaration', target: 'page', lessonIds: [], task: { type: 'gov-submit' } },

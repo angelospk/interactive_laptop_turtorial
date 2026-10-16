@@ -16,7 +16,7 @@ export const module8Guide: GuideDefinition = {
 			id: 'secure-site',
 			target: 'address-bar',
 			lessonIds: ['module8-lesson2'],
-			task: { type: 'navigate', where: { isSecure: true } }
+			task: { type: 'navigate', where: { page: 'gov' } }
 		},
 		{
 			id: 'cookies',

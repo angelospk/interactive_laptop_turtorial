@@ -37,11 +37,15 @@
 
 	const config = parseMobileSimConfig(lesson.config);
 
+	let stageWidth = $state(0);
 	let stageHeight = $state(0);
 	let phoneWidth = $state(0);
 	let phoneHeight = $state(0);
+	// Fit both ways: a short stage and a narrow one (a phone held upright).
 	const phoneScale = $derived(
-		stageHeight && phoneHeight ? Math.min(1, (stageHeight - 16) / phoneHeight) : 1
+		stageHeight && stageWidth && phoneHeight && phoneWidth
+			? Math.min(1, (stageHeight - 16) / phoneHeight, (stageWidth - 16) / phoneWidth)
+			: 1
 	);
 	const goalConfig = config as unknown as Record<string, unknown>;
 	const targetApp = config.apps.find((a) => a.id === config.targetAppId);
@@ -192,6 +196,7 @@
 			style:position="absolute"
 			style:inset="0"
 			style:overflow="hidden"
+			bind:clientWidth={stageWidth}
 			bind:clientHeight={stageHeight}
 		>
 			<!-- offsetHeight ignores the transform, so the scale does not change it. -->

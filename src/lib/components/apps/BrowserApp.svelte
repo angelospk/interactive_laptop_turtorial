@@ -99,7 +99,11 @@
 				let type: Tab['type'] = 'search';
 				let title = url;
 
-				if (url === 'home') {
+				// AI first: gemini.google.com is the assistant, not a Google search.
+				if (isAiSite(url)) {
+					type = 'ai';
+					title = 'AI Assistant';
+				} else if (url === 'home') {
 					type = 'home';
 					title = 'Αρχική';
 				} else if (url.includes('news')) {
@@ -114,9 +118,6 @@
 				} else if (url.includes('search') || url.includes('google')) {
 					type = 'search';
 					title = 'Google';
-				} else if (isAiSite(url)) {
-					type = 'ai';
-					title = 'AI Assistant';
 				}
 
 				return {
@@ -206,7 +207,11 @@
 		let title = url;
 		let isSecure = true;
 
-		if (url.includes('news') || url.includes('eidiseis')) {
+		// AI first, as in the initial tabs.
+		if (isAiSite(url)) {
+			type = 'ai';
+			title = 'AI Assistant';
+		} else if (url.includes('news') || url.includes('eidiseis')) {
 			type = 'news';
 			title = 'Ειδήσεις';
 		} else if (url.includes('weather') || url.includes('kairos')) {
@@ -227,9 +232,6 @@
 		} else if (url.includes('settings') || url.includes('privacy')) {
 			type = 'browser-settings';
 			title = 'Ρυθμίσεις Browser';
-		} else if (isAiSite(url)) {
-			type = 'ai';
-			title = 'AI Assistant';
 		}
 
 		// Simulate insecure site

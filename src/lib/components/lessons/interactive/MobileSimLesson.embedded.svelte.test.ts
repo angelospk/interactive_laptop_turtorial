@@ -20,9 +20,10 @@ const lesson = (variant: 'android' | 'ios') =>
 let last: HTMLElement;
 const stageBottom = () => last.getBoundingClientRect().bottom;
 
-function stage() {
+function stage(width?: string) {
 	const el = document.createElement('div');
 	el.style.height = '500px';
+	if (width) el.style.width = width;
 	document.body.appendChild(el);
 	last = el;
 	return el;
@@ -48,6 +49,40 @@ describe('MobileSimLesson embedded', () => {
 
 		await screen.getByRole('button', { name: 'Αρχική οθόνη' }).click();
 		expect(onEvent).toHaveBeenCalledWith('mobile-home', {});
+	});
+
+	it('never completes, even when the learner does the config goal', async () => {
+		const onEvent = vi.fn();
+		const onComplete = vi.fn();
+		const screen = render(MobileSimLesson, {
+			target: stage(),
+			props: { lesson: lesson('android'), embedded: true, onEvent, onComplete, onBack: vi.fn() }
+		} as never);
+		// The config goal is mobile-dial-number with no number: any call matches it.
+		await screen.getByRole('button', { name: 'Άνοιγμα Τηλέφωνο' }).first().click();
+		await screen.getByRole('button', { name: 'Ψηφίο 6' }).click();
+		await screen.getByRole('button', { name: 'Κλήση' }).click();
+		expect(onEvent).toHaveBeenCalledWith('mobile-call-placed', expect.anything());
+		// A lesson completes 900ms after its goal.
+		await new Promise((r) => setTimeout(r, 1200));
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it('also shrinks to fit a narrow stage', async () => {
+		render(MobileSimLesson, {
+			target: stage('200px'),
+			props: {
+				lesson: lesson('android'),
+				embedded: true,
+				onEvent: vi.fn(),
+				onComplete: vi.fn(),
+				onBack: vi.fn()
+			}
+		} as never);
+		await vi.waitFor(() => {
+			const frame = document.querySelector('[data-guide="phone-screen"]')!.getBoundingClientRect();
+			expect(frame.right).toBeLessThanOrEqual(last.getBoundingClientRect().right);
+		});
 	});
 
 	it('has the pull-down panel and the side buttons a guide talks about', () => {
