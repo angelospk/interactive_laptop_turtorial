@@ -5,6 +5,21 @@ import type { NewLesson } from '../schema';
  * Dedicated module for recognizing and handling security threats.
  */
 export const module10Lessons: NewLesson[] = [
+	// «Οδηγός»: αναγνώριση απατών βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module10-guide',
+		moduleId: 'module10',
+		lessonKey: 'guide',
+		titleKey: 'module10_guide_title',
+		descriptionKey: 'module10_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module10' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Urgent Payment Request (Phishing)
 	{
 		id: 'module10-lesson1',

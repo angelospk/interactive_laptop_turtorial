@@ -461,6 +461,7 @@
 								size="icon"
 								class="rounded-full text-red-600 hover:bg-red-50"
 								title="Αναφορά Phishing"
+								data-guide="email-report"
 								onclick={() => reportPhishing(selectedEmail!.id)}
 							>
 								<AlertTriangle class="h-4 w-4" />
