@@ -229,6 +229,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	],
 	module8: [
 		{ title: 'Θεωρία', count: 7 },
+		{ title: 'Οδηγός', count: 1 },
 		{ title: 'Ασφαλής περιήγηση', count: 5 },
 		{ title: 'Συναλλαγές & προστασία λογαριασμού', count: 8 }
 	],

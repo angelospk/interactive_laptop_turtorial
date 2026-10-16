@@ -4,6 +4,21 @@ import type { NewLesson } from '../schema';
  * Module 8: Internet Safety & Banking
  */
 export const module8Lessons: NewLesson[] = [
+	// «Οδηγός»: ασφάλεια στο διαδίκτυο βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module8-guide',
+		moduleId: 'module8',
+		lessonKey: 'guide',
+		titleKey: 'module8_guide_title',
+		descriptionKey: 'module8_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module8' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'module8-lesson1',
 		moduleId: 'module8',

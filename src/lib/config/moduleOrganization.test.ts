@@ -101,10 +101,11 @@ describe('buildLessonSections', () => {
 		expect(sections.map((s) => s.items.length)).toEqual([1, 1, 7, 3]);
 	});
 
-	it('labels the module8 theory wall separately from the two practice groups', () => {
-		const sections = buildLessonSections('module8', lessons(18))!;
-		expect(sections.map((s) => s.items.length)).toEqual([7, 5, 6]);
+	it('labels the module8 theory wall and the guide separately from the two practice groups', () => {
+		const sections = buildLessonSections('module8', lessons(21))!;
+		expect(sections.map((s) => s.items.length)).toEqual([7, 1, 5, 8]);
 		expect(sections[0].title).toBe('Θεωρία');
+		expect(sections[1].title).toBe('Οδηγός');
 	});
 
 	it('preserves original indices across sections', () => {
