@@ -5,6 +5,21 @@ import type { NewLesson } from '../schema';
  * Realistic scenario: building a monthly household expenses table
  */
 export const module7Lessons: NewLesson[] = [
+	// «Οδηγός»: το Excel βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module7-guide',
+		moduleId: 'module7',
+		lessonKey: 'guide',
+		titleKey: 'module7_guide_title',
+		descriptionKey: 'module7_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module7' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'module7-lesson1',
 		moduleId: 'module7',

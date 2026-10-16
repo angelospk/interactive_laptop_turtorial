@@ -184,6 +184,9 @@
 			variant="ghost"
 			size="icon"
 			class={currentStyle.bold ? 'bg-slate-200' : ''}
+			title="Έντονα"
+			aria-label="Έντονα"
+			data-guide="excel-bold"
 			onclick={() => toggleStyle('bold')}
 		>
 			<Bold class="h-4 w-4" />
@@ -233,13 +236,19 @@
 		</Button>
 
 		<div class="h-6 w-px bg-slate-300"></div>
-		<Button variant="ghost" size="icon" title="Συναρτήσεις" onclick={() => (formulaBar = '=')}>
+		<Button
+			variant="ghost"
+			size="icon"
+			title="Συναρτήσεις"
+			data-guide="excel-functions"
+			onclick={() => (formulaBar = '=')}
+		>
 			<Calculator class="h-4 w-4" />
 		</Button>
 	</div>
 
 	<!-- Formula Bar -->
-	<div class="flex items-center gap-2 border-b p-2">
+	<div data-guide="excel-formula-bar" class="flex items-center gap-2 border-b p-2">
 		<div class="w-10 text-center text-sm font-bold text-slate-500">{selectedCell || ''}</div>
 		<div class="h-6 w-px bg-slate-300"></div>
 		<span class="font-serif text-slate-400 italic">fx</span>
@@ -257,7 +266,7 @@
 
 	<!-- Grid -->
 	<div class="flex-1 overflow-auto select-none">
-		<table class="border-collapse text-sm" style="table-layout: fixed;">
+		<table data-guide="excel-grid" class="border-collapse text-sm" style="table-layout: fixed;">
 			<thead>
 				<tr>
 					<th class="w-10 border bg-slate-100"></th>
