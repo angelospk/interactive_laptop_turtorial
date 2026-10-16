@@ -248,6 +248,7 @@
 	<!-- Command Bar (Win11 style) -->
 	<div class="flex items-center gap-1 border-b bg-slate-50 px-2 py-1.5">
 		<Button
+			data-guide="explorer-new-folder"
 			variant="ghost"
 			size="sm"
 			class="gap-2 rounded-md text-slate-700 hover:bg-slate-200/70"
@@ -266,6 +267,7 @@
 			size="icon"
 			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Αποκοπή"
+			data-guide="explorer-cut"
 			onclick={() => copyItem(true)}
 			disabled={!selectedItemId}
 		>
@@ -276,6 +278,7 @@
 			size="icon"
 			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Αντιγραφή"
+			data-guide="explorer-copy"
 			onclick={() => copyItem(false)}
 			disabled={!selectedItemId}
 		>
@@ -286,6 +289,7 @@
 			size="icon"
 			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Επικόλληση"
+			data-guide="explorer-paste"
 			onclick={pasteItem}
 			disabled={!clipboard}
 		>
@@ -297,6 +301,7 @@
 			size="icon"
 			class="h-8 w-8 rounded-md hover:bg-slate-200/70"
 			title="Μετονομασία"
+			data-guide="explorer-rename"
 			onclick={() => {
 				if (selectedItemId) {
 					isRenaming = true;
@@ -312,6 +317,7 @@
 			variant="ghost"
 			size="icon"
 			title="Διαγραφή"
+			data-guide="explorer-delete"
 			class="h-8 w-8 rounded-md text-red-600 hover:bg-slate-200/70 hover:text-red-700"
 			onclick={deleteItem}
 			disabled={!selectedItemId}
@@ -404,6 +410,7 @@
 				<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
+					data-guide="explorer-files"
 					class="grid h-full grid-cols-4 content-start gap-4"
 					ondragover={(e) => e.preventDefault()}
 					ondrop={(e) => handleDrop(e, currentFolderId)}

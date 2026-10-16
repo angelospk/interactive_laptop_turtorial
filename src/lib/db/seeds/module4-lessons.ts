@@ -5,6 +5,21 @@ import type { NewLesson } from '../schema';
  * Refactored to use desktop-simulation
  */
 export const module4Lessons: NewLesson[] = [
+	// «Οδηγός»: Εξερεύνηση αρχείων, βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module4-guide',
+		moduleId: 'module4',
+		lessonKey: 'guide',
+		titleKey: 'module4_guide_title',
+		descriptionKey: 'module4_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module4' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Navigating Folders
 	{
 		id: 'module4-lesson1',
