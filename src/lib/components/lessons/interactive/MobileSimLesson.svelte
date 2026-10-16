@@ -27,11 +27,22 @@
 		lesson: Lesson;
 		onComplete: (score: number) => void;
 		onBack: () => void;
+		/** Inside a guide: just the phone, no lesson frame, no scoring. */
+		embedded?: boolean;
+		/** Every semantic event, for a guide's practical steps. */
+		onEvent?: (action: string, data: Record<string, unknown>) => void;
 	}
 
-	let { lesson, onComplete, onBack }: Props = $props();
+	let { lesson, onComplete, onBack, embedded = false, onEvent }: Props = $props();
 
 	const config = parseMobileSimConfig(lesson.config);
+
+	let stageHeight = $state(0);
+	let phoneWidth = $state(0);
+	let phoneHeight = $state(0);
+	const phoneScale = $derived(
+		stageHeight && phoneHeight ? Math.min(1, (stageHeight - 16) / phoneHeight) : 1
+	);
 	const goalConfig = config as unknown as Record<string, unknown>;
 	const targetApp = config.apps.find((a) => a.id === config.targetAppId);
 	const variant = config.variant === 'ios' ? 'ios' : 'android';
@@ -80,10 +91,13 @@
 	/** Single entry point for every semantic event the simulation emits. */
 	function dispatch(action: string, data: Record<string, unknown> = {}) {
 		if (done) return;
+		onEvent?.(action, data);
 
 		if (action === 'mobile-app-opened') {
 			currentAppId = data.appId as string;
 		}
+		// A guide's phone is for trying things out: nothing scores or misses.
+		if (embedded) return;
 
 		if (checkGoalMatch(config.goal, action, data, goalConfig)) {
 			succeed();
@@ -130,19 +144,20 @@
 
 	function goHome() {
 		currentAppId = null;
+		onEvent?.('mobile-home', {});
 	}
 
 	// Screenshot lesson: show the physical bezel buttons and turn the correct
 	// platform chord into the semantic event. The truthful combination lives in
 	// the capability profile, not in the lesson config (codex plan review).
-	const isScreenshotLesson = config.goal === 'mobile-screenshot';
+	const isScreenshotLesson = embedded || config.goal === 'mobile-screenshot';
 	const screenshotChord = mobilePlatformCapabilities[config.variant].screenshotChord;
 
 	function handleSystemChord(chord: string) {
 		if (done) return;
 		if (chord === screenshotChord) {
 			dispatch('mobile-screenshot-taken', { chord });
-		} else {
+		} else if (!embedded) {
 			miss('Άλλος συνδυασμός κουμπιών. Δοκίμασε ξανά τα δύο σωστά κουμπιά μαζί.');
 		}
 	}
@@ -152,7 +167,7 @@
 	const isForceCloseLesson = config.goal === 'mobile-force-close';
 
 	// Quick-settings pull-down (esm001-c2-s6): only in lessons that need it.
-	const isQuickToggleLesson = config.goal === 'mobile-quick-toggle';
+	const isQuickToggleLesson = embedded || config.goal === 'mobile-quick-toggle';
 	let showQuickSettings = $state(false);
 	let showRecents = $state(false);
 
@@ -167,124 +182,154 @@
 	}
 </script>
 
-<LessonTemplate {lesson} {onBack}>
-	<div class="flex flex-col items-center gap-4 py-4">
-		<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
-
-		<MobileFrame
-			{variant}
-			{phone}
-			onHome={goHome}
-			onRecents={isForceCloseLesson && !done ? () => (showRecents = true) : undefined}
-			showSystemButtons={isScreenshotLesson}
-			onSystemChord={handleSystemChord}
-			onPullDown={isQuickToggleLesson && !done ? () => (showQuickSettings = true) : undefined}
-			class="my-2"
+{#if embedded}
+	<!-- Inside a guide the stage is shorter than the phone: shrink it to fit. The
+	     stage is absolute, so its height comes from the guide, never from the phone.
+	     The sizing styles are inline: without them the scale would feed back into itself. -->
+	<div style:position="relative" style:height="100%">
+		<div
+			class="flex items-start justify-center bg-slate-100 py-2"
+			style:position="absolute"
+			style:inset="0"
+			style:overflow="hidden"
+			bind:clientHeight={stageHeight}
 		>
-			{#if showQuickSettings}
-				<QuickSettingsPanel
-					{variant}
-					{phone}
-					onToggle={(tile, on) => dispatch('mobile-quick-toggle', { tile, on })}
-					onClose={() => (showQuickSettings = false)}
-				/>
-			{/if}
-			{#if showRecents}
-				<RecentApps
-					apps={config.apps}
-					recentAppIds={config.recentAppIds ?? []}
-					frozenAppId={config.targetAppId ?? null}
-					onDismiss={dismissRecent}
-					onClose={() => (showRecents = false)}
-				/>
-			{/if}
-			{#if currentApp === null}
-				<MobileHomeScreen
-					{variant}
-					apps={config.apps}
-					dockAppIds={config.dockAppIds ?? []}
-					onOpenApp={(appId) => dispatch('mobile-app-opened', { appId })}
-					highlightAppId={showHint && !done ? (config.targetAppId ?? null) : null}
-					disabled={done}
-				/>
-			{:else if currentApp.kind === 'phone'}
-				<PhoneApp onEvent={dispatch} contacts={config.contacts ?? []} {variant} />
-			{:else if currentApp.kind === 'messages' || currentApp.kind === 'viber'}
-				<MessagingApp
-					onEvent={dispatch}
-					{variant}
-					conversations={config.conversations ?? []}
-					channel={currentApp.kind === 'viber' ? 'viber' : 'sms'}
-					title={currentApp.label}
-					verdictConversationId={config.goal === 'mobile-spot-scam-sms'
-						? (config.targetConversationId ?? null)
-						: null}
-				/>
-			{:else if currentApp.kind === 'settings'}
-				<MobileSettingsApp
-					onEvent={dispatch}
-					wifiNetworks={config.wifiNetworks ?? []}
-					{variant}
-					{phone}
-				/>
-			{:else if currentApp.kind === 'camera'}
-				<CameraApp
-					onEvent={dispatch}
-					{variant}
-					qrUrl={config.qrUrl ?? ''}
-					targetHost={config.targetHost ?? ''}
-				/>
-			{:else if currentApp.kind === 'store'}
-				<StoreApp
-					onEvent={dispatch}
-					{variant}
-					items={config.storeItems ?? []}
-					storeName={config.storeName ?? 'Κατάστημα εφαρμογών'}
-				/>
-			{:else if currentApp.kind === 'assistant'}
-				<AssistantApp
-					onEvent={dispatch}
-					intent={config.intent ?? ''}
-					phrases={config.phrases ?? []}
-					greeting={config.assistantGreeting ?? undefined}
-					confirm={config.assistantConfirm ?? undefined}
-				/>
-			{:else if currentApp.kind === 'browser'}
-				<Login2FA
-					onEvent={dispatch}
-					{variant}
-					url={config.loginUrl ?? ''}
-					code={config.twofaCode ?? ''}
-					serviceName={config.serviceName ?? undefined}
-				/>
-			{:else}
-				<!-- Inert placeholder for apps that are scenery in this lesson -->
+			<!-- offsetHeight ignores the transform, so the scale does not change it. -->
+			<div style:width="{phoneWidth * phoneScale}px" style:height="{phoneHeight * phoneScale}px">
 				<div
-					class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center"
+					style:width="max-content"
+					style:transform-origin="top left"
+					style:transform="scale({phoneScale})"
+					bind:offsetWidth={phoneWidth}
+					bind:offsetHeight={phoneHeight}
 				>
-					<span class="text-5xl" aria-hidden="true">{currentApp.icon}</span>
-					<p class="text-lg font-semibold text-slate-800">{currentApp.label}</p>
-					<p class="text-sm text-muted-foreground">
-						Αυτή η εφαρμογή δεν χρειάζεται σε αυτό το μάθημα. Πάτησε τη γραμμή κάτω για να γυρίσεις
-						στην αρχική οθόνη.
-					</p>
+					{@render phoneFrame()}
 				</div>
-			{/if}
-		</MobileFrame>
-
-		<!-- Calm, non-blocking feedback (aria-live so it is announced) -->
-		<p
-			class="min-h-[1.75rem] text-center text-base font-medium"
-			class:text-emerald-600={done}
-			class:text-amber-700={!done && feedback}
-			role="status"
-			aria-live="polite"
-		>
-			{feedback}
-		</p>
-
-		{#if showHint && !done && config.hint}
-			<p class="text-center text-sm text-muted-foreground">{config.hint}</p>
-		{/if}
+			</div>
+		</div>
 	</div>
-</LessonTemplate>
+{:else}
+	<LessonTemplate {lesson} {onBack}>
+		<div class="flex flex-col items-center gap-4 py-4">
+			<p class="max-w-md text-center text-lg font-semibold text-foreground">{config.prompt}</p>
+
+			{@render phoneFrame()}
+
+			<!-- Calm, non-blocking feedback (aria-live so it is announced) -->
+			<p
+				class="min-h-[1.75rem] text-center text-base font-medium"
+				class:text-emerald-600={done}
+				class:text-amber-700={!done && feedback}
+				role="status"
+				aria-live="polite"
+			>
+				{feedback}
+			</p>
+
+			{#if showHint && !done && config.hint}
+				<p class="text-center text-sm text-muted-foreground">{config.hint}</p>
+			{/if}
+		</div>
+	</LessonTemplate>
+{/if}
+
+{#snippet phoneFrame()}
+	<MobileFrame
+		{variant}
+		{phone}
+		onHome={goHome}
+		onRecents={isForceCloseLesson && !done ? () => (showRecents = true) : undefined}
+		showSystemButtons={isScreenshotLesson}
+		onSystemChord={handleSystemChord}
+		onPullDown={isQuickToggleLesson && !done ? () => (showQuickSettings = true) : undefined}
+		class="my-2"
+	>
+		{#if showQuickSettings}
+			<QuickSettingsPanel
+				{variant}
+				{phone}
+				onToggle={(tile, on) => dispatch('mobile-quick-toggle', { tile, on })}
+				onClose={() => (showQuickSettings = false)}
+			/>
+		{/if}
+		{#if showRecents}
+			<RecentApps
+				apps={config.apps}
+				recentAppIds={config.recentAppIds ?? []}
+				frozenAppId={config.targetAppId ?? null}
+				onDismiss={dismissRecent}
+				onClose={() => (showRecents = false)}
+			/>
+		{/if}
+		{#if currentApp === null}
+			<MobileHomeScreen
+				{variant}
+				apps={config.apps}
+				dockAppIds={config.dockAppIds ?? []}
+				onOpenApp={(appId) => dispatch('mobile-app-opened', { appId })}
+				highlightAppId={showHint && !done ? (config.targetAppId ?? null) : null}
+				disabled={done}
+			/>
+		{:else if currentApp.kind === 'phone'}
+			<PhoneApp onEvent={dispatch} contacts={config.contacts ?? []} {variant} />
+		{:else if currentApp.kind === 'messages' || currentApp.kind === 'viber'}
+			<MessagingApp
+				onEvent={dispatch}
+				{variant}
+				conversations={config.conversations ?? []}
+				channel={currentApp.kind === 'viber' ? 'viber' : 'sms'}
+				title={currentApp.label}
+				verdictConversationId={config.goal === 'mobile-spot-scam-sms'
+					? (config.targetConversationId ?? null)
+					: null}
+			/>
+		{:else if currentApp.kind === 'settings'}
+			<MobileSettingsApp
+				onEvent={dispatch}
+				wifiNetworks={config.wifiNetworks ?? []}
+				{variant}
+				{phone}
+			/>
+		{:else if currentApp.kind === 'camera'}
+			<CameraApp
+				onEvent={dispatch}
+				{variant}
+				qrUrl={config.qrUrl ?? ''}
+				targetHost={config.targetHost ?? ''}
+			/>
+		{:else if currentApp.kind === 'store'}
+			<StoreApp
+				onEvent={dispatch}
+				{variant}
+				items={config.storeItems ?? []}
+				storeName={config.storeName ?? 'Κατάστημα εφαρμογών'}
+			/>
+		{:else if currentApp.kind === 'assistant'}
+			<AssistantApp
+				onEvent={dispatch}
+				intent={config.intent ?? ''}
+				phrases={config.phrases ?? []}
+				greeting={config.assistantGreeting ?? undefined}
+				confirm={config.assistantConfirm ?? undefined}
+			/>
+		{:else if currentApp.kind === 'browser'}
+			<Login2FA
+				onEvent={dispatch}
+				{variant}
+				url={config.loginUrl ?? ''}
+				code={config.twofaCode ?? ''}
+				serviceName={config.serviceName ?? undefined}
+			/>
+		{:else}
+			<!-- Inert placeholder for apps that are scenery in this lesson -->
+			<div class="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">
+				<span class="text-5xl" aria-hidden="true">{currentApp.icon}</span>
+				<p class="text-lg font-semibold text-slate-800">{currentApp.label}</p>
+				<p class="text-sm text-muted-foreground">
+					Αυτή η εφαρμογή δεν χρειάζεται σε αυτό το μάθημα. Πάτησε τη γραμμή κάτω για να γυρίσεις
+					στην αρχική οθόνη.
+				</p>
+			</div>
+		{/if}
+	</MobileFrame>
+{/snippet}

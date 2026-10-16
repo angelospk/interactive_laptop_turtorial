@@ -26,6 +26,21 @@ const homeApps: MobileApp[] = [
 ];
 
 export const androidLessons: NewLesson[] = [
+	// «Οδηγός»: το κινητό Android βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'android-guide',
+		moduleId: 'android',
+		lessonKey: 'guide',
+		titleKey: 'android_guide_title',
+		descriptionKey: 'android_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'android' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'android-open-viber',
 		moduleId: 'android',

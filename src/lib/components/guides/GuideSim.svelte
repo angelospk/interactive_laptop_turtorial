@@ -5,6 +5,7 @@
 	 */
 	import BrowserApp from '$lib/components/apps/BrowserApp.svelte';
 	import DesktopLesson from '$lib/components/lessons/interactive/DesktopLesson.svelte';
+	import MobileSimLesson from '$lib/components/lessons/interactive/MobileSimLesson.svelte';
 	import type { Lesson } from '$lib/db/schema';
 	import MousePad from './MousePad.svelte';
 	import KeyboardPad from './KeyboardPad.svelte';
@@ -18,7 +19,7 @@
 
 	const report = (type: string, data?: Record<string, unknown>) => onEvent({ ...data, type });
 
-	// The desktop is a lesson component: it gets a lesson with no goal, so it never completes.
+	// The desktop and the phone are lesson components: embedded, they never complete.
 	const asLesson = (lessonType: string) =>
 		({
 			id: `guide-${lessonType}`,
@@ -41,6 +42,14 @@
 {:else if sim === 'desktop'}
 	<DesktopLesson
 		lesson={asLesson('desktop-simulation')}
+		embedded
+		onEvent={report}
+		onComplete={noop}
+		onBack={noop}
+	/>
+{:else if sim === 'phone'}
+	<MobileSimLesson
+		lesson={asLesson('mobile-sim')}
 		embedded
 		onEvent={report}
 		onComplete={noop}

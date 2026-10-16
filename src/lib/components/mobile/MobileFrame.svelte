@@ -132,6 +132,7 @@
 			<button
 				type="button"
 				data-testid={`bezel-${id}`}
+				data-guide={`bezel-${id}`}
 				data-armed={armed === id}
 				onclick={() => pressButton(id)}
 				aria-label={BUTTON_LABEL[id]}
@@ -206,6 +207,7 @@
 		<button
 			type="button"
 			aria-label={pullLabel}
+			data-guide="phone-statusbar"
 			data-testid="mobile-statusbar"
 			onclick={() => {
 				if (swiped) {
@@ -249,6 +251,7 @@
 	<!-- Screen content. -mt pulls it under the status bar so wallpapers run edge to edge. -->
 	<div
 		data-testid="mobile-screen"
+		data-guide="phone-screen"
 		class={cn('relative flex-1 overflow-y-auto bg-slate-50', isIos ? '-mt-11 pt-11' : '-mt-8 pt-8')}
 	>
 		{@render children?.()}
@@ -275,6 +278,7 @@
 				type="button"
 				onclick={onHome}
 				aria-label="Αρχική οθόνη"
+				data-guide="phone-home"
 				class="flex min-h-11 items-center justify-center px-6 focus-visible:ring-4 focus-visible:ring-blue-400 focus-visible:outline-none"
 			>
 				<span

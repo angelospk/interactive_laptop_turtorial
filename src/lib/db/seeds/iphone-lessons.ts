@@ -22,6 +22,21 @@ const homeApps: MobileApp[] = [
 ];
 
 export const iphoneLessons: NewLesson[] = [
+	// «Οδηγός»: το iPhone βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'iphone-guide',
+		moduleId: 'iphone',
+		lessonKey: 'guide',
+		titleKey: 'iphone_guide_title',
+		descriptionKey: 'iphone_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'iphone' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'iphone-open-facetime',
 		moduleId: 'iphone',

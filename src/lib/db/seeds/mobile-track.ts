@@ -84,6 +84,25 @@ const CONVERSATIONS = [
 const WIFI_NETWORKS = ['SPITI-WIFI', 'COSMOTE-4G-1234', 'CAFE-KENTRO'];
 
 /**
+ * The whole phone for the android and iphone guides: every app, contact,
+ * conversation and network. The guide embeds the phone, so the goal only
+ * satisfies the config parser and never scores anything.
+ */
+export function mobileGuideConfig(variant: MobileVariant) {
+	return {
+		goal: 'mobile-dial-number',
+		variant,
+		prompt: 'Εξερεύνησε το κινητό.',
+		targetAppId: 'phone',
+		apps: homeApps(variant),
+		dockAppIds: DOCK,
+		contacts: CONTACTS,
+		conversations: CONVERSATIONS,
+		wifiNetworks: WIFI_NETWORKS
+	};
+}
+
+/**
  * Goal-driven lessons 2..7 for one variant. Lesson 1 (mobile-tap) stays
  * hand-written in each track file — it predates the builder and its shape
  * must not change (data policy: shipped lessons are immutable).

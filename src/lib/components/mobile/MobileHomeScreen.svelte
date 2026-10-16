@@ -49,6 +49,7 @@
 		onclick={() => onOpenApp(app.id)}
 		{disabled}
 		aria-label={`Άνοιγμα ${app.label}`}
+		data-guide={`app-${app.id}`}
 		class="flex min-h-[76px] flex-col items-center justify-start gap-1 p-1 transition focus-visible:ring-4 focus-visible:ring-white/80 focus-visible:outline-none active:scale-95 disabled:opacity-60"
 	>
 		<AppIcon

@@ -247,6 +247,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	// path — its 7 lesson ids are the immutable original track (7/7 = «βασική
 	// διαδρομή ολοκληρωμένη»). Later waves append lessons to the other sections.
 	android: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['android-guide'] },
 		{
 			id: 'basics',
 			title: 'Βασικά — πρώτα βήματα',
@@ -293,6 +294,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 		}
 	],
 	iphone: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['iphone-guide'] },
 		{
 			id: 'basics',
 			title: 'Βασικά — πρώτα βήματα',
