@@ -4,6 +4,21 @@ import type { NewLesson } from '../schema';
  * Module 11: Βιντεοκλήση (Video Calls)
  */
 export const module11Lessons: NewLesson[] = [
+	// «Οδηγός»: η βιντεοκλήση βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module11-guide',
+		moduleId: 'module11',
+		lessonKey: 'guide',
+		titleKey: 'module11_guide_title',
+		descriptionKey: 'module11_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module11' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: What is a Video Call (Quiz)
 	{
 		id: 'module11-lesson1',

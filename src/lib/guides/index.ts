@@ -9,6 +9,7 @@ import { module7Guide } from './module7';
 import { module8Guide } from './module8';
 import { module9Guide } from './module9';
 import { module10Guide } from './module10';
+import { module11Guide } from './module11';
 import { module5Guide } from './module5';
 
 /** guideId (the guide lesson's `config.guideId`) → definition. */
@@ -23,6 +24,7 @@ export const guides: Record<string, GuideDefinition> = {
 	[module8Guide.id]: module8Guide,
 	[module9Guide.id]: module9Guide,
 	[module10Guide.id]: module10Guide,
+	[module11Guide.id]: module11Guide,
 	[module5Guide.id]: module5Guide
 };
 

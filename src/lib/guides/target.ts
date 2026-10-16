@@ -19,3 +19,13 @@ export function findTarget(root: ParentNode, target: string): HTMLElement | null
  */
 export const simConfigFor = (guide: GuideDefinition, epoch: number) =>
 	(epoch > 0 && guide.resumeConfig) || guide.simConfig;
+
+/** Resolves true once `target` is on screen, or false after `ms`. */
+export async function waitForTarget(root: ParentNode, target: string, ms: number) {
+	const until = Date.now() + ms;
+	while (!findTarget(root, target)) {
+		if (Date.now() >= until) return false;
+		await new Promise((r) => setTimeout(r, 100));
+	}
+	return true;
+}

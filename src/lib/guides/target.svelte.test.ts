@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { findTarget, simConfigFor } from './target';
+import { findTarget, simConfigFor, waitForTarget } from './target';
 import type { GuideDefinition } from './types';
 
 // A target can render twice, one copy per screen size (a sidebar button on a
@@ -23,6 +23,25 @@ describe('findTarget', () => {
 		const root = document.getElementById('root')!;
 		expect(findTarget(root, 'x')).toBeNull();
 		expect(findTarget(root, 'y')).toBeNull();
+	});
+});
+
+// A target can show up a moment after its step opens (a call's mute button
+// appears once the call connects): the guide waits before it resets the demo.
+describe('waitForTarget', () => {
+	afterEach(() => (document.body.innerHTML = ''));
+
+	it('finds a target that appears a moment later', async () => {
+		document.body.innerHTML = `<div id="root"></div>`;
+		const root = document.getElementById('root')!;
+		setTimeout(() => (root.innerHTML = `<button data-guide="mute">M</button>`), 300);
+		await expect(waitForTarget(root, 'mute', 2000)).resolves.toBe(true);
+	});
+
+	it('gives up after the wait', async () => {
+		document.body.innerHTML = `<div id="root"></div>`;
+		const root = document.getElementById('root')!;
+		await expect(waitForTarget(root, 'mute', 300)).resolves.toBe(false);
 	});
 });
 

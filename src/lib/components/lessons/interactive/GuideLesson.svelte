@@ -6,7 +6,7 @@
 	import { Volume2, VolumeX, RotateCcw, LogOut, LifeBuoy, Hand } from '@lucide/svelte';
 	import GuideSim from '$lib/components/guides/GuideSim.svelte';
 	import GuideSpotlight from '../GuideSpotlight.svelte';
-	import { findTarget, guides, simConfigFor } from '$lib/guides';
+	import { guides, simConfigFor, waitForTarget } from '$lib/guides';
 	import { allClips } from '$lib/guides/scripts';
 	import {
 		createGuide,
@@ -84,10 +84,12 @@
 	}
 
 	// The learner may have clicked away from what this step shows (another tab,
-	// another page). Rather than pointing at nothing, put the demo back.
+	// another page). Rather than pointing at nothing, put the demo back. A target
+	// can also show up a moment late (a call's mute button), so wait first.
 	async function ensureTarget(target: string) {
 		await tick();
-		if (stage && !findTarget(stage, target)) simEpoch++;
+		if (!stage || (await waitForTarget(stage, target, 2500))) return;
+		if (step?.target === target) simEpoch++;
 	}
 
 	const focusOnMount = (el: HTMLElement) => el.focus();

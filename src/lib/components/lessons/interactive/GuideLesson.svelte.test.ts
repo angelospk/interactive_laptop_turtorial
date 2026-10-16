@@ -218,7 +218,10 @@ describe('GuideLesson', () => {
 			await screen.getByRole('button', { name: /Το ξέρω/ }).click();
 		}
 		await expect.element(screen.getByText('Βήμα 6 από 11')).toBeInTheDocument();
-		await vi.waitFor(() => expect(spotlight()?.getAttribute('data-target')).toBe('search'));
+		// The guide first waits a moment for a late target, then resets the demo.
+		await vi.waitFor(() => expect(spotlight()?.getAttribute('data-target')).toBe('search'), {
+			timeout: 5000
+		});
 		expect(document.querySelector('[data-guide="search"]')).not.toBeNull();
 	});
 

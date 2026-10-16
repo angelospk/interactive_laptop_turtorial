@@ -143,6 +143,7 @@
 				class="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 shadow-lg transition-transform hover:bg-green-600 active:scale-95"
 				onclick={startCall}
 				title="Έναρξη κλήσης"
+				data-guide="videocall-start"
 			>
 				<Phone class="h-7 w-7" />
 			</button>
@@ -154,6 +155,7 @@
 						: 'bg-slate-700 hover:bg-slate-600'} shadow-lg"
 					onclick={toggleMute}
 					title={muted ? 'Άρση σίγασης' : 'Σίγαση'}
+					data-guide="videocall-mute"
 				>
 					{#if muted}
 						<MicOff class="h-6 w-6" />
@@ -167,6 +169,7 @@
 				class="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-lg transition-transform hover:bg-red-600 active:scale-95"
 				onclick={endCall}
 				title="Τερματισμός κλήσης"
+				data-guide="videocall-end"
 			>
 				<PhoneOff class="h-7 w-7" />
 			</button>
