@@ -28,10 +28,24 @@ module έχει τον δικό του Οδηγό (`src/lib/guides/<module>.ts`)
 
 | `sim` | Τι ανοίγει | Modules |
 |---|---|---|
-| `browser` | `BrowserApp` | module5 |
-| `desktop` | `DesktopLesson` με `embedded` (χωρίς πλαίσιο μαθήματος, χωρίς στόχο) | module3, module4 κ.ά. |
+| `browser` | `BrowserApp` | module5, module8, module12, module13, bank |
+| `desktop` | `DesktopLesson` με `embedded` (χωρίς πλαίσιο μαθήματος, χωρίς στόχο) | module3, module4, module6 (email), word, module7, module9, module10, module11 |
 | `mouse-pad` | `MousePad`: πέρασμα, κλικ, διπλό κλικ, δεξί κλικ, σύρσιμο | module1 |
 | `keyboard-pad` | `KeyboardPad`: κουτί κειμένου σαν συνομιλία και τα βασικά πλήκτρα | module2 |
+| `phone` | `MobileSimLesson` με `embedded`· το κινητό μικραίνει για να χωρά στη σκηνή | android, iphone |
+| `mac` | `MacSimLesson` με `embedded` | mac |
+| `gov` | `GovGuideSim`: το `GovGrApp`, με την οθόνη (σύνδεση, υπηρεσίες, βεβαίωση, εξουσιοδότηση) που ζητά το `target` του βήματος | gov |
+| `health` | `HealthGuideSim`: το `HealthApp`, με την οθόνη `health-sms` / `health-portal` / `health-appointments` του `target` | health |
+
+Οι ακριβείς αντιστοιχίες είναι στα `src/lib/guides/*.ts`. Το `GuideSim` παίρνει και το
+`target` του τρέχοντος βήματος: έτσι μια προσομοίωση με οθόνες δείχνει τη σωστή, ακόμα
+κι αν ο χρήστης πάτησε «Παράλειψη» στο προηγούμενο βήμα.
+
+Όταν το `target` ενός βήματος λείπει (π.χ. ο χρήστης έκλεισε το παράθυρο), ο Οδηγός
+περιμένει έως 2,5″ (`waitForTarget`, για στοιχεία που εμφανίζονται με καθυστέρηση) και
+μετά ξαναστήνει το demo. Το `resumeConfig` ενός οδηγού είναι το demo αυτής της
+επανεκκίνησης (π.χ. το email ή η τράπεζα ήδη ανοιχτά)· χωρίς αυτό, ξαναμπαίνει το
+`simConfig`.
 
 Δύο είδη βημάτων («μικτός» Οδηγός):
 
