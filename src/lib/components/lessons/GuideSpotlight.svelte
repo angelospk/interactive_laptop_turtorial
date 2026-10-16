@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { findTarget } from '$lib/guides/target';
 	/**
 	 * Darkens `container` except for its `[data-guide=target]` element, which gets
 	 * a thick yellow frame. Takes no clicks: the learner can still use the demo.
@@ -21,11 +22,10 @@
 			return;
 		}
 		const root = container;
-		const selector = `[data-guide="${target}"]`;
 		// Never frame the old element under the new target's name.
 		box = null;
 		let frame = requestAnimationFrame(function measure() {
-			const el = root.querySelector(selector) as HTMLElement | null;
+			const el = findTarget(root, target);
 			const next = el ? relativeBox(el, root) : null;
 			if (!sameBox(box, next)) box = next;
 			frame = requestAnimationFrame(measure);

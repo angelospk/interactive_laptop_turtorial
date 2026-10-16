@@ -4,6 +4,21 @@ import type { NewLesson } from '../schema';
  * Module 6: Email & Security
  */
 export const module6Lessons: NewLesson[] = [
+	// «Οδηγός»: το email βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module6-guide',
+		moduleId: 'module6',
+		lessonKey: 'guide',
+		titleKey: 'module6_guide_title',
+		descriptionKey: 'module6_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module6' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	{
 		id: 'module6-lesson1',
 		moduleId: 'module6',

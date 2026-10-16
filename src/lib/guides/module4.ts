@@ -10,6 +10,8 @@ export const module4Guide: GuideDefinition = {
 	moduleId: 'module4',
 	sim: 'desktop',
 	simConfig: { initialApps: [] },
+	// Closed Explorer by mistake? The demo comes back with it open.
+	resumeConfig: { initialApps: ['explorer'] },
 	steps: [
 		{
 			id: 'open',

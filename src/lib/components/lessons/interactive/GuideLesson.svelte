@@ -6,7 +6,7 @@
 	import { Volume2, VolumeX, RotateCcw, LogOut, LifeBuoy, Hand } from '@lucide/svelte';
 	import GuideSim from '$lib/components/guides/GuideSim.svelte';
 	import GuideSpotlight from '../GuideSpotlight.svelte';
-	import { guides } from '$lib/guides';
+	import { findTarget, guides, simConfigFor } from '$lib/guides';
 	import { allClips } from '$lib/guides/scripts';
 	import {
 		createGuide,
@@ -36,9 +36,6 @@
 	// A guide lesson never changes under the component (LessonRenderer keys it by id).
 	const lessonId = lesson.id;
 	const guide = guides[(lesson.config as { guideId?: string } | null)?.guideId ?? ''];
-	// Handed over once: the browser resets its tabs whenever `config` is read anew,
-	// so passing `tour.guide.simConfig` would reset the demo on every step.
-	const simConfig = guide?.simConfig ?? {};
 
 	let tour = $state.raw<GuideState | null>(guide ? createGuide(guide) : null);
 	const startMuted = typeof localStorage !== 'undefined' && localStorage.getItem(MUTE_KEY) === '1';
@@ -51,6 +48,9 @@
 	let stage = $state<HTMLElement>();
 	/** Bumped to put the demo back as it started (see `ensureTarget`). */
 	let simEpoch = $state(0);
+	// Handed over once per demo: the browser resets its tabs whenever `config` is
+	// read anew, so passing `tour.guide.simConfig` would reset the demo on every step.
+	const simConfig = $derived(guide ? simConfigFor(guide, simEpoch) : {});
 
 	const audio = createGuideAudio({ muted: startMuted });
 
@@ -87,7 +87,7 @@
 	// another page). Rather than pointing at nothing, put the demo back.
 	async function ensureTarget(target: string) {
 		await tick();
-		if (stage && !stage.querySelector(`[data-guide="${target}"]`)) simEpoch++;
+		if (stage && !findTarget(stage, target)) simEpoch++;
 	}
 
 	const focusOnMount = (el: HTMLElement) => el.focus();

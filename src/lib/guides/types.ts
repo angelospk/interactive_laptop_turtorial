@@ -38,6 +38,8 @@ export interface GuideDefinition {
 	moduleId: string;
 	sim: GuideSim;
 	simConfig: Record<string, unknown>;
+	/** The demo after a reset, for a guide whose steps need an app that starts closed. */
+	resumeConfig?: Record<string, unknown>;
 	steps: GuideStep[];
 }
 

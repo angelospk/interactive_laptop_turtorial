@@ -311,6 +311,7 @@
 				<div class="flex items-center justify-between border-t bg-slate-50 px-4 py-3">
 					<div class="flex gap-1">
 						<Button
+							data-guide="email-attach"
 							variant="ghost"
 							size="icon"
 							onclick={addAttachment}
@@ -324,6 +325,7 @@
 					<div class="flex gap-2">
 						<Button variant="ghost" onclick={() => (isComposing = false)}>Ακύρωση</Button>
 						<Button
+							data-guide="email-send"
 							class="rounded-full bg-blue-600 px-5 text-white hover:bg-blue-700"
 							onclick={sendEmail}
 						>
@@ -339,6 +341,7 @@
 	<div class="hidden w-52 border-r bg-slate-50 py-4 pr-3 md:block">
 		<div class="mb-6 px-3">
 			<Button
+				data-guide="email-compose"
 				class="h-12 w-auto gap-3 rounded-full bg-white px-5 text-slate-700 shadow-md hover:bg-slate-100 hover:shadow-lg"
 				onclick={startCompose}
 			>
@@ -389,7 +392,15 @@
 	</div>
 
 	<!-- Email List -->
-	<div class="flex w-80 flex-col overflow-y-auto border-r bg-white">
+	<div data-guide="email-list" class="flex w-80 flex-col overflow-y-auto border-r bg-white">
+		<!-- The sidebar, with «Σύνταξη», is hidden on a narrow screen: the button comes here. -->
+		<Button
+			data-guide="email-compose"
+			class="m-2 h-11 gap-2 rounded-full bg-white text-slate-700 shadow-md hover:bg-slate-100 md:hidden"
+			onclick={startCompose}
+		>
+			<Pencil class="h-4 w-4 text-red-600" /> Σύνταξη
+		</Button>
 		<div class="border-b bg-slate-50 p-3 text-xs font-bold tracking-wider text-slate-500 uppercase">
 			{currentView === 'inbox'
 				? 'Εισερχόμενα'
@@ -459,6 +470,7 @@
 								size="icon"
 								class="rounded-full"
 								title="Απάντηση"
+								data-guide="email-reply"
 								onclick={() => {
 									toast.success('Απάντηση εστάλη!');
 									onAction('reply-email', { id: selectedEmail!.id });
@@ -471,6 +483,7 @@
 								size="icon"
 								class="rounded-full"
 								title="Προώθηση"
+								data-guide="email-forward"
 								onclick={() => {
 									toast.success('Προώθηση εστάλη!');
 									onAction('forward-email', { id: selectedEmail!.id });
@@ -483,6 +496,7 @@
 								size="icon"
 								class="rounded-full"
 								title="Διαγραφή"
+								data-guide="email-delete"
 								onclick={() => deleteEmail(selectedEmail!.id)}
 							>
 								<Trash2 class="h-4 w-4" />
