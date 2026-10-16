@@ -61,7 +61,8 @@
 			| 'gov'
 			| 'banking'
 			| 'history'
-			| 'browser-settings';
+			| 'browser-settings'
+			| 'ai';
 		isSecure: boolean;
 		// Per-tab visual history stack (back/forward). Purely cosmetic — never emits onAction.
 		stack: string[];
@@ -110,6 +111,9 @@
 				} else if (url.includes('search') || url.includes('google')) {
 					type = 'search';
 					title = 'Google';
+				} else if (isAiSite(url)) {
+					type = 'ai';
+					title = 'AI Assistant';
 				}
 
 				return {
@@ -191,6 +195,9 @@
 	}
 
 	// Derive page type/title/security from a URL string (mirrors the original navigate() logic exactly)
+	// AI assistants get their own chat page (the AI lesson and the module13 guide).
+	const isAiSite = (url: string) => /chatgpt|openai|gemini|copilot/.test(url);
+
 	function classify(url: string): { type: Tab['type']; title: string; isSecure: boolean } {
 		let type: Tab['type'] = 'search';
 		let title = url;
@@ -217,6 +224,9 @@
 		} else if (url.includes('settings') || url.includes('privacy')) {
 			type = 'browser-settings';
 			title = 'Ρυθμίσεις Browser';
+		} else if (isAiSite(url)) {
+			type = 'ai';
+			title = 'AI Assistant';
 		}
 
 		// Simulate insecure site
@@ -1227,7 +1237,7 @@
 						</Button>
 					</div>
 				</div>
-			{:else if config.goal === 'type-ai-question'}
+			{:else if activeTab.type === 'ai'}
 				<!-- AI Chat Simulation -->
 				<div class="flex h-full flex-col bg-white">
 					<header class="border-b bg-slate-800 px-6 py-4 text-white">
@@ -1247,7 +1257,7 @@
 							</div>
 						{/each}
 					</div>
-					<div class="flex items-center gap-2 border-t p-4">
+					<div data-guide="ai-question" class="flex items-center gap-2 border-t p-4">
 						<input
 							type="text"
 							class="flex-1 rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
@@ -1258,6 +1268,7 @@
 						<button
 							class="rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:opacity-50"
 							onclick={handleAiQuestion}
+							aria-label="Αποστολή ερώτησης"
 						>
 							<Send class="h-4 w-4" />
 						</button>

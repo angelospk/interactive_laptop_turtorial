@@ -4,6 +4,21 @@ import type { NewLesson } from '../schema';
  * Module 13: Βοηθοί Τεχνητής Νοημοσύνης — AI Assistants [BETA]
  */
 export const module13Lessons: NewLesson[] = [
+	// «Οδηγός»: οι βοηθοί AI βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'module13-guide',
+		moduleId: 'module13',
+		lessonKey: 'guide',
+		titleKey: 'module13_guide_title',
+		descriptionKey: 'module13_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module13' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: What is an AI Assistant (Quiz)
 	{
 		id: 'module13-lesson1',
@@ -41,6 +56,8 @@ export const module13Lessons: NewLesson[] = [
 			goal: 'type-ai-question',
 			initialApps: ['browser'],
 			targetUrl: 'chatgpt.com',
+			// The browser opens on the AI chat page, where the question box is.
+			initialTabs: ['chatgpt.com'],
 			instructions:
 				'Ρωτήστε τον AI: Πληκτρολογήστε μια ερώτηση στο πλαίσιο κειμένου, π.χ. "Πώς μπορώ να ανανεώσω το ΑΜΚΑ μου;"'
 		},

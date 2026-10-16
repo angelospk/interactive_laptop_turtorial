@@ -156,3 +156,34 @@ describe('BrowserApp toolbar on a narrow screen', () => {
 		});
 	}
 });
+
+/**
+ * The AI chat page sat after the «search» branch, and chatgpt.com counted as a
+ * search page, so the AI lesson never showed its chat box.
+ */
+describe('BrowserApp AI assistant page', () => {
+	it('opens the AI chat for a chatgpt.com tab, and reports the question', async () => {
+		const onAction = vi.fn();
+		const screen = render(BrowserApp, {
+			config: { goal: 'type-ai-question', initialTabs: ['chatgpt.com'] },
+			onAction
+		} as never);
+		const box = screen.getByPlaceholder('Γράψτε την ερώτησή σας...');
+		await expect.element(box).toBeVisible();
+		await box.fill('Πώς ανανεώνω την ταυτότητά μου;');
+		await screen.getByRole('button', { name: 'Αποστολή ερώτησης' }).click();
+		expect(onAction).toHaveBeenCalledWith('type-ai-question', {
+			message: 'Πώς ανανεώνω την ταυτότητά μου;'
+		});
+	});
+
+	it('opens the AI chat when the learner types chatgpt.com in the address bar', async () => {
+		const screen = render(BrowserApp, { config: {}, onAction: vi.fn() } as never);
+		const bar = screen.getByPlaceholder('Πληκτρολογήστε μια διεύθυνση Web');
+		await bar.fill('chatgpt.com');
+		(bar.element() as HTMLInputElement).dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+		);
+		await expect.element(screen.getByPlaceholder('Γράψτε την ερώτησή σας...')).toBeVisible();
+	});
+});
