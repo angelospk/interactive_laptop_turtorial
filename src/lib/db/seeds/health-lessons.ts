@@ -12,7 +12,50 @@ import type { NewLesson } from '../schema';
  *   - health-simulation lessons use the isolated HealthApp via HealthSimLesson.
  * Only lesson titleKey/descriptionKey are i18n keys (el+en in the manifest).
  */
+/**
+ * Everything the health guide shows on its three screens: the SMS with the
+ * prescription code, the MyHealth portal and the appointment slots.
+ */
+export function healthGuideConfig() {
+	return {
+		goal: 'health-read-eprescription-code',
+		screen: 'sms',
+		prompt: 'Εξερευνήστε τις υπηρεσίες υγείας.',
+		sender: 'ΕΦΚΑ 1517',
+		smsPreview: 'Ο κωδικός της συνταγής σας είναι έτοιμος',
+		code: 'A7K9',
+		medication: 'Παρακεταμόλη 500mg',
+		patientName: 'Μαρία Παπαδοπούλου',
+		prescriptions: [
+			{ title: 'Παρακεταμόλη 500mg', detail: 'Δρ. Ιωάννου · 1 κουτί · λήξη 30/09' },
+			{ title: 'Βιταμίνη D3', detail: 'Δρ. Ιωάννου · 1 κουτί · λήξη 15/10' }
+		],
+		doctor: 'Δρ. Ιωάννου, Παθολόγος',
+		slots: [
+			{ id: 'mon-10', label: 'Δευτέρα 10:00' },
+			{ id: 'tue-12', label: 'Τρίτη 12:00' },
+			{ id: 'wed-09', label: 'Τετάρτη 09:00' }
+		],
+		targetSlotId: 'mon-10'
+	};
+}
+
 export const healthLessons: NewLesson[] = [
+	// «Οδηγός»: η υγεία online βήμα-βήμα, πριν τις ασκήσεις.
+	{
+		id: 'health-guide',
+		moduleId: 'health',
+		lessonKey: 'guide',
+		titleKey: 'health_guide_title',
+		descriptionKey: 'health_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'health' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Intro quiz — what is άυλη συνταγογράφηση
 	{
 		id: 'health-lesson1',

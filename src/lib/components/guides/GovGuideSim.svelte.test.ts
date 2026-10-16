@@ -10,7 +10,7 @@ describe('GovGuideSim', () => {
 		// `props:` because `target` is also a mount option.
 		const screen = render(GovGuideSim, {
 			props: { config: govGuideConfig(), target: 'gov-login-button', onEvent: vi.fn() }
-		});
+		} as never);
 		expect(has('gov-login-button')).toBe(true);
 
 		// Login skipped: the next step points at a service tile.
@@ -27,7 +27,9 @@ describe('GovGuideSim', () => {
 
 	it('reports the events of the screen', async () => {
 		const onEvent = vi.fn();
-		render(GovGuideSim, { props: { config: govGuideConfig(), target: 'gov-service-x', onEvent } });
+		render(GovGuideSim, {
+			props: { config: govGuideConfig(), target: 'gov-service-x', onEvent }
+		} as never);
 		(document.querySelector('[data-guide="gov-service-citizen-mailbox"]') as HTMLElement).click();
 		expect(onEvent).toHaveBeenCalledWith('gov-service-selected', { serviceId: 'citizen-mailbox' });
 	});

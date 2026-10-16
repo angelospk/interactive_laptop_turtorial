@@ -6,7 +6,8 @@ export type GuideSim =
 	| 'keyboard-pad'
 	| 'phone'
 	| 'mac'
-	| 'gov';
+	| 'gov'
+	| 'health';
 
 /** What a simulation reports when the learner does something in it. */
 export interface GuideEvent {

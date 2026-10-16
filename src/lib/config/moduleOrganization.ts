@@ -387,6 +387,7 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	],
 	// Health services track (Φάση 3).
 	health: [
+		{ id: 'guide', title: 'Οδηγός', lessonIds: ['health-guide'] },
 		{
 			id: 'eprescription',
 			title: 'Άυλη συνταγογράφηση',

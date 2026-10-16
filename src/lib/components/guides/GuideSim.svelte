@@ -9,6 +9,7 @@
 	import MobileSimLesson from '$lib/components/lessons/interactive/MobileSimLesson.svelte';
 	import type { Lesson } from '$lib/db/schema';
 	import GovGuideSim from './GovGuideSim.svelte';
+	import HealthGuideSim from './HealthGuideSim.svelte';
 	import MousePad from './MousePad.svelte';
 	import KeyboardPad from './KeyboardPad.svelte';
 	import type { GuideEvent, GuideSim } from '$lib/guides';
@@ -69,6 +70,8 @@
 	/>
 {:else if sim === 'gov'}
 	<GovGuideSim {config} {target} onEvent={report} />
+{:else if sim === 'health'}
+	<HealthGuideSim {config} {target} onEvent={report} />
 {:else if sim === 'mouse-pad'}
 	<MousePad {onEvent} />
 {:else if sim === 'keyboard-pad'}
