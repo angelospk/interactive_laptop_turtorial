@@ -6,25 +6,28 @@ import { govLessons } from '$lib/db/seeds/gov-lessons';
  * Isolated contract for the gov-simulation config parser + seed. Run in isolation:
  *   bunx vitest run src/lib/lessons/govSim.test.ts
  */
+// The module's «Οδηγός» is a guide lesson outside the exercise chain.
+const simLessons = govLessons.filter((l) => l.lessonType !== 'guide');
+
 describe('parseGovSimConfig', () => {
 	it('accepts every seeded gov lesson config', () => {
-		expect(govLessons.length).toBeGreaterThan(0);
-		for (const l of govLessons) {
+		expect(simLessons.length).toBeGreaterThan(0);
+		for (const l of simLessons) {
 			expect(() => parseGovSimConfig(l.config), `lesson ${l.id}`).not.toThrow();
 		}
 	});
 
 	it('every seeded gov lesson uses the gov-simulation lessonType', () => {
-		for (const l of govLessons) {
+		for (const l of simLessons) {
 			expect(l.lessonType, `lesson ${l.id}`).toBe('gov-simulation');
 		}
 	});
 
 	it('seeds form one chained prerequisite line', () => {
-		expect(govLessons[0].requiredLessonId).toBeNull();
-		for (let i = 1; i < govLessons.length; i++) {
-			expect(govLessons[i].requiredLessonId, `lesson ${govLessons[i].id}`).toBe(
-				govLessons[i - 1].id
+		expect(simLessons[0].requiredLessonId).toBeNull();
+		for (let i = 1; i < simLessons.length; i++) {
+			expect(simLessons[i].requiredLessonId, `lesson ${simLessons[i].id}`).toBe(
+				simLessons[i - 1].id
 			);
 		}
 	});
