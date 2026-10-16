@@ -11,7 +11,7 @@ export const macGuide: GuideDefinition = {
 	id: 'mac',
 	moduleId: 'mac',
 	sim: 'mac',
-	simConfig: macGuideConfig(),
+	simConfig: { ...macGuideConfig() },
 	steps: [
 		{ id: 'desktop', target: 'mac-desktop', lessonIds: ['mac-intro'] },
 		{
