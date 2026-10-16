@@ -22,8 +22,26 @@
 
 ## Οδηγός (guided tour)
 
-Τύπος μαθήματος `guide`, ανάμεσα σε «Θεωρία» και «Εξάσκηση» κάθε module. Πρώτος
-οδηγός: module5 «Περιήγηση στο Διαδίκτυο» (11 βήματα στον προσομοιωμένο browser).
+Τύπος μαθήματος `guide`, ανάμεσα σε «Θεωρία» και «Εξάσκηση» κάθε module. Κάθε
+module έχει τον δικό του Οδηγό (`src/lib/guides/<module>.ts`). Ο Οδηγός ανοίγει την
+προσομοίωση του module μέσα από το `GuideSim.svelte`:
+
+| `sim` | Τι ανοίγει | Modules |
+|---|---|---|
+| `browser` | `BrowserApp` | module5 |
+| `desktop` | `DesktopLesson` με `embedded` (χωρίς πλαίσιο μαθήματος, χωρίς στόχο) | module3, module4 κ.ά. |
+| `mouse-pad` | `MousePad`: πέρασμα, κλικ, διπλό κλικ, δεξί κλικ, σύρσιμο | module1 |
+| `keyboard-pad` | `KeyboardPad`: κουτί κειμένου σαν συνομιλία και τα βασικά πλήκτρα | module2 |
+
+Δύο είδη βημάτων («μικτός» Οδηγός):
+
+- **Γνωριμία:** το στοιχείο φωτίζεται και ο χρήστης απαντά «Το ξέρω» / «Δεν το ξέρω».
+- **Πρακτικό** (`task: { type, where }`): η κάρτα γράφει «Δοκιμάστε το εσείς». Ο Οδηγός
+  περιμένει το event της προσομοίωσης (π.χ. `minimize-app`, `pad-typed` με
+  `text: 'γεια σας'`). Μόλις γίνει, μετράει ως «Το ξέρω», παίζει ένα «Μπράβο»
+  (`common.done.*`) και προχωρά. «Βοήθεια» = το `hint` του βήματος, «Παράλειψη» = «Δεν το ξέρω».
+  Ό,τι κάνει ο χρήστης όσο παίζει το «Μπράβο» κρατιέται για το επόμενο βήμα, οπότε
+  όποιος προτρέχει δεν κολλάει.
 
 Τι κάνει ο χρήστης:
 
@@ -53,7 +71,9 @@
 Νέος οδηγός για άλλο module:
 
 1. `src/lib/guides/<module>.ts` (βήματα: `target` = `data-guide` της προσομοίωσης,
-   `lessonIds` = ασκήσεις του ίδιου module) και καταχώριση στο `src/lib/guides/index.ts`.
+   `lessonIds` = ασκήσεις του ίδιου module, προαιρετικά `task`) και καταχώριση στο
+   `src/lib/guides/index.ts`. Ένα `target` που δεν υπάρχει ως `data-guide` σε κανένα
+   component το πιάνει contract test.
 2. `docs/guides/<module>.script.md` με `<module>.intro`, `<module>.step.<βήμα>`, `<module>.hint.<βήμα>`.
 3. Seed μάθημα `lessonType: 'guide'`, `config: { guideId }` και ενότητα «Οδηγός» στο `moduleSections`.
 4. `npx vitest run --project server src/lib/guides` — τα contract tests λένε τι λείπει.

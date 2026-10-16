@@ -5,6 +5,22 @@ import type { NewLesson } from '../schema';
  * 11 lessons covering basic to advanced keyboard skills
  */
 export const module2Lessons: NewLesson[] = [
+	// «Οδηγός»: first, before the exercises; click into the box, type,
+	// press Enter, then the keys that change letters (src/lib/guides/module2.ts).
+	{
+		id: 'module2-guide',
+		moduleId: 'module2',
+		lessonKey: 'guide',
+		titleKey: 'module2_guide_title',
+		descriptionKey: 'module2_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module2' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Basic Typing
 	{
 		id: 'module2-lesson1',

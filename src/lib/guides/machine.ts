@@ -1,4 +1,12 @@
-import { COMMON_CLIPS, introClip, stepClip, type GuideDefinition } from './types';
+import {
+	COMMON_CLIPS,
+	hintClip,
+	introClips,
+	stepClip,
+	taskMatches,
+	type GuideDefinition,
+	type GuideEvent
+} from './types';
 
 export type Answer = 'known' | 'unknown';
 export type GuidePhase = 'start' | 'intro' | 'step' | 'feedback' | 'done';
@@ -17,8 +25,6 @@ export interface GuideState {
 	/** Clip to play now; null = silence. */
 	clip: string | null;
 }
-
-const introClips = (guide: GuideDefinition) => [introClip(guide), ...COMMON_CLIPS.intro];
 
 export function createGuide(guide: GuideDefinition): GuideState {
 	return { guide, phase: 'start', introIndex: 0, stepIndex: 0, answers: {}, clip: null };
@@ -44,6 +50,23 @@ export function answer(s: GuideState, kind: Answer): GuideState {
 	const variants = kind === 'known' ? COMMON_CLIPS.known : COMMON_CLIPS.unknown;
 	const clip = variants[(Object.keys(answers).length - 1) % variants.length];
 	return { ...s, phase: 'feedback', answers, clip };
+}
+
+/** Something happened in the demo: on a practical step, the right thing moves on as known. */
+export function act(s: GuideState, event: GuideEvent): GuideState {
+	if (s.phase !== 'step') return s;
+	const step = s.guide.steps[s.stepIndex];
+	if (!step.task || !taskMatches(step.task, event)) return s;
+	const answers = { ...s.answers, [step.id]: 'known' as const };
+	const variants = COMMON_CLIPS.done;
+	const clip = variants[(Object.keys(answers).length - 1) % variants.length];
+	return { ...s, phase: 'feedback', answers, clip };
+}
+
+/** «Βοήθεια»: say the step's hint; the step keeps waiting. */
+export function help(s: GuideState): GuideState {
+	if (s.phase !== 'step') return s;
+	return { ...s, clip: hintClip(s.guide, s.guide.steps[s.stepIndex]) };
 }
 
 /** After the feedback: the next step, or the end. */

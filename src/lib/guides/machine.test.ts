@@ -1,5 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { createGuide, begin, clipEnded, proceed, answer, nextStep, summary } from './machine';
+import {
+	createGuide,
+	begin,
+	clipEnded,
+	proceed,
+	answer,
+	nextStep,
+	summary,
+	act,
+	help
+} from './machine';
+import { clipIdsFor } from './types';
 import type { GuideDefinition } from './types';
 
 const guide: GuideDefinition = {
@@ -88,5 +99,59 @@ describe('guide machine', () => {
 	it('clipEnded at the end does nothing', () => {
 		const s = finish(['known', 'known', 'known']);
 		expect(clipEnded(s)).toBe(s);
+	});
+
+	// «Δοκιμάστε το»: a step can wait for the learner to do the thing in the demo.
+	const practical: GuideDefinition = {
+		...guide,
+		steps: [
+			{ id: 'a', target: 'a', lessonIds: ['l1'], task: { type: 'typed', where: { text: 'ok' } } },
+			{ id: 'b', target: 'b', lessonIds: [] }
+		]
+	};
+	const atTask = () => proceed(begin(createGuide(practical)));
+
+	it('a guide with practical steps explains them in the intro', () => {
+		let s = begin(createGuide(practical));
+		const heard = [s.clip];
+		while (s.clip) {
+			s = clipEnded(s);
+			heard.push(s.clip);
+		}
+		expect(heard).toEqual([
+			'g.intro',
+			'common.intro.how',
+			'common.intro.try',
+			'common.intro.controls',
+			null
+		]);
+		// A guide without them keeps the short intro.
+		expect(clipIdsFor(guide)).not.toContain('common.intro.try');
+		expect(clipIdsFor(practical)).toContain('common.intro.try');
+	});
+
+	it('doing the task counts as known and plays a «well done» clip', () => {
+		const s = act(atTask(), { type: 'typed', text: 'ok' });
+		expect(s.phase).toBe('feedback');
+		expect(s.answers).toEqual({ a: 'known' });
+		expect(s.clip).toBe('common.done.1');
+		expect(clipIdsFor(practical)).toContain('common.done.1');
+	});
+
+	it('an event that does not match the task changes nothing', () => {
+		const s = atTask();
+		expect(act(s, { type: 'typed', text: 'no' })).toBe(s);
+		expect(act(s, { type: 'other' })).toBe(s);
+		const b = clipEnded(act(s, { type: 'typed', text: 'ok' }));
+		expect(b.stepIndex).toBe(1);
+		expect(act(b, { type: 'typed', text: 'ok' })).toBe(b);
+	});
+
+	it('«Βοήθεια» plays the step hint and keeps waiting', () => {
+		const s = help(atTask());
+		expect(s.phase).toBe('step');
+		expect(s.clip).toBe('g.hint.a');
+		expect(clipEnded(s)).toBe(s);
+		expect(act(s, { type: 'typed', text: 'ok' }).phase).toBe('feedback');
 	});
 });

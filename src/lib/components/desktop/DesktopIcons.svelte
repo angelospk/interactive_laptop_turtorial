@@ -49,10 +49,12 @@
 	role="group"
 	aria-label="Εικονίδια επιφάνειας εργασίας"
 	data-testid="desktop-icons"
+	data-guide="desktop-icons"
 >
 	{#each entries as entry (entry.id)}
 		<button
 			type="button"
+			data-guide={`icon-${entry.id}`}
 			{disabled}
 			class={cn(
 				'flex h-[5.5rem] w-[5.25rem] flex-col items-center gap-1 rounded-sm border border-transparent p-1.5 text-center transition-colors focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none',

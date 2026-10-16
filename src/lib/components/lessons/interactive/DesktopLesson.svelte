@@ -50,10 +50,20 @@
 		Activity
 	} from 'lucide-svelte';
 
-	let { lesson, onComplete, onBack } = $props<{
+	let {
+		lesson,
+		onComplete,
+		onBack,
+		embedded = false,
+		onEvent
+	} = $props<{
 		lesson: Lesson;
 		onComplete: (score: number) => void;
 		onBack: () => void;
+		/** Inside a guide: no lesson frame around the desktop, only the desktop. */
+		embedded?: boolean;
+		/** Every action the learner takes, before any goal check (the guide listens). */
+		onEvent?: (action: string, data: Record<string, unknown>) => void;
 	}>();
 
 	// Parse config
@@ -260,9 +270,11 @@
 
 	// Goal Checking Logic
 	function checkGoal(action: string, data: Record<string, unknown> = {}) {
+		onEvent?.(action, data);
 		if (completed) return;
 
 		try {
+			if (embedded && !goal) return;
 			if (!goal || !isValidGoalId(goal)) {
 				console.warn(`[DesktopLesson] Unknown goal "${goal}" — skipping check`);
 				return;
@@ -294,7 +306,15 @@
 	}
 </script>
 
-<LessonTemplate {lesson} {onBack}>
+{#if embedded}
+	{@render desktop()}
+{:else}
+	<LessonTemplate {lesson} {onBack}>
+		{@render desktop()}
+	</LessonTemplate>
+{/if}
+
+{#snippet desktop()}
 	<!-- A column: the instruction keeps its own height and the simulated screen
 	     takes every pixel left, instead of a fixed 600px box. -->
 	<div class="flex h-full min-h-0 flex-col gap-2">
@@ -418,4 +438,4 @@
 			</Desktop>
 		</div>
 	</div>
-</LessonTemplate>
+{/snippet}

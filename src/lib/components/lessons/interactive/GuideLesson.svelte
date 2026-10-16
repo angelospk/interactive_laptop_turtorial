@@ -3,8 +3,8 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { Lesson } from '$lib/db/schema';
 	import { Button } from '$lib/components/ui/button';
-	import { Volume2, VolumeX, RotateCcw, LogOut } from '@lucide/svelte';
-	import BrowserApp from '$lib/components/apps/BrowserApp.svelte';
+	import { Volume2, VolumeX, RotateCcw, LogOut, LifeBuoy, Hand } from '@lucide/svelte';
+	import GuideSim from '$lib/components/guides/GuideSim.svelte';
 	import GuideSpotlight from '../GuideSpotlight.svelte';
 	import { guides } from '$lib/guides';
 	import { allClips } from '$lib/guides/scripts';
@@ -13,11 +13,14 @@
 		begin,
 		proceed,
 		answer,
+		act,
+		help,
 		clipEnded,
 		summary,
 		type Answer,
 		type GuideState
 	} from '$lib/guides/machine';
+	import type { GuideEvent } from '$lib/guides';
 	import { createGuideAudio } from '$lib/guides/audio';
 	import { guidePracticeLessonIds } from '$lib/guides/practice';
 
@@ -33,7 +36,7 @@
 	// A guide lesson never changes under the component (LessonRenderer keys it by id).
 	const lessonId = lesson.id;
 	const guide = guides[(lesson.config as { guideId?: string } | null)?.guideId ?? ''];
-	// Handed over once: BrowserApp resets its tabs whenever `config` is read anew,
+	// Handed over once: the browser resets its tabs whenever `config` is read anew,
 	// so passing `tour.guide.simConfig` would reset the demo on every step.
 	const simConfig = guide?.simConfig ?? {};
 
@@ -60,6 +63,8 @@
 		tour && (tour.phase === 'step' || tour.phase === 'feedback') ? (step?.target ?? null) : null
 	);
 	let result = $derived(tour ? summary(tour) : { known: 0, total: 0 });
+	/** «Δοκιμάστε το»: this step waits for the learner to do it in the demo. */
+	let practical = $derived(!!step?.task);
 
 	function say(id: string, onEnd: () => void) {
 		lastClip = id;
@@ -74,6 +79,7 @@
 		if (next.clip && next.clip !== prev?.clip) say(next.clip, () => tour && go(clipEnded(tour)));
 		if (next.phase === 'step' && (prev?.phase !== 'step' || prev.stepIndex !== next.stepIndex)) {
 			ensureTarget(next.guide.steps[next.stepIndex].target);
+			catchUp();
 		}
 	}
 
@@ -102,9 +108,52 @@
 
 	function respond(kind: Answer) {
 		if (!tour || tour.phase !== 'step') return;
-		const ids = tour.guide.steps[tour.stepIndex].lessonIds;
-		for (const id of ids) latest[id] = kind;
+		record(tour, kind);
 		go(answer(tour, kind));
+	}
+
+	/** The learner did something in the demo: on a practical step, the right thing moves on. */
+	function onSimEvent(event: GuideEvent) {
+		if (!tour) return;
+		// A learner who is ahead types the next answer while the «well done»
+		// still plays; keep it for the step that comes next.
+		if (tour.phase === 'feedback') {
+			ahead.push(event);
+			return;
+		}
+		const next = act(tour, event);
+		if (next === tour) return;
+		record(tour, 'known');
+		go(next);
+	}
+
+	let ahead: GuideEvent[] = [];
+
+	/** A new step opened: what the learner did during the feedback may already solve it. */
+	function catchUp() {
+		const events = ahead;
+		ahead = [];
+		for (const [i, event] of events.entries()) {
+			// Solved: the rest waits for the step after this one.
+			if (tour?.phase !== 'step') {
+				ahead = [...events.slice(i), ...ahead];
+				return;
+			}
+			onSimEvent(event);
+		}
+	}
+
+	function askHelp() {
+		if (!tour) return;
+		const next = help(tour);
+		// Asked again: say the hint again.
+		if (next.clip === tour.clip) replay();
+		else go(next);
+	}
+
+	function record(at: GuideState, kind: Answer) {
+		const ids = at.guide.steps[at.stepIndex].lessonIds;
+		for (const id of ids) latest[id] = kind;
 		if (ids.length) save(Object.fromEntries(ids.map((id) => [id, kind])));
 	}
 
@@ -211,16 +260,17 @@
 		</Button>
 	{/snippet}
 
-	<!-- Demo and card share the viewport under the lesson bar: the demo takes what
+	<!-- Demo and card share the lesson area under the lesson bar: the demo takes what
 	     the card leaves. On a very short screen the minimums win and the page scrolls. -->
-	<div class="mx-auto flex h-[calc(100dvh-5rem)] min-h-[560px] w-full max-w-6xl flex-col gap-3 p-3">
+	<div class="mx-auto flex h-full min-h-[560px] w-full max-w-6xl flex-col gap-3 p-3">
 		<div
 			bind:this={stage}
 			class="relative min-h-[300px] flex-1 overflow-hidden rounded-xl border-2 border-slate-300 shadow-sm"
 		>
-			<div class="h-full" inert={tour.phase === 'start'}>
+			<!-- isolate: the demo's own z-indexes (taskbar, windows) stay under the spotlight. -->
+			<div class="isolate h-full" inert={tour.phase === 'start'}>
 				{#key simEpoch}
-					<BrowserApp config={simConfig} onAction={() => {}} />
+					<GuideSim sim={guide.sim} config={simConfig} onEvent={onSimEvent} />
 				{/key}
 			</div>
 			<GuideSpotlight container={stage} target={spotlight} />
@@ -251,9 +301,16 @@
 			class="sticky bottom-2 z-40 shrink-0 rounded-2xl border-2 border-brand/30 bg-white p-4 shadow-md [@media(min-height:800px)]:p-5"
 		>
 			<div class="mb-2 flex flex-wrap items-center justify-between gap-2">
-				<p class="text-sm font-semibold text-muted-foreground">
+				<p class="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted-foreground">
 					{#if step && (tour.phase === 'step' || tour.phase === 'feedback')}
 						Βήμα {tour.stepIndex + 1} από {tour.guide.steps.length}
+						{#if practical}
+							<span
+								class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-base text-amber-900"
+							>
+								<Hand class="h-5 w-5" aria-hidden="true" /> Δοκιμάστε το εσείς
+							</span>
+						{/if}
 					{/if}
 				</p>
 				<div class="flex gap-2">{@render soundControls()}</div>
@@ -276,6 +333,23 @@
 				{#if tour.phase === 'intro'}
 					<Button class="min-h-14 px-10 text-xl" onclick={() => tour && go(proceed(tour))}>
 						Πάμε!
+					</Button>
+				{:else if practical && (tour.phase === 'step' || tour.phase === 'feedback')}
+					<Button
+						variant="outline"
+						class="min-h-14 flex-1 gap-2 border-2 px-8 text-xl"
+						disabled={tour.phase !== 'step'}
+						onclick={askHelp}
+					>
+						<LifeBuoy class="h-6 w-6" aria-hidden="true" /> Βοήθεια
+					</Button>
+					<Button
+						variant="ghost"
+						class="min-h-14 px-6 text-lg"
+						disabled={tour.phase !== 'step'}
+						onclick={() => respond('unknown')}
+					>
+						Παράλειψη
 					</Button>
 				{:else if tour.phase === 'step' || tour.phase === 'feedback'}
 					<Button

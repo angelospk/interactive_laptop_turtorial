@@ -220,8 +220,12 @@ describe('Database Schema - Seed Data', () => {
 	});
 
 	it('should have Module 1 lessons with sequential order indexes', () => {
-		const orderIndexes = module1Lessons.map((l) => l.orderIndex).sort((a, b) => a - b);
-		const expected = Array.from({ length: module1Lessons.length }, (_, i) => i + 1);
+		// The guide sits at 0, before the exercises.
+		const orderIndexes = module1Lessons
+			.filter((l) => l.lessonType !== 'guide')
+			.map((l) => l.orderIndex)
+			.sort((a, b) => a - b);
+		const expected = Array.from({ length: orderIndexes.length }, (_, i) => i + 1);
 		expect(orderIndexes).toEqual(expected);
 	});
 

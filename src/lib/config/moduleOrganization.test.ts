@@ -80,24 +80,25 @@ describe('buildLessonSections', () => {
 		expect(buildLessonSections('module2', [])).toBeNull();
 	});
 
-	it('splits module2 (13) into the two configured sections', () => {
-		const sections = buildLessonSections('module2', lessons(13))!;
+	it('splits module2 (14) into the guide and the two configured sections', () => {
+		const sections = buildLessonSections('module2', lessons(14))!;
 		expect(sections.map((s) => s.title)).toEqual([
+			'Οδηγός',
 			'Βασική πληκτρολόγηση',
 			'Συντομεύσεις Windows & ταχύτητα'
 		]);
-		expect(sections[0].items).toHaveLength(9);
-		expect(sections[1].items).toHaveLength(4);
+		expect(sections.map((s) => s.items.length)).toEqual([1, 9, 4]);
 	});
 
-	it('splits module1 into theory / core practice / optional extra practice', () => {
-		const sections = buildLessonSections('module1', lessons(11))!;
+	it('splits module1 into theory / guide / core practice / optional extra practice', () => {
+		const sections = buildLessonSections('module1', lessons(12))!;
 		expect(sections.map((s) => s.title)).toEqual([
 			'Θεωρία',
+			'Οδηγός',
 			'Βασική εξάσκηση',
 			'Επιπλέον εξάσκηση (προαιρετική)'
 		]);
-		expect(sections.map((s) => s.items.length)).toEqual([1, 7, 3]);
+		expect(sections.map((s) => s.items.length)).toEqual([1, 1, 7, 3]);
 	});
 
 	it('labels the module8 theory wall separately from the two practice groups', () => {
@@ -107,10 +108,11 @@ describe('buildLessonSections', () => {
 	});
 
 	it('preserves original indices across sections', () => {
-		const sections = buildLessonSections('module2', lessons(13))!;
+		const sections = buildLessonSections('module2', lessons(14))!;
 		expect(sections[0].items[0].index).toBe(0);
-		expect(sections[1].items[0].index).toBe(9);
-		expect(sections[1].items.at(-1)!.index).toBe(12);
+		expect(sections[1].items[0].index).toBe(1);
+		expect(sections[2].items[0].index).toBe(10);
+		expect(sections[2].items.at(-1)!.index).toBe(13);
 	});
 
 	it('appends extra lessons to the last section (never hides any)', () => {

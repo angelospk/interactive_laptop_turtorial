@@ -5,6 +5,21 @@ import type { NewLesson } from '../schema';
  * Refactored to use desktop-simulation
  */
 export const module3Lessons: NewLesson[] = [
+	// «Οδηγός»: between the theory and the exercises; the learner tries\n\t// the Start menu and a window's buttons (src/lib/guides/module3.ts).
+	{
+		id: 'module3-guide',
+		moduleId: 'module3',
+		lessonKey: 'guide',
+		titleKey: 'module3_guide_title',
+		descriptionKey: 'module3_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module3' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Opening Applications
 	{
 		id: 'module3-lesson1',

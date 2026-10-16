@@ -195,6 +195,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
 	data-testid="taskbar"
+	data-guide="taskbar"
 	bind:clientWidth={barWidth}
 	class="absolute right-0 bottom-0 left-0 z-50 flex h-12 items-center border-t border-white/10 bg-[#202020]/85 px-2 [font-family:Segoe_UI,system-ui,sans-serif] backdrop-blur-xl"
 	onclick={(e) => {
@@ -303,6 +304,7 @@
 		>
 			<button
 				type="button"
+				data-guide="start-button"
 				class={cn(
 					'flex h-10 items-center justify-center rounded-md transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
 					compact ? 'w-9' : 'w-12'
@@ -328,6 +330,7 @@
 			<!-- Search pill: on Windows it opens Start with the search field focused -->
 			<button
 				type="button"
+				data-guide="taskbar-search"
 				class={cn(
 					'h-10 items-center gap-2 rounded-full bg-white/90 pr-4 pl-3 text-sm text-slate-700 shadow-sm transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none',
 					compact ? 'hidden' : 'flex'
@@ -347,6 +350,7 @@
 			{#if onTaskViewClick}
 				<button
 					type="button"
+					data-guide="task-view"
 					class={cn(
 						'flex h-10 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
 						compact ? 'w-9' : 'w-11'
@@ -388,6 +392,7 @@
 				{/if}
 				<button
 					type="button"
+					data-guide={`taskbar-${app.id}`}
 					data-highlight={highlighted ? 'true' : undefined}
 					class={cn(
 						'flex h-10 items-center justify-center rounded-md transition-all focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none active:scale-95',
@@ -480,6 +485,7 @@
 		</button>
 		<button
 			type="button"
+			data-guide="quick-settings"
 			class={cn(trayButton, compact && 'gap-1 px-1.5', showQuickSettings && 'bg-white/10')}
 			onclick={() => toggleFlyout('quick')}
 			aria-label="Γρήγορες ρυθμίσεις"
@@ -496,6 +502,7 @@
 		</button>
 		<button
 			type="button"
+			data-guide="clock"
 			class={cn(
 				trayButton,
 				'flex-col items-end gap-0 text-xs leading-tight',

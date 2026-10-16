@@ -211,10 +211,12 @@ export const moduleSections: Record<string, LessonSection[]> = {
 	// μένουν διαθέσιμα ως προαιρετική εξάσκηση, δεν σβήνονται: audit A3).
 	module1: [
 		{ title: 'Θεωρία', count: 1 },
+		{ title: 'Οδηγός', count: 1 },
 		{ title: 'Βασική εξάσκηση', count: 7 },
 		{ title: 'Επιπλέον εξάσκηση (προαιρετική)', count: 3 }
 	],
 	module2: [
+		{ title: 'Οδηγός', count: 1 },
 		{ title: 'Βασική πληκτρολόγηση', count: 9 },
 		{ title: 'Συντομεύσεις Windows & ταχύτητα', count: 4 }
 	],

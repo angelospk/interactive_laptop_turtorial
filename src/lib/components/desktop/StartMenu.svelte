@@ -98,6 +98,7 @@
 		aria-label="Μενού Έναρξη"
 		tabindex="-1"
 		data-testid="start-menu"
+		data-guide="start-menu"
 	>
 		<!-- Search Bar -->
 		<div class="px-8 pt-7 pb-3">

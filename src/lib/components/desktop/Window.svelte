@@ -100,8 +100,8 @@
 		style="
 			left: {isMaximized ? 0 : x}px;
 			top: {isMaximized ? 0 : y}px;
-			width: {isMaximized ? '100%' : `${initialWidth}px`};
-			height: {isMaximized ? 'calc(100% - 3rem)' : `${initialHeight}px`};
+			width: {isMaximized ? '100%' : `min(${initialWidth}px, calc(100% - ${x}px))`};
+			height: {isMaximized ? 'calc(100% - 3rem)' : `min(${initialHeight}px, calc(100% - 3rem - ${y}px))`};
 			z-index: {isMaximized ? 10 : 1};
 		"
 		onclick={(e) => e.stopPropagation()}
@@ -125,6 +125,7 @@
 			role="group"
 			aria-label="Γραμμή τίτλου"
 			data-titlebar
+			data-guide="window-title"
 		>
 			<div
 				class={cn(
@@ -141,6 +142,7 @@
 				<button
 					type="button"
 					class={captionButton}
+					data-guide="window-minimize"
 					aria-label="Ελαχιστοποίηση"
 					title="Ελαχιστοποίηση"
 					onmousedown={(e) => e.stopPropagation()}
@@ -155,6 +157,7 @@
 				<button
 					type="button"
 					class={captionButton}
+					data-guide="window-maximize"
 					aria-label={isMaximized ? 'Επαναφορά μεγέθους' : 'Μεγιστοποίηση'}
 					title={isMaximized ? 'Επαναφορά μεγέθους' : 'Μεγιστοποίηση'}
 					onmousedown={(e) => e.stopPropagation()}
@@ -173,6 +176,7 @@
 				<button
 					type="button"
 					class={cn(captionButton, 'hover:bg-[#c42b1c] hover:text-white')}
+					data-guide="window-close"
 					aria-label="Κλείσιμο παραθύρου"
 					title="Κλείσιμο"
 					onmousedown={(e) => e.stopPropagation()}

@@ -5,6 +5,22 @@ import type { NewLesson } from '../schema';
  * Gamified lessons for mouse interaction
  */
 export const module1Lessons: NewLesson[] = [
+	// «Οδηγός»: after the theory and before the exercises; each step
+	// waits for the learner to try the skill (src/lib/guides/module1.ts).
+	{
+		id: 'module1-guide',
+		moduleId: 'module1',
+		lessonKey: 'guide',
+		titleKey: 'module1_guide_title',
+		descriptionKey: 'module1_guide_desc',
+		difficulty: 'beginner',
+		orderIndex: 0,
+		lessonType: 'guide',
+		config: { guideId: 'module1' },
+		enabled: true,
+		requiredLessonId: null
+	},
+
 	// Lesson 1: Catch the Balloons (Hover)
 	{
 		id: 'module1-lesson1',
