@@ -81,9 +81,15 @@ CREATE TABLE admin_login_attempts (
 
 export type TestDb = ReturnType<typeof drizzle<typeof schema>>;
 
-/** Fresh in-memory DB with the full schema applied. Call in `beforeEach`. */
-export async function createTestDb(): Promise<TestDb> {
+/**
+ * Fresh in-memory DB with the full schema applied. Call in `beforeEach`.
+ * `onQuery` sees every statement drizzle sends, so a test can count round-trips.
+ */
+export async function createTestDb(onQuery?: (query: string) => void): Promise<TestDb> {
 	const client = createClient({ url: ':memory:' });
 	await client.executeMultiple(SCHEMA_DDL);
-	return drizzle(client, { schema });
+	return drizzle(client, {
+		schema,
+		logger: onQuery ? { logQuery: (query) => onQuery(query) } : false
+	});
 }

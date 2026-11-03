@@ -1,8 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db, lessons } from '$lib/db/client';
+import { db } from '$lib/db/client';
 import { allLessons } from '$lib/db/seeds';
-import { eq } from 'drizzle-orm';
+import { seedLessons } from '$lib/db/seedUpsert';
 import { requireAdmin } from '$lib/server/guards';
 
 /**
@@ -17,27 +17,12 @@ export const POST: RequestHandler = async ({ locals }) => {
 	requireAdmin(locals);
 
 	try {
-		let inserted = 0;
-		let skipped = 0;
-
-		// Process each lesson
-		for (const lesson of allLessons) {
-			// Check if lesson already exists
-			const existing = await db.select().from(lessons).where(eq(lessons.id, lesson.id)).get();
-
-			if (existing) {
-				skipped++;
-			} else {
-				// Insert new lesson
-				await db.insert(lessons).values(lesson).run();
-				inserted++;
-			}
-		}
+		const { inserted, existing } = await seedLessons(db, allLessons, 'skip');
 
 		return json({
 			success: true,
 			inserted,
-			skipped,
+			skipped: existing,
 			total: allLessons.length
 		});
 	} catch (err) {

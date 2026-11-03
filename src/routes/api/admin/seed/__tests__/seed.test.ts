@@ -72,6 +72,19 @@ describe('POST /api/admin/seed', () => {
 		expect(lessonsInDb).toHaveLength(allLessons.length);
 	});
 
+	// bd 20l: one SELECT + one INSERT per lesson was ~682 round-trips to Turso.
+	it('seeds every lesson in a bounded number of queries', async () => {
+		let count = 0;
+		currentDb = await createTestDb(() => count++);
+
+		const response = await POST({ locals: { admin: true } } as unknown as Parameters<
+			typeof POST
+		>[0]);
+
+		expect((await response.json()).inserted).toBe(allLessons.length);
+		expect(count).toBeLessThanOrEqual(20);
+	});
+
 	// Normalised by bd-7gk: /api/admin/* answered 401 while /admin pages answered
 	// 403 for the identical condition. Both are 403 now (see server/guards.ts).
 	it('should return 403 if not admin', async () => {
