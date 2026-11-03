@@ -21,6 +21,7 @@
 	import { isValidGoalId, type GoalId } from '$lib/lessons/goals';
 	import {
 		DESKTOP_APPS,
+		DESKTOP_ICON_APP_IDS,
 		wrongAppHint,
 		type DesktopAppId
 	} from '$lib/components/desktop/desktopApps';
@@ -110,10 +111,7 @@
 
 	// Pinned Apps (Default set)
 	const pinnedAppIds = ['explorer', 'browser', 'email', 'settings'];
-	// Shortcuts on the wallpaper: the everyday apps, the way a home PC has them.
-	const desktopIconApps = availableApps.filter((a) =>
-		['browser', 'email', 'word', 'excel'].includes(a.id)
-	);
+	const desktopIconApps = availableApps.filter((a) => DESKTOP_ICON_APP_IDS.includes(a.id));
 
 	// State
 	// `settingsPage` is per instance: a deep link must be able to say "this

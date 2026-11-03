@@ -21,6 +21,9 @@ export const DESKTOP_APPS = [
 
 export type DesktopAppId = (typeof DESKTOP_APPS)[number]['id'];
 
+/** Shortcuts on the wallpaper: the everyday apps, the way a home PC has them. */
+export const DESKTOP_ICON_APP_IDS: readonly DesktopAppId[] = ['browser', 'email', 'word', 'excel'];
+
 const shortNameOf = (id: string | undefined) => DESKTOP_APPS.find((a) => a.id === id)?.shortName;
 
 /**

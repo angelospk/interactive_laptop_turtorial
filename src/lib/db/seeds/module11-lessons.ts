@@ -56,7 +56,7 @@ export const module11Lessons: NewLesson[] = [
 			goal: 'open-app',
 			targetAppId: 'viber',
 			instructions:
-				'Ανοίξτε το Viber: Κάντε διπλό κλικ στο εικονίδιο Viber στην επιφάνεια εργασίας.'
+				'Ανοίξτε το Viber:\n1. Πατήστε το κουμπί «Έναρξη» (τα τέσσερα μπλε τετράγωνα), κάτω στη γραμμή εργασιών.\n2. Στο μενού που ανοίγει, πατήστε «Viber».'
 		},
 		enabled: true,
 		requiredLessonId: 'module11-lesson1'

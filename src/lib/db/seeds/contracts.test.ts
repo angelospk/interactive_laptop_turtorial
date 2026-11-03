@@ -13,7 +13,7 @@ import {
 } from '$lib/config/moduleOrganization';
 import type { Lesson } from '$lib/db/schema';
 import { lessonTypeRegistry } from '$lib/components/lessons/lessonTypeRegistry';
-import { DESKTOP_APPS } from '$lib/components/desktop/desktopApps';
+import { DESKTOP_APPS, DESKTOP_ICON_APP_IDS } from '$lib/components/desktop/desktopApps';
 import { parseMobileSimConfig } from '$lib/lessons/mobileSim';
 import { parseMacSimConfig } from '$lib/lessons/macSim';
 import { parseGovSimConfig } from '$lib/lessons/govSim';
@@ -425,5 +425,22 @@ describe('desktop-simulation playability', () => {
 			})
 			.map((l) => l.id);
 		expect(vague, `instructions do not name the app in: ${vague.join(', ')}`).toEqual([]);
+	});
+
+	// module11-lesson2 said «διπλό κλικ στο εικονίδιο Viber στην επιφάνεια
+	// εργασίας», but the wallpaper only has the everyday apps (bd 7r0).
+	it('sends the learner to a desktop icon only when the desktop has one', () => {
+		const icons = new Set<string>(DESKTOP_ICON_APP_IDS);
+		const missing = desktopLessons
+			.filter((l) => {
+				const config = l.config as { targetAppId?: string; instructions?: string };
+				return (
+					!!config.targetAppId &&
+					/εικονίδιο[^.]*επιφάνεια εργασίας/.test(config.instructions ?? '') &&
+					!icons.has(config.targetAppId)
+				);
+			})
+			.map((l) => l.id);
+		expect(missing).toEqual([]);
 	});
 });
