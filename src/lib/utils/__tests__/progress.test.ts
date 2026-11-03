@@ -3,72 +3,72 @@ import { getModuleProgress, isLessonLocked } from '../progress';
 import type { Lesson } from '$lib/db/schema';
 
 describe('Progress Utils', () => {
-    describe('getModuleProgress', () => {
-        it('should return 0 if no lessons', () => {
-            expect(getModuleProgress('module1', {}, {})).toBe(0);
-        });
+	describe('getModuleProgress', () => {
+		it('should return 0 if no lessons', () => {
+			expect(getModuleProgress('module1', {}, {})).toBe(0);
+		});
 
-        it('should calculate percentage correctly', () => {
-            const moduleLessonIds = {
-                module1: ['l1', 'l2', 'l3', 'l4']
-            };
-            const userProgress = {
-                l1: { completed: true },
-                l2: { completed: true }
-            };
-            // 2/4 = 50%
-            expect(getModuleProgress('module1', moduleLessonIds, userProgress)).toBe(50);
-        });
+		it('should calculate percentage correctly', () => {
+			const moduleLessonIds = {
+				module1: ['l1', 'l2', 'l3', 'l4']
+			};
+			const userProgress = {
+				l1: { completed: true },
+				l2: { completed: true }
+			};
+			// 2/4 = 50%
+			expect(getModuleProgress('module1', moduleLessonIds, userProgress)).toBe(50);
+		});
 
-        it('should handle missing progress', () => {
-            const moduleLessonIds = {
-                module1: ['l1', 'l2']
-            };
-            expect(getModuleProgress('module1', moduleLessonIds, {})).toBe(0);
-        });
+		it('should handle missing progress', () => {
+			const moduleLessonIds = {
+				module1: ['l1', 'l2']
+			};
+			expect(getModuleProgress('module1', moduleLessonIds, {})).toBe(0);
+		});
 
-        it('should round to nearest integer', () => {
-            const moduleLessonIds = {
-                module1: ['l1', 'l2', 'l3']
-            };
-            const userProgress = {
-                l1: { completed: true }
-            };
-            // 1/3 = 33.33% -> 33%
-            expect(getModuleProgress('module1', moduleLessonIds, userProgress)).toBe(33);
-        });
-    });
+		it('should round to nearest integer', () => {
+			const moduleLessonIds = {
+				module1: ['l1', 'l2', 'l3']
+			};
+			const userProgress = {
+				l1: { completed: true }
+			};
+			// 1/3 = 33.33% -> 33%
+			expect(getModuleProgress('module1', moduleLessonIds, userProgress)).toBe(33);
+		});
+	});
 
-    describe('isLessonLocked', () => {
-        // Lesson locking is intentionally disabled — users navigate freely
-        // ("unlock all lessons", commit 50f052b). isLessonLocked always returns
-        // false regardless of order, progress, or explicit prerequisites. These
-        // tests pin that contract so a regression (re-enabling locking silently)
-        // is caught. If sequential locking is reintroduced, gate it behind config
-        // and update these expectations accordingly.
-        const mockLessons: Lesson[] = [
-            { id: 'l1', orderIndex: 0, requiredLessonId: null } as Lesson,
-            { id: 'l2', orderIndex: 1, requiredLessonId: null } as Lesson,
-            { id: 'l3', orderIndex: 2, requiredLessonId: 'l1' } as Lesson // Explicit requirement
-        ];
+	describe('isLessonLocked', () => {
+		// Lesson locking is intentionally disabled — users navigate freely
+		// ("unlock all lessons", commit 50f052b). isLessonLocked always returns
+		// false regardless of order, progress, or explicit prerequisites. These
+		// tests pin that contract so a regression (re-enabling locking silently)
+		// is caught. If sequential locking is reintroduced, gate it behind config
+		// and update these expectations accordingly.
+		const mockLessons: Lesson[] = [
+			{ id: 'l1', orderIndex: 0, requiredLessonId: null } as Lesson,
+			{ id: 'l2', orderIndex: 1, requiredLessonId: null } as Lesson,
+			{ id: 'l3', orderIndex: 2, requiredLessonId: 'l1' } as Lesson // Explicit requirement
+		];
 
-        it('never locks the first lesson', () => {
-            expect(isLessonLocked(0, mockLessons[0], mockLessons, {})).toBe(false);
-        });
+		it('never locks the first lesson', () => {
+			expect(isLessonLocked(0, mockLessons[0], mockLessons, {})).toBe(false);
+		});
 
-        it('does not lock a later lesson even when the previous one is incomplete', () => {
-            expect(isLessonLocked(1, mockLessons[1], mockLessons, {})).toBe(false);
-        });
+		it('does not lock a later lesson even when the previous one is incomplete', () => {
+			expect(isLessonLocked(1, mockLessons[1], mockLessons, {})).toBe(false);
+		});
 
-        it('does not lock a lesson with an unmet explicit prerequisite', () => {
-            // l3 requires l1, which is incomplete — still unlocked (locking disabled).
-            expect(isLessonLocked(2, mockLessons[2], mockLessons, {})).toBe(false);
-        });
+		it('does not lock a lesson with an unmet explicit prerequisite', () => {
+			// l3 requires l1, which is incomplete — still unlocked (locking disabled).
+			expect(isLessonLocked(2, mockLessons[2], mockLessons, {})).toBe(false);
+		});
 
-        it('stays unlocked once prerequisites are complete', () => {
-            const progress = { l1: { completed: true } };
-            expect(isLessonLocked(1, mockLessons[1], mockLessons, progress)).toBe(false);
-            expect(isLessonLocked(2, mockLessons[2], mockLessons, progress)).toBe(false);
-        });
-    });
+		it('stays unlocked once prerequisites are complete', () => {
+			const progress = { l1: { completed: true } };
+			expect(isLessonLocked(1, mockLessons[1], mockLessons, progress)).toBe(false);
+			expect(isLessonLocked(2, mockLessons[2], mockLessons, progress)).toBe(false);
+		});
+	});
 });

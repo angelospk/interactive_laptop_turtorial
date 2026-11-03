@@ -46,7 +46,7 @@
 		? '-translate-y-full'
 		: 'translate-y-0'}"
 >
-	<div class="bg-background/80 supports-[backdrop-filter]:bg-background/65 border-b backdrop-blur">
+	<div class="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/65">
 		<div class="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4">
 			<!-- prev lesson -->
 			<div class="flex flex-1 justify-start">
@@ -54,7 +54,7 @@
 					<a
 						href={resolve('/library/[course]/[sub]', { course: courseId, sub: prev.id })}
 						title={prev.title}
-						class="hover:bg-muted text-muted-foreground hover:text-foreground flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5"
+						class="flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
 					>
 						<ChevronLeft class="h-5 w-5 shrink-0" />
 						<span class="hidden max-w-[10rem] truncate text-sm sm:inline">{prev.title}</span>
@@ -74,7 +74,7 @@
 					<a
 						href={resolve('/library/[course]/[sub]', { course: courseId, sub: next.id })}
 						title={next.title}
-						class="hover:bg-muted text-muted-foreground hover:text-foreground flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5"
+						class="flex max-w-full items-center gap-1 rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
 					>
 						<span class="hidden max-w-[10rem] truncate text-sm sm:inline">{next.title}</span>
 						<span class="sr-only">Επόμενο μάθημα</span>

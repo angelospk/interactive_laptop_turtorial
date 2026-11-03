@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Select as SelectPrimitive } from "bits-ui";
+	import { Select as SelectPrimitive } from 'bits-ui';
 
 	let {
 		value = $bindable(),
@@ -16,7 +16,7 @@
 		},
 		set current(next: never) {
 			value = next;
-		},
+		}
 	};
 </script>
 

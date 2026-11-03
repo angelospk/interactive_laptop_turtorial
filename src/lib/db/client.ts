@@ -6,7 +6,6 @@ import Database from 'better-sqlite3';
 import { createClient } from '@libsql/client';
 import * as schema from './schema';
 
-
 // Create database connection based on environment
 const env = {
 	TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,

@@ -82,4 +82,3 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 
 // Combine handles
 export const handle: Handle = sequence(handleAuth, handleParaglide);
-

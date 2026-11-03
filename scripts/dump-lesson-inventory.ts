@@ -22,4 +22,10 @@ const lessons = allLessons.map((l) => ({
 	orderIndex: l.orderIndex
 }));
 
-console.log(JSON.stringify({ moduleCount: modules.length, lessonCount: lessons.length, modules, lessons }, null, 1));
+console.log(
+	JSON.stringify(
+		{ moduleCount: modules.length, lessonCount: lessons.length, modules, lessons },
+		null,
+		1
+	)
+);

@@ -43,10 +43,9 @@ describe('signSessionCookie / verifySessionCookie', () => {
 	it('rejects a tampered payload (forged isAdmin)', () => {
 		const cookie = signSessionCookie(user, SECRET);
 		const [, sig] = cookie.split('.');
-		const forged = Buffer.from(
-			JSON.stringify({ ...user, isAdmin: true }),
-			'utf8'
-		).toString('base64url');
+		const forged = Buffer.from(JSON.stringify({ ...user, isAdmin: true }), 'utf8').toString(
+			'base64url'
+		);
 		const tampered = `${forged}.${sig}`;
 		expect(verifySessionCookie(tampered, SECRET)).toBeNull();
 	});

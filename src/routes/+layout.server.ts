@@ -3,50 +3,50 @@ import { db, userProgress, type UserProgress } from '$lib/db/client';
 import { eq } from 'drizzle-orm';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-    // Load user session
-    if (!locals.user) {
-        return {
-            user: null,
-            progress: {}
-        };
-    }
+	// Load user session
+	if (!locals.user) {
+		return {
+			user: null,
+			progress: {}
+		};
+	}
 
-    // Load user's progress from database
-    try {
-        const progressData = await db
-            .select()
-            .from(userProgress)
-            .where(eq(userProgress.userId, locals.user.id));
+	// Load user's progress from database
+	try {
+		const progressData = await db
+			.select()
+			.from(userProgress)
+			.where(eq(userProgress.userId, locals.user.id));
 
-        // Convert to map
-        const progressMap: Record<
-            string,
-            Pick<
-                UserProgress,
-                'completed' | 'score' | 'stars' | 'attempts' | 'completedAt' | 'lastAttemptAt' | 'source'
-            >
-        > = {};
-        for (const item of progressData) {
-            progressMap[item.lessonId] = {
-                completed: item.completed,
-                score: item.score,
-                stars: item.stars,
-                attempts: item.attempts,
-                completedAt: item.completedAt,
-                lastAttemptAt: item.lastAttemptAt,
-                source: item.source
-            };
-        }
+		// Convert to map
+		const progressMap: Record<
+			string,
+			Pick<
+				UserProgress,
+				'completed' | 'score' | 'stars' | 'attempts' | 'completedAt' | 'lastAttemptAt' | 'source'
+			>
+		> = {};
+		for (const item of progressData) {
+			progressMap[item.lessonId] = {
+				completed: item.completed,
+				score: item.score,
+				stars: item.stars,
+				attempts: item.attempts,
+				completedAt: item.completedAt,
+				lastAttemptAt: item.lastAttemptAt,
+				source: item.source
+			};
+		}
 
-        return {
-            user: locals.user,
-            progress: progressMap
-        };
-    } catch (error) {
-        console.error('Error loading progress:', error);
-        return {
-            user: locals.user,
-            progress: {}
-        };
-    }
+		return {
+			user: locals.user,
+			progress: progressMap
+		};
+	} catch (error) {
+		console.error('Error loading progress:', error);
+		return {
+			user: locals.user,
+			progress: {}
+		};
+	}
 };

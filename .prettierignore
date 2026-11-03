@@ -7,3 +7,7 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Reviewed lesson prose (source of truth, see exported_courses/build_manifest.py).
+# Markdown reformatting could change how a lesson renders.
+/content/md/

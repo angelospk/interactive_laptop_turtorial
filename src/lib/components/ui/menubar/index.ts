@@ -1,19 +1,19 @@
-import Root from "./menubar.svelte";
-import CheckboxItem from "./menubar-checkbox-item.svelte";
-import Content from "./menubar-content.svelte";
-import Item from "./menubar-item.svelte";
-import Group from "./menubar-group.svelte";
-import RadioItem from "./menubar-radio-item.svelte";
-import Separator from "./menubar-separator.svelte";
-import Shortcut from "./menubar-shortcut.svelte";
-import SubContent from "./menubar-sub-content.svelte";
-import SubTrigger from "./menubar-sub-trigger.svelte";
-import Trigger from "./menubar-trigger.svelte";
-import Label from "./menubar-label.svelte";
-import GroupHeading from "./menubar-group-heading.svelte";
-import Menu from "./menubar-menu.svelte";
-import Sub from "./menubar-sub.svelte";
-import RadioGroup from "./menubar-radio-group.svelte";
+import Root from './menubar.svelte';
+import CheckboxItem from './menubar-checkbox-item.svelte';
+import Content from './menubar-content.svelte';
+import Item from './menubar-item.svelte';
+import Group from './menubar-group.svelte';
+import RadioItem from './menubar-radio-item.svelte';
+import Separator from './menubar-separator.svelte';
+import Shortcut from './menubar-shortcut.svelte';
+import SubContent from './menubar-sub-content.svelte';
+import SubTrigger from './menubar-sub-trigger.svelte';
+import Trigger from './menubar-trigger.svelte';
+import Label from './menubar-label.svelte';
+import GroupHeading from './menubar-group-heading.svelte';
+import Menu from './menubar-menu.svelte';
+import Sub from './menubar-sub.svelte';
+import RadioGroup from './menubar-radio-group.svelte';
 
 export {
 	Root,
@@ -48,5 +48,5 @@ export {
 	Sub as MenubarSub,
 	RadioGroup as MenubarRadioGroup,
 	Label as MenubarLabel,
-	GroupHeading as MenubarGroupHeading,
+	GroupHeading as MenubarGroupHeading
 };

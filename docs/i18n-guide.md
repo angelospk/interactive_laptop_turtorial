@@ -7,12 +7,12 @@ Android module.
 
 ## Αρχεία που αλλάζουν
 
-| Αρχείο | Ρόλος |
-|---|---|
-| `messages/el.json` | Ελληνικά (**πρωτεύον** — η εφαρμογή είναι forced-Greek) |
-| `messages/en.json` | Αγγλικά (bilingual πληρότητα) |
-| `src/lib/db/seeds/modules.ts` | Το module δηλώνει `titleKey` / `descriptionKey` |
-| `src/lib/db/seeds/<module>-lessons.ts` | Κάθε lesson δηλώνει `titleKey` / `descriptionKey` |
+| Αρχείο                                 | Ρόλος                                                   |
+| -------------------------------------- | ------------------------------------------------------- |
+| `messages/el.json`                     | Ελληνικά (**πρωτεύον** — η εφαρμογή είναι forced-Greek) |
+| `messages/en.json`                     | Αγγλικά (bilingual πληρότητα)                           |
+| `src/lib/db/seeds/modules.ts`          | Το module δηλώνει `titleKey` / `descriptionKey`         |
+| `src/lib/db/seeds/<module>-lessons.ts` | Κάθε lesson δηλώνει `titleKey` / `descriptionKey`       |
 
 > Το `src/lib/paraglide/` είναι **generated** (gitignored) — δεν το πειράζεις με το χέρι.
 
@@ -26,6 +26,7 @@ Android module.
 ```
 
 Κανόνες (τους ελέγχει το `schema.test.ts`):
+
 - Τα keys είναι **χωρίς κενά** και το title-key περιέχει `title`, το desc-key `desc`.
 - Εξαίρεση: τα `reading` lessons χρησιμοποιούν literal τίτλους από το manifest — δεν
   ακολουθούν τη σύμβαση key (φιλτράρονται στο test).
@@ -67,8 +68,7 @@ bunx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/lib/
 **4. (Προαιρετικό) Χρήση στο UI** — για hardcoded strings σε components:
 
 ```svelte
-import * as m from '$lib/paraglide/messages.js';
-…
+import * as m from '$lib/paraglide/messages.js'; …
 {m.android_title()}
 ```
 

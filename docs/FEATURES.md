@@ -26,16 +26,16 @@
 module έχει τον δικό του Οδηγό (`src/lib/guides/<module>.ts`). Ο Οδηγός ανοίγει την
 προσομοίωση του module μέσα από το `GuideSim.svelte`:
 
-| `sim` | Τι ανοίγει | Modules |
-|---|---|---|
-| `browser` | `BrowserApp` | module5, module8, module12, module13, bank |
-| `desktop` | `DesktopLesson` με `embedded` (χωρίς πλαίσιο μαθήματος, χωρίς στόχο) | module3, module4, module6 (email), word, module7, module9, module10, module11 |
-| `mouse-pad` | `MousePad`: πέρασμα, κλικ, διπλό κλικ, δεξί κλικ, σύρσιμο | module1 |
-| `keyboard-pad` | `KeyboardPad`: κουτί κειμένου σαν συνομιλία και τα βασικά πλήκτρα | module2 |
-| `phone` | `MobileSimLesson` με `embedded`· το κινητό μικραίνει για να χωρά στη σκηνή | android, iphone |
-| `mac` | `MacSimLesson` με `embedded` | mac |
-| `gov` | `GovGuideSim`: το `GovGrApp`, με την οθόνη (σύνδεση, υπηρεσίες, βεβαίωση, εξουσιοδότηση) που ζητά το `target` του βήματος | gov |
-| `health` | `HealthGuideSim`: το `HealthApp`, με την οθόνη `health-sms` / `health-portal` / `health-appointments` του `target` | health |
+| `sim`          | Τι ανοίγει                                                                                                                | Modules                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `browser`      | `BrowserApp`                                                                                                              | module5, module8, module12, module13, bank                                    |
+| `desktop`      | `DesktopLesson` με `embedded` (χωρίς πλαίσιο μαθήματος, χωρίς στόχο)                                                      | module3, module4, module6 (email), word, module7, module9, module10, module11 |
+| `mouse-pad`    | `MousePad`: πέρασμα, κλικ, διπλό κλικ, δεξί κλικ, σύρσιμο                                                                 | module1                                                                       |
+| `keyboard-pad` | `KeyboardPad`: κουτί κειμένου σαν συνομιλία και τα βασικά πλήκτρα                                                         | module2                                                                       |
+| `phone`        | `MobileSimLesson` με `embedded`· το κινητό μικραίνει για να χωρά στη σκηνή                                                | android, iphone                                                               |
+| `mac`          | `MacSimLesson` με `embedded`                                                                                              | mac                                                                           |
+| `gov`          | `GovGuideSim`: το `GovGrApp`, με την οθόνη (σύνδεση, υπηρεσίες, βεβαίωση, εξουσιοδότηση) που ζητά το `target` του βήματος | gov                                                                           |
+| `health`       | `HealthGuideSim`: το `HealthApp`, με την οθόνη `health-sms` / `health-portal` / `health-appointments` του `target`        | health                                                                        |
 
 Οι ακριβείς αντιστοιχίες είναι στα `src/lib/guides/*.ts`. Το `GuideSim` παίρνει και το
 `target` του τρέχοντος βήματος: έτσι μια προσομοίωση με οθόνες δείχνει τη σωστή, ακόμα

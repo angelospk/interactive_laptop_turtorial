@@ -71,6 +71,7 @@
 ## Accessibility / visual pass (μεσήλικες)
 
 Στοχευμένα, χωρίς rewrite, στα αρχεία που ήδη αγγίζουμε:
+
 - Μεγαλύτερα touch targets & κείμενο σε home/login/grid/breadcrumbs.
 - Ορατά focus rings (πληκτρολόγιο), `scroll-behavior: smooth`.
 - Breadcrumb «Αρχική › Ενότητα › Μάθημα» στο lesson page, ώστε ο χρήστης να μη χάνεται.

@@ -90,7 +90,9 @@
 
 		<div class="space-y-6">
 			<div class="field-group">
-				<label for="copy-source" class="mb-2 block text-sm font-medium text-slate-500">1. Πηγή (Source)</label>
+				<label for="copy-source" class="mb-2 block text-sm font-medium text-slate-500"
+					>1. Πηγή (Source)</label
+				>
 				<Input
 					id="copy-source"
 					type="text"
@@ -112,7 +114,9 @@
 			</div>
 
 			<div class="field-group">
-				<label for="copy-target" class="mb-2 block text-sm font-medium text-slate-500">2. Προορισμός (Target)</label>
+				<label for="copy-target" class="mb-2 block text-sm font-medium text-slate-500"
+					>2. Προορισμός (Target)</label
+				>
 				<Input
 					id="copy-target"
 					type="text"

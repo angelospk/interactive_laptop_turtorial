@@ -27,11 +27,7 @@ export const actions: Actions = {
 
 		// dev and prod share one database, so keep their counters apart.
 		const throttleKey = `${dev ? 'dev' : 'prod'}:${getClientAddress()}`;
-		const allowed = await registerLoginAttempt(
-			db,
-			throttleKey,
-			Math.floor(Date.now() / 1000)
-		);
+		const allowed = await registerLoginAttempt(db, throttleKey, Math.floor(Date.now() / 1000));
 		if (!allowed) {
 			return fail(429, { error: 'Too many attempts. Try again in 15 minutes.' });
 		}

@@ -3,9 +3,7 @@ import { safeRedirect } from './redirect';
 
 describe('safeRedirect', () => {
 	it('accepts internal paths', () => {
-		expect(safeRedirect('/modules/module1/hover-balloons')).toBe(
-			'/modules/module1/hover-balloons'
-		);
+		expect(safeRedirect('/modules/module1/hover-balloons')).toBe('/modules/module1/hover-balloons');
 		expect(safeRedirect('/library/esm001/esm001-c1-s1')).toBe('/library/esm001/esm001-c1-s1');
 		expect(safeRedirect('/modules/m1?notice=missing')).toBe('/modules/m1?notice=missing');
 	});

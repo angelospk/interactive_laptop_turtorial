@@ -33,7 +33,7 @@
 </script>
 
 <section
-	class="mb-10 rounded-3xl border border-brand/15 bg-brand/[0.04] p-6 shadow-soft sm:p-7"
+	class="shadow-soft mb-10 rounded-3xl border border-brand/15 bg-brand/[0.04] p-6 sm:p-7"
 	aria-labelledby="resume-heading"
 >
 	<h2 id="resume-heading" class="text-2xl font-bold text-foreground sm:text-3xl">
@@ -62,7 +62,7 @@
 		{#if next}
 			<Button
 				href={href(next)}
-				class="h-14 justify-center gap-2 rounded-2xl px-7 text-lg shadow-soft"
+				class="shadow-soft h-14 justify-center gap-2 rounded-2xl px-7 text-lg"
 				data-testid="resume-continue"
 			>
 				Συνέχεια

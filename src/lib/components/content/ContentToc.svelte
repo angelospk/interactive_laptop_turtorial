@@ -26,7 +26,7 @@
 				<a
 					href={`#${item.id}`}
 					onclick={(e) => goto(e, item.id)}
-					class="text-muted-foreground hover:text-foreground block rounded py-0.5 leading-snug hover:underline {item.level ===
+					class="block rounded py-0.5 leading-snug text-muted-foreground hover:text-foreground hover:underline {item.level ===
 					3
 						? 'text-[0.8rem]'
 						: 'font-medium'}"

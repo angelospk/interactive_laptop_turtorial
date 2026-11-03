@@ -3,10 +3,7 @@
 	import { Check, Download, AlertCircle } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	let {
-		config = {},
-		onAction
-	} = $props<{
+	let { config = {}, onAction } = $props<{
 		config?: { appName?: string };
 		onAction: (action: string, data?: Record<string, unknown>) => void;
 	}>();
@@ -62,27 +59,40 @@
 		<div class="mb-6 min-h-[200px]">
 			{#if step === 1}
 				<h3 class="mb-4 font-semibold">Βήμα 1: Όροι Χρήσης</h3>
-				<div class="mb-4 h-32 overflow-y-auto rounded border bg-slate-50 p-2 text-xs text-slate-600">
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				<div
+					class="mb-4 h-32 overflow-y-auto rounded border bg-slate-50 p-2 text-xs text-slate-600"
+				>
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+						incididunt ut labore et dolore magna aliqua.
+					</p>
 					<p class="mt-2">1. Αποδέχεστε να χρησιμοποιείτε το λογισμικό νόμιμα.</p>
 					<p>2. Δεν φέρουμε ευθύνη για τυχόν απώλεια δεδομένων.</p>
 					<p>3. Η άδεια χρήσης είναι προσωπική.</p>
 				</div>
-				<label class="flex items-center gap-2 cursor-pointer">
+				<label class="flex cursor-pointer items-center gap-2">
 					<input type="checkbox" bind:checked={eulaAccepted} class="rounded border-slate-300" />
 					<span class="text-sm">Αποδέχομαι τους όρους χρήσης</span>
 				</label>
 			{:else if step === 2}
 				<h3 class="mb-4 font-semibold">Βήμα 2: Επιλογή Τοποθεσίας</h3>
 				<div class="mb-4">
-					<label for="installer-path" class="mb-2 block text-sm text-slate-600">Φάκελος εγκατάστασης:</label>
+					<label for="installer-path" class="mb-2 block text-sm text-slate-600"
+						>Φάκελος εγκατάστασης:</label
+					>
 					<div class="flex gap-2">
-						<input id="installer-path" type="text" value="C:\Program Files\{appName}" readonly class="w-full rounded border p-2 text-sm text-slate-500 bg-slate-100" />
+						<input
+							id="installer-path"
+							type="text"
+							value="C:\Program Files\{appName}"
+							readonly
+							class="w-full rounded border bg-slate-100 p-2 text-sm text-slate-500"
+						/>
 						<Button variant="outline" size="sm">Αλλαγή...</Button>
 					</div>
 				</div>
-				<div class="rounded bg-yellow-50 p-3 text-xs text-yellow-700 flex gap-2 items-start">
-					<AlertCircle class="h-4 w-4 shrink-0 mt-0.5" />
+				<div class="flex items-start gap-2 rounded bg-yellow-50 p-3 text-xs text-yellow-700">
+					<AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
 					<p>Βεβαιωθείτε ότι έχετε αρκετό χώρο στον δίσκο (Απαιτείται: 150MB)</p>
 				</div>
 			{:else if step === 3}
@@ -92,11 +102,16 @@
 					<span>{progress}%</span>
 				</div>
 				<div class="h-4 w-full overflow-hidden rounded-full bg-slate-100">
-					<div class="h-full bg-blue-600 transition-all duration-200" style="width: {progress}%"></div>
+					<div
+						class="h-full bg-blue-600 transition-all duration-200"
+						style="width: {progress}%"
+					></div>
 				</div>
 			{:else if step === 4}
 				<div class="flex flex-col items-center justify-center py-4 text-center">
-					<div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">
+					<div
+						class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600"
+					>
 						<Check class="h-8 w-8" />
 					</div>
 					<h3 class="text-xl font-bold text-green-700">Επιτυχία!</h3>

@@ -7,15 +7,15 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: { adapter: adapter() },
-	alias:{
-		"@/*": "./src/*",
-		"@lib/*": "./src/lib/*",
-		"@components/*": "./src/components/*",
-		"@routes/*": "./src/routes/*",
-		"@stores/*": "./src/stores/*",
-		"@types/*": "./src/types/*",
-		"@utils/*": "./src/utils/*",
-		"@assets/*": "./src/assets/*",
+	alias: {
+		'@/*': './src/*',
+		'@lib/*': './src/lib/*',
+		'@components/*': './src/components/*',
+		'@routes/*': './src/routes/*',
+		'@stores/*': './src/stores/*',
+		'@types/*': './src/types/*',
+		'@utils/*': './src/utils/*',
+		'@assets/*': './src/assets/*'
 	}
 };
 

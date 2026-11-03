@@ -20,18 +20,18 @@ Bead: `interactive_laptop_turtorial-8vz` · Εγκρίθηκε από τον Har
 
 ## Αρχιτεκτονική
 
-| Κομμάτι | Αρχείο | Ευθύνη |
-|---|---|---|
-| Τύπος μαθήματος | `lessonTypeRegistry.ts` → `guide` | Ο Οδηγός είναι ένα μάθημα με `config: { guideId }` |
-| Ορισμός οδηγού | `src/lib/guides/<guideId>.ts` | Ποια προσομοίωση, ποια βήματα, ποιο στοιχείο φωτίζει κάθε βήμα, ποιες ασκήσεις καλύπτει |
-| Σενάριο (λόγια) | `docs/guides/<guideId>.script.md`, `docs/guides/common.script.md` | Μία πηγή αλήθειας για αφήγηση **και** λεζάντες |
-| Parser σεναρίου | `src/lib/guides/script.ts` | `## id` → κείμενο· λεζάντα = κείμενο χωρίς `[tags]` |
-| Μηχανή | `src/lib/guides/machine.ts` | Καθαρή μηχανή καταστάσεων (χωρίς DOM): φάσεις, απαντήσεις, ποιο clip παίζει |
-| Αδράνεια | `src/lib/guides/idle.ts` | Χρονόμετρο «μήπως κολλήσατε;» με εισαγόμενο ρολόι |
-| Ήχος | `src/lib/guides/audio.ts` | Ένα `HTMLAudioElement`, σίγαση στο `localStorage`, σιωπηλή εναλλακτική |
-| UI | `GuideLesson.svelte`, `GuideSpotlight.svelte` | Προσομοίωση + στρώμα spotlight + λεζάντα + κουμπιά |
-| Πρόοδος | `user_progress.source`, `POST /api/lessons/guide-answers` | «Το ξέρω» → ολοκληρωμένη άσκηση με `source='guide'` |
-| Επόμενο ανολοκλήρωτο | `src/lib/lessons/nextUnfinished.ts`, `LessonRunner.svelte` | Μετά από ολοκλήρωση, το «Επόμενο» προσπερνά ό,τι είναι ήδη πράσινο |
+| Κομμάτι              | Αρχείο                                                            | Ευθύνη                                                                                  |
+| -------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Τύπος μαθήματος      | `lessonTypeRegistry.ts` → `guide`                                 | Ο Οδηγός είναι ένα μάθημα με `config: { guideId }`                                      |
+| Ορισμός οδηγού       | `src/lib/guides/<guideId>.ts`                                     | Ποια προσομοίωση, ποια βήματα, ποιο στοιχείο φωτίζει κάθε βήμα, ποιες ασκήσεις καλύπτει |
+| Σενάριο (λόγια)      | `docs/guides/<guideId>.script.md`, `docs/guides/common.script.md` | Μία πηγή αλήθειας για αφήγηση **και** λεζάντες                                          |
+| Parser σεναρίου      | `src/lib/guides/script.ts`                                        | `## id` → κείμενο· λεζάντα = κείμενο χωρίς `[tags]`                                     |
+| Μηχανή               | `src/lib/guides/machine.ts`                                       | Καθαρή μηχανή καταστάσεων (χωρίς DOM): φάσεις, απαντήσεις, ποιο clip παίζει             |
+| Αδράνεια             | `src/lib/guides/idle.ts`                                          | Χρονόμετρο «μήπως κολλήσατε;» με εισαγόμενο ρολόι                                       |
+| Ήχος                 | `src/lib/guides/audio.ts`                                         | Ένα `HTMLAudioElement`, σίγαση στο `localStorage`, σιωπηλή εναλλακτική                  |
+| UI                   | `GuideLesson.svelte`, `GuideSpotlight.svelte`                     | Προσομοίωση + στρώμα spotlight + λεζάντα + κουμπιά                                      |
+| Πρόοδος              | `user_progress.source`, `POST /api/lessons/guide-answers`         | «Το ξέρω» → ολοκληρωμένη άσκηση με `source='guide'`                                     |
+| Επόμενο ανολοκλήρωτο | `src/lib/lessons/nextUnfinished.ts`, `LessonRunner.svelte`        | Μετά από ολοκλήρωση, το «Επόμενο» προσπερνά ό,τι είναι ήδη πράσινο                      |
 
 ### Γιατί spotlight πάνω στην πραγματική προσομοίωση
 
@@ -70,6 +70,7 @@ Markdown, ένα heading ανά clip, σταθερό id:
 
 ```md
 ## module5.step.address-bar
+
 [warm, calm] Εδώ πάνω, σε αυτή τη μακριά γραμμή, γράφουμε τη διεύθυνση...
 ```
 
@@ -147,19 +148,19 @@ Dev και prod μοιράζονται τη βάση Turso. Το `ALTER TABLE us
 `moduleSections.module5`: Θεωρία (4) → **Οδηγός (1)** → Εξάσκηση (10).
 Μάθημα `module5-guide`, `orderIndex: 0`. Βήματα (target → ασκήσεις):
 
-| Βήμα | Στοιχείο | Ασκήσεις |
-|---|---|---|
-| tabs | λωρίδα καρτελών | lesson4 (εναλλαγή) |
-| new-tab | κουμπί + | lesson1 |
-| close-tab | Χ καρτέλας | lesson5 |
-| nav-buttons | Πίσω/Μπροστά/Ανανέωση | — |
-| address-bar | γραμμή διευθύνσεων | lesson2 |
-| search | πλαίσιο Google της αρχικής | lesson3 |
-| bookmark | αστέρι | lesson6 |
-| history | κουμπί Ιστορικού | lesson7 |
-| page | περιοχή σελίδας: λήψη | lesson8 |
-| zoom | περιοχή σελίδας: Ctrl και + / − | lesson9 |
-| find | περιοχή σελίδας: Ctrl+F | lesson10 |
+| Βήμα        | Στοιχείο                        | Ασκήσεις           |
+| ----------- | ------------------------------- | ------------------ |
+| tabs        | λωρίδα καρτελών                 | lesson4 (εναλλαγή) |
+| new-tab     | κουμπί +                        | lesson1            |
+| close-tab   | Χ καρτέλας                      | lesson5            |
+| nav-buttons | Πίσω/Μπροστά/Ανανέωση           | —                  |
+| address-bar | γραμμή διευθύνσεων              | lesson2            |
+| search      | πλαίσιο Google της αρχικής      | lesson3            |
+| bookmark    | αστέρι                          | lesson6            |
+| history     | κουμπί Ιστορικού                | lesson7            |
+| page        | περιοχή σελίδας: λήψη           | lesson8            |
+| zoom        | περιοχή σελίδας: Ctrl και + / − | lesson9            |
+| find        | περιοχή σελίδας: Ctrl+F         | lesson10           |
 
 ## Σφάλματα
 

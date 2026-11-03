@@ -16,7 +16,7 @@ const columns = await db.all<{ name: string }>(sql`PRAGMA table_info(admin_login
 const names = columns.map((c) => c.name).sort();
 const expected = ['attempts', 'key', 'window_start'];
 if (JSON.stringify(names) !== JSON.stringify(expected)) {
-    console.error('❌ admin_login_attempts has unexpected columns:', names);
-    process.exit(1);
+	console.error('❌ admin_login_attempts has unexpected columns:', names);
+	process.exit(1);
 }
 console.log('✅ admin_login_attempts ready:', names.join(', '));

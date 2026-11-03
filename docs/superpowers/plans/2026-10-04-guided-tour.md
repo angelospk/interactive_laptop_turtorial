@@ -14,21 +14,21 @@
 
 ## File map
 
-| Αρχείο | Ευθύνη |
-|---|---|
-| `src/lib/guides/script.ts` (+test) | `parseScript(md) → Map<id,{text,caption}>`, `stripTags` |
-| `src/lib/guides/scripts.ts` | φορτώνει `docs/guides/*.script.md` (`import.meta.glob ?raw`) |
-| `src/lib/guides/types.ts` | `GuideDefinition`, `GuideStep`, `clipIdsFor(guide)` |
-| `src/lib/guides/module5.ts`, `index.ts` | ορισμός πιλότου, registry `guides[guideId]` |
-| `src/lib/guides/contracts.test.ts` | clips υπάρχουν, lessonIds στο module, seeded guideIds έχουν ορισμό |
-| `src/lib/guides/machine.ts` (+test) | μηχανή καταστάσεων |
-| `src/lib/guides/idle.ts` (+test) | χρονόμετρο αδράνειας |
-| `src/lib/guides/audio.ts` | ήχος + σίγαση |
-| `src/lib/lessons/nextUnfinished.ts` (+test) | επόμενο ανολοκλήρωτο |
-| `src/routes/api/lessons/guide-answers/+server.ts` (+test) | αποθήκευση απαντήσεων |
-| `src/lib/components/lessons/interactive/GuideLesson.svelte` (+svelte test) | UI |
-| `src/lib/components/lessons/GuideSpotlight.svelte` | σκοτεινό φόντο με «τρύπα» |
-| τροποποιήσεις | `schema.ts`, `testDb.ts`, `+layout.server.ts`, `complete/+server.ts`, `LessonRunner.svelte`, `LessonCard.svelte`, `BrowserApp.svelte` (`data-guide`), `lessonTypeRegistry.ts`, `module5-lessons.ts`, `moduleOrganization.ts`, `messages/*.json`, README, FEATURES |
+| Αρχείο                                                                     | Ευθύνη                                                                                                                                                                                                                                                            |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/guides/script.ts` (+test)                                         | `parseScript(md) → Map<id,{text,caption}>`, `stripTags`                                                                                                                                                                                                           |
+| `src/lib/guides/scripts.ts`                                                | φορτώνει `docs/guides/*.script.md` (`import.meta.glob ?raw`)                                                                                                                                                                                                      |
+| `src/lib/guides/types.ts`                                                  | `GuideDefinition`, `GuideStep`, `clipIdsFor(guide)`                                                                                                                                                                                                               |
+| `src/lib/guides/module5.ts`, `index.ts`                                    | ορισμός πιλότου, registry `guides[guideId]`                                                                                                                                                                                                                       |
+| `src/lib/guides/contracts.test.ts`                                         | clips υπάρχουν, lessonIds στο module, seeded guideIds έχουν ορισμό                                                                                                                                                                                                |
+| `src/lib/guides/machine.ts` (+test)                                        | μηχανή καταστάσεων                                                                                                                                                                                                                                                |
+| `src/lib/guides/idle.ts` (+test)                                           | χρονόμετρο αδράνειας                                                                                                                                                                                                                                              |
+| `src/lib/guides/audio.ts`                                                  | ήχος + σίγαση                                                                                                                                                                                                                                                     |
+| `src/lib/lessons/nextUnfinished.ts` (+test)                                | επόμενο ανολοκλήρωτο                                                                                                                                                                                                                                              |
+| `src/routes/api/lessons/guide-answers/+server.ts` (+test)                  | αποθήκευση απαντήσεων                                                                                                                                                                                                                                             |
+| `src/lib/components/lessons/interactive/GuideLesson.svelte` (+svelte test) | UI                                                                                                                                                                                                                                                                |
+| `src/lib/components/lessons/GuideSpotlight.svelte`                         | σκοτεινό φόντο με «τρύπα»                                                                                                                                                                                                                                         |
+| τροποποιήσεις                                                              | `schema.ts`, `testDb.ts`, `+layout.server.ts`, `complete/+server.ts`, `LessonRunner.svelte`, `LessonCard.svelte`, `BrowserApp.svelte` (`data-guide`), `lessonTypeRegistry.ts`, `module5-lessons.ts`, `moduleOrganization.ts`, `messages/*.json`, README, FEATURES |
 
 ## Task 1: Parser σεναρίου (bead 8vz.1)
 
@@ -66,6 +66,7 @@ answer(s, k)   // step → feedback, answers[step]=k, clip = known/unknown[feedb
 nextStep(s)    // feedback → step+1 ή done (clip = outro all/some/none)
 summary(s)     // {known, total}
 ```
+
 Κάθε συνάρτηση επιστρέφει νέο state (immutable), αγνοεί άκυρη μετάβαση (επιστρέφει το ίδιο state).
 
 - [ ] Tests: πλήρης διαδρομή· εναλλαγή feedback clips· outro all/some/none· answer εκτός step αγνοείται· βήμα χωρίς lessonIds μετράει στο σύνολο.
@@ -82,7 +83,7 @@ summary(s)     // {known, total}
 
 - [ ] `schema.ts`: `source: text('source')` στο `userProgress`· `testDb.ts` DDL `source TEXT`.
 - [ ] Test `guide-answers.test.ts` (ίδιο mock pattern με `complete.test.ts`):
-  401 χωρίς user· 400 χωρίς answers / μη-guide `guideLessonId`· 400 lessonId άλλου module· known → row `completed, source='guide', score null`· known πάνω σε πραγματική ολοκλήρωση → αμετάβλητη· known πάνω σε μη ολοκληρωμένη row → completed + source guide· unknown → διαγράφει μόνο source guide· unknown πάνω σε πραγματική → αμετάβλητη.
+      401 χωρίς user· 400 χωρίς answers / μη-guide `guideLessonId`· 400 lessonId άλλου module· known → row `completed, source='guide', score null`· known πάνω σε πραγματική ολοκλήρωση → αμετάβλητη· known πάνω σε μη ολοκληρωμένη row → completed + source guide· unknown → διαγράφει μόνο source guide· unknown πάνω σε πραγματική → αμετάβλητη.
 - [ ] Test στο `complete.test.ts`: πραγματική λύση μετά από guide row → `source` null, score ορισμένο.
 - [ ] Υλοποίηση endpoint + `complete` θέτει `source: null` + layout map περιλαμβάνει `source`.
 - [ ] Commit.

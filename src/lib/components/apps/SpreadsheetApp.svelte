@@ -272,7 +272,7 @@
 					<th class="w-10 border bg-slate-100"></th>
 					{#each colLabels as label (label)}
 						<th
-							class="relative border bg-slate-100 px-2 py-1 font-normal text-slate-600 overflow-hidden"
+							class="relative overflow-hidden border bg-slate-100 px-2 py-1 font-normal text-slate-600"
 							style="width: {colWidths[label]}px;"
 						>
 							{label}
@@ -280,7 +280,7 @@
 							<!-- simulated surface / mouse-skill drill: the mouse gesture is the lesson -->
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
-								class="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400"
+								class="absolute top-0 right-0 h-full w-1 cursor-col-resize hover:bg-blue-400"
 								onmousedown={(e) => startResize(label, e)}
 							></div>
 						</th>
@@ -291,14 +291,16 @@
 				{#each { length: rows }, r (r)}
 					{@const rowNum = r + 1}
 					<tr>
-						<td class="border bg-slate-100 text-center text-xs text-slate-500 w-10">{rowNum}</td>
+						<td class="w-10 border bg-slate-100 text-center text-xs text-slate-500">{rowNum}</td>
 						{#each colLabels as col (col)}
 							{@const cellId = `${col}${rowNum}`}
 							{@const style = cellStyles[cellId]}
 							{@const isSelected = selectedCell === cellId}
 							{@const hasFormula = !!formulas[cellId]}
 							<td
-								class="border p-0 overflow-hidden {isSelected ? 'z-10 ring-2 ring-inset ring-green-500' : ''}"
+								class="overflow-hidden border p-0 {isSelected
+									? 'z-10 ring-2 ring-green-500 ring-inset'
+									: ''}"
 								style="width: {colWidths[col]}px;"
 								onclick={() => selectCell(cellId)}
 							>
@@ -323,11 +325,17 @@
 									/>
 								{:else}
 									<div
-										class="px-2 py-1 truncate
+										class="truncate px-2 py-1
 											{style?.bold ? 'font-bold' : ''}
 											{style?.italic ? 'italic' : ''}
 											{style?.underline ? 'underline' : ''}
-											{hasFormula ? 'text-right' : style?.align === 'center' ? 'text-center' : style?.align === 'right' ? 'text-right' : 'text-left'}"
+											{hasFormula
+											? 'text-right'
+											: style?.align === 'center'
+												? 'text-center'
+												: style?.align === 'right'
+													? 'text-right'
+													: 'text-left'}"
 									>
 										{cells[cellId] || ''}
 									</div>

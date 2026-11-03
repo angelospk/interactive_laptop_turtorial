@@ -37,7 +37,9 @@
 					<Lock class="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
 				</span>
 			{:else if progress?.completed}
-				<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
+				<span
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"
+				>
 					<CheckCircle2 class="h-5 w-5 text-emerald-600" strokeWidth={2} />
 				</span>
 			{/if}
@@ -50,9 +52,7 @@
 		<div class="flex items-center justify-between gap-2">
 			<div class="flex flex-wrap items-center gap-2">
 				{#if lesson.lessonType === 'guide'}
-					<span
-						class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"
-					>
+					<span class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
 						🧭 Οδηγός
 					</span>
 				{/if}
@@ -64,9 +64,7 @@
 					</span>
 				{/if}
 				{#if lesson.lessonType === 'reading'}
-					<span
-						class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"
-					>
+					<span class="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
 						📖 Θεωρία
 					</span>
 				{/if}

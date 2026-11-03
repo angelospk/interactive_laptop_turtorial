@@ -8,11 +8,7 @@
 	let scroller: Element | null = null;
 
 	function isPageScroll(t: EventTarget | null): boolean {
-		return (
-			!(t instanceof Element) ||
-			t === document.documentElement ||
-			t === document.body
-		);
+		return !(t instanceof Element) || t === document.documentElement || t === document.body;
 	}
 
 	onMount(() => {
@@ -46,7 +42,7 @@
 		type="button"
 		onclick={toTop}
 		aria-label="Επιστροφή στην κορυφή"
-		class="bg-primary text-primary-foreground fixed right-5 bottom-5 z-[60] flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition hover:opacity-90"
+		class="fixed right-5 bottom-5 z-[60] flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:opacity-90"
 	>
 		<ArrowUp class="h-5 w-5" />
 	</button>

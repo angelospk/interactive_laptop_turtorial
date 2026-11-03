@@ -13,13 +13,13 @@
 
 ## 2. Αποφάσεις (κλειδωμένες)
 
-| Θέμα | Απόφαση |
-|---|---|
-| Σύνδεση θεωρίας ↔ interactive | **Και τα δύο**: reading-steps μέσα στα modules + κεντρική Βιβλιοθήκη Θεωρίας |
-| Serving markdown | **GitHub CDN (jsDelivr) runtime**, με env-configurable base + τοπικό fallback |
-| Granularity mapping | **Υποενότητα → module(s)**, many-to-many |
-| Νέο περιεχόμενο | **Mix challenges + quizzes** (+ καθαρή θεωρία όπου δεν χρειάζεται άσκηση) |
-| Κινητό/smartphone | **Μόνο θεωρία + quiz** — ΟΧΙ interactive simulation |
+| Θέμα                           | Απόφαση                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| Σύνδεση θεωρίας ↔ interactive | **Και τα δύο**: reading-steps μέσα στα modules + κεντρική Βιβλιοθήκη Θεωρίας  |
+| Serving markdown               | **GitHub CDN (jsDelivr) runtime**, με env-configurable base + τοπικό fallback |
+| Granularity mapping            | **Υποενότητα → module(s)**, many-to-many                                      |
+| Νέο περιεχόμενο                | **Mix challenges + quizzes** (+ καθαρή θεωρία όπου δεν χρειάζεται άσκηση)     |
+| Κινητό/smartphone              | **Μόνο θεωρία + quiz** — ΟΧΙ interactive simulation                           |
 
 ## 3. Αρχιτεκτονική
 
@@ -29,29 +29,29 @@
 
 ```jsonc
 {
-  "courses": [
-    {
-      "id": "esm001",
-      "moduleNumber": 1,
-      "title": "Μάθημα 1: Εισαγωγή",
-      "courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/course/",
-      "chapters": [
-        {
-          "title": "Χρήση Υπολογιστή",
-          "subsections": [
-            {
-              "id": "esm001-c1-s2",
-              "title": "Ο Υπολογιστής",
-              "mdPath": "md/Μάθημα_1_Εισαγωγή/01_Χρήση_Υπολογιστή/02_Ο_Υπολογιστής.md",
-              "sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:...",
-              "modules": ["module3", "module1"],
-              "kind": "theory"          // theory | theory+quiz | theory+challenge
-            }
-          ]
-        }
-      ]
-    }
-  ]
+	"courses": [
+		{
+			"id": "esm001",
+			"moduleNumber": 1,
+			"title": "Μάθημα 1: Εισαγωγή",
+			"courseUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/course/",
+			"chapters": [
+				{
+					"title": "Χρήση Υπολογιστή",
+					"subsections": [
+						{
+							"id": "esm001-c1-s2",
+							"title": "Ο Υπολογιστής",
+							"mdPath": "md/Μάθημα_1_Εισαγωγή/01_Χρήση_Υπολογιστή/02_Ο_Υπολογιστής.md",
+							"sourceUrl": "https://courses.nadia.gov.gr/courses/course-v1:EAPSI+esm001+2025_S2/jump_to/block-v1:...",
+							"modules": ["module3", "module1"],
+							"kind": "theory" // theory | theory+quiz | theory+challenge
+						}
+					]
+				}
+			]
+		}
+	]
 }
 ```
 
@@ -92,11 +92,13 @@
 ## 4. Νέες ενότητες (από τα κενά)
 
 **Νέα challenges (interactive simulation):**
+
 - Social media — βασική χρήση Facebook/YouTube.
 - Παρουσιάσεις — PowerPoint-like.
 - Troubleshooting — σενάρια επίλυσης («ο υπολογιστής δεν ανοίγει»).
 
 **Νέα quizzes (γνωσιακά, από θεωρία):**
+
 - Κινητές συσκευές (αντί για simulation).
 - Πνευματικά δικαιώματα.
 - Εργονομία & υγεία.
@@ -106,39 +108,40 @@
 
 **Μόνο θεωρία:** Επισκοπήσεις, «Η τεχνολογία στη ζωή μας», «Επιμόρφωση & εκπαίδευση».
 
-> Σημείωση: Η §4 ορίζει το *τι* θα προστεθεί. Η λεπτομερής υλοποίηση κάθε νέου challenge/quiz θα γίνει σε επόμενες φάσεις/specs. Σε αυτή τη φάση παραδίδεται: manifest + mapping, reading lessonType, Βιβλιοθήκη, και seed των reading lessons + quizzes που προκύπτουν άμεσα από το υλικό.
+> Σημείωση: Η §4 ορίζει το _τι_ θα προστεθεί. Η λεπτομερής υλοποίηση κάθε νέου challenge/quiz θα γίνει σε επόμενες φάσεις/specs. Σε αυτή τη φάση παραδίδεται: manifest + mapping, reading lessonType, Βιβλιοθήκη, και seed των reading lessons + quizzes που προκύπτουν άμεσα από το υλικό.
 
 ## 5. Πίνακας mapping (αρχικός — υποενότητα → module(s))
 
-| ΕΑΨΙ υποενότητα/ομάδα | App module(s) | kind |
-|---|---|---|
-| Ο Υπολογιστής, Περιήγηση Windows 11 | module3, module1 | theory |
-| Ρυθμίσεις προσβασιμότητας | module9 | theory |
-| Χρήση κινητού (όλη η ενότητα) | — (νέο: quiz «Κινητό») | theory+quiz |
-| Διαδίκτυο, Ιστοσελίδες, Μηχανές αναζήτησης | module5 | theory |
-| Αναζήτηση με LLM | module13 | theory |
-| Δημόσιες/ΑμεΑ υπηρεσίες | module12 | theory |
-| Ηλεκτρονικές αγορές/τραπεζικές | module8 | theory+quiz |
-| Email | module6 | theory |
-| Messenger, Viber, Teams/Meet/Zoom | module11 | theory |
-| Facebook, YouTube | — (νέο challenge «Social») | theory+challenge |
-| Google Docs/Drive | word, module4 | theory |
-| Προσωπικά δεδομένα, κανόνες | module8, module10 | theory+quiz |
-| Επεξεργαστής κειμένου | word | theory |
-| Υπολογιστικά φύλλα | module7 | theory |
-| Παρουσιάσεις | — (νέο challenge «Παρουσιάσεις») | theory+challenge |
-| Πολυμέσα | — | theory+quiz |
-| Πνευματικά δικαιώματα | module10 | theory+quiz |
-| Κυβερνοασφάλεια, παραβιάσεις | module8, module10 | theory |
-| Η τεχνολογία στη ζωή μας / Εργονομία | — | theory+quiz |
-| Συχνά προβλήματα (troubleshooting) | module9 (νέο challenge) | theory+challenge |
-| Επιμόρφωση & εκπαίδευση | — | theory |
+| ΕΑΨΙ υποενότητα/ομάδα                      | App module(s)                    | kind             |
+| ------------------------------------------ | -------------------------------- | ---------------- |
+| Ο Υπολογιστής, Περιήγηση Windows 11        | module3, module1                 | theory           |
+| Ρυθμίσεις προσβασιμότητας                  | module9                          | theory           |
+| Χρήση κινητού (όλη η ενότητα)              | — (νέο: quiz «Κινητό»)           | theory+quiz      |
+| Διαδίκτυο, Ιστοσελίδες, Μηχανές αναζήτησης | module5                          | theory           |
+| Αναζήτηση με LLM                           | module13                         | theory           |
+| Δημόσιες/ΑμεΑ υπηρεσίες                    | module12                         | theory           |
+| Ηλεκτρονικές αγορές/τραπεζικές             | module8                          | theory+quiz      |
+| Email                                      | module6                          | theory           |
+| Messenger, Viber, Teams/Meet/Zoom          | module11                         | theory           |
+| Facebook, YouTube                          | — (νέο challenge «Social»)       | theory+challenge |
+| Google Docs/Drive                          | word, module4                    | theory           |
+| Προσωπικά δεδομένα, κανόνες                | module8, module10                | theory+quiz      |
+| Επεξεργαστής κειμένου                      | word                             | theory           |
+| Υπολογιστικά φύλλα                         | module7                          | theory           |
+| Παρουσιάσεις                               | — (νέο challenge «Παρουσιάσεις») | theory+challenge |
+| Πολυμέσα                                   | —                                | theory+quiz      |
+| Πνευματικά δικαιώματα                      | module10                         | theory+quiz      |
+| Κυβερνοασφάλεια, παραβιάσεις               | module8, module10                | theory           |
+| Η τεχνολογία στη ζωή μας / Εργονομία       | —                                | theory+quiz      |
+| Συχνά προβλήματα (troubleshooting)         | module9 (νέο challenge)          | theory+challenge |
+| Επιμόρφωση & εκπαίδευση                    | —                                | theory           |
 
 (Ο πλήρης, ανά-υποενότητα πίνακας υλοποιείται στο `build_manifest.py`. Επισκοπήσεις = theory.)
 
 ## 6. Ασφάλεια repo (πριν γίνει public)
 
 Checklist που θα τρέξει ως ξεχωριστό βήμα:
+
 - Σάρωση για secrets/API tokens/Turso credentials σε όλο το tree **και στο git history**.
 - Επιβεβαίωση ότι `.env`, `local.db`, `.beads/` (Dolt creds) είναι gitignored & δεν έχουν committed.
 - `.env.example` χωρίς πραγματικές τιμές (υπάρχει ήδη).
@@ -153,14 +156,14 @@ Checklist που θα τρέξει ως ξεχωριστό βήμα:
 
 ## 8. Μονάδες & όρια (για isolation)
 
-| Μονάδα | Τι κάνει | Εξαρτήσεις |
-|---|---|---|
-| `build_manifest.py` | Παράγει `content/manifest.json` από cache + mapping | `_cache/*.json` |
-| `resolveContentUrl` | base + relPath → πλήρες URL | `PUBLIC_CONTENT_BASE_URL` |
-| `MarkdownView.svelte` | fetch + parse + sanitize + render | marked, dompurify, resolveContentUrl |
-| `ReadingLesson.svelte` | reading lesson + goal read-content | MarkdownView, goalHandlers |
-| `/library` routes | δέντρο + ανάγνωση υποενότητας | manifest, MarkdownView |
-| seed (reading + quiz) | δημιουργεί lessons από manifest | manifest, schema |
+| Μονάδα                 | Τι κάνει                                            | Εξαρτήσεις                           |
+| ---------------------- | --------------------------------------------------- | ------------------------------------ |
+| `build_manifest.py`    | Παράγει `content/manifest.json` από cache + mapping | `_cache/*.json`                      |
+| `resolveContentUrl`    | base + relPath → πλήρες URL                         | `PUBLIC_CONTENT_BASE_URL`            |
+| `MarkdownView.svelte`  | fetch + parse + sanitize + render                   | marked, dompurify, resolveContentUrl |
+| `ReadingLesson.svelte` | reading lesson + goal read-content                  | MarkdownView, goalHandlers           |
+| `/library` routes      | δέντρο + ανάγνωση υποενότητας                       | manifest, MarkdownView               |
+| seed (reading + quiz)  | δημιουργεί lessons από manifest                     | manifest, schema                     |
 
 ## 9. Testing
 

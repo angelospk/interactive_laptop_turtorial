@@ -9,21 +9,21 @@ import type { UserSession } from '$lib/types';
  */
 
 export async function createUser(username: string, displayName?: string): Promise<User> {
-    const [user] = await db
-        .insert(users)
-        .values({
-            username,
-            displayName: displayName || username,
-            lastLogin: new Date()
-        })
-        .returning();
+	const [user] = await db
+		.insert(users)
+		.values({
+			username,
+			displayName: displayName || username,
+			lastLogin: new Date()
+		})
+		.returning();
 
-    return user;
+	return user;
 }
 
 export async function getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
-    return user;
+	const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+	return user;
 }
 
 /**
@@ -32,49 +32,49 @@ export async function getUserByUsername(username: string): Promise<User | undefi
  * previous login time (bd-hem).
  */
 export async function updateLastLogin(userId: string): Promise<User | undefined> {
-    const [user] = await db
-        .update(users)
-        .set({ lastLogin: new Date() })
-        .where(eq(users.id, userId))
-        .returning();
-    return user;
+	const [user] = await db
+		.update(users)
+		.set({ lastLogin: new Date() })
+		.where(eq(users.id, userId))
+		.returning();
+	return user;
 }
 
 export async function loginOrCreateUser(username: string): Promise<UserSession> {
-    // Validate username
-    const sanitized = username.trim().toLowerCase();
-    if (!sanitized || sanitized.length < 2) {
-        throw new Error('Username must be at least 2 characters');
-    }
+	// Validate username
+	const sanitized = username.trim().toLowerCase();
+	if (!sanitized || sanitized.length < 2) {
+		throw new Error('Username must be at least 2 characters');
+	}
 
-    // Find or create user
-    let user = await getUserByUsername(sanitized);
+	// Find or create user
+	let user = await getUserByUsername(sanitized);
 
-    if (!user) {
-        user = await createUser(sanitized, sanitized);
-    } else {
-        // Use the refreshed row: the cookie is signed from what we return here.
-        user = (await updateLastLogin(user.id)) ?? user;
-    }
+	if (!user) {
+		user = await createUser(sanitized, sanitized);
+	} else {
+		// Use the refreshed row: the cookie is signed from what we return here.
+		user = (await updateLastLogin(user.id)) ?? user;
+	}
 
-    return toUserSession(user);
+	return toUserSession(user);
 }
 
 /** Maps a DB user row to the public session shape (used for login + preference updates). */
 export function toUserSession(user: User): UserSession {
-    return {
-        id: user.id,
-        username: user.username,
-        displayName: user.displayName || undefined,
-        lastLogin: user.lastLogin || undefined,
-        isAdmin: user.isAdmin || false,
-        preferredDevice: user.preferredDevice ?? null
-    };
+	return {
+		id: user.id,
+		username: user.username,
+		displayName: user.displayName || undefined,
+		lastLogin: user.lastLogin || undefined,
+		isAdmin: user.isAdmin || false,
+		preferredDevice: user.preferredDevice ?? null
+	};
 }
 
 export async function getUserById(userId: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-    return user;
+	const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+	return user;
 }
 
 /**
@@ -83,13 +83,13 @@ export async function getUserById(userId: string): Promise<User | undefined> {
  * is gone.
  */
 export async function updatePreferredDevice(
-    userId: string,
-    device: PreferredDevice
+	userId: string,
+	device: PreferredDevice
 ): Promise<UserSession | null> {
-    const [user] = await db
-        .update(users)
-        .set({ preferredDevice: device })
-        .where(eq(users.id, userId))
-        .returning();
-    return user ? toUserSession(user) : null;
+	const [user] = await db
+		.update(users)
+		.set({ preferredDevice: device })
+		.where(eq(users.id, userId))
+		.returning();
+	return user ? toUserSession(user) : null;
 }

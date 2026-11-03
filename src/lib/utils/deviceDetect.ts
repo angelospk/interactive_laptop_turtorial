@@ -53,8 +53,7 @@ function applyIpadTrap(device: Device, nav: Navigator): Device {
 }
 
 export function detectDevice(navigatorLike?: Navigator): DeviceGuess {
-	const nav =
-		navigatorLike ?? (typeof navigator !== 'undefined' ? navigator : undefined);
+	const nav = navigatorLike ?? (typeof navigator !== 'undefined' ? navigator : undefined);
 	if (!nav) return UNKNOWN;
 
 	const hinted = fromUserAgentData(nav as NavWithUAData);

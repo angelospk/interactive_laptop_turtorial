@@ -11,6 +11,7 @@
 **Scope note:** Αυτό το plan = θεμέλιο (infra + reading + library + mapping seed). Τα νέα quizzes (πνευματικά δικαιώματα, εργονομία, κ.λπ.) και νέα interactive challenges (Social, Παρουσιάσεις, Troubleshooting) είναι ξεχωριστά plans/φάσεις — απαιτούν authoring περιεχομένου.
 
 **Key facts verified in codebase:**
+
 - `lesson.titleKey`/`descriptionKey` αποδίδονται παντού με fallback `m[key]?.() || key` (LessonCard.svelte:24, LessonTemplate.svelte:17). → Βάζουμε ελληνικούς τίτλους **inline**, χωρίς νέα i18n keys.
 - Νέος lessonType προστίθεται στο map του `LessonRenderer.svelte` (γραμμές 16-46).
 - Seeds: `seeds/index.ts` συγκεντρώνει arrays· `validateLessons()` πετάει error αν `config.goal` δεν είναι valid goal. Reading lessons **δεν** έχουν `goal` → δεν επηρεάζονται.
@@ -22,30 +23,31 @@
 
 ## File Structure
 
-| Αρχείο | Ευθύνη | Create/Modify |
-|---|---|---|
-| `exported_courses/build_manifest.py` | Ενιαίος builder: render md (ascii paths) + `content/manifest.json` | Create |
-| `content/manifest.json` | Πηγή αλήθειας ιεραρχίας + mapping | Create (generated) |
-| `content/md/**` | Τα markdown (ascii paths) | Create (generated) |
-| `static/content` | symlink → `../content` (τοπικό serving πριν το public) | Create |
-| `.env.example` | Προσθήκη `PUBLIC_CONTENT_BASE_URL` | Modify |
-| `src/lib/content/contentUrl.ts` | `resolveContentUrl(relPath, base?)` | Create |
-| `src/lib/content/contentUrl.test.ts` | Unit test | Create |
-| `src/lib/content/manifest.ts` | Τύποι + `loadManifest(fetch)` | Create |
-| `src/lib/components/content/MarkdownView.svelte` | fetch+parse+sanitize+render md | Create |
-| `src/lib/components/content/MarkdownView.test.ts` | parse/sanitize unit test | Create |
-| `src/lib/components/lessons/interactive/ReadingLesson.svelte` | reading lesson UI | Create |
-| `src/lib/components/lessons/LessonRenderer.svelte` | register `reading` type | Modify (line ~44) |
-| `src/lib/db/seeds/eapsi-reading-lessons.ts` | reading lessons από manifest | Create (generated) |
-| `src/lib/db/seeds/index.ts` | import + spread reading lessons | Modify |
-| `src/routes/library/+page.server.ts` + `+page.svelte` | δέντρο βιβλιοθήκης | Create |
-| `src/routes/library/[course]/[sub]/+page.server.ts` + `+page.svelte` | ανάγνωση υποενότητας | Create |
+| Αρχείο                                                               | Ευθύνη                                                             | Create/Modify      |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------ |
+| `exported_courses/build_manifest.py`                                 | Ενιαίος builder: render md (ascii paths) + `content/manifest.json` | Create             |
+| `content/manifest.json`                                              | Πηγή αλήθειας ιεραρχίας + mapping                                  | Create (generated) |
+| `content/md/**`                                                      | Τα markdown (ascii paths)                                          | Create (generated) |
+| `static/content`                                                     | symlink → `../content` (τοπικό serving πριν το public)             | Create             |
+| `.env.example`                                                       | Προσθήκη `PUBLIC_CONTENT_BASE_URL`                                 | Modify             |
+| `src/lib/content/contentUrl.ts`                                      | `resolveContentUrl(relPath, base?)`                                | Create             |
+| `src/lib/content/contentUrl.test.ts`                                 | Unit test                                                          | Create             |
+| `src/lib/content/manifest.ts`                                        | Τύποι + `loadManifest(fetch)`                                      | Create             |
+| `src/lib/components/content/MarkdownView.svelte`                     | fetch+parse+sanitize+render md                                     | Create             |
+| `src/lib/components/content/MarkdownView.test.ts`                    | parse/sanitize unit test                                           | Create             |
+| `src/lib/components/lessons/interactive/ReadingLesson.svelte`        | reading lesson UI                                                  | Create             |
+| `src/lib/components/lessons/LessonRenderer.svelte`                   | register `reading` type                                            | Modify (line ~44)  |
+| `src/lib/db/seeds/eapsi-reading-lessons.ts`                          | reading lessons από manifest                                       | Create (generated) |
+| `src/lib/db/seeds/index.ts`                                          | import + spread reading lessons                                    | Modify             |
+| `src/routes/library/+page.server.ts` + `+page.svelte`                | δέντρο βιβλιοθήκης                                                 | Create             |
+| `src/routes/library/[course]/[sub]/+page.server.ts` + `+page.svelte` | ανάγνωση υποενότητας                                               | Create             |
 
 ---
 
 ### Task 1: Dependencies & env config
 
 **Files:**
+
 - Modify: `package.json` (deps), `.env.example`
 
 - [ ] **Step 1: Install runtime deps**
@@ -85,6 +87,7 @@ git commit -m "chore: add marked+dompurify deps and PUBLIC_CONTENT_BASE_URL"
 Ενιαίο Python script που διαβάζει τα cache JSON (`exported_courses/_cache/`) και γράφει `content/md/**` (ascii paths) + `content/manifest.json`. Αντικαθιστά τη λογική του `build_md.py` με ascii paths + manifest.
 
 **Files:**
+
 - Create: `exported_courses/build_manifest.py`
 
 - [ ] **Step 1: Write the builder script**
@@ -281,6 +284,7 @@ git commit -m "feat: add unified content+manifest builder script"
 ### Task 3: Generate content + symlink + commit
 
 **Files:**
+
 - Create: `content/manifest.json`, `content/md/**`, `static/content` (symlink)
 
 - [ ] **Step 1: Run builder in venv**
@@ -291,6 +295,7 @@ python3 -m venv .venv && .venv/bin/pip install -q markdownify beautifulsoup4
 .venv/bin/python build_manifest.py
 cd ..
 ```
+
 Expected: `OK: <N> subsections, 6 courses` (N γύρω στο 75-80).
 
 - [ ] **Step 2: Validate manifest JSON + paths exist**
@@ -309,6 +314,7 @@ for c in m['courses']:
 print('valid', n)
 "
 ```
+
 Expected: `valid <N>` χωρίς AssertionError.
 
 - [ ] **Step 3: Create symlink for local serving**
@@ -316,6 +322,7 @@ Expected: `valid <N>` χωρίς AssertionError.
 ```bash
 ln -s ../content static/content
 ```
+
 Expected: `static/content` → `../content`. (Vercel static adapter σερβίρει το `static/`.)
 
 - [ ] **Step 4: Commit content**
@@ -330,6 +337,7 @@ git commit -m "feat: generate EAPSI course content (md + manifest)"
 ### Task 4: resolveContentUrl helper
 
 **Files:**
+
 - Create: `src/lib/content/contentUrl.ts`, `src/lib/content/contentUrl.test.ts`
 
 - [ ] **Step 1: Write failing test**
@@ -344,7 +352,9 @@ describe('joinContentUrl', () => {
 		expect(joinContentUrl('/content', 'md/esm001/c1/s1.md')).toBe('/content/md/esm001/c1/s1.md');
 	});
 	it('trims trailing slash on base', () => {
-		expect(joinContentUrl('https://cdn.example/x/', 'manifest.json')).toBe('https://cdn.example/x/manifest.json');
+		expect(joinContentUrl('https://cdn.example/x/', 'manifest.json')).toBe(
+			'https://cdn.example/x/manifest.json'
+		);
 	});
 	it('trims leading slash on relPath', () => {
 		expect(joinContentUrl('/content', '/manifest.json')).toBe('/content/manifest.json');
@@ -392,6 +402,7 @@ git commit -m "feat: add resolveContentUrl content base helper"
 ### Task 5: MarkdownView component
 
 **Files:**
+
 - Create: `src/lib/components/content/MarkdownView.svelte`, `src/lib/components/content/renderMarkdown.ts`, `src/lib/components/content/renderMarkdown.test.ts`
 
 Λογική parse/sanitize σε ξεχωριστό module (testable), component μόνο για fetch+render.
@@ -488,12 +499,14 @@ Expected: PASS (3 tests). (Αν `DOMPurify` χρειάζεται DOM στο vite
 
 {#if loading}
 	<div class="flex justify-center py-8">
-		<div class="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+		<div
+			class="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"
+		></div>
 	</div>
 {:else if error}
 	<p class="text-red-500">Σφάλμα φόρτωσης περιεχομένου: {error}</p>
 {:else}
-	<article class="prose prose-slate dark:prose-invert max-w-none">
+	<article class="prose max-w-none prose-slate dark:prose-invert">
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html html}
 	</article>
@@ -519,6 +532,7 @@ git commit -m "feat: add MarkdownView component with sanitized rendering"
 ### Task 6: ReadingLesson component + register type
 
 **Files:**
+
 - Create: `src/lib/components/lessons/interactive/ReadingLesson.svelte`
 - Modify: `src/lib/components/lessons/LessonRenderer.svelte` (~line 44)
 
@@ -576,6 +590,7 @@ git commit -m "feat: add reading lesson type + ReadingLesson component"
 Generator (Python, μέρος του build) που διαβάζει `content/manifest.json` και γράφει `src/lib/db/seeds/eapsi-reading-lessons.ts`. Δημιουργεί ένα reading lesson ανά (subsection × module) όπου το `kind` περιέχει `theory` και υπάρχει τουλάχιστον 1 module.
 
 **Files:**
+
 - Modify: `exported_courses/build_manifest.py` (πρόσθεσε `write_seed()`)
 - Create: `src/lib/db/seeds/eapsi-reading-lessons.ts` (generated)
 - Modify: `src/lib/db/seeds/index.ts`
@@ -652,19 +667,25 @@ def write_seed(manifest):
 ```bash
 cd exported_courses && .venv/bin/python build_manifest.py && cd ..
 ```
+
 Expected: ξαναγράφεται manifest + md + `src/lib/db/seeds/eapsi-reading-lessons.ts`.
 
 - [ ] **Step 3: Wire into seeds/index.ts**
 
 Στο `src/lib/db/seeds/index.ts`:
+
 1. Πρόσθεσε import μετά το `import { wordLessons } ...`:
+
 ```typescript
 import { eapsiReadingLessons } from './eapsi-reading-lessons';
 ```
+
 2. Στο `_allLessons` array, πρόσθεσε στο τέλος (πριν το `]`):
+
 ```typescript
     ,...eapsiReadingLessons
 ```
+
 3. Στο τελικό `export { ... }` block πρόσθεσε `eapsiReadingLessons`.
 
 - [ ] **Step 4: Verify validation passes (no unknown goal)**
@@ -684,6 +705,7 @@ git commit -m "feat: generate + wire EAPSI reading lessons seed"
 ### Task 8: Library routes
 
 **Files:**
+
 - Create: `src/lib/content/manifest.ts`
 - Create: `src/routes/library/+page.server.ts`, `src/routes/library/+page.svelte`
 - Create: `src/routes/library/[course]/[sub]/+page.server.ts`, `src/routes/library/[course]/[sub]/+page.svelte`
@@ -702,9 +724,20 @@ export interface Subsection {
 	modules: string[];
 	kind: string;
 }
-export interface Chapter { title: string; subsections: Subsection[]; }
-export interface Course { id: string; moduleNumber: number; title: string; courseUrl: string; chapters: Chapter[]; }
-export interface Manifest { courses: Course[]; }
+export interface Chapter {
+	title: string;
+	subsections: Subsection[];
+}
+export interface Course {
+	id: string;
+	moduleNumber: number;
+	title: string;
+	courseUrl: string;
+	chapters: Chapter[];
+}
+export interface Manifest {
+	courses: Course[];
+}
 
 export async function loadManifest(fetchFn: typeof fetch): Promise<Manifest> {
 	const res = await fetchFn(resolveContentUrl('manifest.json'));
@@ -754,7 +787,9 @@ export const load: PageServerLoad = async ({ fetch }) => {
 				<ul class="ml-4 list-disc space-y-1">
 					{#each chapter.subsections as sub}
 						<li>
-							<a class="underline hover:text-primary" href="/library/{course.id}/{sub.id}">{sub.title}</a>
+							<a class="underline hover:text-primary" href="/library/{course.id}/{sub.id}"
+								>{sub.title}</a
+							>
 						</li>
 					{/each}
 				</ul>
@@ -797,7 +832,11 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 			<h3 class="mb-2 font-semibold">Σχετικές ασκήσεις</h3>
 			<ul class="flex flex-wrap gap-2">
 				{#each data.sub.modules as mod}
-					<li><a class="rounded bg-secondary px-3 py-1 text-sm underline" href="/modules/{mod}">{mod}</a></li>
+					<li>
+						<a class="rounded bg-secondary px-3 py-1 text-sm underline" href="/modules/{mod}"
+							>{mod}</a
+						>
+					</li>
 				{/each}
 			</ul>
 		</div>
@@ -830,6 +869,7 @@ sleep 4
 curl -s localhost:5173/library | grep -q "Βιβλιοθήκη Θεωρίας" && echo "LIBRARY OK"
 kill %1
 ```
+
 Expected: `LIBRARY OK`.
 
 - [ ] **Step 2: Run full unit tests**
@@ -843,6 +883,7 @@ Expected: όλα PASS (συμπεριλαμβανομένων contentUrl, render
 git ls-files | grep -iE "\.env$|local\.db|\.dolt|secret|token" || echo "no tracked secrets"
 git log --all -p | grep -iE "TURSO_AUTH_TOKEN|api[_-]?key|secret" | head || echo "no secrets in history"
 ```
+
 Expected: `no tracked secrets` και κανένα πραγματικό token στο history. Αν βρεθεί κάτι → σταμάτα, ανέφερε στον χρήστη πριν το repo γίνει public.
 
 - [ ] **Step 4: Final commit (αν υπάρχουν αλλαγές)**
