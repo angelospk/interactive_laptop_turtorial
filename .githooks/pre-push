@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Local CI: runs before every `git push` and blocks the push on failure.
+# Enable once per clone: git config core.hooksPath .githooks
+# Skip once (emergency only): git push --no-verify
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+# Nothing to check when the push only deletes remote refs.
+# (Run by hand with no stdin, it always checks.)
+if [ ! -t 0 ]; then
+  refs=0 updates=0
+  while read -r _ local_sha _ _; do
+    refs=$((refs + 1))
+    case "$local_sha" in *[!0]*) updates=1 ;; esac
+  done
+  if [ "$refs" -gt 0 ] && [ "$updates" = 0 ]; then exit 0; fi
+fi
+
+# The checks run on the working tree, not on the pushed commits.
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+  echo "pre-push: warning: uncommitted changes are part of this check" >&2
+fi
+run() { echo "pre-push: $*" >&2; "$@"; }
+
+# Playwright e2e is too slow for every push; run `bun run test:e2e` by hand.
+run bun run check
+run bun run test:unit --run
