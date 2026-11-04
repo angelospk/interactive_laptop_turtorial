@@ -50,3 +50,6 @@ openspec/
 exported_courses/__pycache__/
 # Generated extraction cache (machine-specific absolute paths) — not source.
 exported_courses/_cache/
+
+# local logs
+*.log
